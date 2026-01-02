@@ -1,0 +1,20 @@
+name: sigil-inheriting
+description: Bootstrap design context from existing codebase
+version: "2.0.0"
+
+triggers:
+  - "/inherit"
+
+examples:
+  - input: "/inherit"
+    description: "Scan codebase and create draft design context"
+
+inputs: []
+
+outputs:
+  - path: sigil-mark/inventory.md
+    description: Component inventory
+  - path: sigil-mark/moodboard.md
+    description: Draft moodboard (needs review)
+  - path: sigil-mark/rules.md
+    description: Draft rules (needs review)

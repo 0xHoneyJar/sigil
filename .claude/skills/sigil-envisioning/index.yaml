@@ -1,0 +1,16 @@
+name: sigil-envisioning
+description: Capture product moodboard through interview
+version: "2.0.0"
+
+triggers:
+  - "/envision"
+
+examples:
+  - input: "/envision"
+    description: "Start moodboard capture interview"
+
+inputs: []
+
+outputs:
+  - path: sigil-mark/moodboard.md
+    description: Product moodboard with design context
