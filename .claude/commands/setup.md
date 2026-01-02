@@ -1,35 +1,28 @@
 ---
 name: "setup"
-version: "2.0.0"
+version: "1.1.0"
 description: |
-  Initialize Sigil design context framework on a repository.
-  Detects component directories, creates state files, and prepares for design capture.
+  First-time Loa setup wizard for onboarding and project initialization.
+  Detects user type, configures MCP integrations, initializes analytics.
 
-command_type: "init"
+command_type: "wizard"
 
 arguments: []
 
 pre_flight:
-  - check: "file_exists"
-    path: ".sigil-version.json"
-    error: "Sigil not mounted. Run mount-sigil.sh first."
+  - check: "file_not_exists"
+    path: ".loa-setup-complete"
+    error: "Setup already completed. Run /config to modify MCP settings."
+
+integrations_source: ".claude/mcp-registry.yaml"
 
 outputs:
-  - path: "sigil-mark/moodboard.md"
+  - path: ".loa-setup-complete"
     type: "file"
-    description: "Empty moodboard template"
-  - path: "sigil-mark/rules.md"
+    description: "Setup marker with user type and configuration"
+  - path: "loa-grimoire/analytics/usage.json"
     type: "file"
-    description: "Empty rules template"
-  - path: "sigil-mark/inventory.md"
-    type: "file"
-    description: "Empty inventory file"
-  - path: ".sigilrc.yaml"
-    type: "file"
-    description: "Zone configuration with detected paths"
-  - path: ".sigil-setup-complete"
-    type: "file"
-    description: "Setup completion marker"
+    description: "Analytics file (THJ users only)"
 
 mode:
   default: "foreground"
@@ -40,7 +33,7 @@ mode:
 
 ## Purpose
 
-Initialize Sigil design context framework on a repository. Detects component directories, creates state files, and prepares for design capture.
+First-time setup wizard that initializes Loa for a new project. Determines user type (THJ vs OSS), configures MCP integrations, and initializes analytics tracking.
 
 ## Invocation
 
@@ -48,89 +41,79 @@ Initialize Sigil design context framework on a repository. Detects component dir
 /setup
 ```
 
-## Prerequisites
-
-- Sigil must be mounted (`.sigil-version.json` exists)
-
 ## Workflow
 
-### Step 1: Pre-flight Checks
+### Phase 0: User Type Detection
 
-1. Verify `.sigil-version.json` exists (Sigil is mounted)
-2. Check if `.sigil-setup-complete` already exists (warn if so)
+Ask the user to identify their pathway:
+- **THJ Developer**: Full analytics, MCP configuration, `/feedback` and `/config` access
+- **OSS User**: Streamlined setup, no analytics, documentation pointers
 
-### Step 2: Detect Component Directories
+### Phase 0.5: Template Detection
 
-Scan for common component directory patterns:
-- `components/`
-- `app/components/`
-- `src/components/`
-- `lib/components/`
-- `src/ui/`
-- `src/features/**/components/`
+Detect if this repository is a fork/template of Loa:
 
-Use the `detect-components.sh` script:
+1. Check origin remote URL for known templates
+2. Check upstream/loa remote for template references
+3. Query GitHub API for fork relationship (if `gh` CLI available)
+
+Store detection result for Git Safety features.
+
+### Phase 0.6: Optional Enhancement Detection
+
+Check for optional enhancement tools and display status:
+
+**ck (Semantic Code Search)**:
 ```bash
-.claude/skills/sigil-setup/scripts/detect-components.sh
+if command -v ck >/dev/null 2>&1; then
+    CK_VERSION=$(ck --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' || echo "unknown")
+    echo "✓ ck installed: ${CK_VERSION}"
+    HAS_CK=true
+else
+    echo "○ ck not installed (optional)"
+    echo "  For semantic search: cargo install ck-search"
+    echo "  See INSTALLATION.md for details"
+    HAS_CK=false
+fi
 ```
 
-### Step 3: Create State Directory
-
-Create `sigil-mark/` with templates:
-
+**bd (Beads Task Tracker)**:
 ```bash
-mkdir -p sigil-mark
+if command -v bd >/dev/null 2>&1; then
+    BD_VERSION=$(bd version 2>/dev/null || echo "unknown")
+    echo "✓ bd installed: ${BD_VERSION}"
+    HAS_BD=true
+else
+    echo "○ bd not installed (optional)"
+    echo "  For task tracking: See https://github.com/steveyegge/beads"
+    HAS_BD=false
+fi
 ```
 
-Copy templates from `.claude/templates/`:
-- `moodboard.md` → `sigil-mark/moodboard.md`
-- `rules.md` → `sigil-mark/rules.md`
+Store enhancement status in marker file for future reference.
 
-Create empty `sigil-mark/inventory.md`.
+### Phase 1A: THJ Developer Setup
 
-### Step 4: Create Configuration
+1. Display welcome message with command overview
+2. Show analytics notice (cannot be disabled)
+3. Initialize `loa-grimoire/analytics/usage.json`
+4. Offer MCP integration selection (multiSelect)
+5. Provide setup instructions for selected MCPs
+6. Display optional enhancement status (ck and bd)
+7. Create `.loa-setup-complete` marker with enhancement info
+8. Display completion message based on installed tools:
+   - Both ck + bd: "Setup complete with full enhancement suite"
+   - Only ck: "Setup complete with semantic search"
+   - Only bd: "Setup complete with task tracking"
+   - Neither: "Setup complete. For enhanced capabilities, see INSTALLATION.md"
 
-Create `.sigilrc.yaml` with detected component paths:
+### Phase 1B: OSS User Setup
 
-```yaml
-version: "1.0"
-
-component_paths:
-  - "components/"        # Add detected paths
-  - "app/components/"
-
-zones:
-  critical:
-    paths: []
-    motion: "deliberate"
-    patterns:
-      prefer: ["deliberate-entrance"]
-      warn: ["instant-transition"]
-
-  marketing:
-    paths: []
-    motion: "playful"
-    patterns:
-      prefer: ["playful-bounce"]
-
-  admin:
-    paths: []
-    motion: "snappy"
-
-rejections: []
-```
-
-### Step 5: Create Marker
-
-Create `.sigil-setup-complete` marker:
-
-```
-Sigil setup completed at [timestamp]
-```
-
-### Step 6: Report Success
-
-Output created files and next steps.
+1. Display welcome message with documentation pointers
+2. Display optional enhancement status (ck and bd)
+3. Create `.loa-setup-complete` marker (no analytics) with enhancement info
+4. Display completion message based on installed tools
+5. Point to GitHub issues for support
 
 ## Arguments
 
@@ -142,49 +125,77 @@ Output created files and next steps.
 
 | Path | Description |
 |------|-------------|
-| `sigil-mark/moodboard.md` | Empty moodboard template |
-| `sigil-mark/rules.md` | Empty rules template |
-| `sigil-mark/inventory.md` | Empty inventory file |
-| `.sigilrc.yaml` | Zone configuration with detected paths |
-| `.sigil-setup-complete` | Setup completion marker |
+| `.loa-setup-complete` | Marker file with user type and config |
+| `loa-grimoire/analytics/usage.json` | Usage metrics (THJ only) |
+| `loa-grimoire/analytics/summary.md` | Human-readable summary (THJ only) |
 
-## Idempotency
+## User Type Differences
 
-If already set up:
-1. Warn user that setup is already complete
-2. Offer to refresh symlinks only
-3. Never overwrite existing state files
+| Feature | THJ Developer | OSS User |
+|---------|---------------|----------|
+| Analytics | Full tracking | None |
+| `/feedback` | Available | Unavailable |
+| `/config` | Available | Unavailable |
+| MCP Setup | Guided wizard | Manual |
 
-## Output Format
+## MCP Integrations
 
+Available servers are defined in `.claude/mcp-registry.yaml`.
+
+Use helper scripts to query the registry:
+```bash
+.claude/scripts/mcp-registry.sh list      # List all servers
+.claude/scripts/mcp-registry.sh groups    # List server groups
+.claude/scripts/mcp-registry.sh info <server>  # Get setup instructions
 ```
-Sigil Setup Complete
 
-Detected component paths:
-  - components/
-  - src/features/**/components/
+### Server Groups (THJ developers)
 
-Created:
-  - sigil-mark/moodboard.md (template)
-  - sigil-mark/rules.md (template)
-  - sigil-mark/inventory.md (empty)
-  - .sigilrc.yaml (configuration)
-  - .sigil-setup-complete (marker)
+| Group | Description | Servers |
+|-------|-------------|---------|
+| essential | Recommended for all | linear, github |
+| deployment | Production workflows | github, vercel |
+| crypto | Blockchain projects | web3-stats, github |
+| communication | Team communication | discord |
+| productivity | Document tools | gdrive |
 
-Next steps:
-  - New project: /envision to capture product feel
-  - Existing codebase: /inherit to bootstrap from components
+## Marker File Format
+
+```json
+{
+  "completed_at": "ISO-8601 timestamp",
+  "framework_version": "0.7.0",
+  "user_type": "thj|oss",
+  "mcp_servers": ["list", "of", "configured"],
+  "git_user": "developer@example.com",
+  "template_source": {
+    "detected": true,
+    "repo": "0xHoneyJar/loa",
+    "detection_method": "origin_url",
+    "detected_at": "ISO-8601 timestamp"
+  },
+  "enhancements": {
+    "ck": {
+      "installed": true,
+      "version": "0.7.0",
+      "checked_at": "ISO-8601 timestamp"
+    },
+    "bd": {
+      "installed": false,
+      "version": null,
+      "checked_at": "ISO-8601 timestamp"
+    }
+  }
+}
 ```
 
 ## Error Handling
 
 | Error | Cause | Resolution |
 |-------|-------|------------|
-| "Sigil not mounted" | Missing `.sigil-version.json` | Run mount-sigil.sh first |
-| "Already set up" | `.sigil-setup-complete` exists | Use existing setup or delete marker |
+| "Setup already completed" | `.loa-setup-complete` exists | Run `/config` to modify MCP settings |
+| "Cannot determine user type" | User didn't respond | Re-run `/setup` and select an option |
 
 ## Next Step
 
-After setup:
-- **New project**: `/envision` to capture product moodboard
-- **Existing codebase**: `/inherit` to bootstrap from existing components
+After setup: `/plan-and-analyze` to create Product Requirements Document
