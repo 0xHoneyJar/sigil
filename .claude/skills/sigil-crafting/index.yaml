@@ -1,0 +1,22 @@
+name: sigil-crafting
+description: Provide design guidance during implementation
+version: "2.0.0"
+
+triggers:
+  - "/craft"
+
+examples:
+  - input: "/craft"
+    description: "Get general design guidance"
+  - input: "/craft src/components/Button.tsx"
+    description: "Get zone-specific guidance for a file"
+  - input: "/craft \"How should modals animate?\""
+    description: "Ask a design question"
+
+inputs:
+  - name: context
+    type: string
+    required: false
+    description: File path or design question
+
+outputs: []

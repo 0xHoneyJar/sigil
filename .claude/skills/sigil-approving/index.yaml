@@ -1,0 +1,24 @@
+name: sigil-approving
+description: Human review and sign-off on design patterns
+version: "2.0.0"
+
+triggers:
+  - "/approve"
+
+examples:
+  - input: "/approve Button"
+    description: "Approve Button component"
+  - input: "/approve \"motion in checkout\""
+    description: "Approve motion pattern"
+  - input: "/approve CartSummary"
+    description: "Approve specific component"
+
+inputs:
+  - name: target
+    type: string
+    required: true
+    description: Component or pattern name to approve
+
+outputs:
+  - path: sigil-mark/rules.md
+    description: Updated with approval record
