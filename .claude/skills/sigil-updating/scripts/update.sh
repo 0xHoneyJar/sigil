@@ -1,163 +1,146 @@
-#!/bin/bash
-# Update Sigil framework to latest version
-# Usage: ./update.sh [--check] [--force]
-#
-# Examples:
-#   ./update.sh              # Update to latest
-#   ./update.sh --check      # Check for updates only
-#   ./update.sh --force      # Force refresh even if current
-
+#!/usr/bin/env bash
+# Sigil Update Script
+# Usage: update.sh [--check] [--force]
 set -e
 
-ORIGINAL_DIR=$(pwd)
+# === Colors ===
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+log() { echo -e "${GREEN}[sigil]${NC} $*"; }
+warn() { echo -e "${YELLOW}[sigil]${NC} $*"; }
+info() { echo -e "${CYAN}[sigil]${NC} $*"; }
+
+# === Parse Arguments ===
 CHECK_ONLY=false
 FORCE=false
 
-# Parse arguments
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --check)
-      CHECK_ONLY=true
-      shift
-      ;;
-    --force)
-      FORCE=true
-      shift
-      ;;
-    *)
-      shift
-      ;;
+    --check) CHECK_ONLY=true; shift ;;
+    --force) FORCE=true; shift ;;
+    *) shift ;;
   esac
 done
 
-# Check if sigil is mounted
+# === Check Prerequisites ===
 if [[ ! -f ".sigil-version.json" ]]; then
-  echo "ERROR: Sigil not mounted on this repository."
-  echo "Run /sigil mount first."
+  echo "ERROR: Sigil not mounted. Run mount-sigil.sh first."
   exit 1
 fi
 
-# Read current version info
-if command -v yq &> /dev/null; then
-  CURRENT_VERSION=$(yq -r '.version' .sigil-version.json)
-  SIGIL_HOME=$(yq -r '.sigil_home' .sigil-version.json)
+# Read current config
+if command -v jq &> /dev/null; then
+  SIGIL_HOME=$(jq -r '.sigil_home' .sigil-version.json)
+  CURRENT_VERSION=$(jq -r '.version' .sigil-version.json)
 else
-  CURRENT_VERSION=$(grep '"version"' .sigil-version.json | sed 's/.*: "\(.*\)".*/\1/')
-  SIGIL_HOME=$(grep '"sigil_home"' .sigil-version.json | sed 's/.*: "\(.*\)".*/\1/')
+  SIGIL_HOME=$(grep -o '"sigil_home"[[:space:]]*:[[:space:]]*"[^"]*"' .sigil-version.json | cut -d'"' -f4)
+  CURRENT_VERSION=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' .sigil-version.json | cut -d'"' -f4)
 fi
 
-echo "Current version: $CURRENT_VERSION"
-echo "Sigil home: $SIGIL_HOME"
-echo ""
-
-# Check if framework exists
 if [[ ! -d "$SIGIL_HOME" ]]; then
-  echo "ERROR: Sigil framework not found at $SIGIL_HOME"
-  echo "The framework may have been moved or deleted."
-  echo ""
-  echo "To reinstall:"
-  echo "  rm .sigil-version.json"
-  echo "  /sigil mount"
+  echo "ERROR: Sigil home not found at $SIGIL_HOME"
   exit 1
 fi
 
-# Change to sigil home
+# === Fetch Remote ===
 cd "$SIGIL_HOME"
-
-# Fetch latest from remote
-echo "Checking for updates..."
 git fetch origin main --quiet 2>/dev/null || {
-  echo "WARNING: Could not fetch from remote. Continuing with local version."
+  warn "Could not fetch remote. Working offline."
 }
 
 # Get versions
-LOCAL_VERSION=$(cat VERSION 2>/dev/null || echo "$CURRENT_VERSION")
+LOCAL_VERSION=$(cat VERSION 2>/dev/null || echo "unknown")
 REMOTE_VERSION=$(git show origin/main:VERSION 2>/dev/null || echo "$LOCAL_VERSION")
 
-echo "Local version: $LOCAL_VERSION"
-echo "Remote version: $REMOTE_VERSION"
-echo ""
+cd - > /dev/null
 
-# Compare versions
-if [[ "$LOCAL_VERSION" == "$REMOTE_VERSION" && "$FORCE" != "true" ]]; then
-  echo "Already at latest version: $LOCAL_VERSION"
-  echo ""
-  echo "Use --force to refresh symlinks anyway."
-  exit 0
-fi
-
-if [[ "$LOCAL_VERSION" != "$REMOTE_VERSION" ]]; then
-  echo "Update available: $LOCAL_VERSION → $REMOTE_VERSION"
-  echo ""
-
-  # Show changelog
-  echo "Changes:"
-  echo "--------"
-  git log --oneline "$LOCAL_VERSION..origin/main" 2>/dev/null | head -20 || \
-    git log --oneline -10 origin/main 2>/dev/null || \
-    echo "  (changelog not available)"
-  echo ""
-fi
-
-# Check only mode
+# === Check Mode ===
 if [[ "$CHECK_ONLY" == "true" ]]; then
-  echo "Run '/sigil update' to apply."
+  echo ""
+  log "Sigil Update Check"
+  echo ""
+  info "Current version: $CURRENT_VERSION"
+  info "Local version:   $LOCAL_VERSION"
+  info "Remote version:  $REMOTE_VERSION"
+  echo ""
+
+  if [[ "$LOCAL_VERSION" != "$REMOTE_VERSION" ]]; then
+    log "Status: Update available"
+    echo ""
+    info "Run '/update' to apply updates."
+  else
+    log "Status: Up to date"
+  fi
   exit 0
 fi
+
+# === Apply Updates ===
+if [[ "$LOCAL_VERSION" == "$REMOTE_VERSION" ]] && [[ "$FORCE" != "true" ]]; then
+  log "Sigil is up to date (version $LOCAL_VERSION)"
+  echo ""
+  info "Use '--force' to refresh symlinks anyway."
+  exit 0
+fi
+
+log "Updating Sigil..."
 
 # Pull updates
-echo "Pulling updates..."
-git stash --quiet 2>/dev/null || true
-git pull origin main --quiet 2>/dev/null || echo "WARNING: Could not pull updates."
-git stash pop --quiet 2>/dev/null || true
-
-# Return to original directory
-cd "$ORIGINAL_DIR"
+cd "$SIGIL_HOME"
+git pull origin main --quiet 2>/dev/null || warn "Pull failed, using cached version"
+NEW_VERSION=$(cat VERSION 2>/dev/null || echo "$LOCAL_VERSION")
+cd - > /dev/null
 
 # Refresh symlinks
-echo "Refreshing symlinks..."
+log "Refreshing symlinks..."
 
-# Remove old symlinks
-rm -f .claude/skills/sigil-* 2>/dev/null || true
-for cmd in taste query export showcase mount update moodboard; do
-  rm -f ".claude/commands/${cmd}.md" 2>/dev/null || true
-done
-
-# Create fresh skill symlinks
+# Skills
+skill_count=0
 for skill in "$SIGIL_HOME/.claude/skills/sigil-"*; do
   if [[ -d "$skill" ]]; then
-    ln -sf "$skill" .claude/skills/
+    skill_name=$(basename "$skill")
+    rm -rf ".claude/skills/$skill_name"
+    ln -sf "$skill" ".claude/skills/$skill_name"
+    ((skill_count++))
   fi
 done
 
-# Create fresh command symlinks
-for cmd in taste query export showcase mount update moodboard; do
+# Commands
+cmd_count=0
+for cmd in setup envision codify craft approve inherit update; do
   if [[ -f "$SIGIL_HOME/.claude/commands/${cmd}.md" ]]; then
-    ln -sf "$SIGIL_HOME/.claude/commands/${cmd}.md" .claude/commands/
+    rm -f ".claude/commands/${cmd}.md"
+    ln -sf "$SIGIL_HOME/.claude/commands/${cmd}.md" ".claude/commands/${cmd}.md"
+    ((cmd_count++))
   fi
 done
-
-# Count what was symlinked
-SKILL_COUNT=$(find .claude/skills -type l -name "sigil-*" 2>/dev/null | wc -l | tr -d ' ')
-CMD_COUNT=$(find .claude/commands -type l -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
 
 # Update version file
-MOUNTED_AT=$(grep '"mounted_at"' .sigil-version.json 2>/dev/null | sed 's/.*: "\(.*\)".*/\1/' || echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)")
+if command -v jq &> /dev/null; then
+  jq --arg v "$NEW_VERSION" --arg t "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    '.version = $v | .updated_at = $t' .sigil-version.json > .sigil-version.json.tmp
+  mv .sigil-version.json.tmp .sigil-version.json
+else
+  # Simple sed fallback
+  sed -i.bak "s/\"version\"[[:space:]]*:[[:space:]]*\"[^\"]*\"/\"version\": \"$NEW_VERSION\"/" .sigil-version.json
+  sed -i.bak "s/\"updated_at\"[[:space:]]*:[[:space:]]*\"[^\"]*\"/\"updated_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"/" .sigil-version.json
+  rm -f .sigil-version.json.bak
+fi
 
-cat > .sigil-version.json << EOF
-{
-  "version": "$REMOTE_VERSION",
-  "mounted_at": "$MOUNTED_AT",
-  "updated_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "sigil_home": "$SIGIL_HOME"
-}
-EOF
-
 echo ""
-echo "✓ Sigil updated to $REMOTE_VERSION"
+log "Sigil Updated"
 echo ""
-echo "Symlinks refreshed:"
-echo "  - $SKILL_COUNT skills"
-echo "  - $CMD_COUNT commands"
+info "Previous version: $CURRENT_VERSION"
+info "New version:      $NEW_VERSION"
 echo ""
-echo "You may need to restart Claude Code to load new commands."
+info "Refreshed:"
+info "  - $skill_count skills"
+info "  - $cmd_count commands"
+echo ""
+info "Your state files are preserved:"
+info "  - sigil-mark/moodboard.md"
+info "  - sigil-mark/rules.md"
+info "  - .sigilrc.yaml"
+echo ""

@@ -1,0 +1,154 @@
+{
+  "version": "0.1.0",
+  "created": 1767335068,
+  "updated": 1767335075,
+  "files": {
+    "./loa-grimoire/reality/structure.md": {
+      "path": "./loa-grimoire/reality/structure.md",
+      "hash": "0f63fecad57eda712a325db0a161c73f1b1fd512722bf4c947a880d78edbbe2a",
+      "last_modified": 1767334769,
+      "size": 2335
+    },
+    "./loa-grimoire/a2a/sprint-2/COMPLETED": {
+      "path": "./loa-grimoire/a2a/sprint-2/COMPLETED",
+      "hash": "af7cd7831989d8d99174d962940aa44e7c928f00219af436e7c46c035717fae4",
+      "last_modified": 1767335014,
+      "size": 172
+    },
+    "./loa-grimoire/sprint.md": {
+      "path": "./loa-grimoire/sprint.md",
+      "hash": "c01fbea49549c6fa345213b20232e61b166aa9109ca23e96e24c2529907e8fd1",
+      "last_modified": 1767334917,
+      "size": 11171
+    },
+    "./loa-grimoire/prd.md": {
+      "path": "./loa-grimoire/prd.md",
+      "hash": "069a06a44ad8c56b78fd353cd0612e0949847cc7d4d550f922a27e4b425b2c7c",
+      "last_modified": 1767333995,
+      "size": 12061
+    },
+    "./loa-grimoire/a2a/sprint-1/reviewer.md": {
+      "path": "./loa-grimoire/a2a/sprint-1/reviewer.md",
+      "hash": "9d7f4e484789c14b9ed7ca438ec48a0be503431a5a79626478bf3a524c7eaa95",
+      "last_modified": 1767334409,
+      "size": 5711
+    },
+    "./loa-grimoire/legacy/doc-files.txt": {
+      "path": "./loa-grimoire/legacy/doc-files.txt",
+      "hash": "ca9fbe3111edbb920ffce62aac153eca609acf44e1ac038f1767142082b7ab1a",
+      "last_modified": 1767334873,
+      "size": 68
+    },
+    "./loa-grimoire/drift-report.md": {
+      "path": "./loa-grimoire/drift-report.md",
+      "hash": "065a36a5370e700657cc4939190175fe406ffa0b3251fbe7ecfcfa7c5c4abe05",
+      "last_modified": 1767334958,
+      "size": 5509
+    },
+    "./loa-grimoire/reality/hygiene-report.md": {
+      "path": "./loa-grimoire/reality/hygiene-report.md",
+      "hash": "f2f6626a088659a074edcced672992d310fa39eb4c00024bffc22d6970c4ea75",
+      "last_modified": 1767334856,
+      "size": 2157
+    },
+    "./AGENTS.md": {
+      "path": "./AGENTS.md",
+      "hash": "29dd204e51e1d6e2a4903b041de5d9ef4ccc00194eff609505cefb8d6bfab44d",
+      "last_modified": 1767334191,
+      "size": 1327
+    },
+    "./LICENSE.md": {
+      "path": "./LICENSE.md",
+      "hash": "3cdd0e4592486716a4fd7a14640c254bdc13c0f2ba70acecee53ba636fd47efe",
+      "last_modified": 1767323216,
+      "size": 1368
+    },
+    "./CLAUDE.md": {
+      "path": "./CLAUDE.md",
+      "hash": "cb9fc2cdb887808dc620a08c61c2081f97426d67c31d7ffb99a7875e6e7841f6",
+      "last_modified": 1767333837,
+      "size": 5561
+    },
+    "./loa-grimoire/a2a/sprint-2/auditor-sprint-feedback.md": {
+      "path": "./loa-grimoire/a2a/sprint-2/auditor-sprint-feedback.md",
+      "hash": "394a85c64d1a865662b7a160b4e2ade1fe4c9afcd34101ddfd600e7d0fb536c2",
+      "last_modified": 1767335008,
+      "size": 1689
+    },
+    "./VERSION": {
+      "path": "./VERSION",
+      "hash": "7de76b077577d20e6741385c0b1b71eec68da5c09bc9d56272bca66eea90cb07",
+      "last_modified": 1767333579,
+      "size": 6
+    },
+    "./loa-grimoire/a2a/trajectory/riding-20260101.jsonl": {
+      "path": "./loa-grimoire/a2a/trajectory/riding-20260101.jsonl",
+      "hash": "361de405fcccc34226b6c34fd7be221e65de60d2b309a93a1b14d5b4f3ff6b56",
+      "last_modified": 1767335011,
+      "size": 1206
+    },
+    "./loa-grimoire/consistency-report.md": {
+      "path": "./loa-grimoire/consistency-report.md",
+      "hash": "42809fb27bdc4e33ce54838fad496e6c3c44f5e2792a1247ef00952c3a5b67ff",
+      "last_modified": 1767335011,
+      "size": 3707
+    },
+    "./loa-grimoire/a2a/sprint-2/engineer-feedback.md": {
+      "path": "./loa-grimoire/a2a/sprint-2/engineer-feedback.md",
+      "hash": "e23a110586d5644f26076e8bb5ab3449429d3ed52dfc0c130bd9d619beedf78d",
+      "last_modified": 1767334898,
+      "size": 1560
+    },
+    "./loa-grimoire/context/claims-to-verify.md": {
+      "path": "./loa-grimoire/context/claims-to-verify.md",
+      "hash": "af37a8f9a1d8f8047bfdcd89b316e9faa233df5c1245607fb34574d5b32683dc",
+      "last_modified": 1767334748,
+      "size": 3278
+    },
+    "./loa-grimoire/NOTES.md": {
+      "path": "./loa-grimoire/NOTES.md",
+      "hash": "cdc34c81ce08860c284407e89feda7f7ff5bee53f4325e3bc7f61d9abd34efeb",
+      "last_modified": 1767334191,
+      "size": 601
+    },
+    "./loa-grimoire/a2a/sprint-1/engineer-feedback.md": {
+      "path": "./loa-grimoire/a2a/sprint-1/engineer-feedback.md",
+      "hash": "079863547797982a0b6df88770baaad427733493d430f5e850eccc4296d476b3",
+      "last_modified": 1767334453,
+      "size": 1596
+    },
+    "./loa-grimoire/a2a/sprint-2/reviewer.md": {
+      "path": "./loa-grimoire/a2a/sprint-2/reviewer.md",
+      "hash": "2d7962906fe93f438b3f1fcba119852bd21a252e34dd814acd0f23529e1f3334",
+      "last_modified": 1767334780,
+      "size": 4925
+    },
+    "./loa-grimoire/sdd.md": {
+      "path": "./loa-grimoire/sdd.md",
+      "hash": "261765cb24946de44c6ee23757e7c38f2727adc8f9a98ab7796838557cf77630",
+      "last_modified": 1767333995,
+      "size": 24366
+    },
+    "./loa-grimoire/legacy/INVENTORY.md": {
+      "path": "./loa-grimoire/legacy/INVENTORY.md",
+      "hash": "18f1292bb3b0723a911068d0bef507c435f5fe3b66e7824d563e8da611094b65",
+      "last_modified": 1767334902,
+      "size": 2273
+    },
+    "./README.md": {
+      "path": "./README.md",
+      "hash": "2e1cadfb2baac5dd1e06e60f43b3e609b9aadfc33ea089efb428cad92c430567",
+      "last_modified": 1767333837,
+      "size": 3648
+    },
+    "./loa-grimoire/reality/code-inventory.md": {
+      "path": "./loa-grimoire/reality/code-inventory.md",
+      "hash": "c805ff76c481ed956e20264237358b86e87992b1f45dca6f043534f3b5bb3ac7",
+      "last_modified": 1767334819,
+      "size": 3713
+    }
+  },
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "embedding_dimensions": 384,
+  "chunk_hash_version": 2
+}

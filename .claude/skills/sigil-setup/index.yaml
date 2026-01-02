@@ -1,0 +1,24 @@
+name: sigil-setup
+description: Initialize Sigil on a repository
+version: "2.0.0"
+
+triggers:
+  - "/setup"
+
+examples:
+  - input: "/setup"
+    description: "Initialize Sigil on current repo"
+
+inputs: []
+
+outputs:
+  - path: sigil-mark/moodboard.md
+    description: Empty moodboard template
+  - path: sigil-mark/rules.md
+    description: Empty rules template
+  - path: sigil-mark/inventory.md
+    description: Empty inventory file
+  - path: .sigilrc.yaml
+    description: Zone configuration with detected paths
+  - path: .sigil-setup-complete
+    description: Setup completion marker
