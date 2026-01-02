@@ -251,14 +251,14 @@
 **Description**: Provide design guidance during implementation.
 
 **Acceptance Criteria**:
-- [ ] Checks for .sigil-setup-complete (preflight)
-- [ ] Loads moodboard.md into context
-- [ ] Loads rules.md into context
-- [ ] Determines zone from file path (if provided)
-- [ ] Answers questions about design patterns
-- [ ] Suggests recipes based on zone
-- [ ] Warns about rejected patterns (doesn't refuse)
-- [ ] Purely conversational (no file output)
+- [x] Checks for .sigil-setup-complete (preflight)
+- [x] Loads moodboard.md into context
+- [x] Loads rules.md into context
+- [x] Determines zone from file path (if provided)
+- [x] Answers questions about design patterns
+- [x] Suggests recipes based on zone
+- [x] Warns about rejected patterns (doesn't refuse)
+- [x] Purely conversational (no file output)
 
 **Usage Examples**:
 - `/craft` - General design guidance
@@ -277,13 +277,13 @@
 **Description**: Human review and sign-off on patterns.
 
 **Acceptance Criteria**:
-- [ ] Checks for .sigil-setup-complete (preflight)
-- [ ] Takes component or pattern name as argument
-- [ ] Reads applicable rules from rules.md
-- [ ] Presents for human review via AskUserQuestion
-- [ ] Records approval in rules.md Approvals section
-- [ ] Includes date and approver
-- [ ] Simple approve/reject (no automated validation)
+- [x] Checks for .sigil-setup-complete (preflight)
+- [x] Takes component or pattern name as argument
+- [x] Reads applicable rules from rules.md
+- [x] Presents for human review via AskUserQuestion
+- [x] Records approval in rules.md Approvals section
+- [x] Includes date and approver
+- [x] Simple approve/reject (no automated validation)
 
 **Usage**:
 - `/approve Button` - Approve Button component
@@ -301,11 +301,11 @@
 **Description**: Provide example motion recipes for user adaptation.
 
 **Acceptance Criteria**:
-- [ ] useDeliberateEntrance.ts template
-- [ ] usePlayfulBounce.ts template
-- [ ] useSnappyTransition.ts template
-- [ ] Each with JSDoc explaining zone and feel
-- [ ] Works with react-spring (can adapt to framer-motion)
+- [x] useDeliberateEntrance.ts template
+- [x] usePlayfulBounce.ts template
+- [x] useSnappyTransition.ts template
+- [x] Each with JSDoc explaining zone and feel
+- [x] Works with react-spring (can adapt to framer-motion)
 
 **Files**:
 - `templates/recipes/useDeliberateEntrance.ts`
@@ -317,10 +317,10 @@
 
 ### Sprint 4 Success Criteria
 
-- [ ] `/craft` provides contextual design guidance
-- [ ] `/approve` records human sign-off
-- [ ] Recipe templates are usable
-- [ ] Full workflow functional: setup → envision → codify → craft → approve
+- [x] `/craft` provides contextual design guidance
+- [x] `/approve` records human sign-off
+- [x] Recipe templates are usable
+- [x] Full workflow functional: setup → envision → codify → craft → approve
 
 ---
 
