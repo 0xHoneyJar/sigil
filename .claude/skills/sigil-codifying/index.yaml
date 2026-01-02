@@ -1,0 +1,18 @@
+name: sigil-codifying
+description: Define design rules through interview
+version: "2.0.0"
+
+triggers:
+  - "/codify"
+
+examples:
+  - input: "/codify"
+    description: "Start design rules interview"
+
+inputs: []
+
+outputs:
+  - path: sigil-mark/rules.md
+    description: Design rules organized by category
+  - path: .sigilrc.yaml
+    description: Updated zone definitions

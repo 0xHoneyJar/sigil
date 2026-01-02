@@ -1,0 +1,74 @@
+version: "1.0"
+
+# Where to find components
+component_paths:
+  - "components/"
+  - "app/components/"
+  - "src/components/"
+
+# Zone definitions (path-based)
+# Use /codify to populate paths through interview
+zones:
+  critical:
+    # High-stakes actions: checkout, claims, transactions
+    paths: []
+    # Example paths (uncomment and customize):
+    # - "src/features/checkout/**"
+    # - "src/features/claim/**"
+    # - "app/(app)/transactions/**"
+    motion: "deliberate"
+    timing: "800ms+"
+    patterns:
+      prefer:
+        - "deliberate-entrance"
+        - "confirmation-flow"
+        - "skeleton-loading"
+      warn:
+        - "instant-transition"
+        - "playful-bounce"
+        - "spinner"
+
+  marketing:
+    # Showcase, landing pages, promotional content
+    paths: []
+    # Example paths (uncomment and customize):
+    # - "src/features/marketing/**"
+    # - "app/(marketing)/**"
+    # - "src/features/showcase/**"
+    motion: "playful"
+    timing: "variable"
+    patterns:
+      prefer:
+        - "playful-bounce"
+        - "attention-grab"
+        - "stagger-reveal"
+      warn:
+        - "instant-transition"
+
+  admin:
+    # Internal tools, settings, utility screens
+    paths: []
+    # Example paths (uncomment and customize):
+    # - "src/features/admin/**"
+    # - "app/admin/**"
+    # - "src/features/settings/**"
+    motion: "snappy"
+    timing: "<200ms"
+    patterns:
+      prefer:
+        - "snappy-transition"
+        - "instant-feedback"
+      warn:
+        - "deliberate-entrance"
+        - "playful-bounce"
+
+# Global rejections - patterns to avoid everywhere
+# Use /codify to add rejections through interview
+rejections: []
+# Example rejections (uncomment and customize):
+# - pattern: "Spinner"
+#   reason: "Creates anxiety in critical zones"
+#   exceptions: ["admin/**"]
+# - pattern: "instant-transition"
+#   reason: "Feels jarring, prefer animated transitions"
+#   exceptions: []
