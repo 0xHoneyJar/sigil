@@ -566,12 +566,12 @@ External review identified:
 
 ### Deliverables
 
-- [ ] `/unlock` command created and routed to `unlocking-decisions` skill
-- [ ] `/de-canonize` command created OR references removed from `/canonize` output
-- [ ] Lens capture interview questions added to `/envision` skill
-- [ ] `--lens` flag added to `/craft` command (medium priority)
-- [ ] Poll templates added to `consulting-decisions` skill (medium priority)
-- [ ] Monitors documented as manual check-ins (medium priority)
+- [x] `/unlock` command created and routed to `unlocking-decisions` skill
+- [x] `/de-canonize` command created OR references removed from `/canonize` output
+- [x] Lens capture interview questions added to `/envision` skill
+- [x] `--lens` flag added to `/craft` command (medium priority)
+- [x] Poll templates added to `consulting-decisions` skill (medium priority)
+- [x] Monitors documented as manual check-ins (medium priority)
 
 ### Acceptance Criteria
 
@@ -579,58 +579,58 @@ External review identified:
 > From external review: "No lens capture interview questions in /envision"
 
 **High Priority (Must Fix):**
-- [ ] Running `/unlock <decision-id>` triggers time-based unlock flow
-- [ ] `/canonize` output either uses `/de-canonize` command OR removes reference
-- [ ] `/envision` includes interview questions for lens definitions per SDD §3.4
-- [ ] Lens interview captures: name, description, priority, constraints, validation rules
+- [x] Running `/unlock <decision-id>` triggers time-based unlock flow
+- [x] `/canonize` output either uses `/de-canonize` command OR removes reference
+- [x] `/envision` includes interview questions for lens definitions per SDD §3.4
+- [x] Lens interview captures: name, description, priority, constraints, validation rules
 
 **Medium Priority (Should Fix):**
-- [ ] `/craft --lens power_user` forces validation in specific lens
-- [ ] `/consult` outputs proper poll templates for strategic tier
-- [ ] `/prove` documents monitors as manual check-ins, not automated
+- [x] `/craft --lens power_user` forces validation in specific lens
+- [x] `/consult` outputs proper poll templates for strategic tier
+- [x] `/prove` documents monitors as manual check-ins, not automated
 
 ### Technical Tasks
 
 **Task 7.1: Create /unlock Command (HIGH - 1 hour)**
-- [ ] Create `.claude/commands/unlock.md` with frontmatter
-- [ ] Route to existing `unlocking-decisions` internal skill
-- [ ] Verify skill path in `.claude/skills/unlocking-decisions/`
-- [ ] Test unlock flow for expired decision lock
+- [x] Create `.claude/commands/unlock.md` with frontmatter
+- [x] Route to existing `unlocking-decisions` internal skill
+- [x] Verify skill path in `.claude/skills/unlocking-decisions/`
+- [x] Test unlock flow for expired decision lock
 
 **Task 7.2: Handle /de-canonize Reference (HIGH - 2 hours)**
-- [ ] Option A: Create `/de-canonize` command and skill
+- [x] Option A: Create `/de-canonize` command and skill
   - Create `.claude/commands/de-canonize.md`
   - Create `.claude/skills/de-canonizing-flaws/index.yaml`
   - Create `.claude/skills/de-canonizing-flaws/SKILL.md`
-- [ ] Option B: Remove reference from `/canonize` output
+- [x] Option B: Remove reference from `/canonize` output
   - Update `.claude/skills/canonizing-flaws/SKILL.md`
   - Remove "Use /de-canonize to reverse" text
 
 **Task 7.3: Add Lens Interview to /envision (HIGH - 4 hours)**
-- [ ] Update `.claude/skills/envisioning-moodboard/SKILL.md`
-- [ ] Add lens definition interview section per SDD §3.4
-- [ ] Interview questions for each lens:
+- [x] Update `.claude/skills/envisioning-moodboard/SKILL.md`
+- [x] Add lens definition interview section per SDD §3.4
+- [x] Interview questions for each lens:
   - "Who is this lens representing?" (name/description)
   - "What priority does this lens have?" (1 = truth test)
   - "What constraints apply to this lens?" (accessibility, performance, etc.)
   - "What validation rules should apply?" (specific checks)
-- [ ] Ensure lens definitions saved to `sigil-mark/lens-array/lenses.yaml`
+- [x] Ensure lens definitions saved to `sigil-mark/lens-array/lenses.yaml`
 
 **Task 7.4: Add --lens Flag to /craft (MEDIUM - 1 hour)**
-- [ ] Update `.claude/commands/craft.md` to accept `--lens` argument
-- [ ] Update `.claude/skills/crafting-guidance/SKILL.md` to parse lens flag
-- [ ] When `--lens X` provided, force validation in that lens only
+- [x] Update `.claude/commands/craft.md` to accept `--lens` argument
+- [x] Update `.claude/skills/crafting-guidance/SKILL.md` to parse lens flag
+- [x] When `--lens X` provided, force validation in that lens only
 
 **Task 7.5: Add Poll Templates to /consult (MEDIUM - 1 hour)**
-- [ ] Update `.claude/skills/consulting-decisions/SKILL.md`
-- [ ] Add Discord poll template for strategic tier
-- [ ] Add Slack poll template for strategic tier
-- [ ] Add Twitter poll template for strategic tier
+- [x] Update `.claude/skills/consulting-decisions/SKILL.md`
+- [x] Add Discord poll template for strategic tier
+- [x] Add Slack poll template for strategic tier
+- [x] Add Twitter poll template for strategic tier
 
 **Task 7.6: Document Monitor Expectations (MEDIUM - 30 min)**
-- [ ] Update `.claude/skills/proving-features/SKILL.md`
-- [ ] Clarify monitors are manual check-in prompts, not automated
-- [ ] Add example of manual monitoring workflow
+- [x] Update `.claude/skills/proving-features/SKILL.md`
+- [x] Clarify monitors are manual check-in prompts, not automated
+- [x] Add example of manual monitoring workflow
 
 ### Dependencies
 
