@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Default Sigil tokens */
+  --sigil-bg: #0f0f0f;
+  --sigil-surface: #1a1a1a;
+  --sigil-border: #2a2a2a;
+  --sigil-text: #fafafa;
+  --sigil-muted: #888888;
+  --sigil-accent: #3b82f6;
+  --sigil-success: #22c55e;
+  --sigil-warning: #f59e0b;
+  --sigil-danger: #ef4444;
+
+  /* Tension-controlled variables (defaults) */
+  --sigil-border-radius: 8px;
+  --sigil-color-saturation: 90%;
+  --sigil-animation-bounce: 1.0;
+  --sigil-icon-style: sharp;
+  --sigil-corner-smoothing: 30%;
+
+  --sigil-shadow-opacity: 0.1;
+  --sigil-shadow-blur: 12px;
+  --sigil-font-weight: 400;
+  --sigil-padding-scale: 1;
+  --sigil-border-width: 1px;
+
+  --sigil-spacing-unit: 7px;
+  --sigil-font-size-base: 15px;
+  --sigil-line-height: 1.5;
+  --sigil-gap: 18px;
+  --sigil-container-padding: 18px;
+
+  --sigil-transition-duration: 160ms;
+  --sigil-animation-duration: 225ms;
+  --sigil-delay: 50ms;
+  --sigil-easing: ease-out;
+}
+
+body {
+  background-color: var(--sigil-bg);
+  color: var(--sigil-text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  font-size: var(--sigil-font-size-base);
+  line-height: var(--sigil-line-height);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  transition: background-color var(--sigil-transition-duration) var(--sigil-easing),
+              border-color var(--sigil-transition-duration) var(--sigil-easing),
+              box-shadow var(--sigil-transition-duration) var(--sigil-easing),
+              border-radius var(--sigil-transition-duration) var(--sigil-easing);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sigil-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sigil-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--sigil-muted);
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid var(--sigil-accent);
+  outline-offset: 2px;
+}
+
+/* Utility classes */
+.sigil-surface {
+  background-color: var(--sigil-surface);
+  border: 1px solid var(--sigil-border);
+  border-radius: var(--sigil-border-radius);
+  padding: calc(var(--sigil-spacing-unit) * 2);
+}
+
+.sigil-card {
+  background-color: var(--sigil-surface);
+  border: var(--sigil-border-width) solid var(--sigil-border);
+  border-radius: var(--sigil-border-radius);
+  box-shadow: 0 var(--sigil-shadow-blur) calc(var(--sigil-shadow-blur) * 2)
+    rgba(0, 0, 0, var(--sigil-shadow-opacity));
+}

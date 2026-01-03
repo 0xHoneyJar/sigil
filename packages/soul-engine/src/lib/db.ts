@@ -274,6 +274,118 @@ export async function loadCorrectionsFromDB(
   return corrections;
 }
 
+/**
+ * Load paper cuts from database
+ */
+export async function loadPaperCutsFromDB(
+  dbPath: string
+): Promise<
+  Array<{
+    id: string;
+    category: string;
+    description: string;
+    file_path?: string;
+    line_number?: number;
+    severity: string;
+    status: string;
+    created_at: string;
+    fixed_at?: string;
+  }>
+> {
+  const paperCuts: Array<{
+    id: string;
+    category: string;
+    description: string;
+    file_path?: string;
+    line_number?: number;
+    severity: string;
+    status: string;
+    created_at: string;
+    fixed_at?: string;
+  }> = [];
+
+  if (!existsSync(dbPath)) return paperCuts;
+
+  const sql = await getSql();
+  const buffer = readFileSync(dbPath);
+  const db = new sql.Database(buffer);
+
+  try {
+    const result = db.exec(
+      `SELECT id, category, description, file_path, line_number,
+              severity, status, created_at, fixed_at
+       FROM paper_cuts`
+    );
+
+    if (result.length > 0) {
+      for (const row of result[0].values) {
+        paperCuts.push({
+          id: row[0] as string,
+          category: row[1] as string,
+          description: row[2] as string,
+          file_path: row[3] as string | undefined,
+          line_number: row[4] as number | undefined,
+          severity: row[5] as string,
+          status: row[6] as string,
+          created_at: row[7] as string,
+          fixed_at: row[8] as string | undefined,
+        });
+      }
+    }
+  } finally {
+    db.close();
+  }
+
+  return paperCuts;
+}
+
+/**
+ * Save paper cut to database
+ */
+export async function savePaperCutToDB(
+  dbPath: string,
+  paperCut: {
+    id: string;
+    category: string;
+    description: string;
+    file_path?: string;
+    line_number?: number;
+    severity: string;
+    status: string;
+    created_at: string;
+    fixed_at?: string;
+  }
+): Promise<void> {
+  const sql = await getSql();
+  const buffer = readFileSync(dbPath);
+  const db = new sql.Database(buffer);
+
+  try {
+    db.run(
+      `INSERT OR REPLACE INTO paper_cuts
+        (id, category, description, file_path, line_number,
+         severity, status, created_at, fixed_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        paperCut.id,
+        paperCut.category,
+        paperCut.description,
+        paperCut.file_path || null,
+        paperCut.line_number || null,
+        paperCut.severity,
+        paperCut.status,
+        paperCut.created_at,
+        paperCut.fixed_at || null,
+      ]
+    );
+
+    const data = db.export();
+    writeFileSync(dbPath, Buffer.from(data));
+  } finally {
+    db.close();
+  }
+}
+
 // Export types
 export interface SigilDatabase {
   tensions: TensionState;
