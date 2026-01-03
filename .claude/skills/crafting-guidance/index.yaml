@@ -1,6 +1,6 @@
 name: crafting-guidance
-description: Provide design guidance with value/flaw awareness during implementation
-version: "3.0.0"
+description: Provide design guidance with value/flaw/lens awareness during implementation
+version: "3.1.0"
 
 triggers:
   - "/craft"
@@ -12,6 +12,8 @@ examples:
     description: "Get zone-specific guidance for a file"
   - input: "/craft \"How should modals animate?\""
     description: "Ask a design question"
+  - input: "/craft \"Does this work for all lenses?\""
+    description: "Validate component against all defined lenses"
 
 inputs:
   - name: context
@@ -26,3 +28,5 @@ checks:
     description: Check for value violations
   - path: sigil-mark/soul-binder/canon-of-flaws.yaml
     description: Check for protected flaw impacts
+  - path: sigil-mark/lens-array/lenses.yaml
+    description: Check for lens constraint violations

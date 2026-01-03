@@ -38,6 +38,7 @@ Craft enables good decisions, it doesn't enforce them. The human is always accou
 2. **Strictness Level**: Load from `.sigilrc.yaml`
 3. **Design Context**: Check for moodboard.md and rules.md (warn if missing)
 4. **Soul Binder**: Load immutable-values.yaml and canon-of-flaws.yaml
+5. **Lens Array**: Load lenses.yaml for lens-aware guidance
 
 ## Context Loading
 
@@ -108,6 +109,22 @@ Check if file path matches any protected flaw:
 result=$(.claude/scripts/check-flaw.sh "src/features/checkout/Cart.tsx")
 # Returns JSON with matching flaws or empty array
 ```
+
+### Lens Detection
+
+Detect applicable lens for file path or get all available lenses:
+
+```bash
+# Get lens for specific file
+lens_result=$(.claude/scripts/get-lens.sh "src/mobile/components/Button.tsx")
+# Returns: {"lenses": [{"id": "mobile", ...}], "primary": "mobile", "status": "detected"}
+
+# Get all available lenses
+all_lenses=$(.claude/scripts/get-lens.sh)
+# Returns: {"lenses": [...], "primary": "power_user", "status": "available"}
+```
+
+Use lens context to apply lens-specific constraints and validation.
 
 ## Strictness-Aware Behavior
 
@@ -219,6 +236,13 @@ I've loaded your design context.
 - marketing: [paths summary]
 - admin: [paths summary]
 
+**Lenses Defined**
+[List lenses by priority]
+- power_user (priority 1 - truth test)
+- newcomer (priority 2)
+- mobile (priority 3)
+- accessibility (priority 4)
+
 **Strictness Level**: {level}
   {Description of what this means}
 
@@ -233,11 +257,14 @@ When invoked with a file path:
 /craft src/features/checkout/CartSummary.tsx
 ```
 
-**First**: Check for flaw matches and value concerns:
+**First**: Check for flaw matches, lens context, and value concerns:
 
 ```bash
 # Check flaws
 flaw_result=$(.claude/scripts/check-flaw.sh "src/features/checkout/CartSummary.tsx")
+
+# Check lens
+lens_result=$(.claude/scripts/get-lens.sh "src/features/checkout/CartSummary.tsx")
 
 # Get strictness
 strictness=$(.claude/scripts/get-strictness.sh)
@@ -270,6 +297,20 @@ This file is in the **[zone]** zone.
 - Timing: [zone timing]
 - Preferred patterns: [list]
 - Patterns to avoid: [list]
+
+**Lens Context**
+[If lens detected from path]
+- Detected lens: [lens_name] (priority [N])
+- Key constraints:
+  - [constraint_1]: [description]
+  - [constraint_2]: [description]
+- Validation rules:
+  - [rule_1]
+  - [rule_2]
+
+[If no lens detected]
+- No specific lens detected for this path
+- Truth test lens: [primary_lens] will be used for validation
 
 **Applicable Values**
 [Values relevant to this zone/file]
@@ -312,6 +353,41 @@ Based on your design context:
 
 **Example Implementation**
 [Suggest pattern or recipe]
+```
+
+### Mode 4: Lens Validation
+
+When asked to validate against lenses:
+
+```
+/craft "Does this component work for all lenses?"
+```
+
+Response format:
+
+```
+Validating against configured lenses...
+
+**Truth Test: [primary_lens]** (priority 1)
+[Validation result for most constrained lens]
+
+**Other Lenses:**
+| Lens | Priority | Status | Notes |
+|------|----------|--------|-------|
+| power_user | 1 | ✅ Pass | All constraints met |
+| newcomer | 2 | ✅ Pass | Help tooltips present |
+| mobile | 3 | ⚠️ Warn | Touch targets at 40px (recommend 44px) |
+| accessibility | 4 | ✅ Pass | ARIA labels present |
+
+**Immutable Properties:** ✅ Consistent across all lenses
+
+[If any lens fails:]
+The [lens_name] lens has failing constraints:
+- [constraint_id]: [what's wrong]
+
+Recommendations:
+1. [Specific fix]
+2. [Alternative approach]
 ```
 
 ## Warning About Rejected Patterns
@@ -386,5 +462,15 @@ When suggesting motion, reference available recipes:
 | No moodboard.md | "No moodboard found. Run `/envision` to capture product feel." |
 | No rules.md | "No rules found. Run `/codify` to define design rules." |
 | No values | "No immutable values defined. Run `/envision` to capture values." |
+| No lenses | "No lenses configured. Run `/envision` to define user lenses." |
 | Unknown zone | "This path doesn't match any configured zone. Using default guidance." |
+| Unknown lens | "No lens detected for this path. Using truth test lens for validation." |
 | Empty context | Provide general guidance mode |
+
+## Lens-Aware Guidance Principles
+
+1. **Truth Test First**: Always validate against the most constrained lens (lowest priority)
+2. **Immutable Properties**: Never allow lens variations to modify security, core logic, or data integrity
+3. **Constraint Awareness**: Surface required vs optional constraints clearly
+4. **Stacking Support**: When multiple lenses apply, use conflict resolution rules
+5. **Actionable Feedback**: Provide specific fixes when lens constraints fail
