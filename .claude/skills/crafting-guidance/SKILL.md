@@ -4,6 +4,9 @@ zones:
     paths:
       - sigil-mark/moodboard.md
       - sigil-mark/rules.md
+      - sigil-mark/soul-binder/immutable-values.yaml
+      - sigil-mark/soul-binder/canon-of-flaws.yaml
+      - sigil-mark/lens-array/lenses.yaml
       - .sigilrc.yaml
     permission: read
   config:
@@ -12,16 +15,29 @@ zones:
     permission: read
 ---
 
-# Sigil Crafting Skill
+# Sigil Crafting Skill (v3)
 
 ## Purpose
 
-Provide design guidance during implementation. Loads moodboard and rules context, determines zone from file path, and answers questions about design patterns.
+Provide design guidance during implementation with awareness of:
+1. **Moodboard** — Product feel and anti-patterns
+2. **Rules** — Design rules by zone
+3. **Immutable Values** — Core principles with enforcement
+4. **Canon of Flaws** — Protected emergent behaviors
+5. **Lenses** — User persona perspectives
+
+## Philosophy
+
+> "Make the right path easy. Make the wrong path visible. Don't make the wrong path impossible."
+
+Craft enables good decisions, it doesn't enforce them. The human is always accountable.
 
 ## Pre-Flight Checks
 
 1. **Sigil Setup**: Verify `.sigil-setup-complete` exists
-2. **Design Context**: Check for moodboard.md and rules.md (warn if missing)
+2. **Strictness Level**: Load from `.sigilrc.yaml`
+3. **Design Context**: Check for moodboard.md and rules.md (warn if missing)
+4. **Soul Binder**: Load immutable-values.yaml and canon-of-flaws.yaml
 
 ## Context Loading
 
@@ -44,7 +60,28 @@ sigil-mark/rules.md
 ├── Components
 └── Approvals
 
+sigil-mark/soul-binder/immutable-values.yaml
+├── values
+│   ├── {value_id}
+│   │   ├── name
+│   │   ├── enforcement.level (block/warn/review)
+│   │   └── enforcement.constraints[]
+
+sigil-mark/soul-binder/canon-of-flaws.yaml
+├── flaws[]
+│   ├── id
+│   ├── status (PROTECTED/UNDER_REVIEW)
+│   ├── affected_code_patterns[]
+│   └── protection_rule
+
+sigil-mark/lens-array/lenses.yaml
+├── lenses
+│   ├── {lens_id}
+│   │   ├── priority
+│   │   └── constraints[]
+
 .sigilrc.yaml
+├── strictness (discovery/guiding/enforcing/strict)
 ├── zones (paths, motion, patterns)
 └── rejections
 ```
@@ -62,6 +99,90 @@ Use zone to apply specific guidance:
 - `critical` → Deliberate motion, skeleton loading, confirmation flows
 - `marketing` → Playful motion, attention-grabbing, stagger reveals
 - `admin` → Snappy motion, instant feedback, minimal animation
+
+### Flaw Detection
+
+Check if file path matches any protected flaw:
+
+```bash
+result=$(.claude/scripts/check-flaw.sh "src/features/checkout/Cart.tsx")
+# Returns JSON with matching flaws or empty array
+```
+
+## Strictness-Aware Behavior
+
+Based on `.sigilrc.yaml` strictness level:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      AGENT RESPONSE MATRIX                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Violation Type          │ discovery │ guiding  │ enforcing │ strict       │
+│  ────────────────────────┼───────────┼──────────┼───────────┼──────────    │
+│  Immutable Value         │ "Consider"│ ⚠️ WARN  │ ⛔ BLOCK  │ ⛔ BLOCK     │
+│  Protected Flaw          │ "Consider"│ ⚠️ WARN  │ ⛔ BLOCK  │ ⛔ BLOCK     │
+│  Lens Failure            │ "Consider"│ ⚠️ WARN  │ ⚠️ WARN   │ ⛔ BLOCK     │
+│  Pattern Warning         │ "FYI"     │ "Consider"│ "Consider"│ ⚠️ WARN     │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Message Formats
+
+### Block Message (⛔)
+
+```
+⛔ {VIOLATION_TYPE} VIOLATION
+
+{Violation description}
+
+CONTEXT:
+{Why this matters - reference to value/flaw}
+
+DETAILS:
+- Affected: {what triggered the block}
+- Rule: {specific constraint violated}
+- Strictness: {current level}
+
+OPTIONS:
+[Fix Issue] [Override with Reasoning] [Escalate to Taste Owner] [Abandon]
+
+If you believe this is a false positive, choose "Override with Reasoning"
+and provide justification. This will be logged for audit purposes.
+```
+
+### Warning Message (⚠️)
+
+```
+⚠️ {ISSUE_TYPE} WARNING
+
+{Issue description}
+
+CONCERN:
+{Why this might be problematic}
+
+SUGGESTION:
+{Alternative approach}
+
+You can proceed anyway—this is a warning, not a block.
+If you proceed, consider documenting why this deviation is acceptable.
+
+[Proceed] [Follow Suggestion] [Get More Context]
+```
+
+### Suggestion Message (💡)
+
+```
+💡 DESIGN CONSIDERATION
+
+{Suggestion}
+
+Based on:
+- {Reference to moodboard/rules/values}
+
+This is purely informational. Your judgment takes precedence.
+```
 
 ## Guidance Modes
 
@@ -84,10 +205,22 @@ I've loaded your design context.
 **Key Rules**
 [Summarize rules - motion by zone, key patterns]
 
+**Immutable Values**
+[List values with enforcement level]
+- Security First (block)
+- Accessibility (warn)
+
+**Protected Flaws**
+[List protected flaws]
+- FLAW-001: Double-Click Submit
+
 **Zones Configured**
 - critical: [paths summary]
 - marketing: [paths summary]
 - admin: [paths summary]
+
+**Strictness Level**: {level}
+  {Description of what this means}
 
 What would you like guidance on?
 ```
@@ -100,8 +233,35 @@ When invoked with a file path:
 /craft src/features/checkout/CartSummary.tsx
 ```
 
-Response format:
+**First**: Check for flaw matches and value concerns:
 
+```bash
+# Check flaws
+flaw_result=$(.claude/scripts/check-flaw.sh "src/features/checkout/CartSummary.tsx")
+
+# Get strictness
+strictness=$(.claude/scripts/get-strictness.sh)
+```
+
+**Then**: Provide response based on findings:
+
+If protected flaw matched:
+```
+⚠️ PROTECTED FLAW DETECTED
+
+This file matches pattern for: FLAW-001 "Double-Click Submit"
+
+Protection Rule:
+{protection_rule from flaw}
+
+Any changes to this file should NOT:
+{what must be avoided}
+
+Current strictness: {level}
+{What this means for this file}
+```
+
+Otherwise, normal zone guidance:
 ```
 This file is in the **[zone]** zone.
 
@@ -110,6 +270,9 @@ This file is in the **[zone]** zone.
 - Timing: [zone timing]
 - Preferred patterns: [list]
 - Patterns to avoid: [list]
+
+**Applicable Values**
+[Values relevant to this zone/file]
 
 **Relevant Rules**
 [Extract applicable rules from rules.md]
@@ -140,6 +303,9 @@ Based on your design context:
 - Critical: [zone-specific answer]
 - Marketing: [zone-specific answer]
 - Admin: [zone-specific answer]
+
+**Value Considerations**
+[Any immutable values that apply]
 
 **Relevant Rules**
 [Quote applicable rules]
@@ -180,6 +346,20 @@ this deviates from your established patterns. Would you like to:
 - Discuss further
 ```
 
+## Override Logging
+
+When user overrides a block or warning, log to `sigil-mark/audit/overrides.yaml`:
+
+```yaml
+overrides:
+  - timestamp: "{ISO-8601}"
+    violation_type: "PROTECTED_FLAW"
+    flaw_id: "FLAW-001"
+    file_path: "src/features/checkout/Button.tsx"
+    reasoning: "{user provided reasoning}"
+    user: "{git user or unknown}"
+```
+
 ## Recipe Suggestions
 
 When suggesting motion, reference available recipes:
@@ -192,11 +372,12 @@ When suggesting motion, reference available recipes:
 
 ## Response Guidelines
 
-1. **Be specific**: Reference actual moodboard and rules content
-2. **Be helpful**: Suggest concrete implementations
-3. **Be honest**: Warn about anti-patterns clearly
+1. **Be specific**: Reference actual moodboard, rules, and values content
+2. **Be strictness-aware**: Adjust response based on current level
+3. **Be honest**: Warn about anti-patterns and flaw impacts clearly
 4. **Be flexible**: Never refuse, always offer alternatives
 5. **Be concise**: Don't overwhelm with information
+6. **Log overrides**: Track when users deviate from guidance
 
 ## Error Handling
 
@@ -204,11 +385,6 @@ When suggesting motion, reference available recipes:
 |-----------|----------|
 | No moodboard.md | "No moodboard found. Run `/envision` to capture product feel." |
 | No rules.md | "No rules found. Run `/codify` to define design rules." |
+| No values | "No immutable values defined. Run `/envision` to capture values." |
 | Unknown zone | "This path doesn't match any configured zone. Using default guidance." |
 | Empty context | Provide general guidance mode |
-
-## Philosophy
-
-> "Make the right path easy. Make the wrong path visible. Don't make the wrong path impossible."
-
-Craft enables good decisions, it doesn't enforce them. The human is always accountable.

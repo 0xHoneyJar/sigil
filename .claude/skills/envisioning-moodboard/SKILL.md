@@ -3,27 +3,42 @@ zones:
   state:
     paths:
       - sigil-mark/moodboard.md
+      - sigil-mark/soul-binder/immutable-values.yaml
+      - sigil-mark/lens-array/lenses.yaml
     permission: read-write
   config:
     paths:
       - .sigil-setup-complete
+      - .sigilrc.yaml
     permission: read
 ---
 
-# Sigil Envisioning Skill
+# Sigil Envisioning Skill (v3)
 
 ## Purpose
 
-Capture product feel and design context through an interview-based workflow. Creates a moodboard that guides design decisions.
+Capture the product's soul through an interview-based workflow. Creates:
+1. **Moodboard** — Product feel, references, anti-patterns
+2. **Immutable Values** — Core principles with enforcement rules
+3. **Lens Definitions** — User persona perspectives
+
+## Philosophy
+
+> "Culture is the Reality. Code is Just the Medium."
+
+This skill captures both intended soul (values) and sets up the framework for protecting emergent soul (flaws via /canonize).
 
 ## Pre-Flight Checks
 
 1. **Sigil Setup**: Verify `.sigil-setup-complete` exists
-2. **Existing Moodboard**: Check if `sigil-mark/moodboard.md` has content (offer to update vs replace)
+2. **Existing State**: Check for existing files and offer to update vs replace
+3. **Section Focus**: If section argument provided, skip other sections
 
-## Interview Flow
+## Workflow
 
-### Question 1: Reference Products
+### Section 1: Moodboard (Product Feel)
+
+#### Question 1.1: Reference Products
 
 Use AskUserQuestion with multiSelect:
 
@@ -46,7 +61,7 @@ multiSelect: true
 - "Which specific [games/apps] inspire you?"
 - "What specifically about [product] do you want to capture?"
 
-### Question 2: Transaction Feel
+#### Question 1.2: Transaction Feel
 
 ```
 question: "How should users feel during important actions?"
@@ -63,7 +78,7 @@ options:
 multiSelect: false
 ```
 
-### Question 3: Success States
+#### Question 1.3: Success States
 
 ```
 question: "How should wins and completions feel?"
@@ -80,7 +95,7 @@ options:
 multiSelect: false
 ```
 
-### Question 4: Loading States
+#### Question 1.4: Loading States
 
 ```
 question: "How should waiting moments feel?"
@@ -97,7 +112,7 @@ options:
 multiSelect: false
 ```
 
-### Question 5: Error States
+#### Question 1.5: Error States
 
 ```
 question: "How should errors and failures feel?"
@@ -114,7 +129,7 @@ options:
 multiSelect: false
 ```
 
-### Question 6: Anti-Patterns
+#### Question 1.6: Anti-Patterns
 
 ```
 question: "What patterns should we explicitly avoid?"
@@ -133,7 +148,7 @@ multiSelect: true
 
 **Follow-up**: For each selection, ask "Why is this important to avoid?"
 
-### Question 7: Key Moments (Free Text)
+#### Question 1.7: Key Moments (Free Text)
 
 For each key moment, use free-form follow-up:
 
@@ -141,9 +156,110 @@ For each key moment, use free-form follow-up:
 2. "Describe your ideal celebration - what does a major win look like?"
 3. "Describe your ideal recovery - what does bouncing back from an error look like?"
 
+### Section 2: Immutable Values (Soul Binder)
+
+#### Question 2.1: Shared Values
+
+```
+question: "Which shared values are non-negotiable for your product?"
+header: "Core Values"
+options:
+  - label: "Security First"
+    description: "No compromises on user safety or data protection"
+  - label: "Accessibility"
+    description: "All users can interact with the product"
+  - label: "Performance"
+    description: "Fast, responsive, no blocking operations"
+  - label: "Privacy"
+    description: "Minimal data collection, user control"
+multiSelect: true
+```
+
+For each selected value, ask:
+- "What's the enforcement level? (block = hard stop, warn = allow with warning, review = flag for review)"
+- "Any specific constraints? For example: 'No API keys in code' for Security"
+
+#### Question 2.2: Project-Specific Values
+
+```
+question: "Any values specific to THIS project?"
+header: "Project Values"
+```
+
+Free-form input. For each value mentioned:
+- "What enforcement level? (block/warn/review)"
+- "Any specific constraints or patterns to check?"
+
+#### Question 2.3: Domain Values
+
+```
+question: "What domain is this product in?"
+header: "Domain"
+options:
+  - label: "DeFi / Financial"
+    description: "Adds: Transaction safety, exploit prevention"
+  - label: "Creative Tools"
+    description: "Adds: Export reliability, performance"
+  - label: "Community Platform"
+    description: "Adds: Content moderation, abuse prevention"
+  - label: "Gaming"
+    description: "Adds: Fair play, skill expression"
+  - label: "General / Other"
+    description: "No domain-specific values"
+multiSelect: false
+```
+
+Each domain auto-suggests relevant values:
+- DeFi: transaction_safety, no_exploits
+- Creative: export_reliability, no_data_loss
+- Community: content_safety, no_abuse_vectors
+- Gaming: fair_play, skill_expression
+
+### Section 3: Lens Definitions (Lens Array)
+
+#### Question 3.1: User Types
+
+```
+question: "Who are your primary user types?"
+header: "Users"
+options:
+  - label: "Power Users"
+    description: "Experienced, efficiency-focused"
+  - label: "Newcomers"
+    description: "First-time users needing guidance"
+  - label: "Mobile Users"
+    description: "Touch-first, limited screen"
+  - label: "Accessibility Users"
+    description: "Screen reader, keyboard-only"
+multiSelect: true
+```
+
+For each selected user type:
+- "What constraints matter most for [user type]?"
+- "What's the priority? (1 = most constrained, truth test)"
+
+#### Question 3.2: Immutable Properties
+
+```
+question: "What properties should NEVER vary between user types?"
+header: "Immutable"
+options:
+  - label: "Security"
+    description: "All users get same security protections"
+  - label: "Core Logic"
+    description: "Business rules don't change per user"
+  - label: "Data Integrity"
+    description: "Data handling is consistent"
+  - label: "Custom"
+    description: "Specify your own"
+multiSelect: true
+```
+
 ## Output Generation
 
-After completing the interview, generate `sigil-mark/moodboard.md`:
+### Moodboard Output
+
+Write to `sigil-mark/moodboard.md`:
 
 ```markdown
 # Product Moodboard
@@ -168,10 +284,10 @@ After completing the interview, generate `sigil-mark/moodboard.md`:
 
 | Context | Feel | Reference |
 |---------|------|-----------|
-| Transactions | [Answer from Q2] | [Relevant reference] |
-| Success states | [Answer from Q3] | [Relevant reference] |
-| Loading | [Answer from Q4] | [Relevant reference] |
-| Errors | [Answer from Q5] | [Relevant reference] |
+| Transactions | [Answer from Q1.2] | [Relevant reference] |
+| Success states | [Answer from Q1.3] | [Relevant reference] |
+| Loading | [Answer from Q1.4] | [Relevant reference] |
+| Errors | [Answer from Q1.5] | [Relevant reference] |
 
 ---
 
@@ -179,51 +295,154 @@ After completing the interview, generate `sigil-mark/moodboard.md`:
 
 | Pattern | Reason |
 |---------|--------|
-[From Q6 with follow-up reasons]
+[From Q1.6 with follow-up reasons]
 
 ---
 
 ## Key Moments
 
 ### High-Stakes Actions
-[From Q7]
+[From Q1.7]
 
 ### Celebrations
-[From Q7]
+[From Q1.7]
 
 ### Recovery
-[From Q7]
+[From Q1.7]
 ```
 
-## Handling Existing Moodboard
+### Immutable Values Output
 
-If `sigil-mark/moodboard.md` already has content:
+Write to `sigil-mark/soul-binder/immutable-values.yaml`:
+
+```yaml
+# Soul Binder — Immutable Values
+# Core principles that hard-block violations
+# Generated through /envision interview
+
+version: "1.0"
+generated_by: "/envision"
+generated_at: "[timestamp]"
+
+values:
+  security:
+    name: "Security First"
+    description: "[from interview]"
+    type: "shared"
+    enforcement:
+      level: "block"  # block | warn | review
+      constraints:
+        - name: "no_exposed_keys"
+          description: "API keys and secrets must not appear in code"
+          pattern: "(?i)(api[_-]?key|secret|password|token)\\s*[:=]"
+          scope: ["**/*.ts", "**/*.js", "**/*.yaml"]
+
+  # Additional values from interview...
+```
+
+### Lens Array Output
+
+Write to `sigil-mark/lens-array/lenses.yaml`:
+
+```yaml
+# Lens Array — User Persona Definitions
+# Multiple truths coexist on top of core
+# Generated through /envision interview
+
+version: "1.0"
+generated_by: "/envision"
+generated_at: "[timestamp]"
+
+lenses:
+  power_user:
+    name: "Power User"
+    description: "Experienced users optimizing for efficiency"
+    priority: 1  # Lower = more constrained = truth test
+
+    constraints:
+      - id: "keyboard_shortcuts"
+        description: "All actions accessible via keyboard"
+        required: true
+
+    validation:
+      - "All interactive elements have tabindex"
+
+  # Additional lenses from interview...
+
+immutable_properties:
+  description: "Properties that cannot vary between lenses"
+  properties:
+    - name: "security"
+    - name: "core_logic"
+    - name: "data_integrity"
+
+stacking:
+  allowed_combinations: []
+  conflict_resolution:
+    priority_order: []
+```
+
+## Handling Existing State
+
+If files already exist:
 
 ```
-question: "A moodboard already exists. What would you like to do?"
+question: "Existing [moodboard/values/lenses] found. What would you like to do?"
 header: "Existing"
 options:
   - label: "Update existing"
-    description: "Add to or refine current moodboard"
+    description: "Add to or refine current state"
   - label: "Start fresh"
-    description: "Replace with new moodboard"
-  - label: "Cancel"
-    description: "Keep existing, exit envision"
+    description: "Replace with new state"
+  - label: "Skip this section"
+    description: "Keep existing, move to next section"
 multiSelect: false
 ```
 
 ## Success Output
 
 ```
-Moodboard Captured!
+Product Soul Captured!
 
-Written to: sigil-mark/moodboard.md
+Written to:
+  - sigil-mark/moodboard.md
+  - sigil-mark/soul-binder/immutable-values.yaml
+  - sigil-mark/lens-array/lenses.yaml
 
 Captured:
   - X reference products
-  - 4 feel descriptors
-  - Y anti-patterns
-  - 3 key moments
+  - Y feel descriptors
+  - Z immutable values (N blocking, M warning)
+  - L user lenses
 
-Next step: /codify to define design rules
+Strictness Level: [current from .sigilrc.yaml]
+  [Description of what this means]
+
+Next steps:
+  - /codify to define design rules
+  - /canonize to protect emergent behaviors
+  - /craft to get design guidance
 ```
+
+## Error Handling
+
+| Situation | Response |
+|-----------|----------|
+| No setup complete | "Sigil not initialized. Run `/setup` first." |
+| User cancels | Save partial state, note incomplete sections |
+| Empty selections | Use sensible defaults, note in output |
+| Invalid enforcement | Default to "warn", note the fallback |
+
+## Philosophy
+
+This interview captures the INTENDED soul. The EMERGENT soul develops over time and is protected via `/canonize`. Both are equally important.
+
+Do NOT:
+- Rush the interview
+- Make assumptions without asking
+- Skip sections without user consent
+
+DO:
+- Explain why each question matters
+- Offer examples when helpful
+- Save progress incrementally

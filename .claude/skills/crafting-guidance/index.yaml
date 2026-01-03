@@ -1,6 +1,6 @@
 name: crafting-guidance
-description: Provide design guidance during implementation
-version: "2.0.0"
+description: Provide design guidance with value/flaw awareness during implementation
+version: "3.0.0"
 
 triggers:
   - "/craft"
@@ -20,3 +20,9 @@ inputs:
     description: File path or design question
 
 outputs: []
+
+checks:
+  - path: sigil-mark/soul-binder/immutable-values.yaml
+    description: Check for value violations
+  - path: sigil-mark/soul-binder/canon-of-flaws.yaml
+    description: Check for protected flaw impacts

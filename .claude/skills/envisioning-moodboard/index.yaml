@@ -1,16 +1,28 @@
 name: envisioning-moodboard
-description: Capture product moodboard through interview
-version: "2.0.0"
+description: Capture product moodboard, immutable values, and lens definitions through interview
+version: "3.0.0"
 
 triggers:
   - "/envision"
 
 examples:
   - input: "/envision"
-    description: "Start moodboard capture interview"
+    description: "Start full product soul capture interview"
+  - input: "/envision moodboard"
+    description: "Focus on moodboard section only"
+  - input: "/envision values"
+    description: "Focus on immutable values only"
 
-inputs: []
+inputs:
+  - name: section
+    type: string
+    required: false
+    description: "Optional section to focus on (moodboard, values, lenses)"
 
 outputs:
   - path: sigil-mark/moodboard.md
     description: Product moodboard with design context
+  - path: sigil-mark/soul-binder/immutable-values.yaml
+    description: Core values with enforcement rules
+  - path: sigil-mark/lens-array/lenses.yaml
+    description: User persona lens definitions
