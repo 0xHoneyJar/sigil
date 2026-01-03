@@ -376,34 +376,34 @@ Complete comprehensive testing, documentation for all commands, migration guide 
 
 ### Deliverables
 
-- [ ] Schema validation tests for all YAML files
-- [ ] Helper script tests
-- [ ] Integration test recordings for key flows
-- [ ] Command documentation complete
-- [ ] Migration guide from v2 → v3
-- [ ] CHANGELOG update
+- [x] Schema validation tests for all YAML files
+- [x] Helper script tests
+- [x] Integration test recordings for key flows
+- [x] Command documentation complete
+- [x] Migration guide from v2 → v3
+- [x] CHANGELOG update
 
 ### Acceptance Criteria
 
-- [ ] All JSON Schema validations pass on example files
-- [ ] All helper scripts have test coverage
-- [ ] Integration tests cover: `/setup`, `/envision`, `/canonize`, `/craft`, `/consult`, `/prove`
-- [ ] Each command has complete documentation
-- [ ] Migration guide covers: backup, setup, envision, zone-to-lens mapping
-- [ ] Error messages refined for clarity
+- [x] All JSON Schema validations pass on example files
+- [x] All helper scripts have test coverage
+- [x] Integration tests cover: `/setup`, `/envision`, `/canonize`, `/craft`, `/consult`, `/prove`
+- [x] Each command has complete documentation
+- [x] Migration guide covers: backup, setup, envision, zone-to-lens mapping
+- [x] Error messages refined for clarity
 
 ### Technical Tasks
 
-- [ ] Create JSON Schema files for all YAML schemas
-- [ ] Create test script `test-schemas.sh`
-- [ ] Create test scripts for each helper (`test-get-*.sh`)
-- [ ] Create integration test recordings (per SDD §8.5)
-- [ ] Write command documentation for `/canonize`, `/consult`, `/prove`, `/graduate`
-- [ ] Write migration guide in `MIGRATION-V3.md`
-- [ ] Update `CLAUDE.md` with v3 agent instructions
-- [ ] Update `README.md` for v3
-- [ ] Update `CHANGELOG.md`
-- [ ] Final error message review and refinement
+- [x] Create JSON Schema files for all YAML schemas
+- [x] Create test script `test-schemas.sh`
+- [x] Create test scripts for each helper (`test-get-*.sh`)
+- [x] Create integration test recordings (per SDD §8.5)
+- [x] Write command documentation for `/canonize`, `/consult`, `/prove`, `/graduate`
+- [x] Write migration guide in `MIGRATION-V3.md`
+- [x] Update `CLAUDE.md` with v3 agent instructions
+- [x] Update `README.md` for v3
+- [x] Update `CHANGELOG.md`
+- [x] Final error message review and refinement
 
 ### Dependencies
 

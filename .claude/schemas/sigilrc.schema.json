@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sigil-v3/sigilrc",
+  "title": "Sigil Configuration Schema",
+  "description": ".sigilrc.yaml - Main Sigil v3 configuration file",
+  "type": "object",
+  "required": ["version", "strictness"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "strictness": {
+      "type": "string",
+      "enum": ["discovery", "guiding", "enforcing", "strict"],
+      "description": "Progressive strictness level"
+    },
+    "component_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "taste_owners": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "placeholder": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "domains": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["defi", "creative", "community", "games", "general"]
+      }
+    },
+    "consultation": {
+      "type": "object",
+      "properties": {
+        "internal_tool": {
+          "type": ["string", "null"]
+        },
+        "community_channels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "proving": {
+      "type": "object",
+      "properties": {
+        "default_duration_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "environments": {
+          "type": "object",
+          "properties": {
+            "testnet": {
+              "type": "boolean"
+            },
+            "staging": {
+              "type": "boolean"
+            },
+            "beta": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "zones": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "motion": {
+            "type": "string"
+          },
+          "patterns": {
+            "type": "object",
+            "properties": {
+              "prefer": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "warn": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "rejections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["pattern", "reason"],
+        "properties": {
+          "pattern": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "exceptions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sigil-v3/immutable-values",
+  "title": "Immutable Values Schema",
+  "description": "Soul Binder - Core principles that hard-block violations",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "generated_by": {
+      "type": ["string", "null"]
+    },
+    "generated_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "values": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": ["shared", "project-specific"]
+          },
+          "description": {
+            "type": "string"
+          },
+          "enforcement": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "type": "string",
+                "enum": ["block", "warn", "suggest"]
+              },
+              "patterns": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

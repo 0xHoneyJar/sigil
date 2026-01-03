@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sigil-v3/proving-record",
+  "title": "Proving Record Schema",
+  "description": "Proving Grounds - Individual feature proving record",
+  "type": "object",
+  "required": ["id", "feature_name", "domain", "status", "started_at"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^PROVE-[0-9]+$"
+    },
+    "feature_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string",
+      "enum": ["defi", "creative", "community", "games", "general"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["proving", "eligible", "blocked", "graduated", "abandoned"]
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration_days": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "ends_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "monitors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "green", "yellow", "red"]
+          },
+          "threshold": {
+            "type": ["number", "string"]
+          },
+          "current_value": {
+            "type": ["number", "string"]
+          },
+          "last_checked": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "description"],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["P1", "P2", "P3"]
+          },
+          "description": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolved": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "graduation_eligibility": {
+      "type": "object",
+      "properties": {
+        "duration_complete": {
+          "type": "boolean"
+        },
+        "monitors_green": {
+          "type": "boolean"
+        },
+        "no_p1_violations": {
+          "type": "boolean"
+        },
+        "taste_owner_approval": {
+          "type": "boolean"
+        }
+      }
+    },
+    "graduated_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "taste_owner": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sigil-v3/proving-config",
+  "title": "Proving Grounds Config Schema",
+  "description": "Proving Grounds - Scale validation configuration",
+  "type": "object",
+  "required": ["version", "default_duration_days", "graduation_requires"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "default_duration_days": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "duration_options": {
+      "type": "object",
+      "properties": {
+        "quick": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "standard": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "extended": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "graduation_requires": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["all_monitors_green", "no_p1_violations", "taste_owner_signoff"]
+      }
+    },
+    "domains": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "monitors"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "monitors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

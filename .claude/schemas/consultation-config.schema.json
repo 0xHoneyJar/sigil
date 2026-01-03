@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sigil-v3/consultation-config",
+  "title": "Consultation Chamber Config Schema",
+  "description": "Consultation Chamber - Decision authority configuration",
+  "type": "object",
+  "required": ["version", "layers"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "layers": {
+      "type": "object",
+      "required": ["strategic", "direction", "execution"],
+      "properties": {
+        "strategic": {
+          "$ref": "#/definitions/layer"
+        },
+        "direction": {
+          "$ref": "#/definitions/layer"
+        },
+        "execution": {
+          "$ref": "#/definitions/layer"
+        }
+      }
+    },
+    "lock_durations": {
+      "type": "object",
+      "properties": {
+        "strategic": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "direction": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "execution": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "lock": {
+      "type": "object",
+      "properties": {
+        "unlock_requires": {
+          "type": "string"
+        },
+        "early_unlock_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "layer": {
+      "type": "object",
+      "required": ["description", "process", "authority"],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "process": {
+          "type": "string",
+          "enum": ["community_poll", "sentiment_gathering", "none"]
+        },
+        "authority": {
+          "type": "string",
+          "enum": ["binding_vote", "taste_owner", "taste_owner_dictates"]
+        }
+      }
+    }
+  }
+}
