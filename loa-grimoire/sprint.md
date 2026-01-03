@@ -53,36 +53,36 @@ Create the foundational directory structure, configuration schemas, and update `
 
 ### Deliverables
 
-- [ ] v3 directory structure created (`sigil-mark/soul-binder/`, `lens-array/`, etc.)
-- [ ] `.sigilrc.yaml` schema updated for v3 (strictness, taste_owners, domains)
-- [ ] `/setup` command updated to create v3 structure
-- [ ] Progressive strictness foundation implemented
-- [ ] Helper script `get-strictness.sh` created
+- [x] v3 directory structure created (`sigil-mark/soul-binder/`, `lens-array/`, etc.)
+- [x] `.sigilrc.yaml` schema updated for v3 (strictness, taste_owners, domains)
+- [x] `/setup` command updated to create v3 structure
+- [x] Progressive strictness foundation implemented
+- [x] Helper script `get-strictness.sh` created
 
 ### Acceptance Criteria
 
 > From prd.md FR-10: "Strictness level configurable" and "Agent behavior adjusts to level"
 
-- [ ] Running `/setup` creates complete v3 directory tree
-- [ ] `.sigilrc.yaml` supports `strictness: discovery|guiding|enforcing|strict`
-- [ ] `.sigilrc.yaml` supports `taste_owners` with scope paths
-- [ ] `.sigilrc.yaml` supports `domains` array (e.g., `["defi"]`)
-- [ ] `get-strictness.sh` returns current strictness level from config
-- [ ] Setup creates all four pillar subdirectories in `sigil-mark/`
+- [x] Running `/setup` creates complete v3 directory tree
+- [x] `.sigilrc.yaml` supports `strictness: discovery|guiding|enforcing|strict`
+- [x] `.sigilrc.yaml` supports `taste_owners` with scope paths
+- [x] `.sigilrc.yaml` supports `domains` array (e.g., `["defi"]`)
+- [x] `get-strictness.sh` returns current strictness level from config
+- [x] Setup creates all four pillar subdirectories in `sigil-mark/`
 
 ### Technical Tasks
 
-- [ ] Update `.claude/skills/initializing-sigil/SKILL.md` for v3 structure
-- [ ] Update `.claude/commands/setup.md` frontmatter for v3 outputs
-- [ ] Create `sigil-mark/soul-binder/` directory template
-- [ ] Create `sigil-mark/lens-array/` directory template
-- [ ] Create `sigil-mark/consultation-chamber/` directory template with `decisions/`
-- [ ] Create `sigil-mark/proving-grounds/` directory template with `active/`
-- [ ] Create `sigil-mark/canon/graduated/` directory template
-- [ ] Create `sigil-mark/audit/` directory for override logging
-- [ ] Implement `.sigilrc.yaml` v3 schema with validation
-- [ ] Create `.claude/scripts/get-strictness.sh` helper
-- [ ] Update `.sigil-version.json` schema for v3
+- [x] Update `.claude/skills/initializing-sigil/SKILL.md` for v3 structure
+- [x] Update `.claude/commands/setup.md` frontmatter for v3 outputs
+- [x] Create `sigil-mark/soul-binder/` directory template
+- [x] Create `sigil-mark/lens-array/` directory template
+- [x] Create `sigil-mark/consultation-chamber/` directory template with `decisions/`
+- [x] Create `sigil-mark/proving-grounds/` directory template with `active/`
+- [x] Create `sigil-mark/canon/graduated/` directory template
+- [x] Create `sigil-mark/audit/` directory for override logging
+- [x] Implement `.sigilrc.yaml` v3 schema with validation
+- [x] Create `.claude/scripts/get-strictness.sh` helper
+- [x] Update `.sigil-version.json` schema for v3
 
 ### Dependencies
 
