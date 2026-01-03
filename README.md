@@ -71,8 +71,38 @@ claude
 |---------|---------|--------|
 | `/canonize` | Protect emergent behaviors | canon-of-flaws.yaml |
 | `/consult` | Start decision consultation | decisions/{id}.yaml |
+| `/unlock` | Unlock a locked decision early | Updated decision record |
 | `/prove` | Register feature for proving | proving-grounds/active/{feature}.yaml |
 | `/graduate` | Graduate feature to canon | canon/graduated/{feature}.yaml |
+
+## When to Use What
+
+### Starting Out
+| Situation | Command | Why |
+|-----------|---------|-----|
+| Brand new project | `/setup` → `/envision` → `/codify` | Capture intent before code |
+| Existing codebase | `/setup` → `/inherit` → `/envision` | Scan first, then refine |
+| Pulling updates | `/update` | Get latest framework |
+
+### During Development
+| Situation | Command | Why |
+|-----------|---------|-----|
+| Need design guidance | `/craft` | Get zone-aware suggestions |
+| Working in specific lens | `/craft --lens power_user` | Force validation in that lens |
+| New pattern to approve | `/approve` | Human sign-off on deviations |
+
+### Protecting Culture
+| Situation | Command | Why |
+|-----------|---------|-----|
+| Users love a "bug" | `/canonize` | Protect it from optimization |
+| Major design decision | `/consult` | Start appropriate consultation |
+| Decision locked too long | `/unlock` | Early unlock with justification |
+
+### Validating at Scale
+| Situation | Command | Why |
+|-----------|---------|-----|
+| New feature ready for prod | `/prove` | Register for proving period |
+| Proving period complete | `/graduate` | Graduate to Living Canon |
 
 ## Workflow
 

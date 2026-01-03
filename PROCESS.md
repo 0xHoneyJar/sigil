@@ -45,6 +45,35 @@ Sigil's workflow has two paths:
 
 ---
 
+## Command Decision Tree
+
+Use this to quickly find the right command:
+
+```
+┌─ Starting a project?
+│  ├─ New project → /setup → /envision → /codify
+│  └─ Existing code → /setup → /inherit → /envision
+│
+├─ During development?
+│  ├─ Need design guidance → /craft
+│  ├─ Validate in specific lens → /craft --lens <name>
+│  └─ New pattern needs sign-off → /approve
+│
+├─ Protecting culture?
+│  ├─ Emergent behavior to protect → /canonize
+│  ├─ Major design decision → /consult
+│  └─ Need to revisit locked decision → /unlock
+│
+├─ Validating at scale?
+│  ├─ Feature ready for proving → /prove
+│  └─ Proving complete → /graduate
+│
+└─ Maintenance?
+   └─ Get framework updates → /update
+```
+
+---
+
 ## Commands
 
 ### Phase 0: Setup (`/setup`)
@@ -219,10 +248,22 @@ With moodboard and rules captured, you build your product. Sigil provides contex
    /craft "button spacing"
    ```
 
+4. **Forced Lens Mode**: Validate in a specific lens
+   ```bash
+   /craft --lens power_user "accessible loading state"
+   ```
+
 **Command**:
 ```bash
-/craft [file_path | question]
+/craft [--lens <lens_name>] [file_path | question]
 ```
+
+**Arguments**:
+| Argument | Description |
+|----------|-------------|
+| `--lens <name>` | Force validation in specific lens (e.g., `power_user`, `new_visitor`) |
+| `file_path` | Path to get zone context for |
+| `question` | Design question to answer |
 
 **Output**: Conversational guidance with zone context
 
@@ -342,6 +383,33 @@ With moodboard and rules captured, you build your product. Sigil provides contex
 ```
 
 **Output**: `sigil-mark/canon/graduated/{feature}.yaml`
+
+---
+
+### Unlock (`/unlock`)
+
+**Skill**: `unlocking-decisions`
+
+**Goal**: Unlock a locked decision before its natural unlock date
+
+**When to Use**:
+- Decision was locked but circumstances changed
+- Need to revisit a decision earlier than planned
+- Taste Owner needs to override a lock
+
+**Command**:
+```bash
+/unlock DEC-001
+```
+
+**Process**:
+1. Verifies decision exists and is locked
+2. Checks if natural unlock time has passed
+3. If still locked, requires justification
+4. Updates decision record with unlock reason
+5. Logs override to audit trail
+
+**Output**: Updated `sigil-mark/consultation-chamber/decisions/{id}.yaml`
 
 ---
 
