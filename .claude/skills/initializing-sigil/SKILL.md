@@ -200,9 +200,17 @@ layers:
     process: "none"
     authority: "taste_owner_dictates"
 
+lock_durations:
+  strategic: 180  # 6 months
+  direction: 90   # 3 months
+  execution: 30   # 1 month
+
 lock:
-  default_duration_days: 90
-  unlock_requires: "new_consultation"
+  unlock_requires: "taste_owner_approval"
+  early_unlock_reasons:
+    - "new_information"
+    - "causing_harm"
+    - "external_requirement"
 ```
 
 ### Step 7: Create Proving Grounds Files
@@ -214,18 +222,56 @@ Create `sigil-mark/proving-grounds/config.yaml`:
 
 version: "1.0"
 
-default_duration_days: 7
+default_duration_days: 14
+
+# Duration options for proving
+duration_options:
+  quick: 7      # Low-risk features
+  standard: 14  # Default
+  extended: 30  # High-stakes features
 
 graduation_requires:
   - all_monitors_green
   - no_p1_violations
   - taste_owner_signoff
 
-monitors: []
-  # Configured based on domain in .sigilrc.yaml
-  # DeFi: tvl_changes, transaction_patterns, exploit_detection
-  # Creative: performance, crash_rate, export_success
-  # Community: engagement, reports, load_patterns
+# Domain-specific monitors
+# Use get-monitors.sh to retrieve for a specific domain
+domains:
+  defi:
+    name: "DeFi"
+    monitors:
+      - tx_success_rate
+      - slippage_tolerance
+      - gas_efficiency
+      - liquidity_health
+  creative:
+    name: "Creative"
+    monitors:
+      - load_performance
+      - render_quality
+      - accessibility_score
+      - engagement_metrics
+  community:
+    name: "Community"
+    monitors:
+      - response_latency
+      - error_rate
+      - user_feedback
+      - governance_compliance
+  games:
+    name: "Games"
+    monitors:
+      - frame_rate
+      - fairness_check
+      - reward_balance
+      - player_retention
+  general:
+    name: "General"
+    monitors:
+      - error_rate
+      - uptime
+      - user_feedback
 ```
 
 ### Step 8: Create Audit Files
