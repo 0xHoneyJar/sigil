@@ -7,6 +7,7 @@ zones:
       - sigil-mark/soul-binder/immutable-values.yaml
       - sigil-mark/soul-binder/canon-of-flaws.yaml
       - sigil-mark/lens-array/lenses.yaml
+      - sigil-mark/consultation-chamber/decisions/
       - .sigilrc.yaml
     permission: read
   config:
@@ -15,7 +16,7 @@ zones:
     permission: read
 ---
 
-# Sigil Crafting Skill (v3)
+# Sigil Crafting Skill (v3.2)
 
 ## Purpose
 
@@ -25,6 +26,7 @@ Provide design guidance during implementation with awareness of:
 3. **Immutable Values** — Core principles with enforcement
 4. **Canon of Flaws** — Protected emergent behaviors
 5. **Lenses** — User persona perspectives
+6. **Locked Decisions** — Consultation chamber outcomes
 
 ## Philosophy
 
@@ -39,6 +41,7 @@ Craft enables good decisions, it doesn't enforce them. The human is always accou
 3. **Design Context**: Check for moodboard.md and rules.md (warn if missing)
 4. **Soul Binder**: Load immutable-values.yaml and canon-of-flaws.yaml
 5. **Lens Array**: Load lenses.yaml for lens-aware guidance
+6. **Locked Decisions**: Check sigil-mark/consultation-chamber/decisions/ for locked decisions
 
 ## Context Loading
 
@@ -80,6 +83,13 @@ sigil-mark/lens-array/lenses.yaml
 │   ├── {lens_id}
 │   │   ├── priority
 │   │   └── constraints[]
+
+sigil-mark/consultation-chamber/decisions/*.yaml
+├── id
+├── decision.title
+├── decision.scope (strategic/direction/execution)
+├── outcome.decision
+└── lock.locked (true/false)
 
 .sigilrc.yaml
 ├── strictness (discovery/guiding/enforcing/strict)
@@ -126,6 +136,20 @@ all_lenses=$(.claude/scripts/get-lens.sh)
 
 Use lens context to apply lens-specific constraints and validation.
 
+### Decision Lock Detection
+
+Check for locked decisions that may affect the current file:
+
+```bash
+# Check for locked decisions related to file or topic
+for decision_file in sigil-mark/consultation-chamber/decisions/*.yaml; do
+    result=$(.claude/scripts/check-decision.sh "$decision_file")
+    # Returns JSON: {"locked": true/false, "status": "...", "decision": {...}}
+done
+```
+
+Locked decisions should trigger warnings/blocks based on strictness level when the user is about to modify code that relates to the locked decision topic.
+
 ## Strictness-Aware Behavior
 
 Based on `.sigilrc.yaml` strictness level:
@@ -139,6 +163,7 @@ Based on `.sigilrc.yaml` strictness level:
 │  ────────────────────────┼───────────┼──────────┼───────────┼──────────    │
 │  Immutable Value         │ "Consider"│ ⚠️ WARN  │ ⛔ BLOCK  │ ⛔ BLOCK     │
 │  Protected Flaw          │ "Consider"│ ⚠️ WARN  │ ⛔ BLOCK  │ ⛔ BLOCK     │
+│  Locked Decision         │ "FYI"     │ ⚠️ WARN  │ ⚠️ WARN   │ ⛔ BLOCK     │
 │  Lens Failure            │ "Consider"│ ⚠️ WARN  │ ⚠️ WARN   │ ⛔ BLOCK     │
 │  Pattern Warning         │ "FYI"     │ "Consider"│ "Consider"│ ⚠️ WARN     │
 │                                                                             │
@@ -201,6 +226,31 @@ Based on:
 This is purely informational. Your judgment takes precedence.
 ```
 
+### Locked Decision Message (🔒)
+
+```
+🔒 LOCKED DECISION
+
+This relates to a locked design decision.
+
+DECISION: {decision_id} - "{decision_title}"
+SCOPE: {strategic|direction|execution}
+OUTCOME: {outcome}
+DECIDED BY: {decided_by} on {decided_at}
+LOCKED UNTIL: {unlock_date}
+
+REASONING:
+{outcome.reasoning}
+
+This decision was made through the consultation process and is
+protected until {unlock_date}.
+
+OPTIONS:
+[Proceed Anyway] [Request Early Unlock] [View Decision] [Abandon]
+
+To request early unlock: /unlock {decision_id}
+```
+
 ## Guidance Modes
 
 ### Mode 1: General Guidance
@@ -243,6 +293,11 @@ I've loaded your design context.
 - mobile (priority 3)
 - accessibility (priority 4)
 
+**Locked Decisions**
+[List locked decisions from consultation chamber]
+- DEC-2026-001: "Primary CTA Color" (direction) - locked until 2026-04-09
+- DEC-2026-002: "Onboarding Flow" (strategic) - locked until 2026-07-09
+
 **Strictness Level**: {level}
   {Description of what this means}
 
@@ -257,7 +312,7 @@ When invoked with a file path:
 /craft src/features/checkout/CartSummary.tsx
 ```
 
-**First**: Check for flaw matches, lens context, and value concerns:
+**First**: Check for flaw matches, lens context, locked decisions, and value concerns:
 
 ```bash
 # Check flaws
@@ -266,11 +321,37 @@ flaw_result=$(.claude/scripts/check-flaw.sh "src/features/checkout/CartSummary.t
 # Check lens
 lens_result=$(.claude/scripts/get-lens.sh "src/features/checkout/CartSummary.tsx")
 
+# Check locked decisions
+for decision_file in sigil-mark/consultation-chamber/decisions/*.yaml; do
+    decision_result=$(.claude/scripts/check-decision.sh "$decision_file")
+    # Check if decision topic relates to current file/context
+done
+
 # Get strictness
 strictness=$(.claude/scripts/get-strictness.sh)
 ```
 
 **Then**: Provide response based on findings:
+
+If locked decision matches context:
+```
+🔒 LOCKED DECISION DETECTED
+
+This file may relate to a locked decision:
+
+DECISION: DEC-2026-001 - "Primary CTA Color"
+SCOPE: direction
+OUTCOME: Blue (#3B82F6) selected
+LOCKED UNTIL: 2026-04-09
+
+Changes to button colors in this context were decided through
+the consultation process.
+
+Current strictness: {level}
+{What this means - warn/block/FYI}
+
+If you need to change this, request early unlock: /unlock DEC-2026-001
+```
 
 If protected flaw matched:
 ```
@@ -463,6 +544,7 @@ When suggesting motion, reference available recipes:
 | No rules.md | "No rules found. Run `/codify` to define design rules." |
 | No values | "No immutable values defined. Run `/envision` to capture values." |
 | No lenses | "No lenses configured. Run `/envision` to define user lenses." |
+| No decisions | "No locked decisions. Use `/consult` to start a consultation." |
 | Unknown zone | "This path doesn't match any configured zone. Using default guidance." |
 | Unknown lens | "No lens detected for this path. Using truth test lens for validation." |
 | Empty context | Provide general guidance mode |

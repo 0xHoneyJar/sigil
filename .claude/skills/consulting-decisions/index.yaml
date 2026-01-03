@@ -1,0 +1,24 @@
+name: consulting-decisions
+description: Start a consultation process with three-tier decision authority
+version: "3.0.0"
+
+triggers:
+  - "/consult"
+
+examples:
+  - input: "/consult"
+    description: "Start a consultation interview"
+  - input: "/consult button-color"
+    description: "Consult on a specific topic"
+  - input: "/consult \"new onboarding flow\""
+    description: "Consult on a strategic decision"
+
+inputs:
+  - name: topic
+    type: string
+    required: false
+    description: Topic to consult on
+
+outputs:
+  - path: sigil-mark/consultation-chamber/decisions/{id}.yaml
+    description: Decision record with consultation details

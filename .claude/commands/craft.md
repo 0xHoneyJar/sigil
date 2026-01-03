@@ -1,9 +1,10 @@
 ---
 name: "craft"
-version: "2.0.0"
+version: "3.2.0"
 description: |
   Provide design guidance during implementation.
-  Loads moodboard and rules context, determines zone, suggests patterns.
+  Loads moodboard, rules, values, flaws, lenses, and locked decisions.
+  Determines zone, suggests patterns, warns about violations.
 
 command_type: "conversational"
 
@@ -29,7 +30,15 @@ mode:
 
 ## Purpose
 
-Provide design guidance during implementation. Loads moodboard and rules context, determines zone from file path, and answers questions about design patterns. Warns about rejected patterns but never refuses.
+Provide design guidance during implementation with full context awareness:
+- **Moodboard** — Product feel and anti-patterns
+- **Rules** — Design rules by zone
+- **Immutable Values** — Core principles with enforcement
+- **Canon of Flaws** — Protected emergent behaviors
+- **Lenses** — User persona perspectives
+- **Locked Decisions** — Consultation chamber outcomes
+
+Warns about violations but never refuses. Human is always accountable.
 
 ## Invocation
 
@@ -51,6 +60,10 @@ Provide design guidance during implementation. Loads moodboard and rules context
 Read and internalize:
 - `sigil-mark/moodboard.md` - Product feel, references, anti-patterns
 - `sigil-mark/rules.md` - Colors, typography, spacing, motion rules
+- `sigil-mark/soul-binder/immutable-values.yaml` - Core principles
+- `sigil-mark/soul-binder/canon-of-flaws.yaml` - Protected behaviors
+- `sigil-mark/lens-array/lenses.yaml` - User personas
+- `sigil-mark/consultation-chamber/decisions/*.yaml` - Locked decisions
 - `.sigilrc.yaml` - Zone definitions and rejections
 
 ### Phase 2: Determine Zone (if file path provided)
@@ -60,11 +73,22 @@ If argument looks like a file path:
 2. Load zone-specific patterns from `.sigilrc.yaml`
 3. Apply zone context to guidance
 
+### Phase 2b: Check Constraints
+
+Run constraint checks:
+1. `check-flaw.sh <path>` - Protected flaws matching file
+2. `get-lens.sh <path>` - Applicable lens constraints
+3. `check-decision.sh` - Locked decisions related to context
+
 ### Phase 3: Provide Guidance
 
 Based on context and question:
 - Reference moodboard feel descriptors
 - Apply rules from rules.md
+- Warn about immutable value violations
+- Flag protected flaw impacts
+- Apply lens constraints
+- Warn about locked decision conflicts
 - Suggest zone-appropriate recipes
 - Warn about (don't refuse) rejected patterns
 
