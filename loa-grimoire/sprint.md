@@ -1354,59 +1354,59 @@ Create the writable soul layer with materials that compose kernel primitives, zo
 
 ### Deliverables
 
-- [ ] `sigil-mark/soul/materials.yaml` with Glass, Clay, Machinery
-- [ ] `sigil-mark/soul/zones.yaml` with path-based mappings
-- [ ] `sigil-mark/soul/tensions.yaml` with 4 axes
-- [ ] `sigil-mark/soul/essence.yaml` with soul statement
-- [ ] Tension presets (Linear, Airbnb, Nintendo, OSRS)
-- [ ] Zone detection algorithm
+- [x] `sigil-mark/soul/materials.yaml` with Glass, Clay, Machinery
+- [x] `sigil-mark/soul/zones.yaml` with path-based mappings
+- [x] `sigil-mark/soul/tensions.yaml` with 4 axes
+- [x] `sigil-mark/soul/essence.yaml` with soul statement
+- [x] Tension presets (Linear, Airbnb, Nintendo, OSRS)
+- [x] Zone detection algorithm
 
 ### Acceptance Criteria
 
 > From PRD: "Materials compose kernel primitives"
 > From SDD: "Materials define physics, not just styles"
 
-- [ ] Materials reference kernel primitives only (no custom physics)
-- [ ] Each material has: primitives, forbidden patterns, css_base
-- [ ] Zones have: material, sync, motion, paths, patterns
-- [ ] Tensions have: default, current, zone_overrides, presets
-- [ ] Essence has: soul statement, invariants
-- [ ] Zone detection matches file path to zone config
+- [x] Materials reference kernel primitives only (no custom physics)
+- [x] Each material has: primitives, forbidden patterns, css_base
+- [x] Zones have: material, sync, motion, paths, patterns
+- [x] Tensions have: default, current, zone_overrides, presets
+- [x] Essence has: soul statement, invariants
+- [x] Zone detection matches file path to zone config
 
 ### Technical Tasks
 
 **Task 14.1: Materials YAML (4 hours)**
-- [ ] Create Glass material (light: refract, weight: weightless)
-- [ ] Create Clay material (light: diffuse, weight: heavy)
-- [ ] Create Machinery material (light: flat, weight: none)
-- [ ] Add forbidden patterns for each material
-- [ ] Add css_base templates
+- [x] Create Glass material (light: refract, weight: weightless)
+- [x] Create Clay material (light: diffuse, weight: heavy)
+- [x] Create Machinery material (light: flat, weight: none)
+- [x] Add forbidden patterns for each material
+- [x] Add css_base templates
 
 **Task 14.2: Zones YAML (3 hours)**
-- [ ] Create critical zone (clay + server_tick)
-- [ ] Create transactional zone (machinery + lww)
-- [ ] Create exploratory zone (glass + lww)
-- [ ] Create marketing zone (clay + fidelity overrides)
-- [ ] Create default zone
+- [x] Create critical zone (clay + server_tick)
+- [x] Create transactional zone (machinery + lww)
+- [x] Create exploratory zone (glass + lww)
+- [x] Create marketing zone (clay + fidelity overrides)
+- [x] Create default zone
 
 **Task 14.3: Tensions YAML (3 hours)**
-- [ ] Create tension schema with 0-100 scale
-- [ ] Add default tensions (all 50)
-- [ ] Add zone_overrides structure
-- [ ] Add presets (Linear, Airbnb, Nintendo, OSRS)
+- [x] Create tension schema with 0-100 scale
+- [x] Add default tensions (all 50)
+- [x] Add zone_overrides structure
+- [x] Add presets (Linear, Airbnb, Nintendo, OSRS)
 
 **Task 14.4: Essence YAML (2 hours)**
-- [ ] Create soul statement field
-- [ ] Add invariants array
-- [ ] Add anti-patterns section
-- [ ] Add key moments section
+- [x] Create soul statement field
+- [x] Add invariants array
+- [x] Add anti-patterns section
+- [x] Add key moments section
 
 **Task 14.5: Zone Detection (4 hours)**
-- [ ] Implement detectZone() function
-- [ ] Match file path against zone patterns
-- [ ] Detect from prompt keywords as fallback
-- [ ] Support explicit --zone override
-- [ ] Return default zone if no match
+- [x] Implement detectZone() function
+- [x] Match file path against zone patterns
+- [x] Detect from prompt keywords as fallback
+- [x] Support explicit --zone override
+- [x] Return default zone if no match
 
 ### Dependencies
 

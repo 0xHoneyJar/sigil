@@ -16,6 +16,16 @@
       "sigil-mark/kernel/fidelity-ceiling.yaml"
     ]
   },
+  "soul": {
+    "initialized": true,
+    "initialized_at": "2026-01-03T00:00:00Z",
+    "files": [
+      "sigil-mark/soul/materials.yaml",
+      "sigil-mark/soul/zones.yaml",
+      "sigil-mark/soul/tensions.yaml",
+      "sigil-mark/soul/essence.yaml"
+    ]
+  },
   "integrity": {
     "enforcement": "warn",
     "last_verified": null
