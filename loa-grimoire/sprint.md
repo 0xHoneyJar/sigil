@@ -1778,57 +1778,57 @@ Complete CLAUDE.md generation, mount script, comprehensive documentation, and te
 
 ### Deliverables
 
-- [ ] CLAUDE.md auto-generation from sigil-mark/
-- [ ] Mount script for existing repos
-- [ ] Complete command documentation
-- [ ] Integration tests for all skills
-- [ ] Updated README.md
-- [ ] Migration guide from v0.4
+- [x] CLAUDE.md auto-generation from sigil-mark/
+- [x] Mount script for existing repos
+- [x] Complete command documentation
+- [x] Integration tests for all skills
+- [x] Updated README.md
+- [x] Migration guide from v0.4
 
 ### Acceptance Criteria
 
 > From PRD: "<30 min to first /craft"
 > From SDD: "CLAUDE.md auto-generated from sigil-mark/"
 
-- [ ] `sigil sync` generates valid CLAUDE.md
-- [ ] CLAUDE.md includes Three Laws, materials, zones, fidelity
-- [ ] Mount script works on existing NextJS project
-- [ ] All 10 commands documented
-- [ ] Time to first `/craft` <30 min on fresh project
+- [x] `sigil sync` generates valid CLAUDE.md
+- [x] CLAUDE.md includes Three Laws, materials, zones, fidelity
+- [x] Mount script works on existing NextJS project
+- [x] All 10 commands documented
+- [x] Time to first `/craft` <30 min on fresh project
 
 ### Technical Tasks
 
 **Task 19.1: CLAUDE.md Generation (6 hours)**
-- [ ] Create generateClaudeMd() function
-- [ ] Include Three Laws section
-- [ ] Include materials from materials.yaml
-- [ ] Include zones from zones.yaml
-- [ ] Include fidelity constraints
-- [ ] Include agent protocol
+- [x] Create generateClaudeMd() function
+- [x] Include Three Laws section
+- [x] Include materials from materials.yaml
+- [x] Include zones from zones.yaml
+- [x] Include fidelity constraints
+- [x] Include agent protocol
 
 **Task 19.2: Mount Script (4 hours)**
-- [ ] Create mount command
-- [ ] Detect existing components
-- [ ] Suggest zone mappings
-- [ ] Create sigil-mark/ structure
-- [ ] Generate initial CLAUDE.md
+- [x] Create mount command
+- [x] Detect existing components
+- [x] Suggest zone mappings
+- [x] Create sigil-mark/ structure
+- [x] Generate initial CLAUDE.md
 
 **Task 19.3: Documentation (4 hours)**
-- [ ] Document all 10 commands
-- [ ] Create quick start guide
-- [ ] Document The Three Laws
-- [ ] Document agent roles
+- [x] Document all 10 commands
+- [x] Create quick start guide
+- [x] Document The Three Laws
+- [x] Document agent roles
 
 **Task 19.4: Testing (4 hours)**
-- [ ] Create integration tests for /setup → /craft flow
-- [ ] Test kernel lock mechanism
-- [ ] Test fidelity validation
-- [ ] Test zone detection
+- [x] Create integration tests for /setup → /craft flow
+- [x] Test kernel lock mechanism
+- [x] Test fidelity validation
+- [x] Test zone detection
 
 **Task 19.5: Migration Guide (2 hours)**
-- [ ] Document v0.4 → v11 changes
-- [ ] Provide migration steps
-- [ ] Note breaking changes
+- [x] Document v0.4 → v11 changes
+- [x] Provide migration steps
+- [x] Note breaking changes
 
 ### Dependencies
 

@@ -1,4 +1,4 @@
-# Sigil
+# Sigil v11 Soul Engine
 
 Constitutional Design Framework for AI-assisted development.
 
@@ -6,33 +6,36 @@ Constitutional Design Framework for AI-assisted development.
 
 ## What is Sigil?
 
-Sigil v0.3 is a constitutional framework that protects both intended soul (Immutable Values) and emergent soul (Canon of Flaws). It captures and preserves design decisions so AI agents can make consistent UI choices.
+Sigil v11 is a Soul Engine that captures product soul and makes it available to AI agents during code generation. It defines **materials** (physics), **zones** (context), and **fidelity constraints** to ensure consistent design decisions.
 
-**Four Pillars:**
-1. **Soul Binder** - Protects values and emergent behaviors (Canon of Flaws)
-2. **Lens Array** - Supports multiple user truths with persona-based validation
-3. **Consultation Chamber** - Layered decision authority (poll/consult/dictate)
-4. **Proving Grounds** - Scale validation before production graduation
+**The Three Laws:**
 
-**Core Features:**
-- **Moodboard** - Capture product feel, references, and anti-patterns
-- **Design Rules** - Define colors, typography, spacing, motion by zone
-- **Zone System** - Path-based context for different areas of your app
-- **Progressive Strictness** - Discovery → Guiding → Enforcing → Strict
-- **Human Approval** - All validation is human review, not automation
+1. **Server-tick data MUST show pending state** — Never optimistic for money/inventory/trades
+2. **Fidelity ceiling cannot be exceeded** — "Better" is often "worse"
+3. **Visuals are dictated, never polled** — Taste Owner decides pixels
+
+**Core Concepts:**
+
+| Concept | Description |
+|---------|-------------|
+| **Materials** | Physics primitives (glass, clay, machinery) |
+| **Zones** | Path-based design context |
+| **Fidelity Ceiling** | Maximum allowed complexity |
+| **Sync Strategies** | Data synchronization rules |
+| **Governance** | Taste Owner + Pollster model |
 
 ## Installation
 
 One-liner mount onto any repository:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/zksoju/sigil/main/.claude/scripts/mount-sigil.sh | bash
+curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash
 ```
 
 Or clone and mount manually:
 
 ```bash
-git clone https://github.com/zksoju/sigil.git ~/.sigil/sigil
+git clone https://github.com/0xHoneyJar/sigil.git ~/.sigil/sigil
 ~/.sigil/sigil/.claude/scripts/mount-sigil.sh
 ```
 
@@ -40,183 +43,235 @@ git clone https://github.com/zksoju/sigil.git ~/.sigil/sigil
 
 ```bash
 # 1. Mount Sigil onto your repo
-curl -fsSL https://raw.githubusercontent.com/zksoju/sigil/main/.claude/scripts/mount-sigil.sh | bash
+curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash
 
 # 2. Start Claude Code
 claude
 
-# 3. Initialize Sigil
-/setup
+# 3. Initialize and capture soul
+/setup              # Initialize Sigil
+/envision           # Capture product soul (interview)
+/codify             # Define materials, lock kernel
+/sync               # Generate CLAUDE.md
 
-# 4. Choose your path:
-/envision    # New project - interview to capture feel
-/inherit     # Existing codebase - scan and infer
+# 4. During development
+/craft              # Get design guidance
+/validate           # Check fidelity ceiling
+/approve            # Taste Owner sign-off
 ```
+
+**Time to first `/craft`:** <30 minutes
 
 ## Commands
 
 ### Core Commands
-| Command | Purpose | Output |
-|---------|---------|--------|
-| `/setup` | Initialize Sigil v0.3 | sigil-mark/, .sigilrc.yaml |
-| `/envision` | Capture product moodboard + values + lenses | moodboard.md, immutable-values.yaml, lenses.yaml |
-| `/codify` | Define design rules | rules.md |
-| `/craft` | Get design guidance | Conversational |
-| `/approve` | Human review and sign-off | Approval record |
-| `/inherit` | Bootstrap from existing code | Draft moodboard, rules, inventory |
-| `/update` | Pull framework updates | Updated symlinks |
 
-### v0.3 Commands (Constitutional Features)
-| Command | Purpose | Output |
-|---------|---------|--------|
-| `/canonize` | Protect emergent behaviors | canon-of-flaws.yaml |
-| `/consult` | Start decision consultation | decisions/{id}.yaml |
-| `/unlock` | Unlock a locked decision early | Updated decision record |
-| `/prove` | Register feature for proving | proving-grounds/active/{feature}.yaml |
-| `/graduate` | Graduate feature to canon | canon/graduated/{feature}.yaml |
+| Command | Purpose |
+|---------|---------|
+| `/setup` | Initialize Sigil on a repo |
+| `/envision` | Capture product soul (interview) |
+| `/codify` | Define materials, lock kernel |
+| `/zone` | Configure path-based zones |
+| `/sync` | Generate CLAUDE.md |
+| `/craft` | Get design guidance |
+| `/validate` | Check fidelity ceiling |
+| `/garden` | Track paper cuts (3:1 ratio) |
 
-## When to Use What
+### Governance Commands
 
-### Starting Out
-| Situation | Command | Why |
-|-----------|---------|-----|
-| Brand new project | `/setup` → `/envision` → `/codify` | Capture intent before code |
-| Existing codebase | `/setup` → `/inherit` → `/envision` | Scan first, then refine |
-| Pulling updates | `/update` | Get latest framework |
+| Command | Purpose |
+|---------|---------|
+| `/approve` | Taste Owner visual approval |
+| `/greenlight` | Community concept polling |
+| `/prove` | Register feature for proving |
 
-### During Development
-| Situation | Command | Why |
-|-----------|---------|-----|
-| Need design guidance | `/craft` | Get zone-aware suggestions |
-| Working in specific lens | `/craft --lens power_user` | Force validation in that lens |
-| New pattern to approve | `/approve` | Human sign-off on deviations |
+### Migration Commands
 
-### Protecting Culture
-| Situation | Command | Why |
-|-----------|---------|-----|
-| Users love a "bug" | `/canonize` | Protect it from optimization |
-| Major design decision | `/consult` | Start appropriate consultation |
-| Decision locked too long | `/unlock` | Early unlock with justification |
+| Command | Purpose |
+|---------|---------|
+| `/inherit` | Bootstrap from existing codebase |
+| `/mount` | Install Sigil framework |
+| `/update` | Pull framework updates |
 
-### Validating at Scale
-| Situation | Command | Why |
-|-----------|---------|-----|
-| New feature ready for prod | `/prove` | Register for proving period |
-| Proving period complete | `/graduate` | Graduate to Living Canon |
+See [docs/COMMANDS.md](docs/COMMANDS.md) for complete reference.
 
-## Workflow
+## Materials
 
-### New Project
+Materials define physics, not just styles:
+
+| Material | Description | Use Cases |
+|----------|-------------|-----------|
+| **Glass** | Light, translucent, refractive | Overlays, modals, nav |
+| **Clay** | Warm, tactile, weighted | Buttons, cards, forms |
+| **Machinery** | Instant, precise, zero-latency | Admin, dashboards, CLI |
+
+Each material has:
+- **Primitives** (light, weight, motion, feedback)
+- **CSS Variables** (for implementation)
+- **Forbidden Patterns** (what violates the material)
+
+## Zones
+
+Zones determine material, sync, and motion by file path:
+
+| Zone | Material | Sync | Motion |
+|------|----------|------|--------|
+| Critical | clay | server_tick | deliberate |
+| Transactional | machinery | lww | instant |
+| Exploratory | glass | lww | flowing |
+| Marketing | clay | local_only | expressive |
+| Celebration | clay | server_tick | triumphant |
+
+Configure in `sigil-mark/soul/zones.yaml`:
+
+```yaml
+zones:
+  critical:
+    paths:
+      - "src/features/checkout/**"
+      - "src/features/trade/**"
+    material: "clay"
+    sync: "server_tick"
 ```
-/setup → /envision → /codify → (build) → /craft → /approve
-```
 
-### Existing Project
-```
-/setup → /inherit → /envision → /codify → (build) → /craft → /approve
-```
+## Fidelity Ceiling
+
+"Better" is often "worse." The Mod Ghost Rule protects the soul.
+
+**Constraints:**
+- Max gradient stops: 2
+- Max shadow layers: 3
+- Max animation duration: 800ms
+- Max border radius: 16px
+
+**Forbidden Techniques:**
+- Mesh gradients
+- 3D transforms
+- Particle systems
+- Bounce/elastic easing
 
 ## Directory Structure
-
-After setup (v0.3 four-pillar architecture):
 
 ```
 your-repo/
 ├── .claude/
-│   ├── commands/      # Symlinked commands
-│   └── skills/        # Symlinked skills
-├── sigil-mark/        # Your design context
-│   ├── moodboard.md           # Product feel, references
-│   ├── rules.md               # Design rules by category
-│   ├── inventory.md           # Component list
-│   ├── soul-binder/           # Pillar 1: Values + Flaws
-│   │   ├── immutable-values.yaml
-│   │   ├── canon-of-flaws.yaml
-│   │   └── visual-soul.yaml
-│   ├── lens-array/            # Pillar 2: User personas
-│   │   └── lenses.yaml
-│   ├── consultation-chamber/  # Pillar 3: Decisions
-│   │   ├── config.yaml
-│   │   └── decisions/
-│   ├── proving-grounds/       # Pillar 4: Feature proving
-│   │   ├── config.yaml
-│   │   └── active/
-│   ├── canon/                 # Graduated features
-│   │   └── graduated/
-│   └── audit/                 # Override logging
-│       └── overrides.yaml
-├── .sigilrc.yaml      # Zone configuration + strictness
-├── .sigil-version.json
-└── .sigil-setup-complete
+│   ├── commands/           # Symlinked commands
+│   ├── skills/             # Symlinked skills
+│   └── scripts/            # Utility scripts
+├── sigil-mark/             # Your design context
+│   ├── kernel/             # IMMUTABLE after lock
+│   │   ├── physics.yaml    # Physics primitives
+│   │   ├── sync.yaml       # Sync strategies
+│   │   └── fidelity-ceiling.yaml
+│   ├── soul/               # Product soul
+│   │   ├── essence.yaml    # Soul statement
+│   │   ├── materials.yaml  # Material definitions
+│   │   ├── zones.yaml      # Zone mappings
+│   │   └── tensions.yaml   # Tension sliders
+│   ├── workbench/          # Active work
+│   │   ├── fidelity-report.yaml
+│   │   └── paper-cuts.yaml
+│   └── governance/         # Approvals and polls
+│       ├── taste-owners.yaml
+│       ├── approvals.yaml
+│       └── greenlight.yaml
+├── .sigilrc.yaml           # Zone configuration
+├── .sigil-version.json     # Version tracking
+├── .sigil-setup-complete   # Setup marker
+└── CLAUDE.md               # Generated design context
 ```
 
-## Zone System
+## Workflow
 
-Zones define design context by file path:
+### New Project
 
-```yaml
-# .sigilrc.yaml
-zones:
-  critical:
-    paths: ["src/features/checkout/**"]
-    motion: "deliberate"
-    patterns:
-      prefer: ["deliberate-entrance"]
-      warn: ["playful-bounce"]
-
-  marketing:
-    paths: ["src/features/marketing/**"]
-    motion: "playful"
+```
+/setup → /envision → /codify → /zone → /sync → /craft
 ```
 
-## Strictness Levels
+### Existing Codebase
 
-Sigil v0.3 introduces progressive strictness:
-
-| Level | Behavior |
-|-------|----------|
-| `discovery` | All suggestions, no blocks (default) |
-| `guiding` | Warnings on violations |
-| `enforcing` | Blocks on protected flaws/values |
-| `strict` | Blocks on all violations |
-
-Configure in `.sigilrc.yaml`:
-```yaml
-strictness: "discovery"
 ```
+/inherit → /envision → /codify → /zone → /sync → /craft
+```
+
+### During Development
+
+```
+/craft → (code) → /validate → /approve
+```
+
+### Feature Launch
+
+```
+/greenlight → /prove → (graduate)
+```
+
+## Governance Model
+
+Sigil v11 introduces a dual governance model:
+
+| Role | Scope | Authority |
+|------|-------|-----------|
+| **Taste Owner** | Visuals | Dictates (not polls) |
+| **Pollster** | Concepts | Polls community |
+
+**Taste Owner** approves:
+- Color palettes
+- Typography choices
+- Animation timing
+- Component layouts
+
+**Pollster** polls:
+- New features
+- Major UX changes
+- Breaking changes
+- High-stakes decisions
+
+## HUD Overlay
+
+The `@sigil/hud` package provides development-only UI:
+
+```tsx
+import { SigilHUD } from '@sigil/hud';
+
+function App() {
+  return (
+    <>
+      <YourApp />
+      <SigilHUD position="bottom-right" />
+    </>
+  );
+}
+```
+
+**Features:**
+- Tension sliders (<16ms RAF updates)
+- Material picker
+- Fidelity status
+- Zero production footprint
 
 ## Philosophy
 
-Sigil doesn't enforce taste via CI blocking. It enables culture through:
+Sigil enables craft, it doesn't police it.
 
-- **Recipes** — Make good patterns easy to use
-- **Warnings** — Make bad patterns visible (not blocked)
-- **Human Review** — Taste owners approve, not bots
-
-Systems that block will be bypassed. Systems that enable will be adopted.
-
-## Coexistence with Loa
-
-Sigil and [Loa](https://github.com/0xHoneyJar/loa) can coexist on the same repo:
-
-| Aspect | Loa | Sigil |
-|--------|-----|-------|
-| State Zone | loa-grimoire/ | sigil-mark/ |
-| Config | .loa.config.yaml | .sigilrc.yaml |
-| Focus | Product development | Design context |
+- **Right path easy** — Clear rules, zone context, pattern suggestions
+- **Wrong path visible** — Warnings on rejected patterns, not blocks
+- **Escape hatches exist** — Human can always override
+- **Humans accountable** — Approval is human, not automated
 
 ## Requirements
 
 - Git
 - Claude Code CLI
+- Node.js >= 18 (for HUD package)
 - jq (optional, for better JSON handling)
-- yq (optional, for YAML parsing)
 
 ## Version
 
-0.3.0 (Constitutional Design Framework)
+v11.0.0 (Soul Engine)
 
-See [CHANGELOG.md](CHANGELOG.md) for release history.
+See [docs/MIGRATION.md](docs/MIGRATION.md) for migration from v0.4.
 
 ## License
 
