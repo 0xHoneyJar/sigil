@@ -26,24 +26,39 @@ Sigil v11 is a Soul Engine that captures product soul and makes it available to 
 
 ## Installation
 
-One-liner mount onto any repository:
+### Recommended (Verify Before Execute)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash
+# Download the install script
+curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh -o mount-sigil.sh
+
+# Review the script (optional but recommended)
+less mount-sigil.sh
+
+# Execute
+bash mount-sigil.sh
 ```
 
-Or clone and mount manually:
+### Alternative: Clone and Mount
 
 ```bash
 git clone https://github.com/0xHoneyJar/sigil.git ~/.sigil/sigil
 ~/.sigil/sigil/.claude/scripts/mount-sigil.sh
 ```
 
+### Quick Install (Convenience)
+
+> **Note:** This executes remote code without review. Only use if you trust the source.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash
+```
+
 ## Quick Start
 
 ```bash
-# 1. Mount Sigil onto your repo
-curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash
+# 1. Mount Sigil onto your repo (see Installation above)
+bash mount-sigil.sh
 
 # 2. Start Claude Code
 claude

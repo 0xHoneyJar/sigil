@@ -5,8 +5,9 @@
 ## Quick Start
 
 ```bash
-# Install Sigil on a repository
-curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash
+# Install Sigil on a repository (download, review, execute)
+curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh -o mount-sigil.sh
+bash mount-sigil.sh
 
 # Initialize and capture soul
 /setup              # Initialize Sigil

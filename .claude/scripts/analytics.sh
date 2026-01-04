@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Analytics helper functions for Loa framework
 # These functions are designed to work cross-platform and fail gracefully
+
+set -euo pipefail
 
 # Get framework version from package.json or CHANGELOG.md
 get_framework_version() {

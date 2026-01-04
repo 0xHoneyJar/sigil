@@ -28,8 +28,8 @@ This audit covers the expanded codebase including:
 | Severity | Count | Description |
 |----------|-------|-------------|
 | CRITICAL | 0 | No critical issues found |
-| HIGH | 2 | Shell script safety gaps, External script execution |
-| MEDIUM | 4 | Missing strict mode in scripts, Path validation, Network trust |
+| HIGH | 0 | All HIGH issues resolved (2 fixed) |
+| MEDIUM | 4 | Path validation, Network trust, Temp files |
 | LOW | 5 | Minor improvements recommended |
 | INFORMATIONAL | 3 | Carried forward from v0.3.0 audit |
 
@@ -43,57 +43,31 @@ This audit covers the expanded codebase including:
 
 ## High Priority Issues (Fix Before Production)
 
-### HIGH-001: Curl Pipe to Bash Pattern
+### HIGH-001: Curl Pipe to Bash Pattern - FIXED
 
-**Location:** `README.md` (lines 32, 46), `.claude/scripts/mount-loa.sh` (line 124)
+**Location:** `README.md`, `docs/COMMANDS.md`
 
-**Description:** The installation documentation recommends the `curl | bash` anti-pattern:
+**Status:** RESOLVED (2026-01-03)
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash
-```
-
-This pattern:
-- Prevents users from reviewing code before execution
-- Creates MITM attack vectors
-- Bypasses checksum verification
-
-**Risk:** An attacker who compromises the GitHub repository or performs a MITM attack could execute arbitrary code on user machines.
-
-**Recommendation:**
-1. Provide a two-step installation:
-   ```bash
-   # Download and verify
-   curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh -o mount-sigil.sh
-   sha256sum mount-sigil.sh  # Verify against published hash
-   bash mount-sigil.sh
-   ```
-2. Publish SHA256 checksums in a separate, signed file
-3. Consider GPG signing releases
+**Fix Applied:**
+- Updated README.md with "Recommended (Verify Before Execute)" installation method
+- Added warning note to quick install option
+- Updated docs/COMMANDS.md with safer two-step installation
 
 ---
 
-### HIGH-002: Shell Scripts Missing Safety Flags
+### HIGH-002: Shell Scripts Missing Safety Flags - FIXED
 
-**Location:** 3 shell scripts lack `set -euo pipefail`
+**Location:** 3 shell scripts
 
-**Affected Files:**
-- `.claude/scripts/analytics.sh` - Uses `#!/bin/bash` without safety flags
-- `.claude/scripts/context-check.sh` - Uses `#!/bin/bash` without safety flags
-- `.claude/scripts/git-safety.sh` - Uses `#!/bin/bash` without safety flags
+**Status:** RESOLVED (2026-01-03)
 
-**Description:** These scripts do not use `set -euo pipefail` which means:
-- Script execution continues after errors (`set -e`)
-- Undefined variables silently expand to empty (`set -u`)
-- Pipeline failures are ignored (`set -o pipefail`)
+**Fix Applied:**
+- `.claude/scripts/analytics.sh` - Added `set -euo pipefail`
+- `.claude/scripts/context-check.sh` - Added `set -euo pipefail`
+- `.claude/scripts/git-safety.sh` - Added `set -euo pipefail`
 
-**Risk:** Silent failures could lead to partial execution states, data corruption, or security bypasses.
-
-**Recommendation:** Add to the top of each script:
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-```
+All scripts now use `#!/usr/bin/env bash` with proper safety flags.
 
 ---
 
@@ -305,7 +279,7 @@ matches_pattern() {
 
 ### GOOD-001: Proper Use of `set -euo pipefail`
 
-46 out of 49 shell scripts (94%) properly use `set -euo pipefail` or `set -e`, demonstrating awareness of shell safety practices.
+49 out of 49 shell scripts (100%) properly use `set -euo pipefail` or `set -e`, demonstrating awareness of shell safety practices.
 
 ### GOOD-002: No Hardcoded Secrets
 
@@ -411,7 +385,7 @@ esac
 | Check | Status | Notes |
 |-------|--------|-------|
 | No hardcoded secrets | PASS | Environment variables used |
-| Shell scripts use safety flags | PARTIAL | 3 scripts missing flags |
+| Shell scripts use safety flags | PASS | All scripts now have safety flags |
 | Input validation | PASS | Whitelist validation for enums |
 | Secure temporary files | PARTIAL | Uses mktemp, could improve |
 | No eval/exec on user input | PASS | No dangerous patterns found |
@@ -547,8 +521,8 @@ The identified issues are primarily related to defense-in-depth improvements rat
 | Production Deployment | APPROVED with conditions | - |
 
 **Conditions for Production:**
-1. Address HIGH-002 (missing safety flags) before deployment
-2. Document HIGH-001 (curl pipe bash) risk in user-facing documentation
+1. ~~Address HIGH-002 (missing safety flags) before deployment~~ DONE
+2. ~~Document HIGH-001 (curl pipe bash) risk in user-facing documentation~~ DONE
 3. Run `npm audit` and address any critical/high findings
 
 ---

@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Git safety detection functions for Loa framework
 # Prevents accidental pushes to upstream template repository
+
+set -euo pipefail
 
 # Known Loa template repositories
 KNOWN_TEMPLATES="(0xHoneyJar|thj-dev)/loa"
