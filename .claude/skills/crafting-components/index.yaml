@@ -1,0 +1,11 @@
+name: crafting-components
+version: "1.0.0"
+description: "Generates UI with context injection. Apprentice Smith role."
+role: "Apprentice Smith"
+command: /craft
+outputs: []  # Generates code, not state files
+dependencies:
+  - envisioning-soul
+  - codifying-materials
+  - mapping-zones
+context_injection: true

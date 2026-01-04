@@ -1438,63 +1438,63 @@ Create the 4 core agent skills: envisioning-soul (Soul Keeper), codifying-materi
 
 ### Deliverables
 
-- [ ] `.claude/skills/envisioning-soul/` with SKILL.md and index.yaml
-- [ ] `.claude/skills/codifying-materials/` with SKILL.md and index.yaml
-- [ ] `.claude/skills/mapping-zones/` with SKILL.md and index.yaml
-- [ ] `.claude/skills/crafting-components/` with SKILL.md and index.yaml
-- [ ] Command files for /envision, /codify, /material, /zone, /craft
-- [ ] Context injection XML template
+- [x] `.claude/skills/envisioning-soul/` with SKILL.md and index.yaml
+- [x] `.claude/skills/codifying-materials/` with SKILL.md and index.yaml
+- [x] `.claude/skills/mapping-zones/` with SKILL.md and index.yaml
+- [x] `.claude/skills/crafting-components/` with SKILL.md and index.yaml
+- [x] Command files for /envision, /codify, /material, /zone, /craft
+- [x] Context injection XML template
 
 ### Acceptance Criteria
 
 > From PRD: "8 agents with clear roles and commands"
 > From SDD: "Context injection happens BEFORE generation"
 
-- [ ] `/envision` conducts interview and creates essence.yaml
-- [ ] `/codify` defines materials and can lock kernel with `--lock`
-- [ ] `/zone` configures path-based zone mappings
-- [ ] `/craft` injects context before generation
-- [ ] Context XML includes zone, material, fidelity, tensions
-- [ ] Constitution check runs after generation
+- [x] `/envision` conducts interview and creates essence.yaml
+- [x] `/codify` defines materials and can lock kernel with `--lock`
+- [x] `/zone` configures path-based zone mappings
+- [x] `/craft` injects context before generation
+- [x] Context XML includes zone, material, fidelity, tensions
+- [x] Constitution check runs after generation
 
 ### Technical Tasks
 
 **Task 15.1: envisioning-soul Skill (4 hours)**
-- [ ] Create index.yaml with metadata
-- [ ] Create SKILL.md with interview workflow
-- [ ] Add soul statement capture
-- [ ] Add anti-pattern detection
-- [ ] Add key moments capture
-- [ ] Output to essence.yaml and moodboard.md
+- [x] Create index.yaml with metadata
+- [x] Create SKILL.md with interview workflow
+- [x] Add soul statement capture
+- [x] Add anti-pattern detection
+- [x] Add key moments capture
+- [x] Output to essence.yaml and moodboard.md
 
 **Task 15.2: codifying-materials Skill (4 hours)**
-- [ ] Create index.yaml with commands (codify, material)
-- [ ] Create SKILL.md with material definition workflow
-- [ ] Add kernel primitive validation
-- [ ] Add lock mechanism (`--lock` flag)
-- [ ] Output to materials.yaml
+- [x] Create index.yaml with commands (codify, material)
+- [x] Create SKILL.md with material definition workflow
+- [x] Add kernel primitive validation
+- [x] Add lock mechanism (`--lock` flag)
+- [x] Output to materials.yaml
 
 **Task 15.3: mapping-zones Skill (3 hours)**
-- [ ] Create index.yaml with zone command
-- [ ] Create SKILL.md with zone configuration workflow
-- [ ] Add path scanning for feature directories
-- [ ] Add material and sync assignment
-- [ ] Output to zones.yaml
+- [x] Create index.yaml with zone command
+- [x] Create SKILL.md with zone configuration workflow
+- [x] Add path scanning for feature directories
+- [x] Add material and sync assignment
+- [x] Output to zones.yaml
 
 **Task 15.4: crafting-components Skill (6 hours)**
-- [ ] Create index.yaml with craft command
-- [ ] Create SKILL.md with context injection workflow
-- [ ] Implement zone detection integration
-- [ ] Implement context XML generation
-- [ ] Implement constitution check
-- [ ] Add --zone, --material, --tension flags
+- [x] Create index.yaml with craft command
+- [x] Create SKILL.md with context injection workflow
+- [x] Implement zone detection integration
+- [x] Implement context XML generation
+- [x] Implement constitution check
+- [x] Add --zone, --material, --tension flags
 
 **Task 15.5: Command Files (2 hours)**
-- [ ] Create /envision command
-- [ ] Create /codify command
-- [ ] Create /material command
-- [ ] Create /zone command
-- [ ] Create /craft command
+- [x] Create /envision command
+- [x] Create /codify command
+- [x] Create /material command
+- [x] Create /zone command
+- [x] Create /craft command
 
 ### Dependencies
 

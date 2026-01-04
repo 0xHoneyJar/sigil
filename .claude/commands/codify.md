@@ -1,232 +1,38 @@
 ---
-name: "codify"
-version: "0.2.0"
-description: |
-  Define design rules by category through interview.
-  Captures colors, typography, spacing, motion, and component rules.
-
-command_type: "interview"
-
-arguments: []
-
-pre_flight:
-  - check: "file_exists"
-    path: ".sigil-setup-complete"
-    error: "Sigil not set up. Run /setup first."
-
-outputs:
-  - path: "sigil-mark/rules.md"
-    type: "file"
-    description: "Design rules organized by category"
-  - path: ".sigilrc.yaml"
-    type: "file"
-    description: "Updated zone definitions"
-
-mode:
-  default: "foreground"
-  allow_background: false
+name: codify
+description: Define physics primitives and materials
+agent: codifying-materials
+agent_path: .claude/skills/codifying-materials/SKILL.md
+preflight:
+  - sigil_setup_complete
+  - essence_exists
 ---
 
-# Codify
+# /codify
 
-## Purpose
+Define materials and configure kernel physics.
 
-Define design rules through a structured interview. Captures colors, typography, spacing, motion patterns, and component-specific rules. Updates `.sigilrc.yaml` with zone definitions.
-
-## Invocation
+## Usage
 
 ```
-/codify
+/codify         # Configure materials and kernel
+/codify --lock  # Lock kernel (irreversible)
 ```
 
-## Prerequisites
+## What This Configures
 
-- Sigil must be set up (`.sigil-setup-complete` exists)
-- Recommended: Run `/envision` first to have moodboard context
-
-## Workflow
-
-### Phase 0: Load Context
-
-Read `sigil-mark/moodboard.md` if it exists to inform questions and provide context.
-
-### Phase 1: Colors
-
-```
-What are your key color tokens?
-
-Think about:
-- Primary/secondary brand colors
-- Background and surface colors
-- Text colors (primary, secondary, muted)
-- Semantic colors (success, warning, error)
-```
-
-Ask about light/dark mode support.
-
-### Phase 2: Typography
-
-```
-What typography patterns do you use?
-
-Think about:
-- Font families (heading, body, mono)
-- Size scale (how do you size text?)
-- Weight usage (when bold, when light?)
-```
-
-### Phase 3: Spacing
-
-```
-What are your spacing conventions?
-
-Think about:
-- Base unit (4px? 8px?)
-- Component internal spacing
-- Section/layout spacing
-- Consistent gaps
-```
-
-### Phase 4: Motion by Zone
-
-For each zone (critical, marketing, admin), ask:
-
-```
-How should motion work in [zone] contexts?
-
-Options:
-- Deliberate (800ms+, heavy spring)
-- Playful (bouncy, attention-grabbing)
-- Snappy (<200ms, instant response)
-- Custom
-```
-
-### Phase 5: Zone Paths
-
-For each zone, ask which file paths belong:
-
-```
-Which paths should use [zone] motion?
-
-Examples:
-- src/features/checkout/** (critical)
-- src/features/marketing/** (marketing)
-- src/features/admin/** (admin)
-```
-
-### Phase 6: Component Rules
-
-```
-Any component-specific rules to capture?
-
-Examples:
-- Button: always animate on hover
-- Modal: deliberate entrance, quick exit
-- Toast: snappy entrance from corner
-```
-
-### Phase 7: Generate Rules
-
-Write `sigil-mark/rules.md`:
-
-```markdown
-# Design Rules
-
-**Version**: 1.0
-**Updated**: [Date]
-
----
-
-## Colors
-
-| Token | Light | Dark | Usage |
-|-------|-------|------|-------|
-| primary | [value] | [value] | [usage] |
-...
-
----
-
-## Typography
-
-| Element | Class | Notes |
-|---------|-------|-------|
-...
-
----
-
-## Spacing
-
-| Context | Value | Notes |
-|---------|-------|-------|
-...
-
----
-
-## Motion
-
-### By Zone
-
-| Zone | Style | Timing | Notes |
-|------|-------|--------|-------|
-| critical | deliberate | 800ms+ | |
-| marketing | playful | - | |
-| admin | snappy | <200ms | |
-
-### Recipes
-
-| Recipe | Zone | Parameters |
-|--------|------|------------|
-...
-
----
-
-## Components
-
-[Component-specific rules]
-
----
-
-## Approvals
-
-| Component | Approved | Date | By |
-|-----------|----------|------|----|
-```
-
-### Phase 8: Update .sigilrc.yaml
-
-Update zone definitions with captured paths:
-
-```yaml
-zones:
-  critical:
-    paths: ["src/features/checkout/**", ...]
-    motion: "deliberate"
-    patterns:
-      prefer: ["deliberate-entrance"]
-      warn: ["instant-transition"]
-  ...
-```
-
-## Arguments
-
-| Argument | Description | Required |
-|----------|-------------|----------|
-| None | | |
+1. **Physics primitives** - Light, weight, motion, feedback
+2. **Sync strategies** - CRDT, LWW, Server-Tick mappings
+3. **Fidelity ceiling** - Gold Standard constraints
+4. **Materials** - Glass, Clay, Machinery compositions
 
 ## Outputs
 
-| Path | Description |
-|------|-------------|
-| `sigil-mark/rules.md` | Design rules organized by category |
-| `.sigilrc.yaml` | Updated zone definitions |
-
-## Error Handling
-
-| Error | Cause | Resolution |
-|-------|-------|------------|
-| "Sigil not set up" | Missing `.sigil-setup-complete` | Run `/setup` first |
-| "Rules already exist" | Previous `/codify` | Offer to update or replace |
+- `sigil-mark/kernel/physics.yaml`
+- `sigil-mark/kernel/sync.yaml`
+- `sigil-mark/kernel/fidelity-ceiling.yaml`
+- `sigil-mark/soul/materials.yaml`
 
 ## Next Step
 
-After codify: `/craft` to get design guidance during implementation
+After `/codify`: Run `/zone` to configure design zones.

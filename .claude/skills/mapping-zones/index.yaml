@@ -1,0 +1,9 @@
+name: mapping-zones
+version: "1.0.0"
+description: "Configures path-based design zones. Zone Architect role."
+role: "Zone Architect"
+command: /zone
+outputs:
+  - sigil-mark/soul/zones.yaml
+dependencies:
+  - codifying-materials
