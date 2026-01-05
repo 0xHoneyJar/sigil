@@ -1,6 +1,6 @@
 # Agent: envisioning-soul
 name: envisioning-soul
-version: "4.0.0"
+version: "0.5.0"
 description: "Captures product essence through interview. Populates resonance/essence.yaml."
 role: "Soul Keeper"
 command: /envision

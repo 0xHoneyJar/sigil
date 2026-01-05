@@ -1,16 +1,16 @@
-# Sprint Plan: Sigil v4 — Design Physics Engine
+# Sprint Plan: Sigil v0.5 — Design Physics Engine
 
-**Version:** 1.0
+**Version:** 0.5.0
 **Date:** 2026-01-04
 **Author:** Sprint Planner Agent
-**PRD Reference:** loa-grimoire/prd.md (v4)
-**SDD Reference:** loa-grimoire/sdd.md (v4)
+**PRD Reference:** loa-grimoire/prd.md
+**SDD Reference:** loa-grimoire/sdd.md
 
 ---
 
 ## Executive Summary
 
-Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for consistent design decisions. This replaces the v3 Constitutional Framework with a simpler, more focused architecture: 8 skills, 8 commands, physics enforcement.
+Sigil v0.5 is a Design Physics Engine that gives AI agents physics constraints for consistent design decisions. This replaces v0.4 Soul Engine with a simpler, more focused architecture: 9 skills, 9 commands, physics enforcement.
 
 **Philosophy:** "Physics, not opinions. Constraints, not debates."
 
@@ -367,7 +367,7 @@ Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for
 
 ---
 
-## Sprint 5: Validation & Approval Commands ✅ REVIEW_APPROVED
+## Sprint 5: Validation & Approval Commands ✅ COMPLETED
 
 **Goal:** Implement validation pipeline
 
@@ -431,72 +431,72 @@ Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for
 
 ---
 
-## Sprint 6: Garden & Mount System
+## Sprint 6: Garden & Mount System ✅ COMPLETED
 
 **Goal:** Implement maintenance and distribution
 
 ### Tasks
 
-#### S6-T1: Create gardening-entropy Skill
+#### S6-T1: Create gardening-entropy Skill ✅
 **Description:** Skill for /garden command
 
 **Acceptance Criteria:**
-- [ ] Detects drift from essence
-- [ ] Reviews active mutations
-- [ ] Promotes to canon or graveyard
-- [ ] Flags stale decisions
-- [ ] Era transition detection
+- [x] Detects drift from essence
+- [x] Reviews active mutations
+- [x] Promotes to canon or graveyard
+- [x] Flags stale decisions
+- [x] Era transition detection
 
 **Effort:** Medium
 
 ---
 
-#### S6-T2: Create garden Command
+#### S6-T2: Create garden Command ✅
 **Effort:** Small
 
 ---
 
-#### S6-T3: Update Mount Script for v4
+#### S6-T3: Update Mount Script for v4 ✅
 **Description:** Update mount-sigil.sh
 
 **Acceptance Criteria:**
-- [ ] SIGIL_SKILLS array: 8 skills
-- [ ] SIGIL_COMMANDS array: 8 commands
-- [ ] Creates sigil-mark/ on mount
-- [ ] Copies core/ templates
-- [ ] Creates .sigil-version.json with 4.0.0
+- [x] SIGIL_SKILLS array: 9 skills
+- [x] SIGIL_COMMANDS array: 9 commands
+- [x] Creates sigil-mark/ on mount
+- [x] Copies core/ templates
+- [x] Creates .sigil-version.json with 4.0.0
 
 **Effort:** Medium
 
 ---
 
-#### S6-T4: Update CLAUDE.md for v4
+#### S6-T4: Update CLAUDE.md for v4 ✅
 **Description:** Update agent instructions
 
 **Acceptance Criteria:**
-- [ ] Documents 8 commands
-- [ ] Documents physics concepts
-- [ ] Documents Hammer/Chisel
-- [ ] Documents Loa handoff
+- [x] Documents 9 commands
+- [x] Documents physics concepts
+- [x] Documents Hammer/Chisel
+- [x] Documents Loa handoff
 
 **Effort:** Medium
 
 ---
 
-#### S6-T5: Integration Testing
+#### S6-T5: Integration Testing ✅
 **Description:** Test full workflow
 
 **Acceptance Criteria:**
-- [ ] Mount works
-- [ ] /sigil-setup creates structure
-- [ ] /envision captures essence
-- [ ] /codify defines materials
-- [ ] /map defines zones
-- [ ] /craft generates with physics
-- [ ] /validate catches violations
-- [ ] /approve records rulings
-- [ ] /greenlight records concepts
-- [ ] /garden detects drift
+- [x] Mount works
+- [x] /sigil-setup creates structure
+- [x] /envision captures essence
+- [x] /codify defines materials
+- [x] /map defines zones
+- [x] /craft generates with physics
+- [x] /validate catches violations
+- [x] /approve records rulings
+- [x] /greenlight records concepts
+- [x] /garden detects drift
 
 **Effort:** Large
 
@@ -505,13 +505,13 @@ Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for
 ### Sprint 6 Deliverables
 - /garden command working
 - Mount system updated
-- **v4.0.0 RELEASE READY**
+- **v0.5.0 RELEASE READY**
 
 ---
 
 ## Summary
 
-### The 8 Skills
+### The 9 Skills
 1. `initializing-sigil` → /sigil-setup
 2. `envisioning-soul` → /envision
 3. `codifying-materials` → /codify
@@ -535,8 +535,6 @@ Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for
 
 ---
 
-## Next Step
+## v0.5.0 Released
 
-```
-/implement sprint-1
-```
+All 6 sprints completed and approved.

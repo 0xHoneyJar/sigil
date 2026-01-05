@@ -1,6 +1,6 @@
 ---
 name: zone
-version: "4.0.0"
+version: "0.5.0"
 description: Alias for /map - Configure path-based design zones
 deprecated: true
 redirect: map

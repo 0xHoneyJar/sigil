@@ -1,6 +1,6 @@
 ---
 name: "sigil-setup"
-version: "4.0.0"
+version: "0.5.0"
 description: |
   Initialize Sigil v4 Design Physics Engine on a repository.
   Creates physics-based directory structure and configuration files.

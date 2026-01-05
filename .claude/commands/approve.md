@@ -1,6 +1,6 @@
 ---
 name: approve
-version: "4.0.0"
+version: "0.5.0"
 description: Taste Key holder sign-off and rulings
 agent: approving-patterns
 agent_path: .claude/skills/approving-patterns/SKILL.md

@@ -1,6 +1,6 @@
 ---
 name: validate
-version: "4.0.0"
+version: "0.5.0"
 description: Validate against physics constraints, budgets, and fidelity ceiling
 agent: validating-fidelity
 agent_path: .claude/skills/validating-fidelity/SKILL.md

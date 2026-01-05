@@ -1,6 +1,6 @@
 name: crafting-components
 description: Generate UI with physics context using Hammer/Chisel toolkit
-version: "4.0.0"
+version: "0.5.0"
 command: /craft
 
 role: "Apprentice Smith"

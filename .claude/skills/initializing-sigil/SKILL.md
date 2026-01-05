@@ -16,17 +16,17 @@ zones:
     permission: read
 ---
 
-# Sigil v4 Setup Skill
+# Sigil v0.5 Setup Skill
 
 ## Purpose
 
-Initialize Sigil v4 Design Physics Engine on a repository. Creates the physics-based directory structure, copies core schemas, and prepares for design capture through interviews.
+Initialize Sigil v0.5 Design Physics Engine on a repository. Creates the physics-based directory structure, copies core schemas, and prepares for design capture through interviews.
 
 ## Philosophy
 
 > "Physics, not opinions. Constraints, not debates."
 
-Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for consistent design decisions. The setup creates:
+Sigil v0.5 is a Design Physics Engine that gives AI agents physics constraints for consistent design decisions. The setup creates:
 
 1. **Core Layer** — Immutable physics (sync, budgets, fidelity, lens)
 2. **Resonance Layer** — Product tuning (materials, zones, tensions, essence)
@@ -49,9 +49,9 @@ Scan for common component directory patterns:
 - `src/components/`
 - `src/features/**/components/`
 
-### Step 2: Create v4 Directory Structure
+### Step 2: Create v0.5 Directory Structure
 
-Create the complete Sigil v4 directory tree:
+Create the complete Sigil v0.5 directory tree:
 
 ```bash
 # Core layer (physics)
@@ -94,10 +94,10 @@ The core layer schemas are already created during sprints 1-2. If they don't exi
 
 ### Step 4: Create Configuration
 
-Create `.sigilrc.yaml` with v4 schema:
+Create `.sigilrc.yaml` with v0.5 schema:
 
 ```yaml
-# Sigil v4 Configuration
+# Sigil v0.5 Configuration
 # Design Physics Engine
 
 version: "4.0"
@@ -139,8 +139,8 @@ physics:
 
 Create `.sigil-setup-complete`:
 ```
-Sigil v4 setup completed at [timestamp]
-Framework version: 4.0.0
+Sigil v0.5 setup completed at [timestamp]
+Framework version: 0.5.0
 Mode: Design Physics Engine
 
 Next steps:
@@ -152,7 +152,7 @@ Next steps:
 Create/update `.sigil-version.json`:
 ```json
 {
-  "version": "4.0.0",
+  "version": "0.5.0",
   "schema_version": "4.0",
   "setup_at": "[timestamp]",
   "layers": {
@@ -168,7 +168,7 @@ Create/update `.sigil-version.json`:
 
 Output:
 ```
-Sigil v4 Setup Complete
+Sigil v0.5 Setup Complete
 
 Design Physics Engine initialized with four layers:
 
@@ -213,7 +213,7 @@ Philosophy: "Physics, not opinions. Constraints, not debates."
 ## Idempotency
 
 If already set up:
-1. Warn user that v4 setup already complete
+1. Warn user that v0.5 setup already complete
 2. Show current configuration
 3. Offer options:
    - Refresh directory structure (add missing directories)

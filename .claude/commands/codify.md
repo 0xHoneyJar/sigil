@@ -1,6 +1,6 @@
 ---
 name: codify
-version: "4.0.0"
+version: "0.5.0"
 description: Configure material selection and zone-material mappings
 agent: codifying-materials
 agent_path: .claude/skills/codifying-materials/SKILL.md

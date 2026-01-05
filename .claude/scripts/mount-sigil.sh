@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Sigil Framework: Mount Script
-# Design context framework for AI-assisted development
+# Design Physics Engine for AI-assisted development
 set -euo pipefail
 
 # === Colors ===
@@ -37,7 +37,7 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       echo "Usage: mount-sigil.sh [OPTIONS]"
       echo ""
-      echo "Mount Sigil design context framework onto a repository."
+      echo "Mount Sigil Design Physics Engine onto a repository."
       echo ""
       echo "Options:"
       echo "  --branch <name>   Sigil branch to use (default: main)"
@@ -99,41 +99,30 @@ setup_sigil_home() {
   log "Sigil home ready at $SIGIL_HOME"
 }
 
-# === Sigil v11 Skills ===
+# === Sigil v4 Skills (9 total) ===
 SIGIL_SKILLS=(
   "initializing-sigil"
   "envisioning-soul"
-  "envisioning-moodboard"
   "codifying-materials"
-  "codifying-rules"
-  "crafting-components"
-  "crafting-guidance"
   "mapping-zones"
+  "crafting-components"
   "validating-fidelity"
-  "validating-lenses"
-  "gardening-entropy"
   "approving-patterns"
   "greenlighting-concepts"
-  "inheriting-design"
-  "updating-framework"
+  "gardening-entropy"
 )
 
-# === Sigil v11 Commands ===
+# === Sigil v4 Commands (9 total) ===
 SIGIL_COMMANDS=(
-  "setup"
+  "sigil-setup"
   "envision"
   "codify"
+  "map"
   "craft"
-  "zone"
   "validate"
-  "garden"
   "approve"
   "greenlight"
-  "material"
-  "sync"
-  "inherit"
-  "update"
-  "sigil-setup"
+  "garden"
 )
 
 # === Create Symlinks ===
@@ -144,7 +133,7 @@ create_symlinks() {
   mkdir -p .claude/skills
   mkdir -p .claude/commands
 
-  # Symlink Sigil v11 skills
+  # Symlink Sigil v4 skills
   local skill_count=0
   for skill_name in "${SIGIL_SKILLS[@]}"; do
     if [[ -d "$SIGIL_HOME/.claude/skills/$skill_name" ]]; then
@@ -156,7 +145,7 @@ create_symlinks() {
   done
   log "Linked $skill_count skills"
 
-  # Symlink Sigil v11 commands
+  # Symlink Sigil v4 commands
   local cmd_count=0
   for cmd in "${SIGIL_COMMANDS[@]}"; do
     if [[ -f "$SIGIL_HOME/.claude/commands/${cmd}.md" ]]; then
@@ -182,11 +171,27 @@ create_symlinks() {
   log "Linked scripts"
 }
 
+# === Create State Zone Structure ===
+create_state_zone() {
+  step "Creating sigil-mark/ state zone..."
+
+  # Create v4 directory structure
+  mkdir -p sigil-mark/core
+  mkdir -p sigil-mark/resonance
+  mkdir -p sigil-mark/memory/eras
+  mkdir -p sigil-mark/memory/decisions
+  mkdir -p sigil-mark/memory/mutations/active
+  mkdir -p sigil-mark/memory/graveyard
+  mkdir -p sigil-mark/taste-key/rulings
+
+  log "State zone structure created"
+}
+
 # === Create Version File ===
 create_version_file() {
   step "Creating version manifest..."
 
-  local sigil_version="11.0.0"
+  local sigil_version="0.5.0"
   if [[ -f "$SIGIL_HOME/VERSION" ]]; then
     sigil_version=$(cat "$SIGIL_HOME/VERSION" | tr -d '[:space:]')
   fi
@@ -197,7 +202,8 @@ create_version_file() {
   "mounted_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "updated_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "sigil_home": "$SIGIL_HOME",
-  "branch": "$SIGIL_BRANCH"
+  "branch": "$SIGIL_BRANCH",
+  "architecture": "design-physics-engine"
 }
 EOF
 
@@ -208,8 +214,8 @@ EOF
 main() {
   echo ""
   log "======================================================================="
-  log "  Sigil Soul Engine v11.0.0"
-  log "  Constitutional Design Framework for AI-Assisted Development"
+  log "  Sigil v0.5.0 — Design Physics Engine"
+  log "  Physics constraints for AI-assisted design"
   log "======================================================================="
   log "  Branch: $SIGIL_BRANCH"
   echo ""
@@ -217,6 +223,7 @@ main() {
   preflight
   setup_sigil_home
   create_symlinks
+  create_state_zone
   create_version_file
 
   echo ""
@@ -226,19 +233,25 @@ main() {
   echo ""
   info "Next steps:"
   info "  1. Run 'claude' to start Claude Code"
-  info "  2. Issue '/setup' to initialize Sigil"
-  info "  3. Then '/envision' or '/inherit' to capture design context"
+  info "  2. Issue '/sigil-setup' to initialize physics schemas"
+  info "  3. Then '/envision' to capture product soul"
   echo ""
   info "Framework structure:"
-  info "  .claude/skills/     -> 15 Sigil agents symlinked"
-  info "  .claude/commands/   -> 14 Sigil commands symlinked"
-  info "  sigil-mark/         -> Your design context (created by /setup)"
-  info "  .sigilrc.yaml       -> Zone configuration (created by /setup)"
+  info "  .claude/skills/     -> 9 Sigil agents symlinked"
+  info "  .claude/commands/   -> 9 Sigil commands symlinked"
+  info "  sigil-mark/         -> Your design context (state zone)"
+  info "  .sigil-version.json -> Version tracking"
+  echo ""
+  info "The v4 Architecture:"
+  info "  core/       -> Physics (sync, budgets, fidelity, lens)"
+  info "  resonance/  -> Tuning (materials, zones, tensions, essence)"
+  info "  memory/     -> History (eras, decisions, mutations, graveyard)"
+  info "  taste-key/  -> Authority (holder, rulings)"
   echo ""
   info "The Three Laws:"
-  info "  1. Server-tick data MUST show pending state"
-  info "  2. Fidelity ceiling cannot be exceeded"
-  info "  3. Visuals are dictated, never polled"
+  info "  1. Physics violations are IMPOSSIBLE (no override)"
+  info "  2. Budget/fidelity violations are BLOCK (Taste Key can override)"
+  info "  3. Drift warnings are WARN (suggestions only)"
   echo ""
 }
 

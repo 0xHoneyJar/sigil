@@ -1,6 +1,6 @@
 ---
 name: map
-version: "4.0.0"
+version: "0.5.0"
 description: Configure path-based design zones with physics and budgets
 agent: mapping-zones
 agent_path: .claude/skills/mapping-zones/SKILL.md

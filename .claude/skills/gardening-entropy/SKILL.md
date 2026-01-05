@@ -1,372 +1,478 @@
-# Sigil Agent: Gardening Entropy
+# Sigil v4 Agent: Gardening Entropy
 
-> "Before 1 new feature, fix 3 paper cuts."
+> "Entropy accumulates. Gardens must be tended."
 
 ## Role
 
-**Gardener** — Tracks paper cuts, enforces 3:1 rule, prevents entropy accumulation.
+**Entropy Gardener** — Detects drift from essence, reviews active mutations, promotes to canon or graveyard, flags stale decisions, and manages era transitions.
 
-## Commands
+## Command
 
 ```
-/garden                    # Show paper cut status
-/garden scan               # Scan for new paper cuts
-/garden add [description]  # Manually add paper cut
-/garden fix [id]           # Mark paper cut as fixed
-/garden debt               # Show debt status
+/garden                    # Show entropy status
+/garden drift              # Detect drift from essence
+/garden mutations          # Review active mutations
+/garden decisions          # Review stale decisions
+/garden rulings            # Review active rulings
+/garden era                # Check for era transition
+/garden promote [id]       # Promote mutation to canon
+/garden archive [id]       # Move to graveyard
 ```
 
 ## Outputs
 
 | Path | Description |
 |------|-------------|
-| `sigil-mark/workbench/paper-cuts.yaml` | Paper cut queue |
+| `sigil-mark/memory/eras/*.yaml` | Era transition records |
+| `sigil-mark/memory/graveyard/*.yaml` | Archived mutations/decisions |
 
-## The 3:1 Rule
+## Prerequisites
 
-Linear doesn't ship big features. They **garden** the product.
+- Run `/sigil-setup` first
+- Run `/envision` first (for essence context)
 
-Paper cuts accumulate into "this feels cheap." Without tracking, quality degrades.
+## The Entropy Model
 
-**Rule**: Before adding 1 new feature, fix 3 paper cuts.
+Entropy accumulates in design systems:
+- Mutations pile up in active/
+- Decisions become stale
+- Rulings need periodic review
+- Essence drifts from implementation
 
-## Paper Cut Categories
-
-### P0: Breaks Functionality
-- Component doesn't render
-- Interaction doesn't work
-- Data displays incorrectly
-
-### P1: Visually Jarring
-- Obvious misalignment
-- Color clash
-- Animation jank
-- Layout broken on resize
-
-### P2: Noticeable on Inspection
-- Inconsistent spacing
-- Hardcoded colors not matching tokens
-- Animation timing drift
-- Shadow inconsistency
-
-### P3: Only Designers Notice
-- 1px alignment issues
-- Subtle color variations
-- Micro-animation timing
-- Typography baseline drift
-
-## Detection Rules
-
-### Spacing Drift
-```javascript
-function detectSpacingDrift(css) {
-  const spacingValues = extractSpacingValues(css);
-  const validTokens = loadTokens('spacing');
-
-  for (const value of spacingValues) {
-    if (!validTokens.includes(value)) {
-      return {
-        type: "spacing_drift",
-        value: value,
-        suggestion: findClosestToken(value, validTokens)
-      };
-    }
-  }
-}
-
-// Valid spacing tokens
-const VALID_SPACING = [0, 1, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80, 96];
-```
-
-### Color Drift
-```javascript
-function detectColorDrift(css) {
-  const hexPattern = /#[0-9a-fA-F]{3,8}/g;
-  const colors = css.match(hexPattern) || [];
-  const validTokens = loadTokens('colors');
-
-  for (const color of colors) {
-    if (!validTokens.includes(color.toLowerCase())) {
-      return {
-        type: "color_drift",
-        value: color,
-        suggestion: findClosestToken(color, validTokens)
-      };
-    }
-  }
-}
-```
-
-### Animation Drift
-```javascript
-function detectAnimationDrift(css) {
-  const timingPattern = /(\d+)ms/g;
-  const timings = css.match(timingPattern) || [];
-  const validTimings = [0, 100, 150, 200, 300, 400, 600, 800];
-
-  for (const timing of timings) {
-    const ms = parseInt(timing);
-    if (!validTimings.includes(ms)) {
-      return {
-        type: "animation_drift",
-        value: ms,
-        suggestion: findClosestTiming(ms, validTimings)
-      };
-    }
-  }
-}
-```
-
-### Component Duplication
-```javascript
-function detectDuplication(components) {
-  // AST similarity analysis
-  for (let i = 0; i < components.length; i++) {
-    for (let j = i + 1; j < components.length; j++) {
-      const similarity = calculateSimilarity(components[i], components[j]);
-      if (similarity > 0.8) {
-        return {
-          type: "component_duplication",
-          files: [components[i].path, components[j].path],
-          similarity: similarity
-        };
-      }
-    }
-  }
-}
-```
-
-## Paper Cut Queue
-
-```yaml
-# sigil-mark/workbench/paper-cuts.yaml
-
-version: "1.0"
-last_scan: "2025-01-15T10:00:00Z"
-total_debt: 7
-debt_threshold: 10
-
-stats:
-  features_since_gardening: 1
-  fixes_since_gardening: 2
-  ratio_status: "need_1_more"  # 3:1 rule
-
-paper_cuts:
-  - id: "PC-001"
-    priority: "p2"
-    category: "spacing_drift"
-    description: "Button padding uses 14px instead of 16px token"
-    file: "src/components/Button.tsx"
-    line: 23
-    detected_at: "2025-01-10"
-    status: "open"
-    suggestion: "Replace 14px with --spacing-4 (16px)"
-
-  - id: "PC-002"
-    priority: "p2"
-    category: "color_drift"
-    description: "Hardcoded #3B82F6 instead of --color-primary"
-    file: "src/features/dashboard/Card.tsx"
-    line: 45
-    detected_at: "2025-01-12"
-    status: "open"
-    suggestion: "Use var(--color-primary)"
-
-  - id: "PC-003"
-    priority: "p3"
-    category: "animation_drift"
-    description: "Transition uses 250ms instead of 200ms or 300ms"
-    file: "src/components/Modal.tsx"
-    line: 67
-    detected_at: "2025-01-14"
-    status: "open"
-    suggestion: "Use 200ms or 300ms from motion tokens"
-
-fixed:
-  - id: "PC-000"
-    fixed_at: "2025-01-14"
-    fixed_by: "@developer"
-    category: "spacing_drift"
-```
+Without gardening, the system becomes:
+- Inconsistent (mutations conflict)
+- Stale (decisions never revisited)
+- Cluttered (graveyard overflows)
+- Misaligned (essence drift)
 
 ## Workflow
 
-### Show Status
+### Phase 1: Load Context
+
+Read the following files:
+- `sigil-mark/resonance/essence.yaml` — Product soul
+- `sigil-mark/memory/mutations/active/*.yaml` — Active mutations
+- `sigil-mark/memory/decisions/*.yaml` — Concept decisions
+- `sigil-mark/taste-key/rulings/*.yaml` — Active rulings
+
+### Phase 2: Detect Drift
+
+```python
+def detect_drift(essence, implementation):
+    drift_items = []
+
+    # Check soul alignment
+    soul = essence.soul.statement
+    if not implementation_aligns(implementation, soul):
+        drift_items.append({
+            "type": "SOUL_DRIFT",
+            "message": "Implementation drifting from soul statement",
+            "action": "REVIEW"
+        })
+
+    # Check invariant violations
+    for invariant in essence.soul.invariants:
+        if not check_invariant(implementation, invariant):
+            drift_items.append({
+                "type": "INVARIANT_DRIFT",
+                "invariant": invariant,
+                "message": f"Implementation may violate: {invariant}",
+                "action": "REVIEW"
+            })
+
+    # Check anti-pattern creep
+    for anti_pattern in essence.anti_patterns:
+        if pattern_present(implementation, anti_pattern):
+            drift_items.append({
+                "type": "ANTI_PATTERN_CREEP",
+                "pattern": anti_pattern.pattern,
+                "message": f"Anti-pattern detected: {anti_pattern.pattern}",
+                "action": "WARN"
+            })
+
+    return drift_items
+```
+
+### Phase 3: Review Mutations
+
+```python
+def review_mutations(mutations):
+    review_items = []
+    now = current_date()
+
+    for mutation in mutations:
+        age_days = (now - mutation.created_at).days
+
+        # Check for stale mutations
+        if age_days > 30:
+            review_items.append({
+                "id": mutation.id,
+                "type": "STALE_MUTATION",
+                "age_days": age_days,
+                "message": "Mutation older than 30 days",
+                "action": "PROMOTE_OR_ARCHIVE",
+                "suggestion": "Decide: promote to canon or archive"
+            })
+
+        # Check for conflicting mutations
+        conflicts = find_conflicts(mutation, mutations)
+        if conflicts:
+            review_items.append({
+                "id": mutation.id,
+                "type": "CONFLICT",
+                "conflicts_with": [c.id for c in conflicts],
+                "message": "Mutation conflicts with others",
+                "action": "RESOLVE"
+            })
+
+    return review_items
+```
+
+### Phase 4: Review Decisions
+
+```python
+def review_decisions(decisions):
+    review_items = []
+    now = current_date()
+
+    for decision in decisions:
+        # Check cooldown status for rejections
+        if decision.status == "REJECTED":
+            if decision.cooldown.ends < now:
+                review_items.append({
+                    "id": decision.id,
+                    "type": "COOLDOWN_EXPIRED",
+                    "concept": decision.concept.name,
+                    "message": "Cooldown expired, can revisit",
+                    "action": "RECONSIDER"
+                })
+
+        # Check for orphaned approvals
+        if decision.status == "APPROVED":
+            age_days = (now - decision.approval.date).days
+            if age_days > 180 and not decision.implemented:
+                review_items.append({
+                    "id": decision.id,
+                    "type": "ORPHANED_APPROVAL",
+                    "concept": decision.concept.name,
+                    "message": "Approved 6+ months ago, not implemented",
+                    "action": "ARCHIVE_OR_IMPLEMENT"
+                })
+
+    return review_items
+```
+
+### Phase 5: Review Rulings
+
+```python
+def review_rulings(rulings):
+    review_items = []
+    now = current_date()
+
+    for ruling in rulings:
+        age_days = (now - ruling.date).days
+
+        # Check for old rulings
+        if age_days > 90:
+            review_items.append({
+                "id": ruling.id,
+                "type": "OLD_RULING",
+                "age_days": age_days,
+                "constraint": ruling.constraint,
+                "message": "Ruling older than 90 days",
+                "action": "REVIEW_OR_REVOKE"
+            })
+
+        # Check if ruling still needed
+        if ruling.type == "fidelity_override":
+            if not file_still_needs_override(ruling.scope.files):
+                review_items.append({
+                    "id": ruling.id,
+                    "type": "OBSOLETE_RULING",
+                    "message": "File no longer needs this override",
+                    "action": "REVOKE"
+                })
+
+    return review_items
+```
+
+### Phase 6: Era Transition Detection
+
+```python
+def detect_era_transition(essence, history):
+    # Era transitions happen when:
+    # 1. Soul statement changes significantly
+    # 2. Multiple invariants are updated
+    # 3. Major anti-pattern list revision
+
+    signals = []
+
+    if essence.soul.statement != history.last_soul_statement:
+        signals.append("soul_statement_changed")
+
+    invariant_changes = count_invariant_changes(essence, history)
+    if invariant_changes >= 3:
+        signals.append("major_invariant_revision")
+
+    anti_pattern_changes = count_anti_pattern_changes(essence, history)
+    if anti_pattern_changes >= 5:
+        signals.append("major_anti_pattern_revision")
+
+    if len(signals) >= 2:
+        return {
+            "era_transition": True,
+            "signals": signals,
+            "message": "Era transition detected. Archive current state?",
+            "action": "CREATE_ERA_SNAPSHOT"
+        }
+
+    return {"era_transition": False}
+```
+
+## Output Formats
+
+### Status Report
 
 ```
 /garden
 
-Paper Cut Status
+ENTROPY STATUS
+==============
 
-Debt: 7 paper cuts
-Threshold: 10 (features blocked at this level)
+Drift Detection:
+  SOUL_DRIFT: 0 items
+  INVARIANT_DRIFT: 1 item
+  ANTI_PATTERN_CREEP: 2 items
 
-By Priority:
-  P0: 0 (breaks functionality)
-  P1: 1 (visually jarring)
-  P2: 4 (noticeable on inspection)
-  P3: 2 (designer-level)
+Active Mutations: 7
+  STALE (>30 days): 3
+  CONFLICTING: 1
+  HEALTHY: 3
 
-By Category:
-  spacing_drift: 2
-  color_drift: 3
-  animation_drift: 1
-  component_duplication: 1
+Decisions:
+  COOLDOWN_EXPIRED: 1 (can revisit)
+  ORPHANED_APPROVAL: 2
 
-3:1 Rule Status:
-  Features added since last gardening: 1
-  Paper cuts fixed: 2
-  Need to fix 1 more before next feature
+Rulings:
+  OLD (>90 days): 2
+  OBSOLETE: 1
 
-Recent:
-  PC-001: Button padding drift (P2)
-  PC-002: Hardcoded color (P2)
-  PC-003: Animation timing (P3)
+Era Status: STABLE (no transition signals)
+
+Recommendations:
+1. Review 3 stale mutations
+2. Archive or implement 2 orphaned approvals
+3. Revoke 1 obsolete ruling
 ```
 
-### Scan for Paper Cuts
+### Drift Report
 
 ```
-/garden scan
+/garden drift
 
-Scanning codebase for paper cuts...
+DRIFT DETECTION
+===============
 
-Checking:
-  Spacing values... found 2 issues
-  Color values... found 3 issues
-  Animation timings... found 1 issue
-  Component similarity... found 1 potential duplicate
-  Accessibility... found 0 issues
+Checking against essence...
 
-New paper cuts found: 7
-Added to queue.
+INVARIANT DRIFT:
+⚠ "Meaningful rewards, not manipulation"
+  Found: Achievement badge system in settings/
+  This may conflict with invariant
+  Action: REVIEW
 
-View with /garden
+ANTI-PATTERN CREEP:
+⚠ "gamified productivity" detected
+  Found: XP bar in user profile
+  Source: src/features/profile/XPBar.tsx
+  Action: WARN
+
+⚠ "infinite scroll" detected
+  Found: Virtualized list without end
+  Source: src/features/feed/InfiniteList.tsx
+  Action: WARN
+
+Summary: 1 invariant drift, 2 anti-pattern warnings
 ```
 
-### Enforce 3:1 Rule
-
-When user requests new feature:
+### Mutation Review
 
 ```
-User: "Add a new dashboard widget"
+/garden mutations
 
-Paper Cut Check
+ACTIVE MUTATIONS
+================
 
-Before adding this feature, the 3:1 rule requires fixing paper cuts.
+STALE MUTATIONS (>30 days):
+  MUT-2026-001 (45 days)
+    File: src/components/Button.tsx
+    Change: Added hover shadow
+    Suggestion: Promote to pattern or archive
 
-Current status:
-  Features since gardening: 1
-  Paper cuts fixed: 2
-  Required fixes: 1
+  MUT-2026-002 (38 days)
+    File: src/features/checkout/ClaimButton.tsx
+    Change: Extended animation to 1200ms
+    Suggestion: Already has ruling, promote to canon
 
-Suggested paper cuts to fix:
-  1. PC-001: Button padding drift (5 min)
-  2. PC-002: Hardcoded color (2 min)
-  3. PC-003: Animation timing (2 min)
+  MUT-2026-003 (32 days)
+    File: src/components/Modal.tsx
+    Change: Updated backdrop blur
+    Suggestion: Conflicts with MUT-2026-004
 
-Fix these first? [Y/n]
+CONFLICTING:
+  MUT-2026-003 ↔ MUT-2026-004
+    Both modify Modal.tsx blur values
+    Resolve with /garden promote or /garden archive
+
+HEALTHY: 3 mutations (created within 30 days)
 ```
 
-### Debt Threshold
-
-When debt exceeds threshold:
+### Era Transition
 
 ```
-FEATURE BLOCKED
+/garden era
 
-Paper cut debt: 12
-Threshold: 10
+ERA STATUS
+==========
 
-Cannot add new features until debt is reduced.
+Current Era: "Foundation" (started 2026-01-01)
+Duration: 4 days
 
-High-impact fixes:
-  1. PC-005: Component duplication (P1) - removes 3 issues
-  2. PC-001: Button padding drift (P2)
-  3. PC-002: Hardcoded colors (P2)
+Era Transition Signals:
+  ✗ Soul statement unchanged
+  ✗ Invariants unchanged
+  ✗ Anti-patterns unchanged
 
-Fix paper cuts with /garden fix [id]
+Status: STABLE
+
+No era transition detected.
+
+To manually trigger era transition:
+/garden era --new "Era Name"
 ```
 
-### Mark Fixed
+## Promotion and Archival
+
+### Promote to Canon
 
 ```
-/garden fix PC-001
+/garden promote MUT-2026-001
 
-Marked PC-001 as fixed.
+PROMOTE TO CANON
+================
 
-Paper cut: Button padding drift
-Category: spacing_drift
-Fixed at: 2025-01-15T11:30:00Z
+Mutation: MUT-2026-001
+File: src/components/Button.tsx
+Change: Added hover shadow
 
-Debt: 6 (was 7)
-3:1 Status: 3 fixes / 1 feature = BALANCED
+This will:
+1. Record mutation as canonical pattern
+2. Update validation rules to expect this
+3. Remove from active mutations
+
+Confirm promotion? [y/n]
 ```
 
-## Integration with /craft
+### Archive to Graveyard
 
-The `/craft` agent should check garden status:
+```
+/garden archive MUT-2026-003
 
-```python
-def pre_craft_check():
-    debt = load_debt()
-    features_since_gardening = count_features()
-    fixes_since_gardening = count_fixes()
+ARCHIVE TO GRAVEYARD
+====================
 
-    if debt > THRESHOLD:
-        return block("Paper cut debt too high")
+Mutation: MUT-2026-003
+File: src/components/Modal.tsx
+Change: Updated backdrop blur
 
-    if features_since_gardening > fixes_since_gardening / 3:
-        return warn("3:1 rule: fix paper cuts before new feature")
+This will:
+1. Move mutation to graveyard
+2. Record reason for archival
+3. Keep for historical reference
 
-    return proceed()
+Reason for archival:
+> Superseded by MUT-2026-004
+
+Confirm archival? [y/n]
 ```
 
-## Scan Patterns
+## Era Record Format
 
-### Files to Scan
 ```yaml
-scan_paths:
-  - "src/components/**/*.tsx"
-  - "src/features/**/*.tsx"
-  - "src/styles/**/*.css"
+# sigil-mark/memory/eras/2026-01-foundation.yaml
 
-exclude_paths:
-  - "**/*.test.tsx"
-  - "**/*.stories.tsx"
-  - "**/node_modules/**"
+era:
+  name: "Foundation"
+  started: "2026-01-01"
+  ended: "2026-03-15"
+
+  transition_reason: |
+    Major product pivot from B2B to B2C.
+    Soul statement updated to reflect consumer focus.
+
+  snapshot:
+    soul_statement: "Tools for professionals, not toys."
+    invariants:
+      - "Power over polish"
+      - "Keyboard-first navigation"
+    anti_patterns:
+      - "Gamified productivity"
+      - "Social features for vanity"
+
+  statistics:
+    mutations_promoted: 12
+    mutations_archived: 5
+    decisions_made: 8
+    rulings_issued: 3
 ```
 
-### Detection Thresholds
+## Graveyard Record Format
+
 ```yaml
-thresholds:
-  spacing_drift:
-    tolerance: 2  # Allow 2px variance
-  color_drift:
-    tolerance: 10  # Allow 10 units in color space
-  animation_drift:
-    tolerance: 50  # Allow 50ms variance
-  duplication:
-    similarity: 0.8  # 80% similar = duplicate
+# sigil-mark/memory/graveyard/MUT-2026-003.yaml
+
+archived:
+  id: "MUT-2026-003"
+  type: "mutation"
+  archived_at: "2026-01-04"
+
+  original:
+    file: "src/components/Modal.tsx"
+    change: "Updated backdrop blur to 24px"
+    created_at: "2026-01-02"
+
+  reason: "Superseded by MUT-2026-004 which uses 16px"
+
+  archived_by: "Entropy Gardener"
 ```
 
 ## Success Criteria
 
-- [ ] Paper cuts are tracked
-- [ ] 3:1 rule is enforced
-- [ ] Debt stays below threshold
-- [ ] Scans run regularly
-- [ ] Fixed paper cuts are logged
+- [ ] Drift from essence detected
+- [ ] Active mutations reviewed
+- [ ] Stale mutations flagged (>30 days)
+- [ ] Conflicting mutations identified
+- [ ] Cooldown-expired decisions flagged
+- [ ] Orphaned approvals identified
+- [ ] Old rulings flagged (>90 days)
+- [ ] Obsolete rulings identified
+- [ ] Era transition signals detected
+- [ ] Promotion to canon works
+- [ ] Archival to graveyard works
 
 ## Error Handling
 
 | Situation | Response |
 |-----------|----------|
-| No paper-cuts.yaml | Create empty file |
-| Invalid paper cut ID | List valid IDs |
-| Scan fails on file | Skip with warning |
-| Threshold exceeded | Block features |
+| No essence.yaml | Prompt to run /envision |
+| No active mutations | Report "no entropy" |
+| Invalid mutation ID | List valid IDs |
+| Era already exists | Append date to name |
 
 ## Next Step
 
-After `/garden`: Run `/approve` for Taste Owner sign-off.
+After `/garden`:
+- Promote good mutations to canon
+- Archive obsolete mutations
+- Revoke obsolete rulings via /approve --revoke
+- Address drift via /craft or /codify

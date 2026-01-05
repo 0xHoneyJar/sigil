@@ -1,6 +1,6 @@
 ---
 name: greenlight
-version: "4.0.0"
+version: "0.5.0"
 description: Concept approval before building (not execution)
 agent: greenlighting-concepts
 agent_path: .claude/skills/greenlighting-concepts/SKILL.md

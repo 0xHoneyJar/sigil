@@ -1,6 +1,6 @@
 name: mapping-zones
 description: Configure path-based design zones with physics and budgets
-version: "4.0.0"
+version: "0.5.0"
 command: /map
 
 role: "Zone Architect"

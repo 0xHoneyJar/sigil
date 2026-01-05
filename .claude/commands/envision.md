@@ -1,6 +1,6 @@
 ---
 name: envision
-version: "4.0.0"
+version: "0.5.0"
 description: Capture product soul through structured interview
 agent: envisioning-soul
 agent_path: .claude/skills/envisioning-soul/SKILL.md
