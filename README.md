@@ -24,17 +24,27 @@ Sigil treats design decisions like physics, not opinions:
 
 When you frame constraints as physics, AI agents follow them without question. Humans stop debating and start building.
 
-### The Mental Model: Zones
+### Core Principles
 
-Think of your app like a video game with different physics zones:
+**1. Feel Before Form**
 
-| Zone | Feel | Why |
-|------|------|-----|
-| **Checkout/Trading** | Heavy, deliberate, slow | Money is at stake. Users need to feel the weight of their actions. Server must confirm before UI updates. |
-| **Browse/Discover** | Light, fluid, fast | Exploration should feel effortless. Optimistic updates are fine—low stakes. |
-| **Admin/Dashboard** | Precise, instant, mechanical | Power users want speed and accuracy. No flourishes, just function. |
+Design is about how things *feel*, not how they *look*. A checkout button and a browse button might be visually identical—same color, same size, same font. But they *behave* differently because they're in different physics zones. Checkout is heavy and deliberate. Browse is light and instant. Define the feel first; the form follows.
 
-This isn't about "looks"—it's about "feels". A button in checkout and a button in browse might look identical, but they *behave* differently because they're in different physics zones.
+**2. Context Over Components**
+
+The same component behaves differently based on where it lives. Zone is determined by *file path*, not component type. This means physics are automatic—no manual annotation needed. Put a file in `/checkout/` and it inherits critical zone physics. Move it to `/explore/` and it becomes exploratory.
+
+**3. Constraints Enable Creativity**
+
+Unlimited options produce paralysis. "You can do anything" means "you must decide everything." Physics constraints free you to focus on what matters. When the agent knows checkout buttons MUST have pending states, it stops asking and starts building.
+
+**4. Diagnose Before Prescribe**
+
+When something feels wrong, don't jump to solutions. "Make it faster" might break the system. "Why does it feel slow?" reveals the root cause. Often, the "problem" is actually physics working correctly—checkout *should* feel deliberate.
+
+**5. Entropy Is Inevitable**
+
+Products drift. What felt right at launch feels stale at scale. Design systems decay. Decisions become outdated. Sigil treats this as physics: entropy is real, and gardens need tending. Plan for evolution, not perfection.
 
 ### The Hierarchy
 
@@ -48,6 +58,20 @@ This hierarchy eliminates debate: physics is physics, taste is taste.
 
 ## Best Practices
 
+### The Setup Flow
+
+Run these commands in order when starting a new project:
+
+```
+/sigil-setup    → Creates state zone structure
+/envision       → Captures product soul (interview)
+/codify         → Defines material physics
+/map            → Configures zone paths
+```
+
+**Time investment:** ~30 minutes
+**Payoff:** Every future generation inherits your design physics automatically.
+
 ### 1. Start with Soul, Not Rules
 
 Run `/envision` before anything else. The soul interview captures *why* your product feels the way it does—reference products, anti-patterns, key moments. Rules without soul produce soulless output.
@@ -55,24 +79,60 @@ Run `/envision` before anything else. The soul interview captures *why* your pro
 **Bad**: "Use blue buttons with 8px radius"
 **Good**: "We want the confidence of Linear with the warmth of Notion. Checkout should feel like confirming a bank transfer—heavy and deliberate."
 
-### 2. Zones Are Your Biggest Lever
+The `/envision` command asks about:
+- **Reference products**: "What apps/games inspire the feel?" (Linear, Notion, Stripe, Nintendo)
+- **Anti-patterns**: "What should we never do?" (No spinners in critical flows, no bounce animations)
+- **Key moments**: "What are the high-stakes interactions?" (Claim, purchase, delete)
 
-Most products have 3-5 zones. Define them early:
+### 2. Define Zones Early
+
+Zones are your biggest lever. Most products have 3-5:
 
 ```yaml
-zones:
-  critical:    # Money, trades, claims
-    paths: ["src/features/checkout/**", "src/features/claim/**"]
-    material: clay
-    sync: server_authoritative
+# sigil-mark/resonance/zones.yaml
+definitions:
+  critical:
+    paths:
+      - "**/checkout/**"
+      - "**/claim/**"
+      - "**/payment/**"
+    physics:
+      sync: server_authoritative
+      tick: discrete
+      tick_rate_ms: 600
+      material: clay
+      budget:
+        interactive_elements: 5
+        decisions: 2
 
-  exploratory: # Browse, discover, social
-    paths: ["src/features/browse/**", "src/features/social/**"]
-    material: glass
-    sync: client_authoritative
+  exploratory:
+    paths:
+      - "**/browse/**"
+      - "**/discover/**"
+      - "**/gallery/**"
+    physics:
+      sync: client_authoritative
+      tick: continuous
+      material: glass
+      budget:
+        interactive_elements: 20
+        decisions: 10
 ```
 
-Once zones are set, every file inherits the right physics automatically. No per-component decisions needed.
+**Zone resolution works by file path:**
+1. Agent gets file path: `src/features/checkout/ConfirmButton.tsx`
+2. Matches against zones in priority order
+3. `**/checkout/**` matches → critical zone
+4. Physics applied automatically
+
+**To refine zones:**
+```
+/map              # Review current zones, add paths
+/map --add        # Create custom zone (e.g., "gaming", "social")
+/map --paths      # Focus on path mapping only
+```
+
+Once zones are set, every file inherits the right physics. No per-component decisions needed.
 
 ### 3. Use /craft Diagnostically
 
@@ -81,12 +141,54 @@ When something "feels wrong," don't ask for a fix—ask for diagnosis:
 **Bad**: `/craft "make the button faster"`
 **Good**: `/craft "the claim button feels slow, diagnose why"`
 
-The Hammer tool will identify root causes. Often, "feels slow" isn't a design problem—it's a physics constraint (server-authoritative = discrete tick = intentional delay). Fixing the symptom breaks the system.
+The Hammer tool identifies root causes:
+
+```
+/craft "checkout feels slow"
+
+DIAGNOSIS: Physics conflict detected.
+
+The claim button is in critical zone (server_authoritative).
+Physics requires:
+  - Pending state while waiting for server
+  - Discrete tick (600ms minimum rhythm)
+  - No optimistic updates
+
+This is NOT a design problem. The delay IS the trust.
+
+Options:
+1. Accept the physics (recommended for money)
+2. Handoff to Loa: /consult "Should checkout be client_authoritative?"
+3. Add loading feedback within physics constraints
+```
+
+Often, "feels slow" is physics working correctly. Fixing the symptom breaks the trust model.
 
 ### 4. One Taste Key Holder
 
-Design by committee produces mediocrity. Designate ONE person as the Taste Key holder. They can:
-- Override budget/fidelity violations with rulings
+Design by committee produces mediocrity. Designate ONE person as the Taste Key holder:
+
+```yaml
+# sigil-mark/taste-key/holder.yaml
+holder:
+  name: "Design Lead"
+  email: "lead@example.com"
+  github: "@designlead"
+
+authority:
+  can_override:
+    - budgets
+    - fidelity
+    - colors
+    - typography
+  cannot_override:
+    - physics
+    - security
+    - accessibility
+```
+
+The Taste Key holder can:
+- Override budget violations with rulings (`/approve`)
 - Make final calls on aesthetic decisions
 - But they CANNOT override physics
 
@@ -94,13 +196,40 @@ This isn't dictatorship—it's clarity. Everyone knows who decides taste.
 
 ### 5. Garden Regularly
 
-Entropy is real. Run `/garden` monthly to:
-- Detect drift from essence
-- Review stale mutations
-- Archive obsolete decisions
-- Prepare for era transitions
+Entropy is real. Run `/garden` monthly:
+
+```
+/garden              # Full entropy check
+/garden drift        # Just drift detection
+/garden mutations    # Review active changes
+/garden era          # Check for era transition signals
+```
+
+What it catches:
+- **Drift**: Components straying from essence
+- **Stale mutations**: Decisions older than 30 days without resolution
+- **Obsolete rulings**: Overrides no longer needed
+- **Era signals**: Patterns suggesting a major evolution
 
 Products evolve. Your design physics should evolve with them—deliberately, not accidentally.
+
+### 6. Let Loa Handle Architecture
+
+Sigil handles design physics. When you hit structural issues, hand off to Loa:
+
+| Problem | Owner |
+|---------|-------|
+| "Button feels wrong" | Sigil (`/craft`) |
+| "Should checkout be optimistic?" | Loa (`/consult`) |
+| "Animation is too slow" | Sigil (`/craft`) |
+| "Do we need real-time updates?" | Loa (`/consult`) |
+
+The handoff is explicit:
+```
+/craft "checkout feels slow"
+→ DIAGNOSIS: This is architecture, not design
+→ Handoff: /consult "Evaluate sync strategy for checkout"
+```
 
 ## Quick Start
 
