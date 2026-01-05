@@ -1,200 +1,182 @@
-# Sprint 3 Implementation Report
+# Sprint 3 Implementation Review (Sigil v4)
 
-**Sprint:** Lens Array
-**Date:** 2026-01-02
-**Status:** COMPLETE
-
----
-
-## Sprint Goal
-
-Implement the Lens Array pillar with user persona definitions, constrained lens validation, and integration with `/craft` for lens-aware guidance.
+**Sprint:** Setup & Envision Commands
+**Date:** 2026-01-04
+**Version:** Sigil v4 (Design Physics Engine)
+**Status:** ✅ COMPLETE
 
 ---
 
-## Deliverables Completed
+## Executive Summary
 
-### 1. `get-lens.sh` Helper Script Created
-
-| File | Status | Description |
-|------|--------|-------------|
-| `.claude/scripts/get-lens.sh` | ✅ Created | Detect applicable lens(es) for file paths |
-
-**Features:**
-- Detects lens from file path patterns (mobile, accessibility, power_user, newcomer)
-- Returns all available lenses when called without arguments
-- JSON output with lens ID, name, priority, and status
-- Uses yq with graceful grep fallback
-- Proper exit codes (0=success, 1=missing args, 2=no config)
-
-**Path Pattern Detection:**
-- `*mobile*`, `*ios*`, `*android*` → mobile lens
-- `*a11y*`, `*accessibility*` → accessibility lens
-- `*admin*`, `*dashboard*`, `*pro*` → power_user lens
-- `*onboarding*`, `*tutorial*` → newcomer lens
-
-### 2. `validating-lenses` Internal Skill Created
-
-| File | Status | Description |
-|------|--------|-------------|
-| `.claude/skills/validating-lenses/index.yaml` | ✅ Created | Skill metadata (internal, not user-invoked) |
-| `.claude/skills/validating-lenses/SKILL.md` | ✅ Created | Full validation workflow |
-
-**Capabilities:**
-- Validates assets against all defined lenses
-- Prioritizes most constrained lens as truth test (lowest priority number)
-- Checks required vs optional constraints
-- Enforces immutable properties across all lenses
-- Strictness-aware response (block/warn/suggest)
-- Detailed validation output format
-
-**Validation Logic:**
-1. Load lens definitions sorted by priority
-2. Identify truth test lens (lowest priority)
-3. Validate each lens in priority order
-4. Check immutable properties consistency
-5. Return structured validation result
-
-### 3. `/craft` Skill Updated (v3.1.0)
-
-| File | Status | Changes |
-|------|--------|---------|
-| `.claude/skills/crafting-guidance/index.yaml` | ✅ Updated | v3.1.0, added lens check |
-| `.claude/skills/crafting-guidance/SKILL.md` | ✅ Updated | Lens detection, Mode 4 validation |
-
-**New Capabilities:**
-- Pre-flight check for lens-array/lenses.yaml
-- Lens detection via `get-lens.sh` in zone-specific guidance
-- Lens Context section in file guidance output
-- Mode 4: Lens Validation for explicit validation requests
-- Updated error handling for lens-related issues
-- Lens-Aware Guidance Principles section
-
-**New Output Sections:**
-- "Lenses Defined" in general guidance (lists all lenses by priority)
-- "Lens Context" in zone-specific guidance (detected lens + constraints)
-- Lens validation table in Mode 4
+Sprint 3 implemented the `/sigil-setup` and `/envision` commands for Sigil v4. Both skills and commands have been updated from v0.3 to the v4 Design Physics Engine architecture.
 
 ---
 
-## Acceptance Criteria Status
+## Tasks Completed
 
-| Criteria | Status |
-|----------|--------|
-| `/envision` creates lens definitions in lenses.yaml | ✅ Pass (Section 3 already implemented in Sprint 2) |
-| Each lens has: name, description, priority, constraints, validation rules | ✅ Pass (Schema in SDD §3.4 supported) |
-| Lens with lowest priority number is the truth test | ✅ Pass (validating-lenses skill) |
-| Validation fails if asset breaks in constrained lens | ✅ Pass (truth test fail = block) |
-| Immutable properties cannot vary between lenses | ✅ Pass (immutable violation = block) |
-| `/craft` detects current lens and applies appropriate constraints | ✅ Pass (get-lens.sh integration) |
+### S3-T1: Create initializing-sigil Skill ✅
 
----
+**Files:**
+- `.claude/skills/initializing-sigil/index.yaml`
+- `.claude/skills/initializing-sigil/SKILL.md`
 
-## Technical Implementation Notes
+**Acceptance Criteria:**
+- [x] index.yaml with metadata (v4.0.0)
+- [x] SKILL.md with setup workflow
+- [x] Pre-flight checks (`.sigil-setup-complete`)
+- [x] Creates sigil-mark/ structure (4 layers)
+- [x] Copies core/ templates reference
+- [x] Creates .sigil-setup-complete marker
 
-### get-lens.sh Output Format
-
-```json
-{
-  "lenses": [
-    {"id": "power_user", "name": "Power User", "priority": 1}
-  ],
-  "primary": "power_user",
-  "status": "detected"
-}
-```
-
-Status values:
-- `detected` — Lens inferred from file path
-- `available` — All lenses returned (no file path)
-- `no_match` — File path doesn't match any lens pattern
-- `no_config` — No lenses.yaml found
-- `available_no_yq` — Lenses exist but yq not available for parsing
-
-### Validation Response Structure
-
-```json
-{
-  "status": "pass" | "fail" | "warn",
-  "truth_test": {
-    "lens": "power_user",
-    "passed": true
-  },
-  "lenses": [...],
-  "immutable_violations": [],
-  "message": "Human-readable summary"
-}
-```
-
-### Strictness Matrix for Lens Failures
-
-| Validation Result | discovery | guiding | enforcing | strict |
-|-------------------|-----------|---------|-----------|--------|
-| Truth test fail | Suggest | ⚠️ WARN | ⛔ BLOCK | ⛔ BLOCK |
-| Other lens fail | Suggest | ⚠️ WARN | ⚠️ WARN | ⛔ BLOCK |
-| Immutable violation | Suggest | ⚠️ WARN | ⛔ BLOCK | ⛔ BLOCK |
+**Key Implementation Details:**
+- Updated from v0.3 (4 pillars) to v4 (4 layers) architecture
+- Layers: Core, Resonance, Memory, Taste Key
+- Physics enforcement documented (IMPOSSIBLE vs BLOCK)
+- Temporal Governor concept documented
+- Materials physics quick reference included
 
 ---
 
-## Files Changed (Summary)
+### S3-T2: Create sigil-setup Command ✅
 
-```
-.claude/scripts/get-lens.sh                          # New
-.claude/skills/validating-lenses/index.yaml          # New
-.claude/skills/validating-lenses/SKILL.md            # New
-.claude/skills/crafting-guidance/index.yaml          # Updated to v3.1.0
-.claude/skills/crafting-guidance/SKILL.md            # Updated with lens awareness
-```
+**File:** `.claude/commands/sigil-setup.md`
 
----
+**Acceptance Criteria:**
+- [x] .claude/commands/sigil-setup.md exists
+- [x] References initializing-sigil skill
+- [x] Documents workflow
 
-## Dependencies Verified
-
-| Dependency | Status |
-|------------|--------|
-| Sprint 2: `/envision` Section 3 (lens interview) | ✅ Available |
-| Sprint 2: Soul Binder values | ✅ Available |
-| Sprint 1: `get-strictness.sh` | ✅ Available |
+**Key Implementation Details:**
+- Updated to v4.0.0
+- Documents 4 layers instead of 4 pillars
+- Physics enforcement levels documented
+- Clear next step: `/envision`
 
 ---
 
-## Risks Addressed
+### S3-T3: Create envisioning-soul Skill ✅
 
-| Risk | Status | Mitigation |
-|------|--------|------------|
-| Lens complexity overwhelming | ✅ Mitigated | Default to single lens, path-based detection is optional |
-| Stacking conflicts confusing | ✅ Mitigated | Conflict resolution rules in schema, priority order wins |
+**Files:**
+- `.claude/skills/envisioning-soul/index.yaml`
+- `.claude/skills/envisioning-soul/SKILL.md`
+
+**Acceptance Criteria:**
+- [x] index.yaml with metadata (v4.0.0)
+- [x] SKILL.md with interview phases
+- [x] Questions for each essence section
+- [x] Writes to resonance/essence.yaml
+- [x] Uses AskUserQuestion (documented)
+
+**Key Implementation Details:**
+- 9 interview phases covering all essence sections
+- Questions for: identity, soul, invariants, references, feel, moments, anti-patterns, tensions, taste key
+- Output format matches resonance/essence.yaml template from Sprint 2
+- Tension presets documented (Linear, Airbnb, Nintendo, OSRS)
+- Best practices for interview included
+- Error handling for common situations
 
 ---
 
-## Success Metrics
+### S3-T4: Create envision Command ✅
 
-| Metric | Status |
-|--------|--------|
-| `/envision` creates at least 2 lens definitions | ✅ Ready (Section 3 interview) |
-| `get-lens.sh` correctly identifies lens from config | ✅ Ready (path pattern matching) |
-| Validation correctly fails when constrained lens fails | ✅ Ready (truth test logic) |
-| Immutable property violation detected and blocked | ✅ Ready (immutable_violations check) |
+**File:** `.claude/commands/envision.md`
+
+**Acceptance Criteria:**
+- [x] .claude/commands/envision.md exists
+- [x] References envisioning-soul skill
+
+**Key Implementation Details:**
+- Updated to v4.0.0
+- Documents all 9 interview phases
+- Outputs to resonance/essence.yaml (v4 path)
+- Preset table for quick configuration
+- Clear next step: `/codify`
+
+---
+
+## Files Modified
+
+| Path | Description | Change Type |
+|------|-------------|-------------|
+| `.claude/skills/initializing-sigil/index.yaml` | Skill metadata | Updated to v4.0.0 |
+| `.claude/skills/initializing-sigil/SKILL.md` | Setup workflow | Rewritten for v4 |
+| `.claude/commands/sigil-setup.md` | Command file | Updated to v4.0.0 |
+| `.claude/skills/envisioning-soul/index.yaml` | Skill metadata | Updated to v4.0.0 |
+| `.claude/skills/envisioning-soul/SKILL.md` | Interview workflow | Rewritten for v4 |
+| `.claude/commands/envision.md` | Command file | Updated to v4.0.0 |
+
+---
+
+## Architecture Changes (v0.3 → v4)
+
+### Directory Structure
+
+| v0.3 (4 Pillars) | v4 (4 Layers) |
+|------------------|---------------|
+| soul-binder/ | core/ (physics) |
+| lens-array/ | resonance/ (tuning) |
+| consultation-chamber/ | memory/ (versioning) |
+| proving-grounds/ | taste-key/ (authority) |
+
+### Key Concepts
+
+| v0.3 | v4 |
+|------|-----|
+| Immutable Values | Physics (IMPOSSIBLE) |
+| Canon of Flaws | Budgets/Fidelity (BLOCK) |
+| Strictness levels | Physics enforcement |
+| Lenses | Lens Registry |
+| Proving | N/A (post-MVP) |
+
+### Essence Location
+
+| v0.3 | v4 |
+|------|-----|
+| `sigil-mark/soul-binder/` | `sigil-mark/resonance/essence.yaml` |
+
+---
+
+## Quality Notes
+
+### Strengths
+
+1. **Clear v4 identity**: All files updated with v4.0.0 version
+2. **Physics-first documentation**: IMPOSSIBLE vs BLOCK clearly explained
+3. **Comprehensive interview**: 9 phases cover all essence sections
+4. **Practical presets**: Linear, Airbnb, Nintendo, OSRS tension presets
+5. **Error handling**: Common interview situations documented
+
+### Integration Points
+
+- `/sigil-setup` creates directory structure matching Sprint 1-2 schemas
+- `/envision` populates essence.yaml template from Sprint 2
+- Both commands reference the correct v4 file paths
+
+---
+
+## Verification Checklist
+
+- [x] initializing-sigil index.yaml updated to v4.0.0
+- [x] initializing-sigil SKILL.md rewritten for v4 architecture
+- [x] sigil-setup.md references correct skill and paths
+- [x] envisioning-soul index.yaml updated to v4.0.0
+- [x] envisioning-soul SKILL.md has interview phases for all essence sections
+- [x] envision.md references correct skill and paths
+- [x] All outputs point to v4 paths (resonance/, taste-key/)
 
 ---
 
 ## Next Sprint
 
-**Sprint 4: Consultation Chamber**
-- Implement `/consult` command and skill
-- Create decision record schema
-- Implement three-tier layer detection (strategic/direction/execution)
-- Add decision locking mechanism
-- Integrate with `/craft` for locked decision awareness
+**Sprint 4: Codify, Map, and Craft Commands (MVP)**
+- S4-T1: Create codifying-materials Skill
+- S4-T2: Create codify Command
+- S4-T3: Create mapping-zones Skill
+- S4-T4: Create map Command
+- S4-T5: Create crafting-components Skill with Hammer/Chisel
+- S4-T6: Create craft Command
 
----
-
-## Sign-off
-
-Sprint 3 implementation is complete. The Lens Array pillar is now functional with:
-- Lens detection from file paths via `get-lens.sh`
-- Lens validation logic with truth test prioritization
-- Immutable property enforcement across lenses
-- Lens-aware guidance in `/craft`
-
-Ready for review.
+```
+/implement sprint-4
+```

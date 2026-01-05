@@ -1,9 +1,9 @@
 ---
 name: "sigil-setup"
-version: "0.3.0"
+version: "4.0.0"
 description: |
-  Initialize Sigil v0.3 Constitutional Design Framework on a repository.
-  Creates four-pillar directory structure and configuration files.
+  Initialize Sigil v4 Design Physics Engine on a repository.
+  Creates physics-based directory structure and configuration files.
 
 command_type: "wizard"
 
@@ -12,64 +12,63 @@ arguments: []
 pre_flight:
   - check: "file_not_exists"
     path: ".sigil-setup-complete"
-    error: "Sigil v0.3 setup already completed. Edit .sigilrc.yaml to modify settings."
+    error: "Sigil v4 setup already completed. Edit .sigilrc.yaml to modify settings."
 
 outputs:
-  # Core state files
-  - path: sigil-mark/moodboard.md
+  # Core layer (physics)
+  - path: sigil-mark/core/sync.yaml
     type: "file"
-    description: "Product feel, references, anti-patterns"
-  - path: sigil-mark/rules.md
+    description: "Temporal Governor (tick modes, sync authority)"
+  - path: sigil-mark/core/budgets.yaml
     type: "file"
-    description: "Design rules by category"
-  - path: sigil-mark/inventory.md
+    description: "Cognitive, visual, complexity budgets"
+  - path: sigil-mark/core/fidelity.yaml
     type: "file"
-    description: "Component inventory"
+    description: "Fidelity Ceiling (Mod Ghost Rule)"
+  - path: sigil-mark/core/lens.yaml
+    type: "file"
+    description: "Lens Registry (rendering layers)"
 
-  # Soul Binder (Pillar 1)
-  - path: sigil-mark/soul-binder/immutable-values.yaml
+  # Resonance layer (tuning)
+  - path: sigil-mark/resonance/materials.yaml
     type: "file"
-    description: "Core values with enforcement rules"
-  - path: sigil-mark/soul-binder/canon-of-flaws.yaml
+    description: "Clay, Machinery, Glass physics"
+  - path: sigil-mark/resonance/zones.yaml
     type: "file"
-    description: "Protected emergent behaviors"
-  - path: sigil-mark/soul-binder/visual-soul.yaml
+    description: "Path-based zone definitions"
+  - path: sigil-mark/resonance/tensions.yaml
     type: "file"
-    description: "Grit signatures for cultural validation"
+    description: "Tuning sliders"
+  - path: sigil-mark/resonance/essence.yaml
+    type: "file"
+    description: "Product soul (populated by /envision)"
 
-  # Lens Array (Pillar 2)
-  - path: sigil-mark/lens-array/lenses.yaml
-    type: "file"
-    description: "User persona lens definitions"
-
-  # Consultation Chamber (Pillar 3)
-  - path: sigil-mark/consultation-chamber/config.yaml
-    type: "file"
-    description: "Consultation process configuration"
-  - path: sigil-mark/consultation-chamber/decisions/
+  # Memory layer
+  - path: sigil-mark/memory/eras/
     type: "directory"
-    description: "Decision records with locks"
-
-  # Proving Grounds (Pillar 4)
-  - path: sigil-mark/proving-grounds/config.yaml
-    type: "file"
-    description: "Monitor configuration"
-  - path: sigil-mark/proving-grounds/active/
+    description: "Era versioning"
+  - path: sigil-mark/memory/decisions/
     type: "directory"
-    description: "Features currently proving"
-
-  # Canon and Audit
-  - path: sigil-mark/canon/graduated/
+    description: "Decision records"
+  - path: sigil-mark/memory/mutations/active/
     type: "directory"
-    description: "Features that passed proving"
-  - path: sigil-mark/audit/overrides.yaml
+    description: "Active mutations"
+  - path: sigil-mark/memory/graveyard/
+    type: "directory"
+    description: "Deprecated decisions"
+
+  # Taste Key
+  - path: sigil-mark/taste-key/holder.yaml
     type: "file"
-    description: "Human override log"
+    description: "Taste Key authority definition"
+  - path: sigil-mark/taste-key/rulings/
+    type: "directory"
+    description: "Taste Key rulings"
 
   # Configuration
   - path: .sigilrc.yaml
     type: "file"
-    description: "Framework configuration (strictness, taste owners, domains)"
+    description: "Framework configuration"
   - path: .sigil-setup-complete
     type: "file"
     description: "Setup completion marker"
@@ -82,17 +81,17 @@ mode:
   allow_background: false
 ---
 
-# Sigil v0.3 Setup
+# Sigil v4 Setup
 
 ## Purpose
 
-Initialize Sigil v0.3 Constitutional Design Framework on a repository. Creates the four-pillar directory structure, configuration files, and prepares for design capture through interviews.
+Initialize Sigil v4 Design Physics Engine on a repository. Creates the physics-based directory structure, configuration files, and prepares for design capture through interviews.
 
 ## Philosophy
 
-> "Culture is the Reality. Code is Just the Medium."
+> "Physics, not opinions. Constraints, not debates."
 
-Sigil v0.3 is a constitutional framework that protects both intended soul (Immutable Values) and emergent soul (Canon of Flaws).
+Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for consistent design decisions.
 
 ## Invocation
 
@@ -110,36 +109,34 @@ See: `.claude/skills/initializing-sigil/SKILL.md` for full workflow details.
 
 1. **Pre-flight**: Check if already setup
 2. **Detect**: Find component directories
-3. **Create**: Build v0.3 directory structure (4 pillars)
-4. **Configure**: Initialize `.sigilrc.yaml` with strictness: discovery
+3. **Create**: Build v4 directory structure (4 layers)
+4. **Configure**: Initialize `.sigilrc.yaml`
 5. **Report**: Show completion message with next steps
 
-## Four Pillars
+## Four Layers
 
-| Pillar | Directory | Purpose |
-|--------|-----------|---------|
-| Soul Binder | `soul-binder/` | Protects values and emergent behaviors |
-| Lens Array | `lens-array/` | Supports multiple user truths |
-| Consultation Chamber | `consultation-chamber/` | Layered decision authority |
-| Proving Grounds | `proving-grounds/` | Scale validation before production |
+| Layer | Directory | Purpose |
+|-------|-----------|---------|
+| Core | `sigil-mark/core/` | Immutable physics (sync, budgets, fidelity, lens) |
+| Resonance | `sigil-mark/resonance/` | Product tuning (materials, zones, tensions, essence) |
+| Memory | `sigil-mark/memory/` | Decision versioning (eras, decisions, mutations) |
+| Taste Key | `sigil-mark/taste-key/` | Human authority (holder, rulings) |
 
-## Strictness Levels
+## Physics Enforcement
 
 | Level | Behavior |
 |-------|----------|
-| discovery | All suggestions, no blocks. Perfect for greenfield projects. |
-| guiding | Warnings on violations, optional blocks on critical |
-| enforcing | Blocks on protected flaws and immutable values |
-| strict | Blocks on all violations, requires approval for overrides |
+| IMPOSSIBLE | Cannot override (sync authority, tick modes) |
+| BLOCK | Requires Taste Key approval (budgets, fidelity) |
 
 ## Error Handling
 
 | Error | Cause | Resolution |
 |-------|-------|------------|
 | "Setup already complete" | `.sigil-setup-complete` exists | Edit `.sigilrc.yaml` to modify settings |
-| "Cannot detect components" | No standard component paths | Proceed with empty paths; user can edit .sigilrc.yaml |
+| "Cannot detect components" | No standard component paths | Proceed with empty paths; edit .sigilrc.yaml |
 | "Permission denied" | File system issue | Check directory permissions |
 
 ## Next Step
 
-After setup: `/envision` to capture product soul, define values and lenses
+After setup: `/envision` to capture product soul

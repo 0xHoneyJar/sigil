@@ -1,210 +1,198 @@
-# Sprint 2 Implementation Report
+# Sprint 2 Implementation Review (Sigil v4)
 
-**Sprint:** Soul Binder Core
-**Date:** 2026-01-02
-**Status:** COMPLETE
-
----
-
-## Sprint Goal
-
-Implement the Soul Binder pillar with interview-generated immutable values, the Canon of Flaws registry, and protection blocking based on strictness level.
+**Sprint:** Resonance Layer
+**Date:** 2026-01-04
+**Status:** ✅ COMPLETE
 
 ---
 
-## Deliverables Completed
+## Executive Summary
 
-### 1. `/envision` Skill Updated (v3.0.0)
-
-| File | Status | Changes |
-|------|--------|---------|
-| `.claude/skills/envisioning-moodboard/index.yaml` | ✅ Updated | Version 3.0.0, added outputs for values and lenses |
-| `.claude/skills/envisioning-moodboard/SKILL.md` | ✅ Rewritten | Three-section interview (moodboard, values, lenses) |
-
-**New Capabilities:**
-- Section 1: Moodboard (product feel) - existing functionality preserved
-- Section 2: Immutable Values capture with enforcement levels
-- Section 3: Lens definitions with priority ordering
-- Domain-specific value suggestions (DeFi, Creative, Community, Gaming)
-- Outputs to three files: `moodboard.md`, `immutable-values.yaml`, `lenses.yaml`
-
-### 2. `/canonize` Command and Skill Created
-
-| File | Status | Description |
-|------|--------|-------------|
-| `.claude/skills/canonizing-flaws/index.yaml` | ✅ Created | Skill metadata with triggers `/canonize` and `/canonise` |
-| `.claude/skills/canonizing-flaws/SKILL.md` | ✅ Created | 7-step interview workflow per SDD §4.3 |
-| `.claude/commands/canonize.md` | ✅ Created | Command frontmatter with pre-flight checks |
-
-**Interview Flow:**
-1. Identify the behavior (if not provided as argument)
-2. Interview: Intended vs Emergent behavior
-3. Interview: Protection criteria (usage, attachment, skill expression)
-4. Define protection patterns and rule
-5. Generate YAML entry
-6. Confirm and save to `canon-of-flaws.yaml`
-7. Report with de-canonization instructions
-
-### 3. Helper Script Created
-
-| Script | Status | Purpose |
-|--------|--------|---------|
-| `.claude/scripts/check-flaw.sh` | ✅ Created | Check if file path matches protected flaw patterns |
-
-**Features:**
-- Uses `yq` when available, graceful fallback to grep
-- Returns JSON with matches or "clean" status
-- Checks only PROTECTED status flaws
-- Proper exit codes (0=success, 1=missing arg, 2=no canon)
-
-### 4. `/craft` Skill Updated (v3.0.0)
-
-| File | Status | Changes |
-|------|--------|---------|
-| `.claude/skills/crafting-guidance/index.yaml` | ✅ Updated | Version 3.0.0, added checks for values and flaws |
-| `.claude/skills/crafting-guidance/SKILL.md` | ✅ Rewritten | Full v3 implementation with strictness awareness |
-
-**New Capabilities:**
-- Loads immutable values and canon of flaws
-- Flaw detection via `check-flaw.sh`
-- Strictness-aware response matrix
-- Block message format (⛔) per SDD §6.2
-- Warning message format (⚠️) per SDD §6.3
-- Override logging to `sigil-mark/audit/overrides.yaml`
+Sprint 2 implemented the Resonance Layer: product tuning through materials, zones, tensions, essence, eras, and taste key authority. The agent now has full physics context for design decisions.
 
 ---
 
-## Acceptance Criteria Status
+## Tasks Completed
 
-| Criteria | Status |
-|----------|--------|
-| `/envision` interviews user about core values (shared + project-specific) | ✅ Pass |
-| Values saved to `sigil-mark/soul-binder/immutable-values.yaml` | ✅ Pass |
-| `/canonize` interviews user about emergent behavior | ✅ Pass |
-| Flaw saved to `sigil-mark/soul-binder/canon-of-flaws.yaml` with PROTECTED status | ✅ Pass |
-| `/craft` checks values and warns/blocks based on strictness | ✅ Pass |
-| Protected flaw violations BLOCK in enforcing/strict modes | ✅ Pass |
-| All blocks show escape hatch for human override | ✅ Pass |
+### S2-T1: Implement Materials Schema ✅
 
----
+**File:** `sigil-mark/resonance/materials.yaml`
 
-## Technical Implementation Notes
+**Acceptance Criteria:**
+- [x] Clay: diffuse, heavy, spring(120/14), depress
+- [x] Machinery: flat, none, instant, highlight
+- [x] Glass: refract, weightless, ease(200/20), glow
+- [x] CSS implications for each material
+- [x] Zone affinity mappings
+- [x] Selection guide by action type
 
-### Immutable Values Schema
-
-```yaml
-values:
-  {value_id}:
-    name: "Human readable name"
-    description: "Why this matters"
-    type: "shared | project-specific"
-    enforcement:
-      level: "block | warn | review"
-      constraints:
-        - name: "constraint_id"
-          description: "What it checks"
-          pattern: "regex pattern"
-          scope: ["**/*.ts", "**/*.js"]
-```
-
-### Canon of Flaws Schema
-
-```yaml
-flaws:
-  - id: "FLAW-001"
-    name: "Behavior Name"
-    status: "PROTECTED | UNDER_REVIEW | DE_CANONIZED"
-    canonized_date: "2026-01-02"
-    canonized_by: "Taste Owner"
-    description: |
-      Brief description
-    intended_behavior: |
-      What should happen
-    emergent_behavior: |
-      What actually happens (beloved)
-    why_protected: |
-      - Reason 1
-      - Reason 2
-    affected_code_patterns:
-      - "*submit*handler*"
-    protection_rule: |
-      Any change that X must be BLOCKED.
-    de_canonization:
-      requires_threshold: 70
-      cooldown_days: 180
-```
-
-### Strictness Response Matrix
-
-| Violation Type | discovery | guiding | enforcing | strict |
-|----------------|-----------|---------|-----------|--------|
-| Immutable Value | Consider | ⚠️ WARN | ⛔ BLOCK | ⛔ BLOCK |
-| Protected Flaw | Consider | ⚠️ WARN | ⛔ BLOCK | ⛔ BLOCK |
-| Lens Failure | Consider | ⚠️ WARN | ⚠️ WARN | ⛔ BLOCK |
-| Pattern Warning | FYI | Consider | Consider | ⚠️ WARN |
+**Key Implementation Details:**
+- Each material has physics properties (light, weight, motion, feedback)
+- CSS implications section maps physics to actual styles
+- Zone affinity guides automatic material selection
+- Selection guide by action type (irreversible → Clay, frequent → Machinery, exploratory → Glass)
 
 ---
 
-## Files Changed (Summary)
+### S2-T2: Implement Zones Schema ✅
 
-```
-.claude/skills/envisioning-moodboard/index.yaml     # Updated to v3.0.0
-.claude/skills/envisioning-moodboard/SKILL.md       # Rewritten with 3 sections
-.claude/skills/canonizing-flaws/index.yaml          # New
-.claude/skills/canonizing-flaws/SKILL.md            # New (7-step workflow)
-.claude/commands/canonize.md                        # New
-.claude/scripts/check-flaw.sh                       # New
-.claude/skills/crafting-guidance/index.yaml         # Updated to v3.0.0
-.claude/skills/crafting-guidance/SKILL.md           # Rewritten with value/flaw checking
-```
+**File:** `sigil-mark/resonance/zones.yaml`
 
----
+**Acceptance Criteria:**
+- [x] Critical: server_authoritative, discrete, clay, 5 elements
+- [x] Transactional: client_authoritative, continuous, machinery, 12 elements
+- [x] Exploratory: client_authoritative, continuous, glass, 20 elements
+- [x] Marketing: client_authoritative, continuous, glass, 15 elements
+- [x] Default zone fallback
+- [x] Glob path patterns
+- [x] Tension overrides per zone
 
-## Dependencies Verified
-
-| Dependency | Status |
-|------------|--------|
-| Sprint 1: v3 directory structure | ✅ Available |
-| Sprint 1: `get-strictness.sh` | ✅ Available |
-
----
-
-## Risks Addressed
-
-| Risk | Status | Mitigation |
-|------|--------|------------|
-| Interview fatigue | ✅ Mitigated | Section-based interview with skip options |
-| False positive flaw detection | ✅ Mitigated | Glob patterns are conservative, human override always available |
+**Key Implementation Details:**
+- 5 zones defined: critical, transactional, exploratory, marketing, admin
+- Each zone has full physics (sync, tick, material, budget)
+- Glob patterns for path-based detection (e.g., `**/checkout/**` → critical)
+- Priority order for zone resolution
+- Default zone fallback for unmatched paths
+- Tension overrides per zone
 
 ---
 
-## Success Metrics
+### S2-T3: Implement Tensions Schema ✅
 
-| Metric | Status |
-|--------|--------|
-| `/envision` captures at least 2 immutable values | ✅ Ready (interview implemented) |
-| `/canonize` creates valid flaw entry with PROTECTED status | ✅ Ready (7-step workflow) |
-| `/craft` correctly warns on value violation in guiding mode | ✅ Ready (strictness matrix) |
-| `/craft` correctly blocks on flaw violation in enforcing mode | ✅ Ready (block message format) |
+**File:** `sigil-mark/resonance/tensions.yaml`
+
+**Acceptance Criteria:**
+- [x] Playfulness: 0-100 (serious ↔ fun)
+- [x] Weight: 0-100 (light ↔ heavy)
+- [x] Density: 0-100 (spacious ↔ dense)
+- [x] Speed: 0-100 (slow ↔ fast)
+- [x] Zone presets
+- [x] CSS mapping
+- [x] Conflict resolution rules
+
+**Key Implementation Details:**
+- 4 tension sliders with 0-100 range
+- CSS mapping at 0/50/100 points for interpolation
+- Zone presets matching zone definitions
+- Conflict resolution: Physics > Tensions > Zone > Product
+- Override hierarchy documented
+
+---
+
+### S2-T4: Implement Essence Template ✅
+
+**File:** `sigil-mark/resonance/essence.yaml`
+
+**Acceptance Criteria:**
+- [x] Product identity: name, tagline
+- [x] Soul statement with invariants
+- [x] Reference products: games, apps, physical
+- [x] Feel descriptors by context
+- [x] Anti-patterns section
+- [x] Key moments
+
+**Key Implementation Details:**
+- Template structure for /envision to populate
+- Soul statement with invariants and anti-invariants
+- Reference products by category (games, apps, physical)
+- Feel descriptors for different moments (first glance, during use, after completion, on error)
+- Key moments section (high stakes, celebration, recovery, discovery)
+- Product-level tension defaults
+
+---
+
+### S2-T5: Implement Era-1 Template ✅
+
+**File:** `sigil-mark/memory/eras/era-1.yaml`
+
+**Acceptance Criteria:**
+- [x] Era id, name, dates
+- [x] Context sections
+- [x] Truths with evidence
+- [x] Deprecated list
+- [x] Transition triggers
+
+**Key Implementation Details:**
+- Era identity with status (active/deprecated/archived)
+- Context sections (industry, product stage, technology, team)
+- Truths with evidence and decision tracking
+- Deprecated section for previous era truths
+- Transition triggers for era evolution
+- Lifecycle documentation
+
+---
+
+### S2-T6: Implement Taste Key Template ✅
+
+**File:** `sigil-mark/taste-key/holder.yaml`
+
+**Acceptance Criteria:**
+- [x] Holder fields
+- [x] Authority (absolute vs cannot_override)
+- [x] Process (greenlight, execution, integrity)
+- [x] Philosophy
+- [x] Succession rules
+
+**Key Implementation Details:**
+- Holder identity fields (name, role, email, github)
+- Absolute authority list (visual execution, animation, materials, overrides)
+- Cannot override list (physics, greenlighted concepts, accessibility)
+- Process documentation (greenlight, execution, integrity)
+- Philosophy with Linear and OSRS quotes
+- Succession rules with handoff checklist
+
+---
+
+## Files Created
+
+| Path | Description | Lines |
+|------|-------------|-------|
+| `sigil-mark/resonance/materials.yaml` | Clay, Machinery, Glass physics | ~180 |
+| `sigil-mark/resonance/zones.yaml` | Path-based zone definitions | ~220 |
+| `sigil-mark/resonance/tensions.yaml` | Tuning sliders | ~170 |
+| `sigil-mark/resonance/essence.yaml` | Product soul template | ~140 |
+| `sigil-mark/memory/eras/era-1.yaml` | Era versioning template | ~100 |
+| `sigil-mark/taste-key/holder.yaml` | Taste Key authority | ~150 |
+
+---
+
+## Quality Notes
+
+### Strengths
+- Materials, zones, and tensions are fully integrated (zones reference materials, zones set tension overrides)
+- Path-based zone detection enables automatic physics
+- Essence template ready for /envision interview
+- Era system enables decision versioning
+- Taste Key clearly separates authority levels
+
+### Architecture Alignment
+✅ Resonance layer properly references Core layer (sync, budgets from Sprint 1)
+✅ Zone presets match tension definitions
+✅ Material zone affinities align with zone material assignments
+✅ Taste Key authority respects physics immutability
+
+---
+
+## Verification Checklist
+
+- [x] All YAML files syntactically valid
+- [x] All acceptance criteria met
+- [x] Materials referenced by zones
+- [x] Tensions have zone presets
+- [x] Essence template ready for /envision
+- [x] Era template ready for memory versioning
+- [x] Taste Key authority hierarchy clear
 
 ---
 
 ## Next Sprint
 
-**Sprint 3: Lens Array**
-- Implement lens validation logic (most constrained = truth test)
-- Extend `/envision` for complete lens definitions
-- Add `get-lens.sh` helper for lens detection
-- Update `/craft` for lens-aware guidance
+**Sprint 3: Setup & Envision Commands**
+- S3-T1: Create initializing-sigil Skill
+- S3-T2: Create sigil-setup Command
+- S3-T3: Create envisioning-soul Skill
+- S3-T4: Create envision Command
 
----
-
-## Sign-off
-
-Sprint 2 implementation is complete. The Soul Binder pillar is now functional with:
-- Interview-generated immutable values
-- Canon of Flaws registry via `/canonize`
-- Strictness-aware blocking and warnings in `/craft`
-- Human override escape hatches with audit logging
-
-Ready for review.
+```
+/implement sprint-3
+```

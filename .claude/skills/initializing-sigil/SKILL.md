@@ -16,22 +16,22 @@ zones:
     permission: read
 ---
 
-# Sigil v0.3 Setup Skill
+# Sigil v4 Setup Skill
 
 ## Purpose
 
-Initialize Sigil v0.3 Constitutional Design Framework on a repository. Creates the four-pillar directory structure, configuration files, and prepares for design capture through interviews.
+Initialize Sigil v4 Design Physics Engine on a repository. Creates the physics-based directory structure, copies core schemas, and prepares for design capture through interviews.
 
 ## Philosophy
 
-> "Culture is the Reality. Code is Just the Medium."
+> "Physics, not opinions. Constraints, not debates."
 
-Sigil v0.3 is a constitutional framework that protects both intended soul (Immutable Values) and emergent soul (Canon of Flaws). This setup creates the foundation for the four pillars:
+Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for consistent design decisions. The setup creates:
 
-1. **Soul Binder** — Protects values and emergent behaviors
-2. **Lens Array** — Supports multiple user truths
-3. **Consultation Chamber** — Layered decision authority
-4. **Proving Grounds** — Scale validation before production
+1. **Core Layer** — Immutable physics (sync, budgets, fidelity, lens)
+2. **Resonance Layer** — Product tuning (materials, zones, tensions, essence)
+3. **Memory Layer** — Decision versioning (eras, decisions, mutations)
+4. **Taste Key** — Human authority (holder, rulings)
 
 ## Pre-Flight Checks
 
@@ -49,378 +49,178 @@ Scan for common component directory patterns:
 - `src/components/`
 - `src/features/**/components/`
 
-Use Glob or the detect-components.sh script.
+### Step 2: Create v4 Directory Structure
 
-### Step 2: Create v0.3 Directory Structure
-
-Create the complete Sigil v0.3 directory tree:
+Create the complete Sigil v4 directory tree:
 
 ```bash
-# Core state directory
-mkdir -p sigil-mark
+# Core layer (physics)
+mkdir -p sigil-mark/core
 
-# Soul Binder (Pillar 1)
-mkdir -p sigil-mark/soul-binder
+# Resonance layer (tuning)
+mkdir -p sigil-mark/resonance
 
-# Lens Array (Pillar 2)
-mkdir -p sigil-mark/lens-array
+# Memory layer (versioning)
+mkdir -p sigil-mark/memory/eras
+mkdir -p sigil-mark/memory/decisions
+mkdir -p sigil-mark/memory/mutations/active
+mkdir -p sigil-mark/memory/graveyard
 
-# Consultation Chamber (Pillar 3)
-mkdir -p sigil-mark/consultation-chamber/decisions
-
-# Proving Grounds (Pillar 4)
-mkdir -p sigil-mark/proving-grounds/active
-
-# Canon and Audit
-mkdir -p sigil-mark/canon/graduated
-mkdir -p sigil-mark/audit
+# Taste Key (authority)
+mkdir -p sigil-mark/taste-key/rulings
 ```
 
-### Step 3: Create Core State Files
+### Step 3: Copy Core Physics Schemas
 
-Copy templates from `.claude/templates/`:
-- `moodboard.md` → `sigil-mark/moodboard.md`
-- `rules.md` → `sigil-mark/rules.md`
+The core layer schemas are already created during sprints 1-2. If they don't exist, create them from templates:
 
-Create empty `sigil-mark/inventory.md`.
+**Core files (from Sprint 1):**
+- `sigil-mark/core/sync.yaml` — Temporal Governor
+- `sigil-mark/core/budgets.yaml` — Budget limits
+- `sigil-mark/core/fidelity.yaml` — Fidelity Ceiling
+- `sigil-mark/core/lens.yaml` — Lens Registry
 
-### Step 4: Create Soul Binder Files
+**Resonance files (from Sprint 2):**
+- `sigil-mark/resonance/materials.yaml` — Materials physics
+- `sigil-mark/resonance/zones.yaml` — Zone definitions
+- `sigil-mark/resonance/tensions.yaml` — Tension sliders
+- `sigil-mark/resonance/essence.yaml` — Essence template
 
-Create `sigil-mark/soul-binder/immutable-values.yaml`:
+**Memory files (from Sprint 2):**
+- `sigil-mark/memory/eras/era-1.yaml` — Era-1 template
+
+**Taste Key files (from Sprint 2):**
+- `sigil-mark/taste-key/holder.yaml` — Holder template
+
+### Step 4: Create Configuration
+
+Create `.sigilrc.yaml` with v4 schema:
+
 ```yaml
-# Soul Binder — Immutable Values
-# Core principles that hard-block violations
-# Generated through /envision interview
+# Sigil v4 Configuration
+# Design Physics Engine
 
-version: "1.0"
-generated_by: null  # Set by /envision
-generated_at: null
-
-values: {}
-  # Values will be populated by /envision interview
-  # Example:
-  # security:
-  #   name: "Security First"
-  #   type: "shared"
-  #   enforcement:
-  #     level: "block"
-```
-
-Create `sigil-mark/soul-binder/canon-of-flaws.yaml`:
-```yaml
-# Soul Binder — Canon of Flaws
-# Protected emergent behaviors
-# Register new flaws with /canonize
-
-version: "1.0"
-last_updated: null
-
-flaws: []
-  # Flaws registered through /canonize interview
-  # Example:
-  # - id: "FLAW-001"
-  #   name: "Double-Click Submit"
-  #   status: "PROTECTED"
-
-canonization_criteria:
-  usage_threshold_percent: 5
-  requires_community_attachment: true
-```
-
-Create `sigil-mark/soul-binder/visual-soul.yaml`:
-```yaml
-# Soul Binder — Visual Soul
-# Grit signatures for cultural validation
-# Detects "Play-Doh" problem (too smooth, too clean)
-
-version: "1.0"
-generated_at: null
-
-grit_signatures: {}
-  # Defined through /codify interview
-
-anti_patterns: []
-  # Patterns that fail cultural check
-```
-
-### Step 5: Create Lens Array Files
-
-Create `sigil-mark/lens-array/lenses.yaml`:
-```yaml
-# Lens Array — User Persona Definitions
-# Multiple truths coexist on top of core
-# Define through /envision interview
-
-version: "1.0"
-generated_at: null
-
-lenses: {}
-  # Lenses defined through /envision interview
-  # Example:
-  # power_user:
-  #   name: "Power User"
-  #   priority: 1  # Lower = more constrained = truth test
-  #   constraints: [...]
-
-immutable_properties:
-  description: "Properties that cannot vary between lenses"
-  properties:
-    - name: "core_logic"
-    - name: "security"
-    - name: "data_integrity"
-
-stacking:
-  allowed_combinations: []
-  conflict_resolution:
-    priority_order: []
-```
-
-### Step 6: Create Consultation Chamber Files
-
-Create `sigil-mark/consultation-chamber/config.yaml`:
-```yaml
-# Consultation Chamber — Decision Authority
-# Poll strategic, consult direction, dictate execution
-
-version: "1.0"
-
-layers:
-  strategic:
-    description: "Major features, pivots"
-    process: "community_poll"
-    authority: "binding_vote"
-
-  direction:
-    description: "Visual style, tone"
-    process: "sentiment_gathering"
-    authority: "taste_owner"
-
-  execution:
-    description: "Pixel-level details"
-    process: "none"
-    authority: "taste_owner_dictates"
-
-lock_durations:
-  strategic: 180  # 6 months
-  direction: 90   # 3 months
-  execution: 30   # 1 month
-
-lock:
-  unlock_requires: "taste_owner_approval"
-  early_unlock_reasons:
-    - "new_information"
-    - "causing_harm"
-    - "external_requirement"
-```
-
-### Step 7: Create Proving Grounds Files
-
-Create `sigil-mark/proving-grounds/config.yaml`:
-```yaml
-# Proving Grounds — Scale Validation
-# Prove features before production graduation
-
-version: "1.0"
-
-default_duration_days: 14
-
-# Duration options for proving
-duration_options:
-  quick: 7      # Low-risk features
-  standard: 14  # Default
-  extended: 30  # High-stakes features
-
-graduation_requires:
-  - all_monitors_green
-  - no_p1_violations
-  - taste_owner_signoff
-
-# Domain-specific monitors
-# Use get-monitors.sh to retrieve for a specific domain
-domains:
-  defi:
-    name: "DeFi"
-    monitors:
-      - tx_success_rate
-      - slippage_tolerance
-      - gas_efficiency
-      - liquidity_health
-  creative:
-    name: "Creative"
-    monitors:
-      - load_performance
-      - render_quality
-      - accessibility_score
-      - engagement_metrics
-  community:
-    name: "Community"
-    monitors:
-      - response_latency
-      - error_rate
-      - user_feedback
-      - governance_compliance
-  games:
-    name: "Games"
-    monitors:
-      - frame_rate
-      - fairness_check
-      - reward_balance
-      - player_retention
-  general:
-    name: "General"
-    monitors:
-      - error_rate
-      - uptime
-      - user_feedback
-```
-
-### Step 8: Create Audit Files
-
-Create `sigil-mark/audit/overrides.yaml`:
-```yaml
-# Audit Log — Human Overrides
-# Tracks when humans override agent recommendations
-
-version: "1.0"
-
-overrides: []
-  # Each override logs:
-  # - timestamp
-  # - violation_type
-  # - reasoning
-  # - user
-```
-
-### Step 9: Create Configuration
-
-Create `.sigilrc.yaml` with v0.3 schema:
-```yaml
-# Sigil v0.3 Configuration
-# Constitutional Design Framework
-
-version: "0.3"
-
-# Progressive strictness level
-# discovery: All suggestions, no blocks
-# guiding: Warnings on violations, optional blocks on critical
-# enforcing: Blocks on protected flaws and immutable values
-# strict: Blocks on all violations, requires approval for overrides
-strictness: "discovery"
+version: "4.0"
 
 # Detected component paths
 component_paths:
-  - "components/"        # Add detected paths
+  - "components/"
   # - "src/components/"
 
-# Taste Owners with domain authority
-taste_owners:
-  design:
-    name: "Design Lead"
-    placeholder: "@design-lead"
-    scope:
-      - "sigil-mark/**"
-      - "src/components/**"
+# Active zones (from zones.yaml)
+zones:
+  critical:
+    enabled: true
+  transactional:
+    enabled: true
+  exploratory:
+    enabled: true
+  marketing:
+    enabled: true
+  admin:
+    enabled: true
 
-# Domain for proving monitors
-domains: []
-  # - "defi"
-  # - "creative"
-  # - "community"
-  # - "games"
+# Taste Key holder (set via /envision)
+taste_key:
+  holder: null
+  # holder:
+  #   name: "Design Lead"
+  #   email: "lead@example.com"
+  #   github: "@designlead"
 
-# Consultation configuration
-consultation:
-  internal_tool: null  # "linear" | "notion" | etc.
-  community_channels: []
-
-# Proving configuration
-proving:
-  default_duration_days: 7
-  environments:
-    testnet: false
-    staging: false
-    beta: false
+# Physics mode
+physics:
+  # IMPOSSIBLE: Cannot override (sync authority, tick modes)
+  # BLOCK: Taste Key can override (budgets, fidelity)
+  enforcement: "physics"
 ```
 
-### Step 10: Create Marker and Version Files
+### Step 5: Create Marker and Version Files
 
 Create `.sigil-setup-complete`:
 ```
-Sigil v0.3 setup completed at [timestamp]
-Framework version: 0.3.0
-Strictness: discovery
+Sigil v4 setup completed at [timestamp]
+Framework version: 4.0.0
+Mode: Design Physics Engine
 
 Next steps:
-  - /envision to capture product soul and define values
-  - /codify to define design rules
-  - /canonize to protect emergent behaviors
+  - /envision to capture product soul
+  - /codify to configure materials
+  - /craft to get design guidance
 ```
 
 Create/update `.sigil-version.json`:
 ```json
 {
-  "version": "0.3.0",
-  "schema_version": "0.3",
+  "version": "4.0.0",
+  "schema_version": "4.0",
   "setup_at": "[timestamp]",
-  "pillars": {
-    "soul_binder": true,
-    "lens_array": true,
-    "consultation_chamber": true,
-    "proving_grounds": true
+  "layers": {
+    "core": true,
+    "resonance": true,
+    "memory": true,
+    "taste_key": true
   }
 }
 ```
 
-### Step 11: Report Success
+### Step 6: Report Success
 
 Output:
 ```
-Sigil v0.3 Setup Complete
+Sigil v4 Setup Complete
 
-Constitutional Design Framework initialized with four pillars:
-  1. Soul Binder (sigil-mark/soul-binder/)
-     - immutable-values.yaml
-     - canon-of-flaws.yaml
-     - visual-soul.yaml
+Design Physics Engine initialized with four layers:
 
-  2. Lens Array (sigil-mark/lens-array/)
-     - lenses.yaml
+  1. Core (sigil-mark/core/)
+     - sync.yaml (Temporal Governor)
+     - budgets.yaml (Cognitive, Visual, Complexity)
+     - fidelity.yaml (Mod Ghost Rule)
+     - lens.yaml (Rendering Layers)
 
-  3. Consultation Chamber (sigil-mark/consultation-chamber/)
-     - config.yaml
-     - decisions/
+  2. Resonance (sigil-mark/resonance/)
+     - materials.yaml (Clay, Machinery, Glass)
+     - zones.yaml (Critical, Transactional, Exploratory, Marketing, Admin)
+     - tensions.yaml (Playfulness, Weight, Density, Speed)
+     - essence.yaml (Product Soul - run /envision to populate)
 
-  4. Proving Grounds (sigil-mark/proving-grounds/)
-     - config.yaml
-     - active/
+  3. Memory (sigil-mark/memory/)
+     - eras/ (Era versioning)
+     - decisions/ (Decision records)
+     - mutations/ (Active mutations)
+     - graveyard/ (Deprecated)
+
+  4. Taste Key (sigil-mark/taste-key/)
+     - holder.yaml (Authority definition)
+     - rulings/ (Override records)
 
 Configuration:
-  - .sigilrc.yaml (strictness: discovery)
+  - .sigilrc.yaml
   - Detected component paths: [list]
 
-Strictness Level: discovery
-  All suggestions, no blocks. Perfect for greenfield projects.
-  Increase with: Edit .sigilrc.yaml strictness field.
+Physics Mode: Active
+  IMPOSSIBLE violations are blocked automatically.
+  BLOCK violations require Taste Key approval.
 
 Next steps:
-  - /envision → Capture product soul, define values and lenses
-  - /codify → Define design rules
-  - /craft → Get design guidance during implementation
+  - /envision → Capture product soul
+  - /codify → Configure materials and zones
+  - /craft → Get physics-aware design guidance
 
-Philosophy: "Culture is the Reality. Code is Just the Medium."
+Philosophy: "Physics, not opinions. Constraints, not debates."
 ```
 
 ## Idempotency
 
 If already set up:
-1. Warn user that v0.3 setup already complete
-2. Show current strictness level
+1. Warn user that v4 setup already complete
+2. Show current configuration
 3. Offer options:
    - Refresh directory structure (add missing directories)
-   - View current configuration
+   - View current physics configuration
    - Proceed to /envision
 
-Never overwrite existing state files (values, flaws, lenses, decisions).
+Never overwrite existing state files.
 
 ## Error Handling
 
@@ -430,7 +230,30 @@ Never overwrite existing state files (values, flaws, lenses, decisions).
 | "Cannot detect components" | No standard component paths | Proceed with empty paths; user can edit .sigilrc.yaml |
 | "Permission denied" | File system issue | Check directory permissions |
 
+## Key Concepts
+
+### Physics Enforcement
+
+| Level | Behavior |
+|-------|----------|
+| IMPOSSIBLE | Cannot override (sync authority, tick modes) |
+| BLOCK | Requires Taste Key approval (budgets, fidelity) |
+
+### Temporal Governor
+
+| Mode | Tick Rate | Authority | Example |
+|------|-----------|-----------|---------|
+| Discrete | 600ms | Server | Checkout, claims |
+| Continuous | 0ms | Client | Dashboard, settings |
+
+### Materials
+
+| Material | Feel | Motion | Zones |
+|----------|------|--------|-------|
+| Clay | Heavy, deliberate | Spring | Critical |
+| Machinery | Efficient, invisible | Instant | Transactional, Admin |
+| Glass | Light, magical | Ease | Exploratory, Marketing |
+
 ## Scripts
 
-- `detect-components.sh`: Find component directories in codebase
-- `get-strictness.sh`: Return current strictness level from .sigilrc.yaml
+None required for v4. All configuration is YAML-based.

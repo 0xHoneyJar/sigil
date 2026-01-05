@@ -1,64 +1,107 @@
-# Sprint 3 Review — Senior Technical Lead
+# Sprint 3 Review: All Good
 
-**Sprint:** Lens Array
-**Date:** 2026-01-02
 **Reviewer:** Senior Technical Lead
+**Date:** 2026-01-04
+**Version:** Sigil v4 (Design Physics Engine)
+**Status:** ✅ APPROVED
 
 ---
 
-## Review Decision
+## Review Summary
 
-**All good**
-
----
-
-## Verification Summary
-
-### Acceptance Criteria
-
-| Criteria | Status | Evidence |
-|----------|--------|----------|
-| `/envision` creates lens definitions in lenses.yaml | ✅ Pass | Section 3 implemented in Sprint 2 |
-| Each lens has: name, description, priority, constraints, validation | ✅ Pass | Schema supported per SDD §3.4 |
-| Lens with lowest priority = truth test | ✅ Pass | validating-lenses SKILL.md Step 2 |
-| Validation fails if asset breaks in constrained lens | ✅ Pass | Truth test fail logic implemented |
-| Immutable properties cannot vary between lenses | ✅ Pass | Step 4 in validation, immutable_violations check |
-| `/craft` detects current lens and applies constraints | ✅ Pass | get-lens.sh integration in SKILL.md |
-
-### Code Quality
-
-| File | Quality |
-|------|---------|
-| `get-lens.sh` | Excellent: set -e, yq fallback, JSON output, proper exit codes |
-| `validating-lenses/SKILL.md` | Excellent: Clear 4-step validation, strictness matrix, response formats |
-| `validating-lenses/index.yaml` | Good: Internal skill, correct inputs/outputs |
-| `crafting-guidance/SKILL.md` | Excellent: Lens Detection section, Mode 4 validation, updated error handling |
-| `crafting-guidance/index.yaml` | Good: v3.1.0, lens check added |
-
-### Implementation Highlights
-
-1. **Path-based lens detection** — Intelligent pattern matching for mobile/a11y/power_user/newcomer
-2. **Truth test prioritization** — Lowest priority number = most constrained = truth test
-3. **Graceful degradation** — yq fallback to grep, proper handling of missing config
-4. **Mode 4 validation** — Explicit lens validation mode in /craft
-5. **Lens-Aware Guidance Principles** — Clear documentation of lens validation philosophy
-
-### Technical Review
-
-**get-lens.sh:**
-- Proper POSIX shell with `set -e`
-- Well-structured case statements for pattern matching
-- JSON output format consistent with other helpers
-- Handles edge cases (no config, no yq, no match)
-
-**validating-lenses:**
-- Internal skill properly marked with `internal: true`
-- Clear validation workflow with 4 steps
-- Strictness matrix matches SDD specifications
-- Response formats for pass/warn/fail scenarios
+Sprint 3 (Setup & Envision Commands) implementation meets all acceptance criteria. Both skills and commands have been properly updated from v0.3 to v4 architecture.
 
 ---
 
-## Approved
+## Acceptance Criteria Verification
 
-Sprint 3 implementation meets all acceptance criteria. Ready for security audit.
+### S3-T1: initializing-sigil Skill ✅
+
+| Criteria | Status | Verification |
+|----------|--------|--------------|
+| index.yaml with metadata | ✅ Pass | index.yaml:1-3 — v4.0.0, correct description |
+| SKILL.md with setup workflow | ✅ Pass | SKILL.md:42-166 — 6-step workflow |
+| Pre-flight checks | ✅ Pass | SKILL.md:36-40 — .sigil-setup-complete check |
+| Creates sigil-mark/ structure | ✅ Pass | SKILL.md:52-71 — 4 layers: core, resonance, memory, taste-key |
+| Copies core/ templates | ✅ Pass | SKILL.md:73-93 — References Sprint 1-2 schemas |
+| Creates .sigil-setup-complete marker | ✅ Pass | SKILL.md:138-150 — Marker file documented |
+
+### S3-T2: sigil-setup Command ✅
+
+| Criteria | Status | Verification |
+|----------|--------|--------------|
+| .claude/commands/sigil-setup.md exists | ✅ Pass | File exists |
+| References initializing-sigil skill | ✅ Pass | sigil-setup.md:104-106 |
+| Documents workflow | ✅ Pass | sigil-setup.md:108-114 — 5-step workflow |
+
+### S3-T3: envisioning-soul Skill ✅
+
+| Criteria | Status | Verification |
+|----------|--------|--------------|
+| index.yaml with metadata | ✅ Pass | index.yaml:1-5 — v4.0.0, Soul Keeper role |
+| SKILL.md with interview phases | ✅ Pass | SKILL.md:29-210 — 9 interview phases |
+| Questions for each essence section | ✅ Pass | All sections covered: identity, soul, invariants, references, feel, moments, anti-patterns, tensions, taste key |
+| Writes to resonance/essence.yaml | ✅ Pass | SKILL.md:212-280 — Output format documented |
+| Uses AskUserQuestion | ✅ Pass | SKILL.md:31-33 — "Ask using AskUserQuestion" |
+
+### S3-T4: envision Command ✅
+
+| Criteria | Status | Verification |
+|----------|--------|--------------|
+| .claude/commands/envision.md exists | ✅ Pass | File exists |
+| References envisioning-soul skill | ✅ Pass | envision.md:5-7 — agent: envisioning-soul |
+
+---
+
+## Code Quality Assessment
+
+### Skill Quality
+
+| File | Lines | Quality | Notes |
+|------|-------|---------|-------|
+| initializing-sigil/index.yaml | 58 | Excellent | Complete output list, v4 paths |
+| initializing-sigil/SKILL.md | 260 | Excellent | Clear workflow, physics concepts |
+| envisioning-soul/index.yaml | 14 | Good | Clean, correct outputs |
+| envisioning-soul/SKILL.md | 340 | Excellent | Comprehensive interview, presets |
+
+### Command Quality
+
+| File | Lines | Quality | Notes |
+|------|-------|---------|-------|
+| sigil-setup.md | 143 | Excellent | Complete outputs, pre-flight |
+| envision.md | 101 | Excellent | Clear interview flow, presets |
+
+### Strengths
+
+1. **v4 Identity Clear**: All files consistently reference v4.0.0
+2. **Physics-First**: IMPOSSIBLE vs BLOCK enforcement documented
+3. **Comprehensive Interview**: 9 phases cover all essence sections
+4. **Practical Presets**: Linear, Airbnb, Nintendo, OSRS tension presets
+5. **Architecture Alignment**: Outputs match Sprint 1-2 schema paths
+
+### Architecture Alignment
+
+✅ initializing-sigil references correct 4-layer structure (core, resonance, memory, taste-key)
+✅ envisioning-soul writes to resonance/essence.yaml (v4 path)
+✅ Both commands reference correct v4 physics concepts
+✅ Tension presets match tensions.yaml zone_presets
+
+---
+
+## Minor Observations (Non-blocking)
+
+1. **Outputs array format**: envisioning-soul index.yaml line 10 has "(partial)" in path string which is slightly unconventional. Pure YAML list would be cleaner.
+
+2. **Refresh flag**: envision.md documents `--refresh` flag but implementation relies on agent detecting existing file. This is fine, just noting it's convention-based.
+
+These are notes for future consideration, not blocking issues.
+
+---
+
+## Verdict
+
+**All good** - Sprint 3 is approved.
+
+The Setup & Envision Commands are complete and properly updated for v4. Ready for security audit.
+
+Next step: `/audit-sprint sprint-3`

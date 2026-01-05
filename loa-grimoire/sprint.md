@@ -40,81 +40,81 @@ Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for
 
 ---
 
-## Sprint 1: Foundation & State Zone
+## Sprint 1: Foundation & State Zone ✅ COMPLETED
 
 **Goal:** Create sigil-mark/ directory structure and core YAML schemas
 
 ### Tasks
 
-#### S1-T1: Create State Zone Structure
+#### S1-T1: Create State Zone Structure ✅
 **Description:** Create sigil-mark/ directory with all subdirectories
 
 **Acceptance Criteria:**
-- [ ] `sigil-mark/core/` exists
-- [ ] `sigil-mark/resonance/` exists
-- [ ] `sigil-mark/memory/eras/` exists
-- [ ] `sigil-mark/memory/decisions/` exists
-- [ ] `sigil-mark/memory/mutations/active/` exists
-- [ ] `sigil-mark/memory/graveyard/` exists
-- [ ] `sigil-mark/taste-key/rulings/` exists
+- [x] `sigil-mark/core/` exists
+- [x] `sigil-mark/resonance/` exists
+- [x] `sigil-mark/memory/eras/` exists
+- [x] `sigil-mark/memory/decisions/` exists
+- [x] `sigil-mark/memory/mutations/active/` exists
+- [x] `sigil-mark/memory/graveyard/` exists
+- [x] `sigil-mark/taste-key/rulings/` exists
 
 **Effort:** Small
 
 ---
 
-#### S1-T2: Implement Temporal Governor Schema
+#### S1-T2: Implement Temporal Governor Schema ✅
 **Description:** Create sync.yaml with tick modes and authority
 
 **Acceptance Criteria:**
-- [ ] Discrete tick mode: 600ms, heavy, rhythmic
-- [ ] Continuous tick mode: 0ms, instant, fluid
-- [ ] Server-authoritative: NO optimistic updates
-- [ ] Client-authoritative: optimistic expected
-- [ ] Collaborative: CRDT with conflict resolution
-- [ ] Zone mapping for temporal_governor
-- [ ] Physics violations defined as IMPOSSIBLE
+- [x] Discrete tick mode: 600ms, heavy, rhythmic
+- [x] Continuous tick mode: 0ms, instant, fluid
+- [x] Server-authoritative: NO optimistic updates
+- [x] Client-authoritative: optimistic expected
+- [x] Collaborative: CRDT with conflict resolution
+- [x] Zone mapping for temporal_governor
+- [x] Physics violations defined as IMPOSSIBLE
 
 **Effort:** Medium
 
 ---
 
-#### S1-T3: Implement Budget Schema
+#### S1-T3: Implement Budget Schema ✅
 **Description:** Create budgets.yaml with cognitive, visual, complexity limits
 
 **Acceptance Criteria:**
-- [ ] Cognitive: interactive_elements (5→30), decisions (2→10), text_density
-- [ ] Visual: color_count (5), animation_count (1→5), depth_layers (4)
-- [ ] Complexity: props (10), variants (12), dependencies (8)
-- [ ] Enforcement rules: BLOCK with Taste Key override
+- [x] Cognitive: interactive_elements (5→30), decisions (2→10), text_density
+- [x] Visual: color_count (5), animation_count (1→5), depth_layers (4)
+- [x] Complexity: props (10), variants (12), dependencies (8)
+- [x] Enforcement rules: BLOCK with Taste Key override
 
 **Effort:** Small
 
 ---
 
-#### S1-T4: Implement Fidelity Ceiling Schema
+#### S1-T4: Implement Fidelity Ceiling Schema ✅
 **Description:** Create fidelity.yaml with Mod Ghost Rule
 
 **Acceptance Criteria:**
-- [ ] Gradients: 2 stops max
-- [ ] Shadows: 3 layers max
-- [ ] Animation: 800ms max
-- [ ] Blur: 16px max
-- [ ] Border-radius: 24px max
-- [ ] Agent rules: "Generate at ceiling, not above"
+- [x] Gradients: 2 stops max
+- [x] Shadows: 3 layers max
+- [x] Animation: 800ms max
+- [x] Blur: 16px max
+- [x] Border-radius: 24px max
+- [x] Agent rules: "Generate at ceiling, not above"
 
 **Effort:** Small
 
 ---
 
-#### S1-T5: Implement Lens Registry Schema
+#### S1-T5: Implement Lens Registry Schema ✅
 **Description:** Create lens.yaml with rendering layers
 
 **Acceptance Criteria:**
-- [ ] Vanilla: default, core fidelity
-- [ ] High-fidelity: opt-in, cannot change geometry
-- [ ] Utility: opt-in, additive only
-- [ ] Accessibility: highest priority, reduced motion
-- [ ] CSS variable mapping
+- [x] Vanilla: default, core fidelity
+- [x] High-fidelity: opt-in, cannot change geometry
+- [x] Utility: opt-in, additive only
+- [x] Accessibility: highest priority, reduced motion
+- [x] CSS variable mapping
 
 **Effort:** Small
 
@@ -126,97 +126,97 @@ Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for
 
 ---
 
-## Sprint 2: Resonance Layer
+## Sprint 2: Resonance Layer ✅ COMPLETED
 
 **Goal:** Implement product tuning layer with materials, zones, tensions
 
 ### Tasks
 
-#### S2-T1: Implement Materials Schema
+#### S2-T1: Implement Materials Schema ✅
 **Description:** Create materials.yaml with clay, machinery, glass
 
 **Acceptance Criteria:**
-- [ ] Clay: diffuse, heavy, spring(120/14), depress
-- [ ] Machinery: flat, none, instant, highlight
-- [ ] Glass: refract, weightless, ease(200/20), glow
-- [ ] CSS implications for each material
-- [ ] Zone affinity mappings
-- [ ] Selection guide by action type
+- [x] Clay: diffuse, heavy, spring(120/14), depress
+- [x] Machinery: flat, none, instant, highlight
+- [x] Glass: refract, weightless, ease(200/20), glow
+- [x] CSS implications for each material
+- [x] Zone affinity mappings
+- [x] Selection guide by action type
 
 **Effort:** Medium
 
 ---
 
-#### S2-T2: Implement Zones Schema
+#### S2-T2: Implement Zones Schema ✅
 **Description:** Create zones.yaml with path-based physics
 
 **Acceptance Criteria:**
-- [ ] Critical: server_authoritative, discrete, clay, 5 elements
-- [ ] Transactional: client_authoritative, continuous, machinery, 12 elements
-- [ ] Exploratory: client_authoritative, continuous, glass, 20 elements
-- [ ] Marketing: client_authoritative, continuous, glass, 15 elements
-- [ ] Default zone fallback
-- [ ] Glob path patterns
-- [ ] Tension overrides per zone
+- [x] Critical: server_authoritative, discrete, clay, 5 elements
+- [x] Transactional: client_authoritative, continuous, machinery, 12 elements
+- [x] Exploratory: client_authoritative, continuous, glass, 20 elements
+- [x] Marketing: client_authoritative, continuous, glass, 15 elements
+- [x] Default zone fallback
+- [x] Glob path patterns
+- [x] Tension overrides per zone
 
 **Effort:** Medium
 
 ---
 
-#### S2-T3: Implement Tensions Schema
+#### S2-T3: Implement Tensions Schema ✅
 **Description:** Create tensions.yaml with tuning sliders
 
 **Acceptance Criteria:**
-- [ ] Playfulness: 0-100 (serious ↔ fun)
-- [ ] Weight: 0-100 (light ↔ heavy)
-- [ ] Density: 0-100 (spacious ↔ dense)
-- [ ] Speed: 0-100 (slow ↔ fast)
-- [ ] Zone presets
-- [ ] CSS mapping
-- [ ] Conflict resolution rules
+- [x] Playfulness: 0-100 (serious ↔ fun)
+- [x] Weight: 0-100 (light ↔ heavy)
+- [x] Density: 0-100 (spacious ↔ dense)
+- [x] Speed: 0-100 (slow ↔ fast)
+- [x] Zone presets
+- [x] CSS mapping
+- [x] Conflict resolution rules
 
 **Effort:** Small
 
 ---
 
-#### S2-T4: Implement Essence Template
+#### S2-T4: Implement Essence Template ✅
 **Description:** Create essence.yaml template (populated by /envision)
 
 **Acceptance Criteria:**
-- [ ] Product identity: name, tagline
-- [ ] Soul statement with invariants
-- [ ] Reference products: games, apps, physical
-- [ ] Feel descriptors by context
-- [ ] Anti-patterns section
-- [ ] Key moments
+- [x] Product identity: name, tagline
+- [x] Soul statement with invariants
+- [x] Reference products: games, apps, physical
+- [x] Feel descriptors by context
+- [x] Anti-patterns section
+- [x] Key moments
 
 **Effort:** Small
 
 ---
 
-#### S2-T5: Implement Era-1 Template
+#### S2-T5: Implement Era-1 Template ✅
 **Description:** Create memory/eras/era-1.yaml
 
 **Acceptance Criteria:**
-- [ ] Era id, name, dates
-- [ ] Context sections
-- [ ] Truths with evidence
-- [ ] Deprecated list
-- [ ] Transition triggers
+- [x] Era id, name, dates
+- [x] Context sections
+- [x] Truths with evidence
+- [x] Deprecated list
+- [x] Transition triggers
 
 **Effort:** Small
 
 ---
 
-#### S2-T6: Implement Taste Key Template
+#### S2-T6: Implement Taste Key Template ✅
 **Description:** Create taste-key/holder.yaml
 
 **Acceptance Criteria:**
-- [ ] Holder fields
-- [ ] Authority (absolute vs cannot_override)
-- [ ] Process (greenlight, execution, integrity)
-- [ ] Philosophy
-- [ ] Succession rules
+- [x] Holder fields
+- [x] Authority (absolute vs cannot_override)
+- [x] Process (greenlight, execution, integrity)
+- [x] Philosophy
+- [x] Succession rules
 
 **Effort:** Small
 
@@ -229,59 +229,59 @@ Sigil v4 is a Design Physics Engine that gives AI agents physics constraints for
 
 ---
 
-## Sprint 3: Setup & Envision Commands
+## Sprint 3: Setup & Envision Commands ✅ REVIEW_APPROVED
 
 **Goal:** Implement /sigil-setup and /envision commands
 
 ### Tasks
 
-#### S3-T1: Create initializing-sigil Skill
+#### S3-T1: Create initializing-sigil Skill ✅
 **Description:** Skill for /sigil-setup command
 
 **Acceptance Criteria:**
-- [ ] index.yaml with metadata
-- [ ] SKILL.md with setup workflow
-- [ ] Pre-flight checks
-- [ ] Creates sigil-mark/ structure
-- [ ] Copies core/ templates
-- [ ] Creates .sigil-setup-complete marker
+- [x] index.yaml with metadata
+- [x] SKILL.md with setup workflow
+- [x] Pre-flight checks
+- [x] Creates sigil-mark/ structure
+- [x] Copies core/ templates
+- [x] Creates .sigil-setup-complete marker
 
 **Effort:** Medium
 
 ---
 
-#### S3-T2: Create sigil-setup Command
+#### S3-T2: Create sigil-setup Command ✅
 **Description:** Command file for /sigil-setup
 
 **Acceptance Criteria:**
-- [ ] .claude/commands/sigil-setup.md exists
-- [ ] References initializing-sigil skill
-- [ ] Documents workflow
+- [x] .claude/commands/sigil-setup.md exists
+- [x] References initializing-sigil skill
+- [x] Documents workflow
 
 **Effort:** Small
 
 ---
 
-#### S3-T3: Create envisioning-soul Skill
+#### S3-T3: Create envisioning-soul Skill ✅
 **Description:** Skill for /envision command (product soul interview)
 
 **Acceptance Criteria:**
-- [ ] index.yaml with metadata
-- [ ] SKILL.md with interview phases
-- [ ] Questions for each essence section
-- [ ] Writes to resonance/essence.yaml
-- [ ] Uses AskUserQuestion
+- [x] index.yaml with metadata
+- [x] SKILL.md with interview phases
+- [x] Questions for each essence section
+- [x] Writes to resonance/essence.yaml
+- [x] Uses AskUserQuestion
 
 **Effort:** Large
 
 ---
 
-#### S3-T4: Create envision Command
+#### S3-T4: Create envision Command ✅
 **Description:** Command file for /envision
 
 **Acceptance Criteria:**
-- [ ] .claude/commands/envision.md exists
-- [ ] References envisioning-soul skill
+- [x] .claude/commands/envision.md exists
+- [x] References envisioning-soul skill
 
 **Effort:** Small
 

@@ -1,57 +1,57 @@
 name: initializing-sigil
-description: Initialize Sigil v0.3 Constitutional Design Framework on a repository
-version: "0.3.0"
+description: Initialize Sigil v4 Design Physics Engine on a repository
+version: "4.0.0"
 
 triggers:
   - "/sigil-setup"
 
 examples:
   - input: "/sigil-setup"
-    description: "Initialize Sigil v0.3 on current repo"
+    description: "Initialize Sigil v4 on current repo"
 
 inputs: []
 
 outputs:
-  # Core state files
-  - path: sigil-mark/moodboard.md
-    description: Product feel, references, anti-patterns
-  - path: sigil-mark/rules.md
-    description: Design rules by category
-  - path: sigil-mark/inventory.md
-    description: Component inventory
+  # Core state zone
+  - path: sigil-mark/core/sync.yaml
+    description: Temporal Governor (tick modes, sync authority)
+  - path: sigil-mark/core/budgets.yaml
+    description: Cognitive, visual, complexity budgets
+  - path: sigil-mark/core/fidelity.yaml
+    description: Fidelity Ceiling (Mod Ghost Rule)
+  - path: sigil-mark/core/lens.yaml
+    description: Lens Registry (rendering layers)
 
-  # Soul Binder (Pillar 1)
-  - path: sigil-mark/soul-binder/immutable-values.yaml
-    description: Core values with enforcement rules
-  - path: sigil-mark/soul-binder/canon-of-flaws.yaml
-    description: Protected emergent behaviors
-  - path: sigil-mark/soul-binder/visual-soul.yaml
-    description: Grit signatures for cultural validation
+  # Resonance layer
+  - path: sigil-mark/resonance/materials.yaml
+    description: Clay, Machinery, Glass physics
+  - path: sigil-mark/resonance/zones.yaml
+    description: Path-based zone definitions
+  - path: sigil-mark/resonance/tensions.yaml
+    description: Tuning sliders (playfulness, weight, density, speed)
+  - path: sigil-mark/resonance/essence.yaml
+    description: Product soul (populated by /envision)
 
-  # Lens Array (Pillar 2)
-  - path: sigil-mark/lens-array/lenses.yaml
-    description: User persona lens definitions
+  # Memory layer
+  - path: sigil-mark/memory/eras/era-1.yaml
+    description: Era versioning template
+  - path: sigil-mark/memory/decisions/
+    description: Decision records
+  - path: sigil-mark/memory/mutations/active/
+    description: Active mutations
+  - path: sigil-mark/memory/graveyard/
+    description: Deprecated decisions
 
-  # Consultation Chamber (Pillar 3)
-  - path: sigil-mark/consultation-chamber/config.yaml
-    description: Consultation process configuration
-  - path: sigil-mark/consultation-chamber/decisions/
-    description: Decision records with locks
-
-  # Proving Grounds (Pillar 4)
-  - path: sigil-mark/proving-grounds/config.yaml
-    description: Monitor configuration
-  - path: sigil-mark/proving-grounds/active/
-    description: Features currently proving
-
-  # Canon and Audit
-  - path: sigil-mark/canon/graduated/
-    description: Features that passed proving
-  - path: sigil-mark/audit/overrides.yaml
-    description: Human override log
+  # Taste Key
+  - path: sigil-mark/taste-key/holder.yaml
+    description: Taste Key authority definition
+  - path: sigil-mark/taste-key/rulings/
+    description: Taste Key rulings directory
 
   # Configuration
   - path: .sigilrc.yaml
-    description: Framework configuration (strictness, taste owners, domains)
+    description: Framework configuration
   - path: .sigil-setup-complete
     description: Setup completion marker
+  - path: .sigil-version.json
+    description: Version tracking

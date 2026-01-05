@@ -1,10 +1,13 @@
-# Agent 1: envisioning-soul
+# Agent: envisioning-soul
 name: envisioning-soul
-version: "1.0.0"
-description: "Captures product essence through interview. Soul Keeper role."
+version: "4.0.0"
+description: "Captures product essence through interview. Populates resonance/essence.yaml."
 role: "Soul Keeper"
 command: /envision
+
 outputs:
-  - sigil-mark/soul/essence.yaml
-  - sigil-mark/moodboard.md
-dependencies: []
+  - sigil-mark/resonance/essence.yaml
+  - sigil-mark/taste-key/holder.yaml (partial)
+
+dependencies:
+  - sigil-setup-complete
