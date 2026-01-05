@@ -1,4 +1,4 @@
-# Sigil v4 Agent: Gardening Entropy
+# Sigil v1.0 Agent: Gardening Entropy
 
 > "Entropy accumulates. Gardens must be tended."
 
@@ -28,7 +28,7 @@
 
 ## Prerequisites
 
-- Run `/sigil-setup` first
+- Run `mount-sigil.sh` first (creates sigil-mark/)
 - Run `/envision` first (for essence context)
 
 ## The Entropy Model

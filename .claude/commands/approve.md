@@ -1,11 +1,11 @@
 ---
 name: approve
-version: "0.5.0"
+version: "1.0.0"
 description: Taste Key holder sign-off and rulings
 agent: approving-patterns
 agent_path: .claude/skills/approving-patterns/SKILL.md
 preflight:
-  - sigil_setup_complete
+  - sigil_mark_exists
 ---
 
 # /approve

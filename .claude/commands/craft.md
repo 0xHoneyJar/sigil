@@ -1,11 +1,11 @@
 ---
 name: craft
-version: "0.5.0"
+version: "1.0.0"
 description: Generate UI with physics context using Hammer/Chisel toolkit
 agent: crafting-components
 agent_path: .claude/skills/crafting-components/SKILL.md
 preflight:
-  - sigil_setup_complete
+  - sigil_mark_exists
 context_injection: true
 ---
 

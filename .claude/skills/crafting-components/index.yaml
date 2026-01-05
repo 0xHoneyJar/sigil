@@ -8,6 +8,19 @@ role_description: "Diagnoses and executes with physics context"
 
 outputs: []  # Generates code, not state files
 
+reads:
+  # Physics context
+  - sigil-mark/resonance/zones.yaml
+  - sigil-mark/resonance/materials.yaml
+  - sigil-mark/resonance/essence.yaml
+  - sigil-mark/resonance/tensions.yaml
+  - sigil-mark/core/fidelity.yaml
+  # Memory context (ERA-AWARE)
+  - sigil-mark/memory/eras/*.yaml
+  - sigil-mark/memory/decisions/*.yaml
+  - sigil-mark/memory/mutations/active/*.yaml
+  - sigil-mark/taste-key/rulings/*.yaml
+
 prerequisites:
   - sigil_mark_exists
 

@@ -1,11 +1,11 @@
 ---
 name: garden
-version: "0.5.0"
+version: "1.0.0"
 description: Manage design entropy through drift detection and mutation review
 agent: gardening-entropy
 agent_path: .claude/skills/gardening-entropy/SKILL.md
 preflight:
-  - sigil_setup_complete
+  - sigil_mark_exists
 ---
 
 # /garden

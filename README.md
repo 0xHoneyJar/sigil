@@ -1,6 +1,6 @@
 # Sigil
 
-[![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 > *"Physics, not opinions. Constraints, not debates."*
@@ -432,6 +432,49 @@ Sigil and Loa coexist with different responsibilities:
 | State zone | `sigil-mark/` | `loa-grimoire/` |
 | Handoff | Physics issues → Loa | Structural decisions |
 
+## Workbench
+
+The Sigil Workbench provides a 4-panel development environment:
+
+```bash
+# Launch the workbench
+sigil-workbench.sh
+```
+
+### Panel Layout
+
+```
+┌─────────────────┬─────────────────┐
+│                 │                 │
+│   Claude CLI    │   Preview       │
+│   (Pane 0)      │   (Pane 1)      │
+│                 │                 │
+├─────────────────┼─────────────────┤
+│                 │                 │
+│   Tensions      │   Validation    │
+│   (Pane 2)      │   (Pane 3)      │
+│                 │                 │
+└─────────────────┴─────────────────┘
+```
+
+### Individual Scripts
+
+If you don't want the full workbench:
+
+```bash
+sigil-tensions.sh      # Real-time tension monitor
+sigil-validate.sh      # File validation monitor
+sigil-detect-zone.sh   # Zone detection utility
+```
+
+### Keybindings (tmux)
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+b ↑/↓/←/→` | Navigate between panes |
+| `Ctrl+b z` | Toggle pane zoom |
+| `Ctrl+b d` | Detach from session |
+
 ## Documentation
 
 - **[CLAUDE.md](CLAUDE.md)** - Agent instructions
@@ -454,6 +497,7 @@ A sigil is a symbolic representation of intent—a mark that carries meaning bey
 | v0.3.x | Constitutional Design Framework | Four pillars, progressive strictness |
 | v0.4.x | Soul Engine | npm package, React hooks, workbench |
 | v0.5.0 | Design Physics Engine | Simplified architecture, physics focus |
+| v1.0.0 | Full Workbench | 4-panel tmux environment, complete toolkit |
 
 ## License
 

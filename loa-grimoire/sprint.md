@@ -190,24 +190,24 @@ This plan implements Sigil v1.0 Design Physics Engine in 12 sprints. The archite
 
 ### Tasks
 
-- [ ] **S5-T1: Create envisioning-soul skill structure**
+- [x] **S5-T1: Create envisioning-soul skill structure** ✅
   - Create `.claude/skills/envisioning-soul/index.yaml`
   - Create `.claude/skills/envisioning-soul/SKILL.md`
   - **Acceptance:** Skill loads in Claude Code
 
-- [ ] **S5-T2: Implement essence interview flow**
+- [x] **S5-T2: Implement essence interview flow** ✅
   - Ask about reference products (what to feel like)
   - Ask about anti-patterns (what to never do)
   - Ask about key moments (claim, success, error)
   - **Acceptance:** Interview captures product soul
 
-- [ ] **S5-T3: Implement /envision command**
+- [x] **S5-T3: Implement /envision command** ✅
   - Create `.claude/commands/envision.md`
   - Route to envisioning-soul skill
   - Generate `sigil-mark/resonance/essence.yaml`
   - **Acceptance:** `/envision` produces essence.yaml
 
-- [ ] **S5-T4: Integrate essence into craft context**
+- [x] **S5-T4: Integrate essence into craft context** ✅
   - Load essence during /craft
   - Include references in output
   - Warn on anti-pattern matches
@@ -226,25 +226,25 @@ This plan implements Sigil v1.0 Design Physics Engine in 12 sprints. The archite
 
 ### Tasks
 
-- [ ] **S6-T1: Create crafting-components skill structure**
+- [x] **S6-T1: Create crafting-components skill structure** ✅
   - Create `.claude/skills/crafting-components/index.yaml`
   - Create `.claude/skills/crafting-components/SKILL.md`
   - **Acceptance:** Skill loads in Claude Code
 
-- [ ] **S6-T2: Implement /craft command**
+- [x] **S6-T2: Implement /craft command** ✅
   - Create `.claude/commands/craft.md`
   - Accept component description and target path
   - Resolve zone from path
   - Load physics context
   - **Acceptance:** `/craft "button" src/features/checkout/` works
 
-- [ ] **S6-T3: Implement physics context header**
+- [x] **S6-T3: Implement physics context header** ✅
   - Display zone, material, temporal, sync, tensions
   - Display budget usage
   - Use SDD §8.1 format
   - **Acceptance:** Output includes physics context
 
-- [ ] **S6-T4: Implement constraint application**
+- [x] **S6-T4: Implement constraint application** ✅
   - Apply sync constraints (no optimistic in server_authoritative)
   - Apply material physics (spring for clay)
   - Stay within budgets
@@ -263,29 +263,29 @@ This plan implements Sigil v1.0 Design Physics Engine in 12 sprints. The archite
 
 ### Tasks
 
-- [ ] **S7-T1: Create approving-patterns skill structure**
+- [x] **S7-T1: Create approving-patterns skill structure** ✅
   - Create `.claude/skills/approving-patterns/index.yaml`
   - Create `.claude/skills/approving-patterns/SKILL.md`
   - **Acceptance:** Skill loads in Claude Code
 
-- [ ] **S7-T2: Implement /approve command**
+- [x] **S7-T2: Implement /approve command** ✅
   - Create `.claude/commands/approve.md`
   - Record Taste Key rulings
   - Store in `sigil-mark/taste-key/rulings/`
   - **Acceptance:** `/approve` creates ruling record
 
-- [ ] **S7-T3: Create greenlighting-concepts skill structure**
+- [x] **S7-T3: Create greenlighting-concepts skill structure** ✅
   - Create `.claude/skills/greenlighting-concepts/index.yaml`
   - Create `.claude/skills/greenlighting-concepts/SKILL.md`
   - **Acceptance:** Skill loads in Claude Code
 
-- [ ] **S7-T4: Implement /greenlight command**
+- [x] **S7-T4: Implement /greenlight command** ✅
   - Create `.claude/commands/greenlight.md`
   - Record concept approvals
   - Store in `sigil-mark/memory/decisions/`
   - **Acceptance:** `/greenlight` creates decision record
 
-- [ ] **S7-T5: Implement holder.yaml**
+- [x] **S7-T5: Implement holder.yaml** ✅
   - Create `sigil-mark/taste-key/holder.yaml`
   - Define who holds Taste Key authority
   - **Acceptance:** Holder can be queried
@@ -304,25 +304,25 @@ This plan implements Sigil v1.0 Design Physics Engine in 12 sprints. The archite
 
 ### Tasks
 
-- [ ] **S8-T1: Create gardening-entropy skill structure**
+- [x] **S8-T1: Create gardening-entropy skill structure** ✅
   - Create `.claude/skills/gardening-entropy/index.yaml`
   - Create `.claude/skills/gardening-entropy/SKILL.md`
   - **Acceptance:** Skill loads in Claude Code
 
-- [ ] **S8-T2: Implement inflation tracking**
+- [x] **S8-T2: Implement inflation tracking** ✅
   - Count components per zone
   - Track growth over time
   - Store in `sigil-mark/memory/`
   - **Acceptance:** Inflation metrics recorded
 
-- [ ] **S8-T3: Implement /garden command**
+- [x] **S8-T3: Implement /garden command** ✅
   - Create `.claude/commands/garden.md`
   - Report inflation trends
   - Alert on threshold violations
   - Recommend review cadence
   - **Acceptance:** `/garden` produces drift report
 
-- [ ] **S8-T4: Implement stale decision detection**
+- [x] **S8-T4: Implement stale decision detection** ✅
   - Check age of decisions in `sigil-mark/memory/decisions/`
   - Flag decisions older than era boundary
   - **Acceptance:** Old decisions flagged
@@ -407,25 +407,25 @@ This plan implements Sigil v1.0 Design Physics Engine in 12 sprints. The archite
 
 ---
 
-## Sprint 11: Workbench Foundation
+## Sprint 11: Workbench Foundation ✅ COMPLETE
 
 **Goal:** Implement core Workbench scripts
 
 ### Tasks
 
-- [ ] **S11-T1: Create sigil-tensions.sh script**
+- [x] **S11-T1: Create sigil-tensions.sh script** ✅
   - Read tensions from zones.yaml
   - Display as ASCII progress bars
   - Auto-refresh every 2 seconds
   - **Acceptance:** Tensions display in terminal
 
-- [ ] **S11-T2: Create sigil-validate.sh script**
+- [x] **S11-T2: Create sigil-validate.sh script** ✅
   - Watch for file changes (fswatch)
   - Run validation on change
   - Display Pass/Fail status
   - **Acceptance:** Real-time validation in terminal
 
-- [ ] **S11-T3: Handle fallbacks**
+- [x] **S11-T3: Handle fallbacks** ✅
   - Graceful degradation if fswatch missing
   - Manual mode if Chrome MCP unavailable
   - **Acceptance:** Works without optional deps
@@ -437,13 +437,13 @@ This plan implements Sigil v1.0 Design Physics Engine in 12 sprints. The archite
 
 ---
 
-## Sprint 12: Workbench Integration
+## Sprint 12: Workbench Integration ✅ COMPLETE
 
 **Goal:** Complete 4-panel Workbench environment
 
 ### Tasks
 
-- [ ] **S12-T1: Create sigil-workbench.sh script**
+- [x] **S12-T1: Create sigil-workbench.sh script** ✅
   - Check prerequisites (tmux, claude, fswatch)
   - Create tmux session with 4 panes
   - Launch Claude in pane 0
@@ -451,23 +451,23 @@ This plan implements Sigil v1.0 Design Physics Engine in 12 sprints. The archite
   - Launch validation in pane 3
   - **Acceptance:** Workbench launches with all panels
 
-- [ ] **S12-T2: Integrate Chrome MCP panel**
+- [x] **S12-T2: Integrate Chrome MCP panel** ✅
   - Display placeholder in pane 1
   - Document Chrome MCP usage
   - **Acceptance:** Chrome preview documented
 
-- [ ] **S12-T3: Update mount-sigil.sh**
+- [x] **S12-T3: Update mount-sigil.sh** ✅
   - Symlink all scripts
   - Verify all commands work
   - **Acceptance:** Full installation works
 
-- [ ] **S12-T4: Create README and documentation**
+- [x] **S12-T4: Create README and documentation** ✅
   - Quick start guide (<5 min)
   - Command reference
   - Workbench usage
   - **Acceptance:** New user can start in <5 min
 
-- [ ] **S12-T5: Final validation**
+- [x] **S12-T5: Final validation** ✅
   - Run all commands end-to-end
   - Verify clean removal (`rm -rf sigil-mark/`)
   - Verify no daemon, no database, no hooks
