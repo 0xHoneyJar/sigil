@@ -87,7 +87,8 @@ setup_sigil_home() {
     cd "$SIGIL_HOME"
     git fetch origin "$SIGIL_BRANCH" --quiet
     git checkout "$SIGIL_BRANCH" --quiet 2>/dev/null || git checkout -b "$SIGIL_BRANCH" "origin/$SIGIL_BRANCH" --quiet
-    git pull origin "$SIGIL_BRANCH" --quiet
+    git reset --hard "origin/$SIGIL_BRANCH" --quiet
+    log "Reset to origin/$SIGIL_BRANCH"
     cd - > /dev/null
   else
     log "Installing Sigil..."
