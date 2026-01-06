@@ -1,11 +1,11 @@
 ---
 name: greenlight
-version: "0.5.0"
+version: "1.0.0"
 description: Concept approval before building (not execution)
 agent: greenlighting-concepts
 agent_path: .claude/skills/greenlighting-concepts/SKILL.md
 preflight:
-  - sigil_setup_complete
+  - sigil_mark_exists
 ---
 
 # /greenlight

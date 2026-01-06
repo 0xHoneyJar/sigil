@@ -1,11 +1,11 @@
 ---
 name: map
-version: "0.5.0"
+version: "1.0.0"
 description: Analyze codebase and configure path-based design zones
 agent: mapping-zones
 agent_path: .claude/skills/mapping-zones/SKILL.md
 preflight:
-  - sigil_setup_complete
+  - sigil_mark_exists
   - essence_exists
 ---
 

@@ -1,4 +1,4 @@
-# Sigil v4 Agent: Greenlighting Concepts
+# Sigil v1.0 Agent: Greenlighting Concepts
 
 > "Poll concepts, not pixels. 'Should we build X?' is different from 'How should X look?'"
 
@@ -23,7 +23,7 @@
 
 ## Prerequisites
 
-- Run `/sigil-setup` first
+- Run `mount-sigil.sh` first (creates sigil-mark/)
 - Run `/envision` first (for essence context)
 
 ## The Concept vs Execution Distinction

@@ -1,4 +1,4 @@
-# Sigil Agent: Mapping Zones
+# Sigil v1.0 Agent: Mapping Zones
 
 > "Zones are physics contexts. Different zones, different rules."
 
@@ -34,7 +34,7 @@
 
 ## Prerequisites
 
-- Run `/sigil-setup` first
+- Run `mount-sigil.sh` first (creates sigil-mark/ structure)
 - Run `/envision` first (need essence.yaml for feel context)
 - Run `/codify` first (optional, but recommended)
 

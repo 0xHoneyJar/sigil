@@ -1,11 +1,11 @@
 ---
 name: envision
-version: "0.5.0"
+version: "1.0.0"
 description: Capture product soul through structured interview
 agent: envisioning-soul
 agent_path: .claude/skills/envisioning-soul/SKILL.md
 preflight:
-  - sigil_setup_complete
+  - sigil_mark_exists
 ---
 
 # /envision

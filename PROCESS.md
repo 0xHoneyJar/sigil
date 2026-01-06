@@ -1,31 +1,18 @@
 # Development Process
 
-This document outlines the Sigil v0.3 workflow for capturing and maintaining design context in AI-assisted development.
+This document outlines the Sigil v2.0 workflow for building with the Reality Engine architecture.
 
-> "Culture is the Reality. Code is Just the Medium."
+> "Truth is Core. Experience is Lens. Layouts ARE Zones."
 
-## Philosophy
+## Philosophy: Reality Engine
 
-Sigil v0.3 is a constitutional framework that protects both intended soul (Immutable Values) and emergent soul (Canon of Flaws). It enables culture through:
+Sigil v2.0 separates **Truth** (what happens) from **Experience** (how it looks):
 
-- **Soul Protection** — Both intended and emergent soul are protected
-- **Multiple Truths** — Different users can have different valid experiences (Lenses)
-- **Layered Authority** — Not every decision needs community input (Consultation Chamber)
-- **Prove at Scale** — Features must demonstrate stability before becoming canonical
-- **Human Accountability** — All automated decisions can be overridden (with logging)
+- **Core Layer** — Physics engines managing state and time authority
+- **Layout Layer** — Structural containers that ARE zones (no file-path resolution)
+- **Lens Layer** — Interchangeable UI renderers based on context
 
-Systems that block will be bypassed. Systems that enable will be adopted.
-
----
-
-## Four Pillars
-
-| Pillar | Directory | Purpose |
-|--------|-----------|---------|
-| Soul Binder | `soul-binder/` | Protects values and emergent behaviors |
-| Lens Array | `lens-array/` | Supports multiple user truths |
-| Consultation Chamber | `consultation-chamber/` | Layered decision authority |
-| Proving Grounds | `proving-grounds/` | Scale validation before production |
+The key insight: **Layouts ARE Zones**. When you wrap content in `<CriticalZone>`, you've declared the zone. No config files needed.
 
 ---
 
@@ -35,538 +22,350 @@ Sigil's workflow has two paths:
 
 ### New Project Path
 ```
-/setup → /envision → /codify → (build) → /craft → /approve
+/setup → /envision → /codify → (build) → /craft → /garden
 ```
 
 ### Existing Codebase Path
 ```
-/setup → /inherit → /envision → /codify → (build) → /craft → /approve
+/setup → /inherit → /envision → /codify → (build) → /craft
 ```
 
 ---
 
-## Command Decision Tree
-
-Use this to quickly find the right command:
+## Architecture (3 Layers)
 
 ```
-┌─ Starting a project?
-│  ├─ New project → /setup → /envision → /codify
-│  └─ Existing code → /setup → /inherit → /envision
-│
-├─ During development?
-│  ├─ Need design guidance → /craft
-│  ├─ Validate in specific lens → /craft --lens <name>
-│  └─ New pattern needs sign-off → /approve
-│
-├─ Protecting culture?
-│  ├─ Emergent behavior to protect → /canonize
-│  ├─ Major design decision → /consult
-│  └─ Need to revisit locked decision → /unlock
-│
-├─ Validating at scale?
-│  ├─ Feature ready for proving → /prove
-│  └─ Proving complete → /graduate
-│
-└─ Maintenance?
-   └─ Get framework updates → /update
+┌────────────────────────────────────────────────────────────┐
+│  CORE LAYER — Physics engines (Truth)                     │
+│  useCriticalAction → State Stream                         │
+│  { status, timeAuthority, selfPrediction, worldTruth }    │
+├────────────────────────────────────────────────────────────┤
+│  LAYOUT LAYER — Zones + Structural Physics                │
+│  CriticalZone, MachineryLayout, GlassLayout               │
+│  Layouts ARE Zones. Physics is DOM, not lint.             │
+├────────────────────────────────────────────────────────────┤
+│  LENS LAYER — Interchangeable UIs (Experience)            │
+│  useLens() → Lens components                              │
+│  DefaultLens, StrictLens, A11yLens                        │
+└────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Commands
+## Commands (6 Total)
 
-### Phase 0: Setup (`/setup`)
+### `/craft` — Design Guidance
 
-**Goal**: Initialize Sigil on a repository
+**Goal**: Get design guidance with zone and lens context
 
-**Process**:
-1. Creates `sigil-mark/` directory structure
-2. Initializes `.sigilrc.yaml` configuration
-3. Creates `.sigil-setup-complete` marker
-4. Displays next steps
+**Modes**:
+
+1. **Zone Detection**: Which layout wraps this component?
+   ```bash
+   /craft src/features/checkout/PaymentForm.tsx
+   ```
+
+2. **Lens Suggestion**: Which lens is appropriate?
+   ```bash
+   /craft "button for checkout confirmation"
+   ```
+
+3. **Pattern Lookup**: Show me the v2.0 pattern
+   ```bash
+   /craft "useCriticalAction with server-tick"
+   ```
+
+**Output**: Conversational guidance with layout, lens, and time authority suggestions
+
+---
+
+### `/sandbox` — Raw Physics Experimentation
+
+**Goal**: Experiment without layout/lens constraints
+
+**When to Use**:
+- Exploring new interaction patterns
+- Testing physics before committing to a layout
+- Prototyping without zone restrictions
 
 **Command**:
 ```bash
-/setup
+/sandbox
+/sandbox "optimistic list with rollback"
 ```
 
-**Outputs**:
-- `sigil-mark/` directory
-- `.sigilrc.yaml` (zone configuration)
-- `.sigil-setup-complete` marker
+**What Happens**:
+1. Creates file in `sigil-mark/sandbox/`
+2. No layout enforcement
+3. No lens auto-selection
+4. ESLint warns after 7 days (stale sandbox)
 
 ---
 
-### Phase 1A: Envision (`/envision`) - New Projects
+### `/codify` — Define Zone Rules
 
-**Skill**: `envisioning-moodboard`
-
-**Goal**: Capture product moodboard through interview
+**Goal**: Configure layout and lens preferences
 
 **Process**:
-1. **Reference Products**: What games, apps, or products inspire the feel?
-2. **Feel Descriptors**: How should different contexts feel? (critical = deliberate, marketing = playful)
-3. **Anti-Patterns**: What to explicitly avoid?
-4. **Key Moments**: High-stakes, celebrations, error recovery
-
-**Command**:
-```bash
-/envision
-```
-
-**Output**: `sigil-mark/moodboard.md`
-
-**Moodboard Structure**:
-```markdown
-# Product Moodboard
-
-## Reference Products
-- [Product] - Why it inspires us
-
-## Feel by Context
-| Context | Feel | Example |
-|---------|------|---------|
-| Critical | Deliberate, reassuring | Checkout, claims |
-| Marketing | Playful, energetic | Landing pages |
-
-## Anti-Patterns
-- Pattern to avoid - Why
-
-## Key Moments
-- High-stakes: How to handle
-- Celebrations: How to handle
-- Recovery: How to handle
-```
-
----
-
-### Phase 1B: Inherit (`/inherit`) - Existing Codebases
-
-**Skill**: `inheriting-design`
-
-**Goal**: Bootstrap design context from existing code
-
-**Process**:
-1. Scans codebase for components
-2. Detects color tokens, typography, spacing
-3. Identifies motion patterns in use
-4. Generates draft moodboard and rules
-5. Creates component inventory
-
-**Command**:
-```bash
-/inherit
-```
-
-**Outputs**:
-- `sigil-mark/moodboard.md` (draft, needs review)
-- `sigil-mark/rules.md` (draft, needs review)
-- `sigil-mark/inventory.md` (component list)
-
-**Note**: After `/inherit`, run `/envision` to refine the moodboard with intent, not just observation.
-
----
-
-### Phase 2: Codify (`/codify`)
-
-**Skill**: `codifying-rules`
-
-**Goal**: Define explicit design rules by category
-
-**Process**:
-1. **Colors**: Token definitions, light/dark modes
-2. **Typography**: Font classes, size conventions
-3. **Spacing**: Values and when to use them
-4. **Motion**: Recipes by zone (deliberate, playful, snappy)
-5. **Components**: Specific component rules
+1. **Layouts**: Define which layouts map to which paths (for agent guidance)
+2. **Lenses**: Set default lens preferences
+3. **Rejections**: Patterns to warn about
 
 **Command**:
 ```bash
 /codify
 ```
 
-**Output**: `sigil-mark/rules.md`
-
-**Rules Structure**:
-```markdown
-# Design Rules
-
-## Colors
-| Token | Light | Dark | Usage |
-|-------|-------|------|-------|
-
-## Typography
-| Class | Size | Weight | Usage |
-|-------|------|--------|-------|
-
-## Spacing
-| Value | Usage |
-|-------|-------|
-
-## Motion by Zone
-| Zone | Recipe | Duration | Spring |
-|------|--------|----------|--------|
-
-## Component Rules
-- Component: Specific guidance
-```
+**Output**: Updated `.sigilrc.yaml`
 
 ---
 
-### Phase 3: Build (Your Work)
+### `/inherit` — Bootstrap from Existing Code
 
-With moodboard and rules captured, you build your product. Sigil provides context to AI agents during this phase.
-
-**What Happens Automatically**:
-- Agents read `sigil-mark/moodboard.md` and `sigil-mark/rules.md`
-- Zone resolution based on file path in `.sigilrc.yaml`
-- Pattern suggestions based on zone
-
----
-
-### Phase 4: Craft (`/craft`)
-
-**Skill**: `crafting-guidance`
-
-**Goal**: Get design guidance during implementation
-
-**Modes**:
-
-1. **Zone Detection**: Which zone is this file in?
-   ```bash
-   /craft src/features/checkout/PaymentForm.tsx
-   ```
-
-2. **Pattern Suggestion**: What pattern fits this context?
-   ```bash
-   /craft "loading state for checkout"
-   ```
-
-3. **Rule Lookup**: What's the rule for this?
-   ```bash
-   /craft "button spacing"
-   ```
-
-4. **Forced Lens Mode**: Validate in a specific lens
-   ```bash
-   /craft --lens power_user "accessible loading state"
-   ```
-
-**Command**:
-```bash
-/craft [--lens <lens_name>] [file_path | question]
-```
-
-**Arguments**:
-| Argument | Description |
-|----------|-------------|
-| `--lens <name>` | Force validation in specific lens (e.g., `power_user`, `new_visitor`) |
-| `file_path` | Path to get zone context for |
-| `question` | Design question to answer |
-
-**Output**: Conversational guidance with zone context
-
----
-
-### Phase 5: Approve (`/approve`)
-
-**Skill**: `approving-patterns`
-
-**Goal**: Human sign-off on design patterns
+**Goal**: Bootstrap design context from existing codebase
 
 **Process**:
-1. Review new patterns or deviations
-2. Taste owner approves or requests changes
-3. Approval recorded in rules
+1. Scans codebase for v1.2.5 patterns
+2. Suggests v2.0 migration paths
+3. Identifies layout/lens mappings
+4. Generates draft moodboard and rules
 
 **Command**:
 ```bash
-/approve
+/inherit
 ```
-
-**Output**: Approval record in `sigil-mark/rules.md`
 
 ---
 
-### Maintenance: Update (`/update`)
+### `/validate` — Check Physics Compliance
 
-**Goal**: Pull latest Sigil framework updates
+**Goal**: Verify v2.0 patterns are used correctly
+
+**What It Checks**:
+- useCriticalAction has appropriate time authority
+- CriticalZone used for financial/destructive actions
+- Lens components used (not raw buttons)
+- StrictLens enforcement in critical+financial zones
 
 **Command**:
 ```bash
-/update
+/validate
+/validate src/features/checkout/
 ```
-
-**What Happens**:
-1. Fetches latest from upstream
-2. Updates symlinks to new versions
-3. Preserves your `sigil-mark/` content
 
 ---
 
-## v0.3 Constitutional Commands
+### `/garden` — Entropy Detection
 
-### Canonize (`/canonize`)
+**Goal**: Detect drift and maintain design health
 
-**Skill**: `canonizing-flaws`
-
-**Goal**: Protect emergent behaviors that users love
-
-**Process**:
-1. Identify a behavior that emerged organically
-2. Document why it matters
-3. Register in Canon of Flaws
+**What It Catches**:
+- **Drift**: Components not using proper layouts
+- **Stale Sandbox**: Experiments older than 7 days
+- **v1.2.5 Patterns**: Deprecated API usage
+- **Lens Bypass**: Raw buttons in layout zones
 
 **Command**:
 ```bash
-/canonize "double-click submit"
-```
-
-**Output**: `sigil-mark/soul-binder/canon-of-flaws.yaml`
-
----
-
-### Consult (`/consult`)
-
-**Skill**: `consulting-decisions`
-
-**Goal**: Start a consultation process for design decisions
-
-**Layers**:
-| Layer | Process | Authority |
-|-------|---------|-----------|
-| Strategic | Community poll | Binding vote |
-| Direction | Sentiment gathering | Taste Owner decides |
-| Execution | None | Taste Owner dictates |
-
-**Command**:
-```bash
-/consult "new onboarding flow"
-```
-
-**Output**: `sigil-mark/consultation-chamber/decisions/{id}.yaml`
-
----
-
-### Prove (`/prove`)
-
-**Skill**: `proving-features`
-
-**Goal**: Register a feature for proving period
-
-**Domains**: defi, creative, community, games, general
-
-**Command**:
-```bash
-/prove token-swap --domain defi
-```
-
-**Output**: `sigil-mark/proving-grounds/active/{feature}.yaml`
-
----
-
-### Graduate (`/graduate`)
-
-**Skill**: `graduating-features`
-
-**Goal**: Graduate a proven feature to the Living Canon
-
-**Requirements**:
-- All monitors green
-- No P1 violations
-- Taste Owner sign-off
-
-**Command**:
-```bash
-/graduate token-swap
-```
-
-**Output**: `sigil-mark/canon/graduated/{feature}.yaml`
-
----
-
-### Unlock (`/unlock`)
-
-**Skill**: `unlocking-decisions`
-
-**Goal**: Unlock a locked decision before its natural unlock date
-
-**When to Use**:
-- Decision was locked but circumstances changed
-- Need to revisit a decision earlier than planned
-- Taste Owner needs to override a lock
-
-**Command**:
-```bash
-/unlock DEC-001
-```
-
-**Process**:
-1. Verifies decision exists and is locked
-2. Checks if natural unlock time has passed
-3. If still locked, requires justification
-4. Updates decision record with unlock reason
-5. Logs override to audit trail
-
-**Output**: Updated `sigil-mark/consultation-chamber/decisions/{id}.yaml`
-
----
-
-## Strictness Levels
-
-Sigil v0.3 has progressive strictness:
-
-| Level | Behavior |
-|-------|----------|
-| `discovery` | All suggestions, no blocks (default) |
-| `guiding` | Warnings on violations |
-| `enforcing` | Blocks on protected flaws/values |
-| `strict` | Blocks on all violations |
-
-Configure in `.sigilrc.yaml`:
-```yaml
-strictness: "discovery"
+/garden
+/garden drift
+/garden stale
 ```
 
 ---
 
-## Zone System
+## Core Layer
 
-Zones define design context by file path. They're configured in `.sigilrc.yaml`:
+### useCriticalAction
 
-```yaml
-zones:
-  critical:
-    paths: ["src/features/checkout/**", "src/features/claim/**"]
-    motion: "deliberate"
-    patterns:
-      prefer: ["deliberate-entrance", "confirmation-flow"]
-      warn: ["instant-transition", "playful-bounce"]
+Main physics hook with time authority:
 
-  marketing:
-    paths: ["src/features/marketing/**"]
-    motion: "playful"
-    patterns:
-      prefer: ["playful-bounce", "attention-grab"]
+```tsx
+import { useCriticalAction } from 'sigil-mark';
 
-  admin:
-    paths: ["src/admin/**"]
-    motion: "snappy"
+const action = useCriticalAction({
+  mutation: () => api.doThing(),
+  timeAuthority: 'server-tick',
+  onSuccess: (data) => console.log('Done:', data),
+  onError: (error) => console.error('Failed:', error),
+});
+
+// State machine
+action.state.status  // 'idle' | 'confirming' | 'pending' | 'confirmed' | 'failed'
+
+// Actions
+action.commit()      // Execute mutation
+action.cancel()      // Cancel
+action.reset()       // Reset to idle
 ```
 
-### Zone Resolution
+### Time Authorities
 
-When you're working in a file:
-
-1. Agent gets current file path
-2. Matches against zone patterns in `.sigilrc.yaml`
-3. Returns zone name (or "default" if no match)
-4. Applies zone-appropriate patterns
-
-### Motion Recipes by Zone
-
-| Zone | Recipe | Feel | Parameters |
-|------|--------|------|------------|
-| critical | `useDeliberateEntrance` | Heavy, reassuring | 800ms+, tension: 120 |
-| marketing | `usePlayfulBounce` | Bouncy, energetic | Fast, tension: 200 |
-| admin | `useSnappyTransition` | Instant, efficient | <200ms, tension: 400 |
+| Authority | Behavior | Use Case |
+|-----------|----------|----------|
+| `server-tick` | Wait for server confirmation | Payments, destructive actions |
+| `optimistic` | Instant update, silent rollback | Admin tools, lists |
+| `hybrid` | Instant + sync indicator | Real-time collaboration |
 
 ---
 
-## Rejections
+## Layout Layer
 
-Rejections are patterns to avoid, but **not blocked**:
+Layouts ARE Zones. Wrap content to declare context.
 
-```yaml
-rejections:
-  - pattern: "Spinner"
-    reason: "Creates anxiety in critical zones"
-    exceptions: ["admin/**"]
+### CriticalZone
+
+```tsx
+import { CriticalZone, useLens, useCriticalAction } from 'sigil-mark';
+
+function PaymentForm({ amount }) {
+  const payment = useCriticalAction({
+    mutation: () => api.pay(amount),
+    timeAuthority: 'server-tick',
+  });
+  const Lens = useLens(); // Auto-selects StrictLens
+
+  return (
+    <CriticalZone financial>
+      <CriticalZone.Content>
+        <h2>Confirm Payment</h2>
+      </CriticalZone.Content>
+      <CriticalZone.Actions>
+        <Lens.CriticalButton
+          state={payment.state}
+          onAction={() => payment.commit()}
+        >
+          Pay ${amount}
+        </Lens.CriticalButton>
+      </CriticalZone.Actions>
+    </CriticalZone>
+  );
+}
 ```
 
-When a user wants a rejected pattern, agents:
-1. Explain the concern
-2. Offer alternatives
-3. Allow override if user insists
+### MachineryLayout
 
-Example response:
-> "Spinners are noted as creating anxiety in critical zones. Alternatives:
-> 1. Skeleton loading with deliberate reveal
-> 2. Progress indicator with copy
->
-> If you still need a spinner, I can add it—just note this deviates from established patterns."
+```tsx
+import { MachineryLayout, useLens } from 'sigil-mark';
+
+function InvoiceList({ invoices, onSelect, onDelete }) {
+  const Lens = useLens(); // User preference (DefaultLens by default)
+
+  return (
+    <MachineryLayout stateKey="invoices" onAction={onSelect} onDelete={onDelete}>
+      <MachineryLayout.Search placeholder="Search invoices..." />
+      <MachineryLayout.List>
+        {invoices.map(inv => (
+          <Lens.MachineryItem key={inv.id} id={inv.id}>
+            {inv.number} - ${inv.amount}
+          </Lens.MachineryItem>
+        ))}
+      </MachineryLayout.List>
+      <MachineryLayout.Empty>No invoices found</MachineryLayout.Empty>
+    </MachineryLayout>
+  );
+}
+```
+
+### GlassLayout
+
+```tsx
+import { GlassLayout, useLens } from 'sigil-mark';
+
+function ProductCard({ product }) {
+  const Lens = useLens(); // User preference
+
+  return (
+    <GlassLayout variant="card">
+      <GlassLayout.Image src={product.image} alt={product.name} />
+      <GlassLayout.Content>
+        <GlassLayout.Title>{product.name}</GlassLayout.Title>
+        <GlassLayout.Description>{product.description}</GlassLayout.Description>
+      </GlassLayout.Content>
+      <GlassLayout.Actions>
+        <Lens.GlassButton variant="primary">Add to Cart</Lens.GlassButton>
+      </GlassLayout.Actions>
+    </GlassLayout>
+  );
+}
+```
+
+---
+
+## Lens Layer
+
+### useLens
+
+Returns appropriate lens based on zone context:
+
+```tsx
+const Lens = useLens();
+
+// In CriticalZone with financial=true → StrictLens (forced)
+// In MachineryLayout/GlassLayout → User preference
+// Outside layouts → DefaultLens
+```
+
+### Built-in Lenses
+
+| Lens | Touch Target | Contrast | Animations | Use Case |
+|------|-------------|----------|------------|----------|
+| `DefaultLens` | 44px | Standard | Yes | General use |
+| `StrictLens` | 48px | High | No | Financial, critical |
+| `A11yLens` | 56px | WCAG AAA | No | Accessibility focus |
+
+### LensProvider
+
+Set user preference app-wide:
+
+```tsx
+import { LensProvider, A11yLens } from 'sigil-mark';
+
+function App() {
+  return (
+    <LensProvider initialLens={A11yLens}>
+      <Router />
+    </LensProvider>
+  );
+}
+```
+
+**Note**: CriticalZone with `financial={true}` still forces StrictLens regardless of user preference.
 
 ---
 
 ## State Zone Structure
 
-All design context lives in `sigil-mark/` (v0.3 four-pillar architecture):
-
 ```
 sigil-mark/
-├── moodboard.md              # Product feel
-├── rules.md                  # Design rules by category
-├── inventory.md              # Component list
+├── index.ts              # Main entry point (all exports)
+├── moodboard.md          # Product feel + references
+├── rules.md              # Design rules by category
 │
-├── soul-binder/              # Pillar 1: Values + Flaws
-│   ├── immutable-values.yaml # Core values (hard-block violations)
-│   ├── canon-of-flaws.yaml   # Protected emergent behaviors
-│   └── visual-soul.yaml      # Grit signatures
+├── core/                 # Physics engines (Truth)
+│   ├── useCriticalAction.ts
+│   ├── useLocalCache.ts
+│   ├── proprioception.ts
+│   └── types.ts
 │
-├── lens-array/               # Pillar 2: User personas
-│   └── lenses.yaml           # Multi-truth validation
+├── layouts/              # Zone primitives
+│   ├── CriticalZone.tsx
+│   ├── MachineryLayout.tsx
+│   ├── GlassLayout.tsx
+│   └── context.ts
 │
-├── consultation-chamber/     # Pillar 3: Decisions
-│   ├── config.yaml           # Decision authority config
-│   └── decisions/            # Individual decision records
+├── lenses/               # UI renderers (Experience)
+│   ├── default/
+│   ├── strict/
+│   ├── a11y/
+│   ├── useLens.ts
+│   └── LensProvider.tsx
 │
-├── proving-grounds/          # Pillar 4: Feature proving
-│   ├── config.yaml           # Monitor configuration
-│   └── active/               # Features currently proving
-│
-├── canon/                    # Graduated features
-│   └── graduated/
-│
-└── audit/                    # Override logging
-    └── overrides.yaml
+├── recipes/              # v1.2.5 recipes (deprecated)
+├── sandbox/              # Unconstrained experiments
+├── __examples__/         # Usage examples
+└── __tests__/            # Test suite
 ```
-
----
-
-## Skills
-
-Sigil uses modular skills with 3-level architecture:
-
-```
-.claude/skills/{skill-name}/
-├── index.yaml          # Metadata (~100 tokens)
-├── SKILL.md            # Instructions (~2000 tokens)
-└── scripts/            # Bash utilities
-```
-
-### Core Skills
-| Skill | Purpose |
-|-------|---------|
-| `initializing-sigil` | Initialize Sigil v0.3 |
-| `envisioning-moodboard` | Capture moodboard + values + lenses |
-| `codifying-rules` | Define rules |
-| `crafting-guidance` | Provide guidance |
-| `approving-patterns` | Human sign-off |
-| `inheriting-design` | Bootstrap from codebase |
-| `updating-framework` | Pull updates |
-
-### v0.3 Skills
-| Skill | Purpose |
-|-------|---------|
-| `canonizing-flaws` | Protect emergent behaviors |
-| `consulting-decisions` | Start decision consultation |
-| `proving-features` | Register feature for proving |
-| `graduating-features` | Graduate feature to canon |
-| `validating-lenses` | Validate across user lenses |
-| `locking-decisions` | Lock decisions after outcome |
-| `unlocking-decisions` | Unlock decisions early |
-| `monitoring-features` | Update proving monitors |
 
 ---
 
@@ -583,72 +382,84 @@ Sigil uses modular skills with 3-level architecture:
 # → Answer questions about references, feel, anti-patterns
 # → Review sigil-mark/moodboard.md
 
-# 3. Define explicit design rules
+# 3. Define zone preferences
 /codify
-# → Answer questions about colors, typography, spacing, motion
-# → Review sigil-mark/rules.md
+# → Configure .sigilrc.yaml
 
-# 4. Build your product (your work)
-# Agents automatically load design context
+# 4. Build your product
+# Use v2.0 patterns: CriticalZone, useCriticalAction, useLens
 
 # 5. Get guidance during implementation
 /craft src/features/checkout/PaymentForm.tsx
-# → Zone detected: critical
-# → Motion recipe: useDeliberateEntrance
+# → Layout: CriticalZone with financial=true
+# → Lens: StrictLens (forced)
+# → Time Authority: server-tick
 
-# 6. Get human sign-off on new patterns
-/approve
+# 6. Experiment with alternatives
+/sandbox "hybrid time authority for checkout"
+
+# 7. Check compliance
+/validate
+
+# 8. Detect entropy
+/garden
 ```
 
-### Existing Codebase
+### Existing Codebase (v1.2.5 Migration)
 
 ```bash
 # 1. Initialize Sigil
 /setup
 
-# 2. Scan codebase to bootstrap context
+# 2. Scan codebase to detect v1.2.5 patterns
 /inherit
-# → Generates draft moodboard, rules, inventory
+# → Identifies SigilZone, useServerTick usage
+# → Suggests migration paths
 
-# 3. Refine moodboard with intent
+# 3. Refine moodboard
 /envision
 
-# 4. Refine rules with explicit decisions
-/codify
+# 4. Migrate patterns
+# SigilZone material="decisive" → CriticalZone financial
+# useServerTick → useCriticalAction with server-tick
+# useSigilPhysics → useLens
 
-# 5. Continue with craft/approve as needed
+# 5. Continue with craft/validate/garden
 ```
 
 ---
 
 ## Best Practices
 
-### Capturing Feel
-- Be specific about contexts (checkout feels different than marketing)
-- Include anti-patterns with reasons
-- Reference real products, not abstract concepts
+### Using Layouts (Zones)
 
-### Defining Rules
-- Start loose, tighten as patterns emerge
-- Document the "why" not just the "what"
-- Use zone-appropriate motion recipes
+- **CriticalZone** for payments, destructive actions, confirmations
+- **MachineryLayout** for admin lists, data tables, keyboard-driven UIs
+- **GlassLayout** for marketing cards, product displays, hover-driven UIs
 
-### During Implementation
-- Check zone before adding motion
-- Use `/craft` when uncertain
-- Request `/approve` for new patterns
+### Using Time Authorities
 
-### Approval Flow
-- Taste owners (not bots) approve
-- Document approvals in rules
-- Allow escape hatches for edge cases
+- **server-tick** for anything that modifies server state and can't be undone
+- **optimistic** for reversible actions where speed matters
+- **hybrid** for collaborative features where sync status is important
+
+### Using Lenses
+
+- Let `useLens()` auto-select based on zone
+- Use `LensProvider` for app-wide accessibility preferences
+- Don't bypass lens components with raw HTML buttons in layout zones
+
+### Enforcement
+
+- Run `/validate` before commits
+- Review `/garden` output weekly
+- Use StrictLens in all financial flows (CriticalZone enforces this)
 
 ---
 
 ## Related Documentation
 
-- **[README.md](README.md)** - Quick start guide
-- **[INSTALLATION.md](INSTALLATION.md)** - Detailed installation guide
-- **[CLAUDE.md](CLAUDE.md)** - Agent protocol reference
-- **[MIGRATION.md](MIGRATION.md)** - Migration from v0.2 to v0.3
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history
+- **[README.md](README.md)** — Quick start guide
+- **[CLAUDE.md](CLAUDE.md)** — Agent protocol reference
+- **[sigil-mark/README.md](sigil-mark/README.md)** — v2.0 API reference
+- **[sigil-mark/MIGRATION.md](sigil-mark/MIGRATION.md)** — v1.2.5 → v2.0 migration guide

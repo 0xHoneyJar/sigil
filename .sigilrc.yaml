@@ -1,7 +1,8 @@
-# Sigil Configuration
-# Project-owned, never overwritten by framework updates
+# Sigil v2.0 Configuration
+# "Truth is Core. Experience is Lens. Layouts ARE Zones."
 
-version: "11.0"
+sigil: "2.0.0"
+codename: "Reality Engine"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # PROJECT METADATA
@@ -9,13 +10,83 @@ version: "11.0"
 
 project:
   name: "Sigil Framework"
-  era: "2007"  # Fidelity ceiling era (OSRS reference)
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# COMPONENT DISCOVERY
-# Where to find React/Vue/Svelte components
+# v2.0 ZONES
+# Layout-based zone configuration
+# Zones are now declared via Layout primitives, not file paths
 # ═══════════════════════════════════════════════════════════════════════════════
 
+zones:
+  # CriticalZone — High-stakes financial/destructive actions
+  critical:
+    layout: CriticalZone
+    timeAuthority: server-tick
+    lens: strict              # Forces StrictLens when financial=true
+    constraints:
+      optimistic_ui: forbidden
+      loading_spinners: warn
+      animations: warn
+
+  # MachineryLayout — Keyboard-driven admin interfaces
+  admin:
+    layout: MachineryLayout
+    timeAuthority: optimistic
+    lens: user-preference     # Respects user's lens choice
+    constraints:
+      raw_physics: allowed
+
+  # GlassLayout — Hover-driven marketing/showcase
+  marketing:
+    layout: GlassLayout
+    timeAuthority: optimistic
+    lens: user-preference
+    constraints: {}           # No constraints for marketing
+
+  # Default zone (no layout wrapper)
+  default:
+    layout: null
+    timeAuthority: optimistic
+    lens: default
+    constraints: {}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# LENS CONFIGURATION
+# Which lenses are available and their classifications
+# ═══════════════════════════════════════════════════════════════════════════════
+
+lenses:
+  # Built-in lenses
+  DefaultLens:
+    classification: cosmetic
+    minTouchTarget: 44px
+    animations: true
+    description: "Standard UI with animations and 44px touch targets"
+
+  StrictLens:
+    classification: cosmetic
+    minTouchTarget: 48px
+    animations: false
+    description: "High-contrast, no animations, for high-stakes actions"
+    zones:
+      - critical              # Auto-selected in critical+financial zones
+
+  A11yLens:
+    classification: cosmetic
+    minTouchTarget: 56px
+    animations: false
+    wcag: AAA
+    description: "WCAG AAA compliant, 56px targets, bold focus rings"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# v1.2.5 LEGACY (deprecated)
+# These settings are preserved for backwards compatibility
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# @deprecated Use zones.admin instead
+recipes: machinery
+
+# @deprecated Use zones configuration instead
 component_paths:
   - "components/**"
   - "src/components/**"
@@ -23,146 +94,28 @@ component_paths:
   - "packages/*/src/**"
   - "src/features/**/components/**"
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# DEFAULT MATERIAL
-# Which material to use when zone doesn't specify
-# ═══════════════════════════════════════════════════════════════════════════════
+# @deprecated Use zones.critical.timeAuthority instead
+# sync: server_authoritative
+# tick: 600ms
 
-defaults:
-  material: "clay"
-  sync: "lww"
-  tensions:
-    playfulness: 50
-    weight: 50
-    density: 50
-    speed: 50
+# @deprecated Use zones configuration instead
+# constraints:
+#   optimistic_ui: forbidden
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ZONE CONFIGURATION
-# Path-based design zones
+# SANDBOX FILES (managed by /sandbox command)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-zones:
-  critical:
-    paths:
-      - "src/features/checkout/**"
-      - "src/features/claim/**"
-      - "src/features/trade/**"
-      - "src/features/wallet/**"
-    material: "clay"
-    sync: "server_tick"
-    motion: "deliberate"
-    patterns:
-      prefer:
-        - "deliberate-entrance"
-        - "confirmation-flow"
-        - "pending-state"
-      warn:
-        - "instant-transition"
-        - "optimistic-update"
-
-  transactional:
-    paths:
-      - "src/features/dashboard/**"
-      - "src/features/settings/**"
-      - "src/features/admin/**"
-    material: "machinery"
-    sync: "lww"
-    motion: "instant"
-    patterns:
-      prefer:
-        - "instant-feedback"
-        - "keyboard-navigation"
-
-  exploratory:
-    paths:
-      - "src/features/explore/**"
-      - "src/features/browse/**"
-      - "src/features/discover/**"
-    material: "glass"
-    sync: "lww"
-    motion: "flowing"
-    patterns:
-      prefer:
-        - "smooth-scroll"
-        - "hover-preview"
-
-  marketing:
-    paths:
-      - "src/features/landing/**"
-      - "src/features/marketing/**"
-      - "app/(marketing)/**"
-    material: "clay"
-    sync: "local_only"
-    motion: "expressive"
-    patterns:
-      prefer:
-        - "scroll-animation"
-        - "parallax"
+sandbox: []
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# TASTE OWNERS
-# Named authorities who dictate visual decisions
+# REFINEMENT (optional)
 # ═══════════════════════════════════════════════════════════════════════════════
 
-taste_owners:
-  - handle: "@zksoju"
-    name: "Design Lead"
-    scope: ["**/*"]
-    authority: ["materials", "tensions", "motion", "colors", "typography"]
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# GREENLIGHT CONFIGURATION
-# Community polling settings
-# ═══════════════════════════════════════════════════════════════════════════════
-
-greenlight:
-  enabled: true
-  threshold: 0.70  # 70% to pass
-  duration_days: 7
-  min_participation: 10
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# GARDENING CONFIGURATION
-# Paper cut tracking settings
-# ═══════════════════════════════════════════════════════════════════════════════
-
-gardening:
-  three_to_one_rule: true
-  debt_threshold: 10
-  auto_scan: true
-  scan_on_commit: false
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# REJECTIONS
-# Patterns that should trigger warnings
-# ═══════════════════════════════════════════════════════════════════════════════
-
-rejections:
-  - pattern: "Spinner"
-    reason: "Creates anxiety in critical zones"
-    exceptions: ["admin/**"]
-
-  - pattern: "optimistic"
-    reason: "Dangerous for server_tick sync strategy"
-    exceptions: []
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# INTEGRATIONS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-integrations:
-  loa:
-    enabled: true
-    auto_inject: true  # Inject sigil context during /implement
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# ENFORCEMENT
-# How strict to be about violations
-# ═══════════════════════════════════════════════════════════════════════════════
-
-enforcement:
-  fidelity_ceiling: "warn"  # block | warn | disabled
-  sync_strategy: "block"     # Always block sync violations (safety)
-  invariants: "block"        # block | warn
-  paper_cuts: "warn"         # block | warn | disabled
+refinement:
+  sources:
+    - vercel_preview_comments
+    - github_pr_comments
+    - linear_issue_comments
+  auto_commit: true
+  commit_prefix: "refine"

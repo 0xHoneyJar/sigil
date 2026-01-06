@@ -1,284 +1,531 @@
-# Sigil v0.5: Design Physics Engine
+# Sigil v2.0: Reality Engine
 
-> "Physics, not opinions. Constraints, not debates."
+> "Truth is Core. Experience is Lens. Layouts ARE Zones."
 
-## What is Sigil?
-
-Sigil is a Design Physics Engine that gives AI agents physics constraints for consistent design decisions:
-
-1. **Temporal Governor** — Discrete tick (600ms) vs continuous (0ms)
-2. **Budgets** — Cognitive, visual, complexity limits per zone
-3. **Fidelity Ceiling** — Maximum gradient stops, shadow layers, animation duration
-4. **Authority Model** — Physics immutable, taste overridable, concepts greenlit
+You are operating within **Sigil v2.0**, a design physics framework that separates Truth (Core physics) from Experience (Lens rendering). The key architectural insight: **Layouts ARE Zones**.
 
 ---
 
-## Quick Reference
-
-### Commands (9 total)
-
-| Command | Purpose |
-|---------|---------|
-| `/sigil-setup` | Initialize v4 state zone structure |
-| `/envision` | Capture product soul (interview) |
-| `/codify` | Define material physics |
-| `/map` | Configure zone mappings |
-| `/craft` | Generate with physics context (Hammer/Chisel) |
-| `/validate` | Check violations (IMPOSSIBLE/BLOCK/WARN) |
-| `/approve` | Taste Key rulings and sign-off |
-| `/greenlight` | Concept approval (not execution) |
-| `/garden` | Manage entropy and drift |
-
-### State Zone Structure
+## Architecture (3 Layers)
 
 ```
-sigil-mark/
-├── core/                    # Physics (immutable after lock)
-│   ├── sync.yaml            # Temporal Governor
-│   ├── budgets.yaml         # Cognitive/visual/complexity limits
-│   ├── fidelity.yaml        # Fidelity ceiling (Mod Ghost Rule)
-│   └── lens.yaml            # Rendering layers
-│
-├── resonance/               # Tuning (product-specific)
-│   ├── materials.yaml       # Clay, machinery, glass
-│   ├── zones.yaml           # Path-based zones
-│   ├── tensions.yaml        # 4-axis tuning
-│   └── essence.yaml         # Soul statement and invariants
-│
-├── memory/                  # History
-│   ├── eras/                # Era snapshots
-│   ├── decisions/           # Greenlight records
-│   ├── mutations/active/    # Active changes
-│   └── graveyard/           # Archived items
-│
-└── taste-key/               # Authority
-    ├── holder.yaml          # Current Taste Key holder
-    └── rulings/             # Override records
+┌────────────────────────────────────────────────────────────┐
+│  CORE LAYER — Physics engines (Truth)                     │
+│  useCriticalAction → State Stream                         │
+│  { status, timeAuthority, selfPrediction, worldTruth }    │
+├────────────────────────────────────────────────────────────┤
+│  LAYOUT LAYER — Zones + Structural Physics                │
+│  CriticalZone, MachineryLayout, GlassLayout               │
+│  Layouts ARE Zones. Physics is DOM, not lint.             │
+├────────────────────────────────────────────────────────────┤
+│  LENS LAYER — Interchangeable UIs (Experience)            │
+│  useLens() → Lens components                              │
+│  DefaultLens, StrictLens, A11yLens                        │
+└────────────────────────────────────────────────────────────┘
 ```
+
+### Layer Responsibilities
+
+| Layer | Emits | Consumes | Examples |
+|-------|-------|----------|----------|
+| **Core** | State streams | Mutations | `useCriticalAction`, `useLocalCache` |
+| **Layout** | Zone context | State streams | `CriticalZone`, `MachineryLayout`, `GlassLayout` |
+| **Lens** | UI components | State + Zone context | `DefaultLens`, `StrictLens`, `A11yLens` |
+
+---
+
+## Core Philosophy
+
+<sigil_philosophy>
+**Truth vs Experience**
+
+- **Truth (Core):** Physics engines that emit state streams. The server-tick authority, the optimistic rollback, the proprioception — this is Truth.
+- **Experience (Lens):** How that state is rendered. The 44px button, the WCAG AAA contrast, the animations — this is Experience.
+
+Same Truth, different Experience. A payment state can be rendered by StrictLens (48px, no animations) or DefaultLens (44px, tap scale) — the physics don't change, only how they're shown.
+
+**Layouts ARE Zones**
+
+In v2.0, zones are declared by Layout primitives, not file paths:
+
+```tsx
+// This IS a critical zone — by structure, not config
+<CriticalZone financial>
+  {/* Server-tick authority enforced */}
+  {/* StrictLens forced for critical buttons */}
+</CriticalZone>
+```
+
+**Lens Enforcement**
+
+- `CriticalZone` with `financial={true}` → Forces `StrictLens` for critical buttons
+- `MachineryLayout` → Respects user lens preference
+- `GlassLayout` → Respects user lens preference
+- Default (no layout) → Uses `DefaultLens`
+
+**Recipes Are Still Valid**
+
+v1.2.5 recipes still work. They're just wrapped by layouts now:
+
+```tsx
+// v1.2.5 way (still works)
+<SigilZone material="decisive">
+  <DecisiveButton />
+</SigilZone>
+
+// v2.0 way (recommended)
+<CriticalZone financial>
+  <Lens.CriticalButton state={payment.state} onAction={commit} />
+</CriticalZone>
+```
+</sigil_philosophy>
+
+---
+
+## Quick Start
+
+<sigil_quickstart>
+### Payment Form (Critical Zone)
+
+```tsx
+import { useCriticalAction, CriticalZone, useLens } from 'sigil-mark';
+
+function PaymentForm({ amount }: { amount: number }) {
+  const payment = useCriticalAction({
+    mutation: () => api.pay(amount),
+    timeAuthority: 'server-tick',
+  });
+
+  const Lens = useLens(); // Auto-selects StrictLens in CriticalZone
+
+  return (
+    <CriticalZone financial>
+      <CriticalZone.Content>
+        <h2>Confirm Payment</h2>
+        <p>${amount}</p>
+      </CriticalZone.Content>
+      <CriticalZone.Actions>
+        <Lens.CriticalButton
+          state={payment.state}
+          onAction={() => payment.commit()}
+          labels={{
+            confirming: 'Confirm Payment',
+            pending: 'Processing...',
+            confirmed: 'Paid!',
+            failed: 'Failed - Retry',
+          }}
+        >
+          Pay ${amount}
+        </Lens.CriticalButton>
+      </CriticalZone.Actions>
+    </CriticalZone>
+  );
+}
+```
+
+### Admin List (Machinery Layout)
+
+```tsx
+import { MachineryLayout, useLens } from 'sigil-mark';
+
+function InvoiceList({ invoices }: { invoices: Invoice[] }) {
+  const Lens = useLens();
+
+  return (
+    <MachineryLayout
+      stateKey="invoices"
+      onAction={(id) => navigate(`/invoices/${id}`)}
+      onDelete={(id) => deleteInvoice(id)}
+    >
+      <MachineryLayout.Search placeholder="Search invoices..." />
+      <MachineryLayout.List>
+        {invoices.map((invoice) => (
+          <Lens.MachineryItem key={invoice.id} id={invoice.id}>
+            {invoice.title}
+          </Lens.MachineryItem>
+        ))}
+      </MachineryLayout.List>
+      <MachineryLayout.Empty>No invoices found</MachineryLayout.Empty>
+    </MachineryLayout>
+  );
+}
+```
+
+### Marketing Card (Glass Layout)
+
+```tsx
+import { GlassLayout, useLens } from 'sigil-mark';
+
+function ProductCard({ product }: { product: Product }) {
+  const Lens = useLens();
+
+  return (
+    <GlassLayout variant="card">
+      <GlassLayout.Image src={product.image} alt={product.name} />
+      <GlassLayout.Content>
+        <GlassLayout.Title>{product.name}</GlassLayout.Title>
+        <GlassLayout.Description>{product.description}</GlassLayout.Description>
+      </GlassLayout.Content>
+      <GlassLayout.Actions>
+        <Lens.GlassButton variant="primary">
+          Add to Cart
+        </Lens.GlassButton>
+      </GlassLayout.Actions>
+    </GlassLayout>
+  );
+}
+```
+</sigil_quickstart>
+
+---
+
+## Core Layer
+
+<sigil_core>
+### useCriticalAction
+
+The main physics hook. Emits a state stream with time authority.
+
+```tsx
+const action = useCriticalAction({
+  mutation: () => api.doThing(),
+  timeAuthority: 'server-tick' | 'optimistic' | 'hybrid',
+  onSuccess: (data) => {},
+  onError: (error) => {},
+  proprioception: { /* optional prediction config */ },
+});
+
+// State stream
+action.state.status    // 'idle' | 'confirming' | 'pending' | 'confirmed' | 'failed'
+action.state.progress  // 0-100 for hybrid
+action.state.error     // Error | null
+
+// Actions
+action.confirm()       // Enter confirming state
+action.commit()        // Execute mutation
+action.cancel()        // Cancel (if confirming)
+action.reset()         // Reset to idle
+```
+
+### Time Authorities
+
+| Authority | Behavior | Use Case |
+|-----------|----------|----------|
+| `server-tick` | Wait for server confirmation | Payments, destructive actions |
+| `optimistic` | Instant update, silent rollback on error | Admin tools, lists |
+| `hybrid` | Instant + sync indicator, visible rollback | Real-time collaboration |
+
+### Proprioception
+
+Self-prediction for responsive UIs:
+
+```tsx
+const movement = useCriticalAction({
+  mutation: () => api.moveItem(position),
+  timeAuthority: 'hybrid',
+  proprioception: {
+    maxDrift: 200,      // Max ms to predict ahead
+    decayRate: 0.9,     // Confidence decay per frame
+    position: {
+      render: 'ghost',  // Show predicted position as ghost
+      reconcile: 'lerp' // Smooth correction on server response
+    }
+  }
+});
+```
+</sigil_core>
+
+---
+
+## Layout Layer
+
+<sigil_layouts>
+### CriticalZone
+
+For high-stakes actions (payments, destructive operations).
+
+```tsx
+<CriticalZone financial={true}>
+  {/* Zone context: { type: 'critical', financial: true, timeAuthority: 'server-tick' } */}
+  {/* useLens() returns StrictLens for critical buttons */}
+</CriticalZone>
+```
+
+**Props:**
+- `financial` (boolean, default: true) — Forces StrictLens when true
+- `maxActions` (number, default: 3) — Warns if exceeded
+
+**Subcomponents:**
+- `CriticalZone.Content` — Main content area
+- `CriticalZone.Actions` — Button area (32px gap, auto-sorts critical buttons last)
+
+### MachineryLayout
+
+For keyboard-driven admin interfaces.
+
+```tsx
+<MachineryLayout
+  stateKey="items"
+  onAction={(id) => {}}
+  onDelete={(id) => {}}
+>
+  {/* Zone context: { type: 'admin', timeAuthority: 'optimistic' } */}
+</MachineryLayout>
+```
+
+**Keyboard shortcuts:**
+- Arrow keys, j/k: Navigate
+- Enter/Space: Activate
+- Delete/Backspace: Delete
+- Escape: Deselect
+- Home/End: Jump to first/last
+
+**Subcomponents:**
+- `MachineryLayout.List` — Container for items
+- `MachineryLayout.Item` — Single item
+- `MachineryLayout.Search` — Filter input
+- `MachineryLayout.Empty` — Empty state
+
+### GlassLayout
+
+For hover-driven marketing/showcase interfaces.
+
+```tsx
+<GlassLayout variant="card" | "hero" | "feature">
+  {/* Zone context: { type: 'marketing', timeAuthority: 'optimistic' } */}
+</GlassLayout>
+```
+
+**Hover physics:**
+- Scale: 1.02
+- TranslateY: -4px
+- Shadow increase
+- 200ms ease-out transition
+
+**Subcomponents:**
+- `GlassLayout.Image` — Image slot
+- `GlassLayout.Content` — Body container
+- `GlassLayout.Title` — Title text
+- `GlassLayout.Description` — Description text
+- `GlassLayout.Actions` — Button area
+</sigil_layouts>
+
+---
+
+## Lens Layer
+
+<sigil_lenses>
+### useLens Hook
+
+Returns the appropriate lens based on zone context and user preference.
+
+```tsx
+const Lens = useLens();
+
+// In CriticalZone with financial=true → StrictLens (forced)
+// In MachineryLayout → User preference or DefaultLens
+// In GlassLayout → User preference or DefaultLens
+// No layout → DefaultLens
+```
+
+### Built-in Lenses
+
+| Lens | Touch Target | Contrast | Animations | Use Case |
+|------|-------------|----------|------------|----------|
+| `DefaultLens` | 44px | Standard | Yes | General UI |
+| `StrictLens` | 48px | High | No | High-stakes actions |
+| `A11yLens` | 56px | WCAG AAA | No | Accessibility mode |
+
+### Lens Components
+
+Each lens provides:
+- `CriticalButton` — For critical actions (status-based)
+- `GlassButton` — For marketing/showcase buttons
+- `MachineryItem` — For list items
+
+```tsx
+// CriticalButton props
+<Lens.CriticalButton
+  state={action.state}
+  onAction={() => action.commit()}
+  labels={{ pending: 'Processing...' }}
+  disabled={false}
+/>
+
+// GlassButton props
+<Lens.GlassButton
+  variant="primary" | "secondary" | "ghost"
+  onClick={() => {}}
+/>
+
+// MachineryItem props
+<Lens.MachineryItem
+  id="item-1"
+  active={false}
+  onAction={() => {}}
+  onDelete={() => {}}
+/>
+```
+
+### LensProvider
+
+For user preference management:
+
+```tsx
+<LensProvider initialLens={DefaultLens}>
+  <App />
+</LensProvider>
+
+// In child component
+const { lens, setLens } = useLensPreference();
+<button onClick={() => setLens(A11yLens)}>Enable A11y Mode</button>
+```
+</sigil_lenses>
 
 ---
 
 ## Agent Protocol
 
-### Before Generating UI Code
+<sigil_agent_protocol>
+### When Generating UI Code
 
-1. **Check for Sigil setup**: Look for `.sigil-setup-complete`
-2. **Load physics context**: Read `sigil-mark/core/sync.yaml` and `budgets.yaml`
-3. **Determine zone**: Match file path to `sigil-mark/resonance/zones.yaml`
-4. **Apply physics**: Use zone-specific constraints
+1. **Determine zone context:**
+   - Is this inside a Layout? Read the zone context.
+   - What time authority does this zone use?
+   - What lens will be selected?
 
-### Zone Resolution
+2. **Select appropriate pattern:**
+   - Critical action? Use `useCriticalAction` + `CriticalZone`
+   - Admin list? Use `MachineryLayout` with keyboard nav
+   - Marketing? Use `GlassLayout` with hover physics
 
+3. **Respect lens enforcement:**
+   - In `CriticalZone` with `financial={true}`, critical buttons WILL use `StrictLens`
+   - Don't fight this — it's intentional for trust
+
+4. **Use state streams:**
+   - Components receive `state` prop, not `isLoading`
+   - State has `.status`, `.progress`, `.error`
+   - Let the lens render the appropriate UI for each status
+
+### When User Asks for Animation Changes
+
+In v2.0, animations live in lenses, not physics:
+
+```tsx
+// DON'T do this (v1.x pattern)
+<Button spring={{ stiffness: 300 }} />
+
+// DO this (v2.0 pattern)
+// 1. Animations are in lens
+// 2. If user wants different animations, create a custom lens
+// 3. Or use the appropriate built-in lens
+
+// For no animations in critical zones:
+<CriticalZone financial> {/* StrictLens has no animations */}
+
+// For accessibility mode:
+<LensProvider initialLens={A11yLens}>
 ```
-1. Check for @sigil-zone comment in file
-2. Match file path against zones.yaml patterns
-3. Return zone name or "default"
+
+### When User Asks for "Snappier" or "Heavier" Feel
+
+1. Understand the context — what zone, what component?
+2. If it's about TIME authority, adjust the core hook
+3. If it's about VISUAL response, that's lens territory
+4. If it's about STRUCTURAL physics, that's layout territory
+
+```tsx
+// Snappier time authority
+useCriticalAction({ timeAuthority: 'optimistic' }) // Instant
+
+// Heavier visual feel
+// → User should use StrictLens or create custom lens
+
+// Snappier structural physics (Glass)
+// → GlassLayout hover physics are fixed; create custom layout for different feel
 ```
-
-### The Three-Tier Violation System
-
-| Tier | Type | Override |
-|------|------|----------|
-| 1 | **IMPOSSIBLE** (Physics) | NEVER |
-| 2 | **BLOCK** (Budget/Fidelity) | Taste Key can override |
-| 3 | **WARN** (Drift) | Suggestions only |
-
-### Physics Violations (IMPOSSIBLE)
-
-Cannot be generated. Ever. No override exists.
-
-```yaml
-physics_violations:
-  - "Optimistic update in server_authoritative zone"
-  - "Bypassing discrete tick in critical zone"
-  - "Continuous animation in discrete tick zone"
-  - "Missing pending state in server_authoritative zone"
-```
-
-### Budget/Fidelity Violations (BLOCK)
-
-Blocked by default. Taste Key can create ruling to override.
-
-```yaml
-budget_violations:
-  - interactive_elements: { critical: 5, transactional: 12, exploratory: 20 }
-  - decisions: { critical: 2, transactional: 5, exploratory: 10 }
-  - animations: { critical: 1, transactional: 2, exploratory: 5 }
-
-fidelity_ceiling:
-  - gradient_stops: 2
-  - shadow_layers: 3
-  - animation_duration: 800ms
-  - blur_radius: 16px
-  - border_radius: 24px
-```
+</sigil_agent_protocol>
 
 ---
 
-## Hammer/Chisel Toolkit
+## Migration from v1.2.5
 
-The `/craft` command uses a diagnostic-first approach:
+<sigil_migration>
+| v1.2.5 | v2.0 |
+|--------|------|
+| `<SigilZone material="decisive">` | `<CriticalZone financial>` |
+| `<SigilZone material="machinery">` | `<MachineryLayout>` |
+| `<SigilZone material="glass">` | `<GlassLayout>` |
+| `useServerTick()` | `useCriticalAction({ timeAuthority: 'server-tick' })` |
+| `useSigilPhysics()` | `useLens()` |
+| `<Button spring={...}>` | `<Lens.CriticalButton state={...}>` |
 
-### Hammer (Diagnosis)
+### Deprecated APIs
 
-When user reports a problem ("button feels slow"):
-1. Load zone physics
-2. Analyze complaint
-3. Identify root cause
-4. Suggest appropriate fix
+These still work but will be removed in v3.0:
 
-**Never apply bandaids to physics issues.**
-
-### Chisel (Execution)
-
-After diagnosis:
-1. Generate code with physics context
-2. Check against constraints
-3. Route structural issues to Loa
-
-### Loa Handoff
-
-When a design problem requires structural change:
-
-```
-/craft "checkout feels slow"
-
-DIAGNOSIS: Physics conflict detected.
-
-The claim button is in critical zone (server_authoritative).
-Physics requires pending state and discrete tick (600ms).
-
-This is NOT a design problem. This is architecture.
-
-Handoff to Loa:
-/consult "Evaluate if checkout should remain server_authoritative"
-
-Options Loa will consider:
-1. Keep server_authoritative (accept the delay)
-2. Move to client_authoritative (accept the risk)
-3. Hybrid approach (optimistic for non-critical parts)
-```
+- `SigilZone` — Use layout primitives
+- `useSigilPhysics` — Use `useLens()`
+- `useServerAuthoritative` — Use `useCriticalAction`
+- `withSigilPhysics` — Use `useLens()`
+- File-path zone resolution — Zones are now structural (Layout-based)
+</sigil_migration>
 
 ---
 
-## Materials
+## File Structure
 
-Three base materials with physics properties:
-
-| Material | Light | Weight | Motion | Feedback |
-|----------|-------|--------|--------|----------|
-| **Clay** | Diffuse | Heavy | Spring (120/14) | Depress |
-| **Machinery** | Flat | None | Instant | Highlight |
-| **Glass** | Refract | Weightless | Ease (200ms) | Glow |
-
-### Zone Affinity
-
-```yaml
-zone_materials:
-  critical: clay       # Heavy, deliberate
-  transactional: clay  # Reliable, grounded
-  exploratory: glass   # Light, fluid
-  marketing: glass     # Ethereal, inviting
-  celebration: glass   # Sparkle, reward
+<sigil_structure>
 ```
-
----
-
-## Taste Key Authority
-
-### CAN Override
-
-- Budgets (element count, animation count)
-- Fidelity (gradient stops, shadow layers)
-- Taste (colors, typography, spacing)
-
-### CANNOT Override
-
-- Physics (sync authority, tick modes)
-- Security (auth, validation)
-- Accessibility (contrast, keyboard nav)
-
----
-
-## Workflow
-
-### New Project
-
+sigil-mark/
+├── index.ts              # Main entry point
+│
+├── core/                 # Physics engines (Truth)
+│   ├── useCriticalAction.ts
+│   ├── useLocalCache.ts
+│   ├── proprioception.ts
+│   ├── types.ts
+│   └── index.ts
+│
+├── layouts/              # Zones + Structural Physics
+│   ├── context.ts
+│   ├── CriticalZone.tsx
+│   ├── MachineryLayout.tsx
+│   ├── GlassLayout.tsx
+│   └── index.ts
+│
+├── lenses/               # Interchangeable UIs (Experience)
+│   ├── types.ts
+│   ├── useLens.ts
+│   ├── LensProvider.tsx
+│   ├── default/
+│   │   ├── CriticalButton.tsx
+│   │   ├── GlassButton.tsx
+│   │   ├── MachineryItem.tsx
+│   │   └── index.tsx
+│   ├── strict/
+│   │   └── ...
+│   ├── a11y/
+│   │   └── ...
+│   └── index.ts
+│
+├── recipes/              # v1.2.5 recipes (still valid)
+│   ├── decisive/
+│   ├── machinery/
+│   └── glass/
+│
+└── __tests__/
 ```
-/sigil-setup → /envision → /codify → /map → (build) → /craft → /validate → /approve
-```
-
-### During Implementation
-
-1. Load physics context (zone, material, sync)
-2. Generate with constraints
-3. Check violations:
-   - IMPOSSIBLE → Block, cannot proceed
-   - BLOCK → Suggest Taste Key override
-   - WARN → Note for review
-
-### Maintenance
-
-```
-/garden → Review entropy → /approve --revoke obsolete rulings
-```
-
----
-
-## Philosophy
-
-Sigil provides physics, not opinions.
-
-- **Physics are immutable**: No escape hatch for server_authoritative violations
-- **Taste is overridable**: Taste Key can create rulings
-- **Concepts are greenlit**: "Should we build?" is separate from "How should it look?"
-- **Entropy is managed**: Gardens need tending
+</sigil_structure>
 
 ---
 
 ## Coexistence with Loa
 
-Sigil and Loa coexist with different responsibilities:
+Sigil and Loa can coexist. They have separate:
+- State zones (sigil-mark/ vs loa-grimoire/)
+- Config files (.sigilrc.yaml vs .loa.config.yaml)
+- Skills (design-focused vs workflow-focused)
 
-| Aspect | Sigil | Loa |
-|--------|-------|-----|
-| Domain | Design physics | Product architecture |
-| State zone | sigil-mark/ | loa-grimoire/ |
-| Handoff | Physics issues | Structural decisions |
-
-Loa handoff happens when design issues are actually architecture issues.
-
----
-
-## Key Concepts
-
-### Temporal Governor
-
-- **Discrete tick** (600ms): Critical zones, heavy spring
-- **Continuous tick** (0ms): Exploratory zones, fluid animations
-
-### Server Authority
-
-- **server_authoritative**: Must show pending state, no optimistic updates
-- **client_authoritative**: Optimistic updates allowed
-- **collaborative**: CRDT with conflict resolution
-
-### Fidelity Ceiling (Mod Ghost Rule)
-
-Generate at ceiling, not above. A skilled modder can enhance, but base must stand alone.
-
----
-
-## Skills (9 total)
-
-| Skill | Role | Command |
-|-------|------|---------|
-| `initializing-sigil` | Framework Installer | /sigil-setup |
-| `envisioning-soul` | Soul Keeper | /envision |
-| `codifying-materials` | Material Smith | /codify |
-| `mapping-zones` | Zone Architect | /map |
-| `crafting-components` | Apprentice Smith | /craft |
-| `validating-fidelity` | Fidelity Guardian | /validate |
-| `approving-patterns` | Taste Key Guardian | /approve |
-| `greenlighting-concepts` | Concept Gatekeeper | /greenlight |
-| `gardening-entropy` | Entropy Gardener | /garden |
+No automatic cross-loading — developer decides when to reference design context.

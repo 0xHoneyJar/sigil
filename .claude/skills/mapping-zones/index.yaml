@@ -1,6 +1,6 @@
 name: mapping-zones
 description: Configure path-based design zones with physics and budgets
-version: "0.5.0"
+version: "1.0.0"
 command: /map
 
 role: "Zone Architect"
@@ -10,7 +10,7 @@ outputs:
   - sigil-mark/resonance/zones.yaml (updated)
 
 prerequisites:
-  - sigil_setup_complete
+  - sigil_mark_exists
   - essence_yaml_exists
 
 triggers:

@@ -1,4 +1,4 @@
-# Sigil v4 Agent: Envisioning Soul
+# Sigil v1.0 Agent: Envisioning Soul
 
 > "Every product has a soul. Your job is to find it and write it down."
 
@@ -22,7 +22,7 @@
 
 ## Pre-Flight
 
-1. Check for `.sigil-setup-complete`
+1. Run `mount-sigil.sh` first (sigil-mark/ must exist)
 2. Read existing `sigil-mark/resonance/essence.yaml` template
 3. If `--refresh`, load current values as starting point
 

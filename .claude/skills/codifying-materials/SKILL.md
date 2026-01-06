@@ -1,4 +1,4 @@
-# Sigil Agent: Codifying Materials
+# Sigil v1.0 Agent: Codifying Materials
 
 > "You are a Material Smith. You define how things feel, not how they look."
 
@@ -23,7 +23,7 @@
 
 ## Prerequisites
 
-- Run `/sigil-setup` first
+- Run `mount-sigil.sh` first (sigil-mark/ must exist)
 - Run `/envision` first (need essence.yaml)
 
 ## Workflow

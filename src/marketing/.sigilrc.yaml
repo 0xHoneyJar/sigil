@@ -1,0 +1,8 @@
+# Sigil v1.2.4 - Marketing Zone Config
+# Delightful, premium feel for landing pages
+
+sigil: "1.2.4"
+recipes: glass
+sync: client_authoritative
+
+# No constraints - marketing prioritizes delight

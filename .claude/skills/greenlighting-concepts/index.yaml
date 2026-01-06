@@ -1,5 +1,5 @@
 name: greenlighting-concepts
-version: "0.5.0"
+version: "1.0.0"
 description: "Concept approval before building. Distinguishes concept from execution."
 role: "Concept Gatekeeper"
 command: /greenlight
@@ -8,3 +8,6 @@ outputs:
 reads:
   - sigil-mark/resonance/essence.yaml
   - sigil-mark/taste-key/holder.yaml
+
+prerequisites:
+  - sigil_mark_exists

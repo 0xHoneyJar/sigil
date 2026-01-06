@@ -1,5 +1,5 @@
 name: gardening-entropy
-version: "0.5.0"
+version: "1.0.0"
 description: "Detects drift from essence, reviews mutations, manages era transitions. Entropy Gardener role."
 role: "Entropy Gardener"
 command: /garden
@@ -11,3 +11,6 @@ reads:
   - sigil-mark/memory/mutations/active/*.yaml
   - sigil-mark/memory/decisions/*.yaml
   - sigil-mark/taste-key/rulings/*.yaml
+
+prerequisites:
+  - sigil_mark_exists

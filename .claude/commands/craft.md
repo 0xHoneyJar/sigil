@@ -1,122 +1,118 @@
 ---
 name: craft
-version: "0.5.0"
-description: Generate UI with physics context using Hammer/Chisel toolkit
+version: "1.2.4"
+description: Generate UI components using zone-appropriate recipes
 agent: crafting-components
 agent_path: .claude/skills/crafting-components/SKILL.md
 preflight:
-  - sigil_setup_complete
+  - sigil_mark_exists
 context_injection: true
 ---
 
 # /craft
 
-Generate UI components with physics constraints. Uses Hammer to diagnose, Chisel to execute.
+Generate UI components using recipes from the current zone.
 
 ## Usage
 
 ```
-/craft [prompt]                    # Diagnose and generate
-/craft [prompt] --zone [zone]      # Force zone context
-/craft [prompt] --material [mat]   # Force material
+/craft [component_description]               # Auto-detect zone
+/craft [component_description] --file [path] # Specify target file
+/craft [component_description] --zone [zone] # Force zone context
 ```
 
-## The Hammer/Chisel Workflow
-
-Every `/craft` follows this pattern:
+## Workflow
 
 ```
-1. HAMMER (Diagnose)
-   - Detect zone from file path
-   - Load zone physics (sync, tick, material)
-   - Analyze user request against physics
-   - Classify: WITHIN_PHYSICS / BUDGET_VIOLATION / IMPOSSIBLE / STRUCTURAL
+1. RESOLVE ZONE
+   - Get file path (from --file or current context)
+   - Walk up directories for .sigilrc.yaml
+   - Load zone config (recipes, sync, constraints)
 
-2. CHISEL (Execute)
-   - Apply material physics (clay/machinery/glass)
-   - Apply sync pattern (server_tick/optimistic)
-   - Apply tensions (playfulness, weight, density, speed)
-   - Respect budget and fidelity ceiling
-   - Generate component
+2. SELECT RECIPE
+   - Parse component description
+   - Match against available recipes in zone's recipe set
+   - Select most appropriate recipe
+
+3. GENERATE COMPONENT
+   - Import from @sigil/recipes/{zone}
+   - Configure recipe with appropriate props
+   - Show physics being applied
+
+4. OUTPUT
+   - Show ZONE, RECIPE, PHYSICS
+   - Show generated code
+   - If updating: show diff
 ```
 
-## The Linear Test
-
-Before any change, the agent asks:
+## Output Format
 
 ```
-User: "The claim button feels slow"
+ZONE: src/checkout (decisive)
+RECIPE: decisive/Button
 
-WRONG: Add optimistic UI, speed up animation
-RIGHT: Check zone physics first
+[generated code]
 
-Zone: critical → server_authoritative → 600ms discrete tick
-Material: clay → heavy, deliberate
-
-Diagnosis: "Slow" IS the design. The delay is trust.
+PHYSICS: spring(180, 12), server-tick
 ```
 
-## Zone to Physics
+## Recipe Sets
 
-| Zone | Sync | Tick | Material |
-|------|------|------|----------|
-| critical | server_authoritative | discrete (600ms) | clay |
-| transactional | client_authoritative | continuous (0ms) | machinery |
-| exploratory | client_authoritative | continuous (0ms) | glass |
-| marketing | client_authoritative | continuous (0ms) | glass |
-| admin | client_authoritative | continuous (0ms) | machinery |
+| Zone | Recipe Set | Example Recipes |
+|------|------------|-----------------|
+| checkout | decisive | Button, ConfirmFlow |
+| admin | machinery | Table, Toggle, Form |
+| marketing | glass | HeroCard, FeatureCard, Tooltip |
 
-## Physics Violations
+## Physics by Set
 
-### IMPOSSIBLE (Cannot Override)
+| Recipe Set | Spring | Feel |
+|------------|--------|------|
+| decisive | (180, 12) | Heavy, deliberate |
+| machinery | (400, 30) or instant | Efficient, no-nonsense |
+| glass | (200, 20) | Smooth, delightful |
 
-- Optimistic UI in server_authoritative zone
-- Bypassing discrete tick in critical zone
-- Breaking trust model
+## Constraints
 
-### BLOCK (Taste Key Can Override)
+When zone has constraints:
 
-- Exceeding element budget
-- Exceeding fidelity ceiling
-- Drift from essence
+```yaml
+# src/checkout/.sigilrc.yaml
+constraints:
+  optimistic_ui: forbidden
+  loading_spinners: forbidden
+```
+
+Claude will:
+1. Check request against constraints
+2. Refuse IMPOSSIBLE violations
+3. Warn on BLOCK violations
+4. Suggest alternatives
 
 ## Examples
 
 ```
-/craft "Create a claim button"
-→ Zone: critical
-→ Material: clay (heavy spring)
-→ Sync: server_authoritative (no optimistic)
-→ Generates: ServerTickButton with pending state
+/craft "Create a confirm button for checkout"
+→ ZONE: src/checkout (decisive)
+→ RECIPE: decisive/Button
+→ PHYSICS: spring(180, 12), server-tick
+→ Generates: <Button onAction={...} variant="primary" />
 
-/craft "Build a settings toggle"
-→ Zone: transactional
-→ Material: machinery (instant)
-→ Sync: client_authoritative (optimistic)
-→ Generates: instant toggle, no animation
+/craft "Build a data table for admin"
+→ ZONE: src/admin (machinery)
+→ RECIPE: machinery/Table
+→ PHYSICS: none (instant)
+→ Generates: <Table data={...} columns={...} />
 
-/craft "Design a gallery card"
-→ Zone: exploratory
-→ Material: glass (ease, glow)
-→ Sync: client_authoritative
-→ Generates: hover effect, smooth transition
+/craft "Design a hero card for landing page"
+→ ZONE: src/marketing (glass)
+→ RECIPE: glass/HeroCard
+→ PHYSICS: spring(200, 20), float
+→ Generates: <HeroCard glowColor="..." />
 ```
 
-## Loa Handoff
+## Next Steps
 
-If request requires structural change (changing zone physics):
-
-```
-LOA HANDOFF
-
-The request requires changing:
-- Zone sync authority
-- Tick mode
-
-This is a STRUCTURAL change. Route to Loa:
-/consult
-```
-
-## Next Step
-
-After `/craft`: Run `/validate` to check generated code against physics.
+- `/sandbox [path]` — Enable raw physics for experimentation
+- `/codify [path]` — Extract physics to recipe
+- `/validate` — Check recipe compliance

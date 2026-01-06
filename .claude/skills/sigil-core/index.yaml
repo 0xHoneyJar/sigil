@@ -1,0 +1,16 @@
+name: sigil-core
+description: Core Sigil v1.2.4 design physics framework skill
+version: 1.2.4
+
+triggers:
+  - /craft
+  - /sandbox
+  - /codify
+  - /inherit
+  - /validate
+  - /garden
+
+resources:
+  - scripts/sigil-detect-zone.sh
+
+dependencies: []

@@ -1,0 +1,8 @@
+# Sigil v1.2.4 - Admin Zone Config
+# Efficiency-focused interfaces for power users
+
+sigil: "1.2.4"
+recipes: machinery
+sync: client_authoritative
+
+# No special constraints - admin zones prioritize speed

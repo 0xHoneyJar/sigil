@@ -1,0 +1,12 @@
+# Sigil v1.2.4 - Checkout Zone Config
+# High-stakes transactions requiring deliberate, trustworthy feel
+
+sigil: "1.2.4"
+recipes: decisive
+sync: server_authoritative
+tick: 600ms
+
+# Hard constraints for checkout
+constraints:
+  optimistic_ui: forbidden    # IMPOSSIBLE - never show success before server confirms
+  loading_spinners: forbidden # IMPOSSIBLE - use deliberate progress instead

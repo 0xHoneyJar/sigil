@@ -99,9 +99,8 @@ setup_sigil_home() {
   log "Sigil home ready at $SIGIL_HOME"
 }
 
-# === Sigil v4 Skills (9 total) ===
+# === Sigil v1.0 Skills (8 total) ===
 SIGIL_SKILLS=(
-  "initializing-sigil"
   "envisioning-soul"
   "codifying-materials"
   "mapping-zones"
@@ -112,9 +111,8 @@ SIGIL_SKILLS=(
   "gardening-entropy"
 )
 
-# === Sigil v4 Commands (9 total) ===
+# === Sigil v1.0 Commands (8 total) ===
 SIGIL_COMMANDS=(
-  "sigil-setup"
   "envision"
   "codify"
   "map"
@@ -125,6 +123,15 @@ SIGIL_COMMANDS=(
   "garden"
 )
 
+# === Sigil v1.0 Scripts (5 total) ===
+SIGIL_SCRIPTS=(
+  "mount-sigil.sh"
+  "sigil-workbench.sh"
+  "sigil-tensions.sh"
+  "sigil-validate.sh"
+  "sigil-detect-zone.sh"
+)
+
 # === Create Symlinks ===
 create_symlinks() {
   step "Creating symlinks..."
@@ -133,7 +140,7 @@ create_symlinks() {
   mkdir -p .claude/skills
   mkdir -p .claude/commands
 
-  # Symlink Sigil v4 skills
+  # Symlink Sigil v1.0 skills
   local skill_count=0
   for skill_name in "${SIGIL_SKILLS[@]}"; do
     if [[ -d "$SIGIL_HOME/.claude/skills/$skill_name" ]]; then
@@ -145,7 +152,7 @@ create_symlinks() {
   done
   log "Linked $skill_count skills"
 
-  # Symlink Sigil v4 commands
+  # Symlink Sigil v1.0 commands
   local cmd_count=0
   for cmd in "${SIGIL_COMMANDS[@]}"; do
     if [[ -f "$SIGIL_HOME/.claude/commands/${cmd}.md" ]]; then
@@ -156,26 +163,27 @@ create_symlinks() {
   done
   log "Linked $cmd_count commands"
 
-  # Symlink scripts
+  # Symlink Sigil v1.0 scripts
   mkdir -p .claude/scripts
-  for script in "$SIGIL_HOME/.claude/scripts/"*.sh; do
-    if [[ -f "$script" ]]; then
-      local script_name=$(basename "$script")
+  local script_count=0
+  for script_name in "${SIGIL_SCRIPTS[@]}"; do
+    if [[ -f "$SIGIL_HOME/.claude/scripts/$script_name" ]]; then
       # Don't overwrite mount script if it exists locally
       if [[ "$script_name" != "mount-sigil.sh" ]] || [[ ! -f ".claude/scripts/$script_name" ]]; then
         rm -f ".claude/scripts/$script_name"
-        ln -sf "$script" ".claude/scripts/$script_name"
+        ln -sf "$SIGIL_HOME/.claude/scripts/$script_name" ".claude/scripts/$script_name"
+        ((script_count++))
       fi
     fi
   done
-  log "Linked scripts"
+  log "Linked $script_count scripts"
 }
 
 # === Create State Zone Structure ===
 create_state_zone() {
   step "Creating sigil-mark/ state zone..."
 
-  # Create v4 directory structure
+  # Create v1.0 directory structure
   mkdir -p sigil-mark/core
   mkdir -p sigil-mark/resonance
   mkdir -p sigil-mark/memory/eras
@@ -191,7 +199,7 @@ create_state_zone() {
 create_version_file() {
   step "Creating version manifest..."
 
-  local sigil_version="0.5.0"
+  local sigil_version="1.0.0"
   if [[ -f "$SIGIL_HOME/VERSION" ]]; then
     sigil_version=$(cat "$SIGIL_HOME/VERSION" | tr -d '[:space:]')
   fi
@@ -214,7 +222,7 @@ EOF
 main() {
   echo ""
   log "======================================================================="
-  log "  Sigil v0.5.0 — Design Physics Engine"
+  log "  Sigil v1.0 — Design Physics Engine"
   log "  Physics constraints for AI-assisted design"
   log "======================================================================="
   log "  Branch: $SIGIL_BRANCH"
@@ -233,16 +241,19 @@ main() {
   echo ""
   info "Next steps:"
   info "  1. Run 'claude' to start Claude Code"
-  info "  2. Issue '/sigil-setup' to initialize physics schemas"
-  info "  3. Then '/envision' to capture product soul"
+  info "  2. Run '/envision' to capture product soul"
+  info "  3. Run '/codify' to define materials"
+  info "  4. Run '/map' to configure zones"
+  info "  5. Run 'sigil-workbench.sh' to launch Workbench"
   echo ""
   info "Framework structure:"
-  info "  .claude/skills/     -> 9 Sigil agents symlinked"
-  info "  .claude/commands/   -> 9 Sigil commands symlinked"
+  info "  .claude/skills/     -> 8 Sigil agents symlinked"
+  info "  .claude/commands/   -> 8 Sigil commands symlinked"
+  info "  .claude/scripts/    -> 5 Sigil scripts symlinked"
   info "  sigil-mark/         -> Your design context (state zone)"
   info "  .sigil-version.json -> Version tracking"
   echo ""
-  info "The v4 Architecture:"
+  info "The v1.0 Architecture:"
   info "  core/       -> Physics (sync, budgets, fidelity, lens)"
   info "  resonance/  -> Tuning (materials, zones, tensions, essence)"
   info "  memory/     -> History (eras, decisions, mutations, graveyard)"

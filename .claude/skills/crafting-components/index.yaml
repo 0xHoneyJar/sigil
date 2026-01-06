@@ -1,23 +1,31 @@
 name: crafting-components
-description: Generate UI with physics context using Hammer/Chisel toolkit
-version: "0.5.0"
+description: Generate UI components using zone-appropriate recipes (Sigil v1.2.4)
+version: "1.2.4"
 command: /craft
 
 role: "Apprentice Smith"
-role_description: "Diagnoses and executes with physics context"
+role_description: "Generates components using recipes. No raw physics outside sandbox."
 
 outputs: []  # Generates code, not state files
 
+reads:
+  # Zone config
+  - .sigilrc.yaml
+  - src/**/.sigilrc.yaml
+  # Recipes
+  - sigil-mark/recipes/decisive/*.tsx
+  - sigil-mark/recipes/machinery/*.tsx
+  - sigil-mark/recipes/glass/*.tsx
+  # Core
+  - sigil-mark/core/zone-resolver.ts
+  - sigil-mark/hooks/useServerTick.ts
+
 prerequisites:
-  - sigil_setup_complete
+  - sigil_mark_exists
 
 context_injection: true
 
-tools:
-  hammer: "tools/hammer.md"
-  chisel: "tools/chisel.md"
-
 triggers:
-  - /craft [prompt]
-  - /craft [prompt] --zone [zone]
-  - /craft [prompt] --material [material]
+  - /craft [description]
+  - /craft [description] --file [path]
+  - /craft [description] --zone [zone]

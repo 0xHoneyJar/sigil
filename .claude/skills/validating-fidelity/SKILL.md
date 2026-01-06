@@ -1,4 +1,4 @@
-# Sigil v4 Agent: Validating Fidelity
+# Sigil v1.0 Agent: Validating Fidelity
 
 > "Physics violations are IMPOSSIBLE. Budget violations are BLOCK."
 
@@ -23,7 +23,7 @@
 
 ## Prerequisites
 
-- Run `/sigil-setup` first
+- Run `mount-sigil.sh` first (creates sigil-mark/ structure)
 - Run `/envision` first (need essence.yaml)
 
 ## The Three-Tier Violation System
@@ -477,7 +477,7 @@ function has_continuous_animation(code) {
 |-----------|----------|
 | File not found | List valid paths |
 | No zone detected | Use default zone |
-| Missing core files | Error: run /sigil-setup |
+| Missing core files | Error: run mount-sigil.sh |
 | Parse error | Skip file with warning |
 
 ## Next Step

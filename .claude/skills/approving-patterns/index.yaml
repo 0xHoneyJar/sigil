@@ -1,5 +1,5 @@
 name: approving-patterns
-version: "0.5.0"
+version: "1.0.0"
 description: "Taste Key holder sign-off and rulings. Creates override records."
 role: "Taste Key Guardian"
 command: /approve
@@ -10,3 +10,6 @@ reads:
   - sigil-mark/resonance/essence.yaml
   - sigil-mark/core/fidelity.yaml
   - sigil-mark/core/budgets.yaml
+
+prerequisites:
+  - sigil_mark_exists

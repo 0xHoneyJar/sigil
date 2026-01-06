@@ -1,39 +1,49 @@
 {
-  "sigil_version": "11.0.0",
-  "framework_version": "11.0.0",
-  "schema_version": 1,
+  "sigil_version": "1.2.5",
+  "framework_version": "1.2.5",
+  "schema_version": 3,
+  "philosophy": "Zone Provider",
+  "description": "Context-based physics, one component library",
   "zones": {
     "system": ".claude/",
     "state": "sigil-mark/"
   },
-  "kernel": {
-    "locked": false,
-    "locked_at": null,
-    "locked_by": null,
-    "files": [
-      "sigil-mark/kernel/physics.yaml",
-      "sigil-mark/kernel/sync.yaml",
-      "sigil-mark/kernel/fidelity-ceiling.yaml"
+  "core": {
+    "physics_tokens": "sigil-mark/core/physics.ts",
+    "zone_context": "sigil-mark/core/SigilZone.tsx",
+    "zone_resolver": "sigil-mark/core/zone-resolver.ts"
+  },
+  "components": {
+    "path": "sigil-mark/components/",
+    "list": ["Button"]
+  },
+  "materials": ["decisive", "machinery", "glass"],
+  "hooks": {
+    "path": "sigil-mark/hooks/",
+    "list": ["useServerTick"]
+  },
+  "workbench": {
+    "ab_toggle": "sigil-mark/workbench/ab-toggle.ts",
+    "use_ab_toggle": "sigil-mark/workbench/useABToggle.ts"
+  },
+  "history": {
+    "path": "sigil-mark/history/",
+    "last_entry": null
+  },
+  "garden": {
+    "last_run": null,
+    "reports_path": "sigil-mark/reports/"
+  },
+  "migration": {
+    "from_version": "1.2.4",
+    "migrated_at": "2026-01-06T00:00:00Z",
+    "changes": [
+      "Recipes → Physics Tokens",
+      "CSS vars → React Context",
+      "Multiple Buttons → One Button",
+      "Recipe imports → SigilZone wrapper"
     ]
   },
-  "soul": {
-    "initialized": true,
-    "initialized_at": "2026-01-03T00:00:00Z",
-    "files": [
-      "sigil-mark/soul/materials.yaml",
-      "sigil-mark/soul/zones.yaml",
-      "sigil-mark/soul/tensions.yaml",
-      "sigil-mark/soul/essence.yaml"
-    ]
-  },
-  "integrity": {
-    "enforcement": "warn",
-    "last_verified": null
-  },
-  "framework": {
-    "name": "Sigil Soul Engine",
-    "repository": "https://github.com/0xHoneyJar/sigil"
-  },
-  "setup_completed_at": "2026-01-03T00:00:00Z",
-  "last_updated": "2026-01-03T00:00:00Z"
+  "setup_completed_at": "2026-01-05T00:00:00Z",
+  "last_updated": "2026-01-06T00:00:00Z"
 }

@@ -1,4 +1,4 @@
-# Sigil v4 Agent: Approving Patterns
+# Sigil v1.0 Agent: Approving Patterns
 
 > "Taste Key holders dictate execution. They cannot override physics."
 
@@ -24,7 +24,7 @@
 
 ## Prerequisites
 
-- Run `/sigil-setup` first
+- Run `mount-sigil.sh` first (creates sigil-mark/)
 - Run `/envision` first (captures Taste Key holder)
 - Taste Key holder must be defined in `holder.yaml`
 
