@@ -62,8 +62,24 @@ export {
   type CriticalZoneActionsProps,
 } from './CriticalZone';
 
-// MachineryLayout — Sprint 4 (placeholder)
-// export { MachineryLayout } from './MachineryLayout';
+// MachineryLayout — Sprint 4
+export {
+  MachineryLayout,
+  type MachineryLayoutProps,
+  type MachineryLayoutListProps,
+  type MachineryLayoutItemProps,
+  type MachineryLayoutSearchProps,
+  type MachineryLayoutEmptyProps,
+} from './MachineryLayout';
 
-// GlassLayout — Sprint 4 (placeholder)
-// export { GlassLayout } from './GlassLayout';
+// GlassLayout — Sprint 4
+export {
+  GlassLayout,
+  type GlassLayoutProps,
+  type GlassLayoutVariant,
+  type GlassLayoutImageProps,
+  type GlassLayoutContentProps,
+  type GlassLayoutTitleProps,
+  type GlassLayoutDescriptionProps,
+  type GlassLayoutActionsProps,
+} from './GlassLayout';

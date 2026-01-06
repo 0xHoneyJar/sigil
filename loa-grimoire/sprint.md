@@ -224,13 +224,13 @@ This plan implements Sigil v2.0, the "Reality Engine" that separates Truth (Core
 
 ### Tasks
 
-- [ ] **S4-T1: Implement MachineryLayout component**
+- [x] **S4-T1: Implement MachineryLayout component**
   - Create `sigil-mark/layouts/MachineryLayout.tsx`
   - Provide zone context: `{ type: 'admin', timeAuthority: 'optimistic' }`
   - Accept `stateKey`, `onAction`, `onDelete` props
   - **Acceptance:** MachineryLayout provides admin zone context
 
-- [ ] **S4-T2: Implement MachineryLayout keyboard navigation**
+- [x] **S4-T2: Implement MachineryLayout keyboard navigation**
   - Arrow keys: Navigate items
   - j/k: Vim-style navigation
   - Enter/Space: Activate current item
@@ -239,26 +239,26 @@ This plan implements Sigil v2.0, the "Reality Engine" that separates Truth (Core
   - Home/End: Jump to first/last
   - **Acceptance:** All keyboard shortcuts work
 
-- [ ] **S4-T3: Implement MachineryLayout subcomponents**
+- [x] **S4-T3: Implement MachineryLayout subcomponents**
   - `MachineryLayout.List` - container for items
   - `MachineryLayout.Item` - single item with id
   - `MachineryLayout.Search` - filter input
   - `MachineryLayout.Empty` - empty state
   - **Acceptance:** All subcomponents work together
 
-- [ ] **S4-T4: Implement GlassLayout component**
+- [x] **S4-T4: Implement GlassLayout component**
   - Create `sigil-mark/layouts/GlassLayout.tsx`
   - Provide zone context: `{ type: 'marketing', timeAuthority: 'optimistic' }`
   - Accept `variant` prop ('card' | 'hero' | 'feature')
   - **Acceptance:** GlassLayout provides marketing zone context
 
-- [ ] **S4-T5: Implement GlassLayout hover physics**
+- [x] **S4-T5: Implement GlassLayout hover physics**
   - Hover: `scale(1.02)`, `translateY(-4px)`, shadow increase
   - Transition: 200ms ease-out
   - Backdrop blur: `backdrop-blur-lg`
   - **Acceptance:** Hover physics feel polished
 
-- [ ] **S4-T6: Implement GlassLayout subcomponents**
+- [x] **S4-T6: Implement GlassLayout subcomponents**
   - `GlassLayout.Image` - image slot
   - `GlassLayout.Content` - body slot
   - `GlassLayout.Title` - title slot
@@ -266,12 +266,12 @@ This plan implements Sigil v2.0, the "Reality Engine" that separates Truth (Core
   - `GlassLayout.Actions` - actions slot
   - **Acceptance:** All subcomponents work together
 
-- [ ] **S4-T7: Create layouts barrel export**
+- [x] **S4-T7: Create layouts barrel export**
   - Create `sigil-mark/layouts/index.ts`
   - Export all layouts and context utilities
   - **Acceptance:** `import { CriticalZone, MachineryLayout, GlassLayout } from './layouts'` works
 
-- [ ] **S4-T8: Create MachineryLayout and GlassLayout tests**
+- [x] **S4-T8: Create MachineryLayout and GlassLayout tests**
   - Test zone context provided
   - Test keyboard navigation (Machinery)
   - Test hover physics (Glass)
@@ -530,7 +530,7 @@ From PRD §7:
 | Sprint 1 | COMPLETED | 2026-01-05 |
 | Sprint 2 | COMPLETED | 2026-01-05 |
 | Sprint 3 | COMPLETED | 2026-01-05 |
-| Sprint 4 | PENDING | - |
+| Sprint 4 | COMPLETED | 2026-01-05 |
 | Sprint 5 | PENDING | - |
 | Sprint 6 | PENDING | - |
 | Sprint 7 | PENDING | - |
