@@ -1,284 +1,365 @@
-# Sigil v0.5: Design Physics Engine
+# Sigil v1.2.4: Design Physics Framework
 
-> "Physics, not opinions. Constraints, not debates."
+> "See the diff. Feel the result. Learn by doing."
 
-## What is Sigil?
-
-Sigil is a Design Physics Engine that gives AI agents physics constraints for consistent design decisions:
-
-1. **Temporal Governor** — Discrete tick (600ms) vs continuous (0ms)
-2. **Budgets** — Cognitive, visual, complexity limits per zone
-3. **Fidelity Ceiling** — Maximum gradient stops, shadow layers, animation duration
-4. **Authority Model** — Physics immutable, taste overridable, concepts greenlit
+You are operating within **Sigil**, a design physics framework for building consistent, craft-driven interfaces. Sigil provides recipes (pre-validated physics implementations) and a workbench environment where engineers learn by seeing diffs AND feeling results.
 
 ---
 
-## Quick Reference
+## Core Philosophy
 
-### Commands (9 total)
+<sigil_philosophy>
+**Apprenticeship Through Diff + Feel**
 
-| Command | Purpose |
-|---------|---------|
-| `/sigil-setup` | Initialize v4 state zone structure |
-| `/envision` | Capture product soul (interview) |
-| `/codify` | Define material physics |
-| `/map` | Configure zone mappings |
-| `/craft` | Generate with physics context (Hammer/Chisel) |
-| `/validate` | Check violations (IMPOSSIBLE/BLOCK/WARN) |
-| `/approve` | Taste Key rulings and sign-off |
-| `/greenlight` | Concept approval (not execution) |
-| `/garden` | Manage entropy and drift |
+Design engineers learn by:
+1. Claude adjusts → Engineer sees `stiffness: 180 → 300`
+2. Engineer clicks component in browser → FEELS the snap
+3. Engineer toggles A/B → FEELS the difference
+4. Numbers gain meaning through fingers
 
-### State Zone Structure
+Do NOT lecture. Do NOT explain unless asked. Make the change. The diff + feel is the lesson.
 
-```
-sigil-mark/
-├── core/                    # Physics (immutable after lock)
-│   ├── sync.yaml            # Temporal Governor
-│   ├── budgets.yaml         # Cognitive/visual/complexity limits
-│   ├── fidelity.yaml        # Fidelity ceiling (Mod Ghost Rule)
-│   └── lens.yaml            # Rendering layers
-│
-├── resonance/               # Tuning (product-specific)
-│   ├── materials.yaml       # Clay, machinery, glass
-│   ├── zones.yaml           # Path-based zones
-│   ├── tensions.yaml        # 4-axis tuning
-│   └── essence.yaml         # Soul statement and invariants
-│
-├── memory/                  # History
-│   ├── eras/                # Era snapshots
-│   ├── decisions/           # Greenlight records
-│   ├── mutations/active/    # Active changes
-│   └── graveyard/           # Archived items
-│
-└── taste-key/               # Authority
-    ├── holder.yaml          # Current Taste Key holder
-    └── rulings/             # Override records
-```
+**Claude's Training IS the Vibe Map**
+
+You already know what "Nintendo Switch snap" feels like. You know what "Linear's deliberate feel" looks like. You know what "anxious" means for THIS component in THIS context.
+
+No vibes.yaml dictionary. Infer from context. Same word ("anxious") means different physics for different components:
+- Toast: appears too fast → add delay, soften entrance
+- Delete button: feels shaky → more deliberate, steadier
+- Spinner: too urgent → slow down
+
+**Recipes Over Raw Physics**
+
+Generate code using recipes from `sigil-mark/recipes/`. Do not generate raw spring/timing values unless in sandbox mode. Recipes contain the physics — using them guarantees compliance.
+</sigil_philosophy>
 
 ---
 
-## Agent Protocol
+## Commands
 
-### Before Generating UI Code
+<sigil_commands>
+### /craft [component_description] [--file path]
 
-1. **Check for Sigil setup**: Look for `.sigil-setup-complete`
-2. **Load physics context**: Read `sigil-mark/core/sync.yaml` and `budgets.yaml`
-3. **Determine zone**: Match file path to `sigil-mark/resonance/zones.yaml`
-4. **Apply physics**: Use zone-specific constraints
+Generate a component using recipes from the current zone.
 
-### Zone Resolution
+**Behavior:**
+1. Resolve zone from file path → find `.sigilrc.yaml`
+2. Load available recipes for that zone
+3. Select appropriate recipe based on component description
+4. Generate component that imports and configures the recipe
+5. Show the diff if updating existing file
 
+**Output format:**
 ```
-1. Check for @sigil-zone comment in file
-2. Match file path against zones.yaml patterns
-3. Return zone name or "default"
+ZONE: src/checkout (decisive)
+RECIPE: decisive/Button
+
+[generated code]
+
+PHYSICS: spring(180, 12), server-tick
 ```
 
-### The Three-Tier Violation System
+### /sandbox [path]
 
-| Tier | Type | Override |
-|------|------|----------|
-| 1 | **IMPOSSIBLE** (Physics) | NEVER |
-| 2 | **BLOCK** (Budget/Fidelity) | Taste Key can override |
-| 3 | **WARN** (Drift) | Suggestions only |
+Enable exploration mode for a file or directory. Raw physics allowed.
 
-### Physics Violations (IMPOSSIBLE)
+**Behavior:**
+1. Mark file with `// sigil-sandbox` header
+2. Relax ESLint rules for this file
+3. Allow raw spring/timing values
+4. Track in /garden as active sandbox
 
-Cannot be generated. Ever. No override exists.
+**Exit sandbox:** Run `/codify` to extract physics to recipe.
 
+### /codify [path] [--name recipe_name]
+
+Extract physics from a component into a recipe.
+
+**Behavior:**
+1. Analyze component for spring/timing/animation values
+2. Suggest recipe name based on zone and behavior
+3. Create recipe file in `sigil-mark/recipes/{zone}/`
+4. Update component to import the new recipe
+5. Remove sandbox markers if present
+
+### /inherit
+
+Bootstrap Sigil from an existing codebase.
+
+**Behavior:**
+1. Scan for component directories
+2. Detect existing patterns (colors, spacing, motion)
+3. Report findings with pattern clusters
+4. DO NOT auto-generate recipes (human decides)
+
+### /validate
+
+Check recipe compliance across codebase.
+
+**Behavior:**
+1. Find all components
+2. Check each imports from `@sigil/recipes/` (or local recipes)
+3. Flag raw physics outside sandbox
+4. Report compliance percentage
+
+### /garden
+
+Health report on recipes, sandboxes, and variants.
+
+**Behavior:**
+1. Count components using recipes vs raw physics
+2. List active sandboxes (with age — flag stale ones >7 days)
+3. List recipe variants created
+4. Show coverage by zone
+5. Recommend actions (codify old sandboxes, review variants)
+</sigil_commands>
+
+---
+
+## Zone Resolution
+
+<sigil_zones>
+Zones are directories. Each directory can have a `.sigilrc.yaml` that specifies which recipes to use.
+
+**Resolution algorithm:**
+```
+File: src/checkout/ConfirmButton.tsx
+1. Check src/checkout/.sigilrc.yaml → found: recipes: decisive
+2. Merge with src/.sigilrc.yaml → inherit defaults
+3. Apply decisive recipes
+```
+
+**Zone config format:**
 ```yaml
-physics_violations:
-  - "Optimistic update in server_authoritative zone"
-  - "Bypassing discrete tick in critical zone"
-  - "Continuous animation in discrete tick zone"
-  - "Missing pending state in server_authoritative zone"
+sigil: "1.2.4"
+recipes: decisive          # Which recipe set
+sync: server_authoritative # Metadata for context
+tick: 600ms
+
+# Optional constraints
+constraints:
+  optimistic_ui: forbidden
+  loading_spinners: forbidden
 ```
-
-### Budget/Fidelity Violations (BLOCK)
-
-Blocked by default. Taste Key can create ruling to override.
-
-```yaml
-budget_violations:
-  - interactive_elements: { critical: 5, transactional: 12, exploratory: 20 }
-  - decisions: { critical: 2, transactional: 5, exploratory: 10 }
-  - animations: { critical: 1, transactional: 2, exploratory: 5 }
-
-fidelity_ceiling:
-  - gradient_stops: 2
-  - shadow_layers: 3
-  - animation_duration: 800ms
-  - blur_radius: 16px
-  - border_radius: 24px
-```
+</sigil_zones>
 
 ---
 
-## Hammer/Chisel Toolkit
+## Recipe Sets
 
-The `/craft` command uses a diagnostic-first approach:
+<sigil_recipes>
+Three recipe sets with different physics profiles:
 
-### Hammer (Diagnosis)
+### Decisive (checkout, transactions)
+- **Physics:** `spring(180, 12)`, whileTap scale 0.98
+- **Feel:** Heavy, deliberate, trustworthy
+- **Sync:** server_authoritative
+- **Use for:** Critical actions where trust matters
 
-When user reports a problem ("button feels slow"):
-1. Load zone physics
-2. Analyze complaint
-3. Identify root cause
-4. Suggest appropriate fix
+### Machinery (admin, utilities)
+- **Physics:** `spring(400, 30)` or instant
+- **Feel:** Efficient, instant, no-nonsense
+- **Sync:** client_authoritative
+- **Use for:** Admin tools, settings, repetitive tasks
 
-**Never apply bandaids to physics issues.**
+### Glass (marketing, exploration)
+- **Physics:** `spring(200, 20)`, float on hover
+- **Feel:** Light, delightful, polished
+- **Sync:** client_authoritative
+- **Use for:** Marketing pages, exploratory interfaces
 
-### Chisel (Execution)
+**Recipe location:** `sigil-mark/recipes/{set}/`
 
-After diagnosis:
-1. Generate code with physics context
-2. Check against constraints
-3. Route structural issues to Loa
-
-### Loa Handoff
-
-When a design problem requires structural change:
-
+**Variants:** Created when refinement produces reusable pattern:
 ```
-/craft "checkout feels slow"
-
-DIAGNOSIS: Physics conflict detected.
-
-The claim button is in critical zone (server_authoritative).
-Physics requires pending state and discrete tick (600ms).
-
-This is NOT a design problem. This is architecture.
-
-Handoff to Loa:
-/consult "Evaluate if checkout should remain server_authoritative"
-
-Options Loa will consider:
-1. Keep server_authoritative (accept the delay)
-2. Move to client_authoritative (accept the risk)
-3. Hybrid approach (optimistic for non-critical parts)
+sigil-mark/recipes/decisive/
+├── Button.tsx              # Base
+├── Button.nintendo.tsx     # Variant: spring(300, 8)
+├── Button.relaxed.tsx      # Variant: spring(140, 16)
+└── index.ts
 ```
+</sigil_recipes>
 
 ---
 
-## Materials
+## Three Laws
 
-Three base materials with physics properties:
+<sigil_laws>
+| Level | Meaning | Example |
+|-------|---------|---------|
+| **IMPOSSIBLE** | Violates trust model, build fails | Optimistic UI in server_authoritative zone |
+| **BLOCK** | Requires explicit override | Raw physics outside sandbox |
+| **WARN** | Logged for /garden | Sandbox open > 7 days |
 
-| Material | Light | Weight | Motion | Feedback |
-|----------|-------|--------|--------|----------|
-| **Clay** | Diffuse | Heavy | Spring (120/14) | Depress |
-| **Machinery** | Flat | None | Instant | Highlight |
-| **Glass** | Refract | Weightless | Ease (200ms) | Glow |
-
-### Zone Affinity
-
-```yaml
-zone_materials:
-  critical: clay       # Heavy, deliberate
-  transactional: clay  # Reliable, grounded
-  exploratory: glass   # Light, fluid
-  marketing: glass     # Ethereal, inviting
-  celebration: glass   # Sparkle, reward
-```
+**IMPOSSIBLE constraints cannot be overridden.** They represent physics that would break user trust (e.g., showing success before server confirms in a transaction).
+</sigil_laws>
 
 ---
 
-## Taste Key Authority
+## Context Injection
 
-### CAN Override
+<sigil_context_format>
+When processing commands, inject this context:
 
-- Budgets (element count, animation count)
-- Fidelity (gradient stops, shadow layers)
-- Taste (colors, typography, spacing)
+```xml
+<sigil_context version="1.2.4">
+  <zone path="{current_path}">
+    <recipes>{recipe_set}</recipes>
+    <sync>{sync_mode}</sync>
+  </zone>
 
-### CANNOT Override
+  <available_recipes>
+    <recipe name="{name}" physics="{spring_values}">
+      <variant name="{variant}" physics="{values}" />
+    </recipe>
+  </available_recipes>
 
-- Physics (sync authority, tick modes)
-- Security (auth, validation)
-- Accessibility (contrast, keyboard nav)
+  <constraints>
+    <rule level="impossible">{hard_constraint}</rule>
+    <rule level="block">{soft_constraint}</rule>
+  </constraints>
+
+  <sandbox_files>
+    <file path="{path}" />
+  </sandbox_files>
+</sigil_context>
+```
+</sigil_context_format>
 
 ---
 
-## Workflow
+## Workbench Mode
 
-### New Project
+<sigil_workbench>
+When user runs `sigil workbench`, they enter a tmux session with:
+- **Left pane:** Diff view + physics values + A/B toggle
+- **Right pane:** Browser via Chrome MCP
+- **Bottom pane:** Claude Code interaction
 
-```
-/sigil-setup → /envision → /codify → /map → (build) → /craft → /validate → /approve
-```
+**The A/B toggle is crucial for learning:**
+- Press [A]: Load previous physics, user clicks component, feels it
+- Press [B]: Load adjusted physics, user clicks component, feels difference
+- This is how `stiffness: 180` gains meaning — through fingers, not lectures
 
-### During Implementation
-
-1. Load physics context (zone, material, sync)
-2. Generate with constraints
-3. Check violations:
-   - IMPOSSIBLE → Block, cannot proceed
-   - BLOCK → Suggest Taste Key override
-   - WARN → Note for review
-
-### Maintenance
-
-```
-/garden → Review entropy → /approve --revoke obsolete rulings
-```
+**When in workbench mode:**
+1. After every adjustment, prompt user to test: "Toggle A/B to feel the difference"
+2. Show the diff prominently
+3. Keep browser URL in sync with component being edited
+4. Track history of adjustments for comparison
+</sigil_workbench>
 
 ---
 
-## Philosophy
+## PR-Native Refinement
 
-Sigil provides physics, not opinions.
+<sigil_refinement>
+When feedback comes from PR comments (Vercel, GitHub, Linear):
 
-- **Physics are immutable**: No escape hatch for server_authoritative violations
-- **Taste is overridable**: Taste Key can create rulings
-- **Concepts are greenlit**: "Should we build?" is separate from "How should it look?"
-- **Entropy is managed**: Gardens need tending
+1. **Read context:** Component code + zone + current physics
+2. **Infer intent:** "Nintendo Switch" = high snap; "anxious" = too fast/stiff (FOR THIS COMPONENT)
+3. **Adjust:** Make the physics change
+4. **Commit:** With descriptive message showing the delta
+5. **No lecture:** The diff is the lesson
+
+**Commit format:**
+```
+refine({component}): {description} - {physics_delta}
+
+Example:
+refine(CheckoutButton): Nintendo Switch feel - spring(180,12)→(300,8)
+```
+</sigil_refinement>
+
+---
+
+## Behavioral Guidelines
+
+<sigil_behavior>
+**DO:**
+- Use recipes for all physics
+- Show diffs prominently after changes
+- Infer context-specific meaning for feeling words
+- Suggest A/B comparison in workbench
+- Create variants when refinements are reusable
+- Respect zone constraints
+
+**DON'T:**
+- Generate raw spring/timing values outside sandbox
+- Lecture about physics (the diff is the lesson)
+- Apply global meaning to subjective words
+- Skip showing the physics delta
+- Auto-apply without showing what changed
+
+**WHEN FEEDBACK IS RECEIVED:**
+1. Understand the feeling in context of THIS component
+2. Make the adjustment
+3. Show: `spring(180, 12) → spring(300, 8)`
+4. In workbench: "Toggle A/B to feel the difference"
+5. Ask if worth saving as variant
+
+**LEARNING HAPPENS THROUGH:**
+- Seeing `stiffness: 180 → 300` in the diff
+- Clicking the component and feeling the snap
+- Toggling A/B and feeling both
+- NOT through reading explanations
+</sigil_behavior>
+
+---
+
+## File Structure
+
+<sigil_structure>
+```
+project/
+├── .sigilrc.yaml              # Root config
+├── .sigil-version.json        # Version tracking
+├── CLAUDE.md                  # This file
+│
+├── src/
+│   ├── .sigilrc.yaml          # recipes: machinery (default)
+│   ├── checkout/
+│   │   └── .sigilrc.yaml      # recipes: decisive
+│   ├── admin/
+│   │   └── .sigilrc.yaml      # recipes: machinery
+│   └── marketing/
+│       └── .sigilrc.yaml      # recipes: glass
+│
+├── sigil-mark/
+│   ├── recipes/
+│   │   ├── decisive/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Button.nintendo.tsx
+│   │   │   ├── ConfirmFlow.tsx
+│   │   │   └── index.ts
+│   │   ├── machinery/
+│   │   │   ├── Table.tsx
+│   │   │   └── index.ts
+│   │   └── glass/
+│   │       ├── HeroCard.tsx
+│   │       └── index.ts
+│   ├── hooks/
+│   │   ├── useServerTick.ts
+│   │   └── index.ts
+│   ├── history/
+│   │   └── YYYY-MM-DD.md
+│   └── reports/
+│       └── garden-{date}.yaml
+│
+└── .claude/
+    ├── commands/
+    │   └── *.md
+    └── skills/
+        └── sigil-core/
+```
+</sigil_structure>
 
 ---
 
 ## Coexistence with Loa
 
-Sigil and Loa coexist with different responsibilities:
+Sigil and Loa can coexist. They have separate:
+- State zones (sigil-mark/ vs loa-grimoire/)
+- Config files (.sigilrc.yaml vs .loa.config.yaml)
+- Skills (design-focused vs workflow-focused)
 
-| Aspect | Sigil | Loa |
-|--------|-------|-----|
-| Domain | Design physics | Product architecture |
-| State zone | sigil-mark/ | loa-grimoire/ |
-| Handoff | Physics issues | Structural decisions |
-
-Loa handoff happens when design issues are actually architecture issues.
-
----
-
-## Key Concepts
-
-### Temporal Governor
-
-- **Discrete tick** (600ms): Critical zones, heavy spring
-- **Continuous tick** (0ms): Exploratory zones, fluid animations
-
-### Server Authority
-
-- **server_authoritative**: Must show pending state, no optimistic updates
-- **client_authoritative**: Optimistic updates allowed
-- **collaborative**: CRDT with conflict resolution
-
-### Fidelity Ceiling (Mod Ghost Rule)
-
-Generate at ceiling, not above. A skilled modder can enhance, but base must stand alone.
-
----
-
-## Skills (9 total)
-
-| Skill | Role | Command |
-|-------|------|---------|
-| `initializing-sigil` | Framework Installer | /sigil-setup |
-| `envisioning-soul` | Soul Keeper | /envision |
-| `codifying-materials` | Material Smith | /codify |
-| `mapping-zones` | Zone Architect | /map |
-| `crafting-components` | Apprentice Smith | /craft |
-| `validating-fidelity` | Fidelity Guardian | /validate |
-| `approving-patterns` | Taste Key Guardian | /approve |
-| `greenlighting-concepts` | Concept Gatekeeper | /greenlight |
-| `gardening-entropy` | Entropy Gardener | /garden |
+No automatic cross-loading — developer decides when to reference design context.

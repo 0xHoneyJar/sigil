@@ -1,39 +1,42 @@
 {
-  "sigil_version": "11.0.0",
-  "framework_version": "11.0.0",
-  "schema_version": 1,
+  "sigil_version": "1.2.4",
+  "framework_version": "1.2.4",
+  "schema_version": 2,
+  "philosophy": "Diff + Feel",
   "zones": {
     "system": ".claude/",
     "state": "sigil-mark/"
   },
-  "kernel": {
-    "locked": false,
-    "locked_at": null,
-    "locked_by": null,
-    "files": [
-      "sigil-mark/kernel/physics.yaml",
-      "sigil-mark/kernel/sync.yaml",
-      "sigil-mark/kernel/fidelity-ceiling.yaml"
-    ]
+  "recipes": {
+    "count": 0,
+    "sets": ["decisive", "machinery", "glass"],
+    "paths": {
+      "decisive": "sigil-mark/recipes/decisive/",
+      "machinery": "sigil-mark/recipes/machinery/",
+      "glass": "sigil-mark/recipes/glass/"
+    }
   },
-  "soul": {
-    "initialized": true,
-    "initialized_at": "2026-01-03T00:00:00Z",
-    "files": [
-      "sigil-mark/soul/materials.yaml",
-      "sigil-mark/soul/zones.yaml",
-      "sigil-mark/soul/tensions.yaml",
-      "sigil-mark/soul/essence.yaml"
-    ]
+  "variants": {
+    "count": 0,
+    "list": []
   },
-  "integrity": {
-    "enforcement": "warn",
-    "last_verified": null
+  "sandboxes": {
+    "active": [],
+    "stale_threshold_days": 7
   },
-  "framework": {
-    "name": "Sigil Soul Engine",
-    "repository": "https://github.com/0xHoneyJar/sigil"
+  "history": {
+    "path": "sigil-mark/history/",
+    "last_entry": null
   },
-  "setup_completed_at": "2026-01-03T00:00:00Z",
-  "last_updated": "2026-01-03T00:00:00Z"
+  "garden": {
+    "last_run": null,
+    "reports_path": "sigil-mark/reports/"
+  },
+  "migration": {
+    "from_version": "11.0.0",
+    "migrated_at": "2026-01-05T00:00:00Z",
+    "archive_path": "sigil-mark/.archive-v1.0/"
+  },
+  "setup_completed_at": "2026-01-05T00:00:00Z",
+  "last_updated": "2026-01-05T00:00:00Z"
 }

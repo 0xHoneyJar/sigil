@@ -1,7 +1,7 @@
-# Sigil Configuration
-# Project-owned, never overwritten by framework updates
+# Sigil v1.2.4 Configuration
+# "See the diff. Feel the result. Learn by doing."
 
-version: "11.0"
+sigil: "1.2.4"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # PROJECT METADATA
@@ -9,11 +9,18 @@ version: "11.0"
 
 project:
   name: "Sigil Framework"
-  era: "2007"  # Fidelity ceiling era (OSRS reference)
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RECIPES
+# Which recipe set to use by default
+# Options: decisive | machinery | glass
+# ═══════════════════════════════════════════════════════════════════════════════
+
+recipes: machinery
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # COMPONENT DISCOVERY
-# Where to find React/Vue/Svelte components
+# Where to find components that should use recipes
 # ═══════════════════════════════════════════════════════════════════════════════
 
 component_paths:
@@ -24,145 +31,45 @@ component_paths:
   - "src/features/**/components/**"
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# DEFAULT MATERIAL
-# Which material to use when zone doesn't specify
+# SYNC STRATEGY (optional)
+# How UI syncs with server
+# Options: client_authoritative | server_authoritative | server_tick
 # ═══════════════════════════════════════════════════════════════════════════════
 
-defaults:
-  material: "clay"
-  sync: "lww"
-  tensions:
-    playfulness: 50
-    weight: 50
-    density: 50
-    speed: 50
+# sync: client_authoritative
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# ZONE CONFIGURATION
-# Path-based design zones
+# TICK DURATION (optional)
+# For server_tick sync, how long to wait for confirmation
 # ═══════════════════════════════════════════════════════════════════════════════
 
-zones:
-  critical:
-    paths:
-      - "src/features/checkout/**"
-      - "src/features/claim/**"
-      - "src/features/trade/**"
-      - "src/features/wallet/**"
-    material: "clay"
-    sync: "server_tick"
-    motion: "deliberate"
-    patterns:
-      prefer:
-        - "deliberate-entrance"
-        - "confirmation-flow"
-        - "pending-state"
-      warn:
-        - "instant-transition"
-        - "optimistic-update"
-
-  transactional:
-    paths:
-      - "src/features/dashboard/**"
-      - "src/features/settings/**"
-      - "src/features/admin/**"
-    material: "machinery"
-    sync: "lww"
-    motion: "instant"
-    patterns:
-      prefer:
-        - "instant-feedback"
-        - "keyboard-navigation"
-
-  exploratory:
-    paths:
-      - "src/features/explore/**"
-      - "src/features/browse/**"
-      - "src/features/discover/**"
-    material: "glass"
-    sync: "lww"
-    motion: "flowing"
-    patterns:
-      prefer:
-        - "smooth-scroll"
-        - "hover-preview"
-
-  marketing:
-    paths:
-      - "src/features/landing/**"
-      - "src/features/marketing/**"
-      - "app/(marketing)/**"
-    material: "clay"
-    sync: "local_only"
-    motion: "expressive"
-    patterns:
-      prefer:
-        - "scroll-animation"
-        - "parallax"
+# tick: 600ms
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# TASTE OWNERS
-# Named authorities who dictate visual decisions
+# CONSTRAINTS (optional)
+# Physics behaviors that are forbidden in this scope
 # ═══════════════════════════════════════════════════════════════════════════════
 
-taste_owners:
-  - handle: "@zksoju"
-    name: "Design Lead"
-    scope: ["**/*"]
-    authority: ["materials", "tensions", "motion", "colors", "typography"]
+# constraints:
+#   optimistic_ui: forbidden
+#   loading_spinners: forbidden
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# GREENLIGHT CONFIGURATION
-# Community polling settings
+# SANDBOX FILES (managed by /sandbox command)
+# Files where raw physics are allowed for experimentation
 # ═══════════════════════════════════════════════════════════════════════════════
 
-greenlight:
-  enabled: true
-  threshold: 0.70  # 70% to pass
-  duration_days: 7
-  min_participation: 10
+sandbox: []
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# GARDENING CONFIGURATION
-# Paper cut tracking settings
+# REFINEMENT (optional)
+# PR-native feedback configuration
 # ═══════════════════════════════════════════════════════════════════════════════
 
-gardening:
-  three_to_one_rule: true
-  debt_threshold: 10
-  auto_scan: true
-  scan_on_commit: false
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# REJECTIONS
-# Patterns that should trigger warnings
-# ═══════════════════════════════════════════════════════════════════════════════
-
-rejections:
-  - pattern: "Spinner"
-    reason: "Creates anxiety in critical zones"
-    exceptions: ["admin/**"]
-
-  - pattern: "optimistic"
-    reason: "Dangerous for server_tick sync strategy"
-    exceptions: []
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# INTEGRATIONS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-integrations:
-  loa:
-    enabled: true
-    auto_inject: true  # Inject sigil context during /implement
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# ENFORCEMENT
-# How strict to be about violations
-# ═══════════════════════════════════════════════════════════════════════════════
-
-enforcement:
-  fidelity_ceiling: "warn"  # block | warn | disabled
-  sync_strategy: "block"     # Always block sync violations (safety)
-  invariants: "block"        # block | warn
-  paper_cuts: "warn"         # block | warn | disabled
+refinement:
+  sources:
+    - vercel_preview_comments
+    - github_pr_comments
+    - linear_issue_comments
+  auto_commit: true
+  commit_prefix: "refine"
