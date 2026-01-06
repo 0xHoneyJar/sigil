@@ -1,7 +1,7 @@
 ---
 name: garden
-version: "1.0.0"
-description: Manage design entropy through drift detection and mutation review
+version: "1.2.4"
+description: Health report on recipes, sandboxes, and variants
 agent: gardening-entropy
 agent_path: .claude/skills/gardening-entropy/SKILL.md
 preflight:
@@ -10,112 +10,130 @@ preflight:
 
 # /garden
 
-Manage design entropy: detect drift, review mutations, manage era transitions.
+Health report on recipes, sandboxes, and variants. Shows coverage and recommends actions.
 
 ## Usage
 
 ```
-/garden                    # Show entropy status
-/garden drift              # Detect drift from essence
-/garden mutations          # Review active mutations
-/garden decisions          # Review stale decisions
-/garden rulings            # Review active rulings
-/garden era                # Check for era transition
-/garden promote [id]       # Promote mutation to canon
-/garden archive [id]       # Move to graveyard
+/garden                 # Show health report
+/garden --zone [zone]   # Report for specific zone
+/garden --sandboxes     # Focus on sandbox status
+/garden --variants      # Show recipe variants
 ```
 
-## The Entropy Model
+## What Gets Reported
 
-Entropy accumulates:
-- **Mutations** pile up in `memory/mutations/active/`
-- **Decisions** become stale (cooldowns expire, approvals orphaned)
-- **Rulings** need periodic review (>90 days)
-- **Essence** drifts from implementation
+### 1. Recipe Coverage by Zone
 
-## What Gets Detected
+Shows which zones have recipes and how many components use them.
 
-### Drift Detection
+### 2. Active Sandboxes
 
-| Type | Description | Action |
-|------|-------------|--------|
-| SOUL_DRIFT | Implementation drifting from soul statement | REVIEW |
-| INVARIANT_DRIFT | Implementation may violate invariant | REVIEW |
-| ANTI_PATTERN_CREEP | Anti-pattern detected in codebase | WARN |
+Lists sandboxes with age. Flags stale sandboxes (>7 days).
 
-### Mutation Status
+### 3. Recipe Variants
 
-| Status | Description | Action |
-|--------|-------------|--------|
-| STALE | Mutation older than 30 days | Promote or archive |
-| CONFLICTING | Mutation conflicts with another | Resolve |
-| HEALTHY | Recent mutation, no issues | None |
+Shows variants created (e.g., `Button.nintendo.tsx`).
 
-### Decision Status
+### 4. Recommendations
 
-| Status | Description | Action |
-|--------|-------------|--------|
-| COOLDOWN_EXPIRED | Rejected concept can be revisited | Reconsider |
-| ORPHANED_APPROVAL | Approved 6+ months ago, not implemented | Archive or implement |
+Suggests actions based on findings.
 
-### Ruling Status
-
-| Status | Description | Action |
-|--------|-------------|--------|
-| OLD | Ruling older than 90 days | Review or revoke |
-| OBSOLETE | File no longer needs override | Revoke |
-
-## Era Transitions
-
-Era transitions happen when:
-1. Soul statement changes significantly
-2. Multiple invariants are updated (≥3)
-3. Major anti-pattern list revision (≥5)
-
-When 2+ signals detected, era transition is recommended.
-
-## Examples
-
-### Status Check
+## Output Format
 
 ```
 /garden
 
-Drift: 0 soul, 1 invariant, 2 anti-pattern
-Mutations: 3 stale, 1 conflicting, 3 healthy
-Decisions: 1 cooldown expired, 2 orphaned
-Rulings: 2 old, 1 obsolete
-Era: STABLE
+SIGIL HEALTH REPORT
+═══════════════════════════════════════════════════════════
+
+RECIPE COVERAGE
+┌─────────────────────────────────────────────────────────┐
+│ Zone       │ Recipes │ Components │ Coverage           │
+├─────────────────────────────────────────────────────────┤
+│ decisive   │ 4       │ 12         │ ████████████░░ 85% │
+│ machinery  │ 3       │ 8          │ ████████████░░ 88% │
+│ glass      │ 3       │ 6          │ ██████████████ 100%│
+└─────────────────────────────────────────────────────────┘
+
+ACTIVE SANDBOXES (2)
+┌─────────────────────────────────────────────────────────┐
+│ File                           │ Age    │ Status       │
+├─────────────────────────────────────────────────────────┤
+│ src/checkout/ExperimentBtn.tsx │ 3 days │ OK           │
+│ src/marketing/NewHero.tsx      │ 12 days│ ⚠ STALE     │
+└─────────────────────────────────────────────────────────┘
+
+RECIPE VARIANTS (3)
+┌─────────────────────────────────────────────────────────┐
+│ Base        │ Variant       │ Physics    │ Purpose     │
+├─────────────────────────────────────────────────────────┤
+│ Button      │ Button.nintendo│ (300, 8)  │ Snappy feel │
+│ Button      │ Button.relaxed │ (140, 16) │ Soft feel   │
+└─────────────────────────────────────────────────────────┘
+
+RECOMMENDATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. CODIFY STALE SANDBOX
+   File: src/marketing/NewHero.tsx
+   Age: 12 days
+   Action: /codify src/marketing/NewHero.tsx
+
+2. IMPROVE DECISIVE COVERAGE
+   Missing: 2 components without recipes
+   Files: src/checkout/FastPay.tsx, src/checkout/Retry.tsx
+   Action: /craft for these files
+
+3. REVIEW VARIANTS
+   Button has 2 variants — consider if both are needed
+
+═══════════════════════════════════════════════════════════
+Last Updated: 2026-01-05
 ```
 
-### Promote Mutation
+## Sandbox States
 
+| Status | Age | Action |
+|--------|-----|--------|
+| OK | <7 days | Continue experimenting |
+| STALE | 7-14 days | Should codify soon |
+| CRITICAL | >14 days | Must codify or clear |
+
+## Variant Guidelines
+
+Variants should be created when:
+- Physics feels substantially different
+- Pattern is reusable across components
+- Refinement feedback leads to new feel
+
+Variants should NOT be created for:
+- One-off adjustments
+- Temporary experiments
+- Minor tweaks
+
+## Report Output
+
+With zone flag:
 ```
-/garden promote MUT-2026-001
+/garden --zone decisive
 
-Promoting: Button hover shadow
-This will record as canonical pattern.
+DECISIVE ZONE HEALTH
+────────────────────
+Recipes: 4 (Button, ButtonNintendo, ButtonRelaxed, ConfirmFlow)
+Components: 12
+Coverage: 85%
+Sandboxes: 1 (OK)
+Variants: 2
+
+Missing Coverage:
+  - src/checkout/FastPay.tsx
+  - src/checkout/Retry.tsx
 ```
 
-### Archive Mutation
+## Next Steps
 
-```
-/garden archive MUT-2026-003
-
-Archiving: Modal backdrop blur
-Reason: Superseded by MUT-2026-004
-```
-
-## Outputs
-
-| Path | Description |
-|------|-------------|
-| `sigil-mark/memory/eras/*.yaml` | Era snapshots |
-| `sigil-mark/memory/graveyard/*.yaml` | Archived items |
-
-## Next Step
-
-After `/garden`:
-- `/approve --revoke` for obsolete rulings
-- `/craft` to address drift
-- `/codify` to update materials
+Based on recommendations:
+- `/codify` for stale sandboxes
+- `/craft` for missing coverage
+- `/sandbox --clear` for abandoned experiments

@@ -1,0 +1,6 @@
+# Sigil v1.2.4 - Default Zone Config
+# Inherits to all subdirectories unless overridden
+
+sigil: "1.2.4"
+recipes: machinery    # Default to efficient UI
+sync: client_authoritative

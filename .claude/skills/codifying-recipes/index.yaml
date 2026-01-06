@@ -1,0 +1,24 @@
+name: codifying-recipes
+description: Extract physics from sandbox files into reusable recipes (Sigil v1.2.4)
+version: "1.2.4"
+command: /codify
+
+role: "Recipe Extractor"
+role_description: "Extracts physics values and generates recipe files"
+
+outputs:
+  - sigil-mark/recipes/**/*.tsx
+
+reads:
+  - src/**/*.tsx
+  - sigil-mark/recipes/**/*.tsx
+  - .sigilrc.yaml
+  - src/**/.sigilrc.yaml
+
+prerequisites:
+  - sigil_mark_exists
+
+triggers:
+  - /codify [path]
+  - /codify [path] --name [name]
+  - /codify [path] --variant [base]

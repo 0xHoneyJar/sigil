@@ -44,33 +44,33 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
 
 ### Tasks
 
-- [ ] **S1-T1: Archive v1.0 state zone structure**
+- [x] **S1-T1: Archive v1.0 state zone structure**
   - Move `sigil-mark/core/`, `sigil-mark/resonance/`, `sigil-mark/memory/`, `sigil-mark/taste-key/` to `sigil-mark/.archive-v1.0/`
   - Keep `sigil-mark/` directory but clear for v1.2.4 structure
   - **Acceptance:** v1.0 files preserved in archive, root is clean
 
-- [ ] **S1-T2: Create v1.2.4 directory structure**
+- [x] **S1-T2: Create v1.2.4 directory structure**
   - Create `sigil-mark/recipes/` with `decisive/`, `machinery/`, `glass/` subdirectories
   - Create `sigil-mark/hooks/` for shared hooks
   - Create `sigil-mark/history/` for refinement history
   - Create `sigil-mark/reports/` for garden reports
   - **Acceptance:** Directory matches SDD §10.1
 
-- [ ] **S1-T3: Refactor .sigilrc.yaml format**
+- [x] **S1-T3: Refactor .sigilrc.yaml format**
   - Update root `.sigilrc.yaml` to v1.2.4 schema
   - Add `sigil: "1.2.4"` version field
   - Add `recipes:` field (default: machinery)
   - Add optional `sync:`, `tick:`, `constraints:`, `sandbox:` fields
   - **Acceptance:** Config matches SDD §4.1 schema
 
-- [ ] **S1-T4: Update .sigil-version.json**
+- [x] **S1-T4: Update .sigil-version.json**
   - Update version to "1.2.4"
   - Add recipes count tracking
   - Add variants count tracking
   - Add last_garden timestamp
   - **Acceptance:** Version tracking matches SDD §10.2
 
-- [ ] **S1-T5: Create CLAUDE.md for v1.2.4**
+- [x] **S1-T5: Create CLAUDE.md for v1.2.4**
   - Write Sigil v1.2.4 prompt based on SDD §6.2
   - Include `<sigil_philosophy>`, `<sigil_commands>`, `<sigil_zones>`, `<sigil_behavior>` sections
   - Emphasize "Diff + Feel" philosophy
@@ -91,14 +91,14 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
 
 ### Tasks
 
-- [ ] **S2-T1: Create useServerTick hook**
+- [x] **S2-T1: Create useServerTick hook**
   - Create `sigil-mark/hooks/useServerTick.ts`
   - Implement async action wrapper with pending state
   - Prevent optimistic UI updates
   - Export from `sigil-mark/hooks/index.ts`
   - **Acceptance:** Hook prevents action during pending state
 
-- [ ] **S2-T2: Create decisive/Button.tsx recipe**
+- [x] **S2-T2: Create decisive/Button.tsx recipe**
   - Create with `@sigil-recipe` JSDoc annotation
   - Physics: `spring(180, 12)`, whileTap scale 0.98
   - Use `useServerTick` for `onAction` prop
@@ -106,26 +106,26 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
   - Include `size` prop (sm/md/lg)
   - **Acceptance:** Button matches SDD §3.1 anatomy
 
-- [ ] **S2-T3: Create decisive/Button.nintendo.tsx variant**
+- [x] **S2-T3: Create decisive/Button.nintendo.tsx variant**
   - Fork Button.tsx with snappier physics
   - Physics: `spring(300, 8)`
   - Document purpose in JSDoc
   - **Acceptance:** Nintendo variant is noticeably snappier
 
-- [ ] **S2-T4: Create decisive/Button.relaxed.tsx variant**
+- [x] **S2-T4: Create decisive/Button.relaxed.tsx variant**
   - Fork Button.tsx with softer physics
   - Physics: `spring(140, 16)`
   - Document purpose in JSDoc
   - **Acceptance:** Relaxed variant is noticeably softer
 
-- [ ] **S2-T5: Create decisive/ConfirmFlow.tsx recipe**
+- [x] **S2-T5: Create decisive/ConfirmFlow.tsx recipe**
   - Multi-step confirmation dialog
   - Physics: `spring(150, 14)`, 600ms between steps
   - States: initial → confirming → complete
   - Use AnimatePresence for transitions
   - **Acceptance:** Dialog flows through states with deliberate pacing
 
-- [ ] **S2-T6: Create decisive/index.ts barrel export**
+- [x] **S2-T6: Create decisive/index.ts barrel export**
   - Export all recipes and variants
   - Use named exports with clear names
   - **Acceptance:** `import { Button, ButtonNintendo } from '@sigil/recipes/decisive'` works
@@ -144,44 +144,44 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
 
 ### Tasks
 
-- [ ] **S3-T1: Create machinery/Table.tsx recipe**
+- [x] **S3-T1: Create machinery/Table.tsx recipe**
   - No animation / instant state changes
   - `sync: client_authoritative` appropriate
   - Minimal physics overhead
   - **Acceptance:** Table renders without animation delay
 
-- [ ] **S3-T2: Create machinery/Toggle.tsx recipe**
+- [x] **S3-T2: Create machinery/Toggle.tsx recipe**
   - Instant toggle state change
   - Physics: `spring(400, 30)` or instant
   - Focus on efficiency over delight
   - **Acceptance:** Toggle feels instant, not animated
 
-- [ ] **S3-T3: Create machinery/Form.tsx recipe**
+- [x] **S3-T3: Create machinery/Form.tsx recipe**
   - Form wrapper with instant validation feedback
   - No animated transitions
   - **Acceptance:** Form feels efficient
 
-- [ ] **S3-T4: Create machinery/index.ts barrel export**
+- [x] **S3-T4: Create machinery/index.ts barrel export**
   - Export all machinery recipes
   - **Acceptance:** Machinery imports work
 
-- [ ] **S3-T5: Create glass/HeroCard.tsx recipe**
+- [x] **S3-T5: Create glass/HeroCard.tsx recipe**
   - Physics: `spring(200, 20)`, float on hover
   - Enable glow effect with customizable color
   - Entrance animation with delay
   - **Acceptance:** Card floats and glows on hover
 
-- [ ] **S3-T6: Create glass/FeatureCard.tsx recipe**
+- [x] **S3-T6: Create glass/FeatureCard.tsx recipe**
   - Similar to HeroCard but simpler
   - Staggered entrance animation
   - **Acceptance:** Cards animate in sequence
 
-- [ ] **S3-T7: Create glass/Tooltip.tsx recipe**
+- [x] **S3-T7: Create glass/Tooltip.tsx recipe**
   - Soft entrance animation
   - Delayed appearance
   - **Acceptance:** Tooltip feels polished
 
-- [ ] **S3-T8: Create glass/index.ts barrel export**
+- [x] **S3-T8: Create glass/index.ts barrel export**
   - Export all glass recipes
   - **Acceptance:** Glass imports work
 
@@ -198,32 +198,32 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
 
 ### Tasks
 
-- [ ] **S4-T1: Refactor sigil-detect-zone.sh to v1.2.4**
+- [x] **S4-T1: Refactor sigil-detect-zone.sh to v1.2.4**
   - Read new `.sigilrc.yaml` format
   - Walk up directory tree, merge configs
   - Return zone config JSON (not just zone name)
   - **Acceptance:** Script returns full zone config
 
-- [ ] **S4-T2: Create zone config templates**
+- [x] **S4-T2: Create zone config templates**
   - Create `src/.sigilrc.yaml` (default: machinery)
   - Create `src/checkout/.sigilrc.yaml` (decisive, server_authoritative)
   - Create `src/admin/.sigilrc.yaml` (machinery)
   - Create `src/marketing/.sigilrc.yaml` (glass)
   - **Acceptance:** Templates match SDD §4.3
 
-- [ ] **S4-T3: Implement zone resolution in TypeScript**
+- [x] **S4-T3: Implement zone resolution in TypeScript**
   - Create `sigil-mark/core/zone-resolver.ts`
   - Implement `resolveZone(filePath)` function
   - Return typed `ZoneConfig` object
   - **Acceptance:** Resolution matches SDD §4.2 algorithm
 
-- [ ] **S4-T4: Update sigil-core skill for v1.2.4**
+- [x] **S4-T4: Update sigil-core skill for v1.2.4**
   - Create/update `.claude/skills/sigil-core/`
   - Update `SKILL.md` with v1.2.4 commands
   - Remove v1.0 commands not in v1.2.4
   - **Acceptance:** Skill reflects 6 commands only
 
-- [ ] **S4-T5: Configure path aliases**
+- [x] **S4-T5: Configure path aliases**
   - Update `tsconfig.json` with `@sigil/recipes/*` alias
   - Update `vite.config.ts` (if exists) with resolve aliases
   - Document IDE configuration
@@ -244,33 +244,33 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
 
 ### Tasks
 
-- [ ] **S5-T1: Create /craft command for v1.2.4**
+- [x] **S5-T1: Create /craft command for v1.2.4**
   - Update `.claude/commands/craft.md` to v1.2.4 spec
   - Accept component description and optional file path
   - Resolve zone from path
   - Load available recipes for zone
   - **Acceptance:** `/craft "button" src/checkout/` works
 
-- [ ] **S5-T2: Implement recipe selection logic**
+- [x] **S5-T2: Implement recipe selection logic**
   - Parse component description for recipe hints
   - Match against available recipes in zone
   - Suggest most appropriate recipe
   - **Acceptance:** Claude selects correct recipe for context
 
-- [ ] **S5-T3: Implement physics context output**
+- [x] **S5-T3: Implement physics context output**
   - Show zone resolution result
   - Show recipe being used
   - Show physics values (spring config)
   - Format per SDD §7.1 output format
   - **Acceptance:** Output shows `ZONE:`, `RECIPE:`, `PHYSICS:`
 
-- [ ] **S5-T4: Generate recipe-consuming component**
+- [x] **S5-T4: Generate recipe-consuming component**
   - Import from `@sigil/recipes/{zone}`
   - Configure recipe with props
   - No raw physics values in generated code
   - **Acceptance:** Generated code imports recipe, not raw spring values
 
-- [ ] **S5-T5: Update crafting-components skill**
+- [x] **S5-T5: Update crafting-components skill**
   - Update `.claude/skills/crafting-components/SKILL.md`
   - Remove Hammer/Chisel (v1.0 concept)
   - Focus on recipe selection and zone context
@@ -291,37 +291,37 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
 
 ### Tasks
 
-- [ ] **S6-T1: Create /sandbox command**
+- [x] **S6-T1: Create /sandbox command**
   - Create `.claude/commands/sandbox.md`
   - Accept file path argument
   - Add `// sigil-sandbox` header to file
   - Update zone's sandbox list in `.sigilrc.yaml`
   - **Acceptance:** `/sandbox src/checkout/Experiment.tsx` enables raw physics
 
-- [ ] **S6-T2: Update ESLint config for sandbox detection**
+- [x] **S6-T2: Update ESLint config for sandbox detection**
   - Check for `// sigil-sandbox` header
   - Skip rule enforcement for sandbox files
   - **Acceptance:** Sandbox files pass ESLint
 
-- [ ] **S6-T3: Create /codify command**
+- [x] **S6-T3: Create /codify command**
   - Create `.claude/commands/codify.md`
   - Parse sandbox file for physics values
   - Extract spring config, timing values
   - **Acceptance:** `/codify` identifies physics in file
 
-- [ ] **S6-T4: Implement recipe generation from sandbox**
+- [x] **S6-T4: Implement recipe generation from sandbox**
   - Generate recipe file with proper anatomy
   - Include `@sigil-recipe` JSDoc
   - Place in `sigil-mark/recipes/{zone}/`
   - **Acceptance:** Generated recipe follows SDD §3.1 anatomy
 
-- [ ] **S6-T5: Implement sandbox cleanup**
+- [x] **S6-T5: Implement sandbox cleanup**
   - Update source file to import new recipe
   - Remove `// sigil-sandbox` header
   - Remove from zone's sandbox list
   - **Acceptance:** File migrated from sandbox to recipe consumer
 
-- [ ] **S6-T6: Update codifying-materials skill to v1.2.4**
+- [x] **S6-T6: Update codifying-materials skill to v1.2.4**
   - Rename to `codifying-recipes` or update purpose
   - Focus on extracting physics to recipes
   - Remove material interview flow (v1.0 concept)
@@ -342,26 +342,26 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
 
 ### Tasks
 
-- [ ] **S7-T1: Create /inherit command for v1.2.4**
+- [x] **S7-T1: Create /inherit command for v1.2.4**
   - Update `.claude/commands/inherit.md`
   - Scan for existing physics values in codebase
   - Cluster patterns by similarity
   - Report findings (do NOT auto-generate recipes)
   - **Acceptance:** `/inherit` reports patterns without creating files
 
-- [ ] **S7-T2: Implement physics value extraction**
+- [x] **S7-T2: Implement physics value extraction**
   - Find `stiffness`, `damping`, `transition` in TSX files
   - Extract values and file locations
   - **Acceptance:** All physics values found in codebase
 
-- [ ] **S7-T3: Create /validate command for v1.2.4**
+- [x] **S7-T3: Create /validate command for v1.2.4**
   - Update `.claude/commands/validate.md`
   - Check all components for recipe imports
   - Flag raw physics outside sandbox
   - Check zone constraint violations
   - **Acceptance:** `/validate` reports compliance percentage
 
-- [ ] **S7-T4: Create /garden command for v1.2.4**
+- [x] **S7-T4: Create /garden command for v1.2.4**
   - Update `.claude/commands/garden.md`
   - Report recipe coverage by zone
   - List active sandboxes with age
@@ -369,7 +369,7 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
   - Generate recommendations
   - **Acceptance:** `/garden` produces health report
 
-- [ ] **S7-T5: Update gardening-entropy skill**
+- [x] **S7-T5: Update gardening-entropy skill**
   - Focus on recipe coverage, not drift detection
   - Track sandbox age
   - Recommend `/codify` for stale sandboxes
@@ -389,37 +389,37 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
 
 ### Tasks
 
-- [ ] **S8-T1: Refactor sigil-workbench.sh for v1.2.4**
+- [x] **S8-T1: Refactor sigil-workbench.sh for v1.2.4**
   - 3 panes instead of 4 (diff + browser + claude)
   - Remove v1.0 tensions panel
   - Add status bar with A/B toggle hint
   - **Acceptance:** Workbench matches SDD §5.1 layout
 
-- [ ] **S8-T2: Create diff panel script**
+- [x] **S8-T2: Create diff panel script**
   - Watch component files for changes
   - Show git diff with physics value highlights
   - Format: `- stiffness: 180` / `+ stiffness: 300`
   - **Acceptance:** Diff shows physics changes prominently
 
-- [ ] **S8-T3: Implement A/B toggle - hot-swap mode**
+- [x] **S8-T3: Implement A/B toggle - hot-swap mode**
   - Create `sigil-mark/workbench/ab-toggle.ts`
   - Use CSS variables for physics values
   - Dispatch custom event on toggle
   - **Acceptance:** Pressing Space swaps physics instantly
 
-- [ ] **S8-T4: Implement A/B toggle - iframe mode**
+- [x] **S8-T4: Implement A/B toggle - iframe mode**
   - Create iframe-based comparison for flow testing
   - Load two versions of preview URL
   - Toggle visibility on Space
   - **Acceptance:** Full flows can be compared
 
-- [ ] **S8-T5: Document Chrome MCP integration**
+- [x] **S8-T5: Document Chrome MCP integration**
   - Document how browser pane works with Chrome MCP
   - Provide setup instructions
   - Document keyboard shortcuts
   - **Acceptance:** Documentation covers workbench usage
 
-- [ ] **S8-T6: Update workbench branding**
+- [x] **S8-T6: Update workbench branding**
   - Apply Adhesion typeface styling (if applicable)
   - Monochrome colors (#000/#FFF)
   - Box-drawing characters in terminal
@@ -440,34 +440,34 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
 
 ### Tasks
 
-- [ ] **S9-T1: Create eslint-plugin-sigil package structure**
+- [x] **S9-T1: Create eslint-plugin-sigil package structure**
   - Create `sigil-mark/eslint-plugin/` or separate package
   - Set up package.json with eslint peer dependency
   - **Acceptance:** Package structure ready
 
-- [ ] **S9-T2: Implement sigil/no-raw-physics rule**
+- [x] **S9-T2: Implement sigil/no-raw-physics rule**
   - Detect `stiffness`, `damping`, `transition` properties
   - Skip sandbox files (check for header)
   - Error with helpful message
   - **Acceptance:** Rule catches raw physics, ignores sandbox
 
-- [ ] **S9-T3: Implement sigil/require-recipe rule**
+- [x] **S9-T3: Implement sigil/require-recipe rule**
   - Check for `@sigil/recipes` imports
   - Skip sandbox files
   - Error if component has animation without recipe
   - **Acceptance:** Rule requires recipe imports
 
-- [ ] **S9-T4: Implement sigil/no-optimistic-in-decisive rule**
+- [x] **S9-T4: Implement sigil/no-optimistic-in-decisive rule**
   - Detect optimistic UI patterns in decisive zone
   - Check for immediate state updates before async completion
   - **Acceptance:** Rule catches optimistic UI violations
 
-- [ ] **S9-T5: Implement sigil/sandbox-stale rule**
+- [x] **S9-T5: Implement sigil/sandbox-stale rule**
   - Warn if sandbox file older than 7 days
   - Calculate age from file modification time
   - **Acceptance:** Rule warns on stale sandboxes
 
-- [ ] **S9-T6: Create CI workflow**
+- [x] **S9-T6: Create CI workflow**
   - Create `.github/workflows/sigil.yml`
   - Run ESLint with sigil rules
   - Run `sigil validate` command
@@ -487,37 +487,37 @@ This plan refactors Sigil from v1.0 to v1.2.4, transitioning from a "validation 
 
 ### Tasks
 
-- [ ] **S10-T1: Implement refinement history storage**
+- [x] **S10-T1: Implement refinement history storage**
   - Create `sigil-mark/history/YYYY-MM-DD.md` format
   - Log feedback, before/after physics, variant created
   - **Acceptance:** History entries follow SDD §9.1 format
 
-- [ ] **S10-T2: Implement history parsing for Claude**
+- [x] **S10-T2: Implement history parsing for Claude**
   - Parse last 30 days of history
   - Extract feedback patterns
   - Calculate average physics for similar feedback
   - **Acceptance:** Claude can reference history for calibration
 
-- [ ] **S10-T3: Update README.md for v1.2.4**
+- [x] **S10-T3: Update README.md for v1.2.4**
   - Quick start guide
   - Command reference (6 commands)
   - Philosophy section ("Diff + Feel")
   - Migration guide from v1.0
   - **Acceptance:** README matches v1.2.4 architecture
 
-- [ ] **S10-T4: Create unit tests for recipes**
+- [x] **S10-T4: Create unit tests for recipes**
   - Test decisive/Button renders correctly
   - Test useServerTick hook behavior
   - Test zone resolution algorithm
   - **Acceptance:** Core recipes have test coverage
 
-- [ ] **S10-T5: Create integration tests**
+- [x] **S10-T5: Create integration tests**
   - Test /craft generates recipe-consuming code
   - Test /sandbox enables raw physics
   - Test /codify extracts to recipe
   - **Acceptance:** Command flows tested
 
-- [ ] **S10-T6: Final validation**
+- [x] **S10-T6: Final validation**
   - Run all commands end-to-end
   - Verify `rm -rf sigil-mark/` cleans up
   - Verify no daemon, no database, no hooks
@@ -575,21 +575,21 @@ DAY 30: Engineer teaches teammate about spring physics
 
 | Sprint | Status | Completed |
 |--------|--------|-----------|
-| Sprint 1 | PENDING | - |
-| Sprint 2 | PENDING | - |
-| Sprint 3 | PENDING | - |
-| Sprint 4 | PENDING | - |
-| Sprint 5 | PENDING | - |
-| Sprint 6 | PENDING | - |
-| Sprint 7 | PENDING | - |
-| Sprint 8 | PENDING | - |
-| Sprint 9 | PENDING | - |
-| Sprint 10 | PENDING | - |
+| Sprint 1 | COMPLETED | 2026-01-05 |
+| Sprint 2 | COMPLETED | 2026-01-05 |
+| Sprint 3 | COMPLETED | 2026-01-05 |
+| Sprint 4 | COMPLETED | 2026-01-05 |
+| Sprint 5 | COMPLETED | 2026-01-05 |
+| Sprint 6 | COMPLETED | 2026-01-05 |
+| Sprint 7 | COMPLETED | 2026-01-05 |
+| Sprint 8 | COMPLETED | 2026-01-05 |
+| Sprint 9 | COMPLETED | 2026-01-05 |
+| Sprint 10 | COMPLETED | 2026-01-05 |
 
 ---
 
 ## Next Step
 
 ```
-/implement sprint-1
+/implement sprint-2
 ```

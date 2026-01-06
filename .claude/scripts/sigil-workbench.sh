@@ -1,27 +1,31 @@
 #!/usr/bin/env bash
-# Sigil Workbench: 4-Panel Development Environment
-# Launches tmux session with Claude, preview, tensions, and validation panels
+# Sigil Workbench v1.2.4: Learning Environment
+# 3-pane tmux session: diff + browser + Claude Code
+# Philosophy: "See the diff. Feel the result. Learn by doing."
+#
+# BRANDING: Adhesion aesthetic
+# Colors: #000000 bg, #FFFFFF text (monochrome)
 set -euo pipefail
 
-# === Colors ===
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+# === Colors (Monochrome for Adhesion aesthetic) ===
+WHITE='\033[1;37m'
 DIM='\033[2m'
+NC='\033[0m'
 BOLD='\033[1m'
+
+# Error colors (minimal)
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
 
 # === Configuration ===
 SESSION_NAME="${SIGIL_SESSION:-sigil-workbench}"
+DEV_URL="${SIGIL_DEV_URL:-http://localhost:3000}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # === Helper Functions ===
-log() { echo -e "${GREEN}[workbench]${NC} $*"; }
-warn() { echo -e "${YELLOW}[workbench]${NC} $*"; }
-err() { echo -e "${RED}[workbench]${NC} ERROR: $*" >&2; exit 1; }
-info() { echo -e "${CYAN}[workbench]${NC} $*"; }
+log() { echo -e "${WHITE}[sigil]${NC} $*"; }
+warn() { echo -e "${YELLOW}[sigil]${NC} $*"; }
+err() { echo -e "${RED}[sigil]${NC} ERROR: $*" >&2; exit 1; }
 
 # Check if a command exists
 has_command() {
@@ -44,15 +48,9 @@ check_prerequisites() {
     missing+=("claude")
   fi
 
-  # Optional: fswatch (for auto-validation)
-  if ! has_command fswatch; then
-    warn "fswatch not found - validation will run in manual mode"
-    warn "Install with: brew install fswatch"
-  fi
-
   # Check for Sigil setup
   if [[ ! -f ".sigil-version.json" ]] && [[ ! -d "sigil-mark" ]]; then
-    warn "Sigil not mounted - run mount-sigil.sh first"
+    warn "Sigil not initialized - run /setup first"
   fi
 
   if [[ ${#missing[@]} -gt 0 ]]; then
@@ -74,92 +72,98 @@ kill_session() {
   fi
 }
 
-# === Panel Layout ===
+# === Panel Layout (v1.2.4 - 3 panes) ===
 # Layout:
-# ┌─────────────────┬─────────────────┐
-# │                 │                 │
-# │   Pane 0        │   Pane 1        │
-# │   Claude CLI    │   Preview       │
-# │                 │   (placeholder) │
-# │                 │                 │
-# ├─────────────────┼─────────────────┤
-# │                 │                 │
-# │   Pane 2        │   Pane 3        │
-# │   Tensions      │   Validation    │
-# │                 │                 │
-# └─────────────────┴─────────────────┘
+#   ┌─────────────────┬─────────────────────────┐
+#   │   PHYSICS       │                         │
+#   │   + DIFF        │     BROWSER             │
+#   │   + A/B         │     (via Chrome MCP)    │
+#   ├─────────────────┴─────────────────────────┤
+#   │              CLAUDE CODE                  │
+#   └───────────────────────────────────────────┘
 
 create_session() {
   log "Creating tmux session: $SESSION_NAME"
 
-  # Create new session with first pane (Claude)
-  tmux new-session -d -s "$SESSION_NAME" -n "workbench"
+  # Create new session with larger size
+  tmux new-session -d -s "$SESSION_NAME" -n "workbench" -x 200 -y 50
 
-  # Split horizontally for pane 1 (Preview)
-  tmux split-window -h -t "$SESSION_NAME:0"
+  # Split horizontally (top/bottom) - Claude at bottom (40%)
+  tmux split-window -v -t "$SESSION_NAME" -p 40
 
-  # Split pane 0 vertically for pane 2 (Tensions)
-  tmux split-window -v -t "$SESSION_NAME:0.0"
+  # Split top pane vertically (diff left / browser right)
+  tmux select-pane -t "$SESSION_NAME:0.0"
+  tmux split-window -h -t "$SESSION_NAME" -p 65
 
-  # Split pane 1 vertically for pane 3 (Validation)
-  tmux split-window -v -t "$SESSION_NAME:0.1"
-
-  # Set layout - main-horizontal gives us 2x2 grid
-  tmux select-layout -t "$SESSION_NAME" tiled
-
-  log "Session created with 4 panes"
+  log "Session created with 3 panes"
 }
 
 launch_panels() {
   log "Launching panel applications..."
 
-  # Pane 0: Claude CLI
-  log "  Pane 0: Claude Code CLI"
-  tmux send-keys -t "$SESSION_NAME:0.0" "echo -e '${BOLD}${CYAN}SIGIL WORKBENCH - Claude CLI${NC}'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.0" "echo 'Starting Claude Code...'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.0" "echo ''" Enter
-  tmux send-keys -t "$SESSION_NAME:0.0" "claude" Enter
+  # Pane 0 (top-left): Physics/Diff viewer with A/B toggle
+  log "  Pane 0: Physics + Diff"
+  tmux select-pane -t "$SESSION_NAME:0.0"
+  tmux send-keys "clear && echo ''" Enter
+  tmux send-keys "echo '  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'" Enter
+  tmux send-keys "echo '  ┃         SIGIL · PHYSICS            ┃'" Enter
+  tmux send-keys "echo '  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "echo '  ZONE: (waiting for /craft)'" Enter
+  tmux send-keys "echo '  RECIPE: -'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "echo '  ┌─────────────────────────────────┐'" Enter
+  tmux send-keys "echo '  │ DIFF                            │'" Enter
+  tmux send-keys "echo '  │                                 │'" Enter
+  tmux send-keys "echo '  │   (no changes yet)              │'" Enter
+  tmux send-keys "echo '  │                                 │'" Enter
+  tmux send-keys "echo '  └─────────────────────────────────┘'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "echo '  COMPARE:'" Enter
+  tmux send-keys "echo '    [A] Before'" Enter
+  tmux send-keys "echo '    [B] After'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "echo '  ─────────────────────────────────'" Enter
+  tmux send-keys "echo '  Space to toggle · See diff, feel result'" Enter
 
-  # Pane 1: Preview placeholder (Chrome MCP instructions)
-  log "  Pane 1: Preview (Chrome MCP)"
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo -e '${BOLD}${CYAN}SIGIL WORKBENCH - Live Preview${NC}'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo ''" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo 'Chrome MCP Preview Panel'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo '─────────────────────────────────'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo ''" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo 'For live preview, use Chrome MCP:'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo '  1. Install Claude in Chrome extension'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo '  2. Open your dev server (npm run dev)'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo '  3. Claude can control browser for preview'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo ''" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo 'Manual preview:'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo '  Open http://localhost:3000 in browser'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo ''" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo -e '${DIM}This pane is for documentation.${NC}'" Enter
-  tmux send-keys -t "$SESSION_NAME:0.1" "echo -e '${DIM}Run your dev server in a separate terminal.${NC}'" Enter
+  # Pane 1 (top-right): Browser placeholder (Chrome MCP)
+  log "  Pane 1: Browser (Chrome MCP)"
+  tmux select-pane -t "$SESSION_NAME:0.1"
+  tmux send-keys "clear && echo ''" Enter
+  tmux send-keys "echo '  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'" Enter
+  tmux send-keys "echo '  ┃                  BROWSER PREVIEW                     ┃'" Enter
+  tmux send-keys "echo '  ┃              (via Claude MCP)                        ┃'" Enter
+  tmux send-keys "echo '  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "echo '  Browser preview controlled via Claude MCP.'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "echo '  To enable:'" Enter
+  tmux send-keys "echo '    1. Chrome running with Claude in Chrome extension'" Enter
+  tmux send-keys "echo '    2. Navigate to: $DEV_URL'" Enter
+  tmux send-keys "echo '    3. Claude controls browser via MCP'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "echo '  ─────────────────────────────────────────────────'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "echo '  Click components to feel the physics.'" Enter
+  tmux send-keys "echo '  Toggle A/B to compare before/after.'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "echo '  The diff is visible. The feel is testable.'" Enter
+  tmux send-keys "echo '  Numbers gain meaning through your fingers.'" Enter
 
-  # Pane 2: Tensions monitor
-  log "  Pane 2: Tension Monitor"
-  if [[ -f "$SCRIPT_DIR/sigil-tensions.sh" ]]; then
-    tmux send-keys -t "$SESSION_NAME:0.2" "$SCRIPT_DIR/sigil-tensions.sh" Enter
-  else
-    tmux send-keys -t "$SESSION_NAME:0.2" "echo 'Tension monitor not found'" Enter
-    tmux send-keys -t "$SESSION_NAME:0.2" "echo 'Run: sigil-tensions.sh'" Enter
-  fi
-
-  # Pane 3: Validation monitor
-  log "  Pane 3: Validation Monitor"
-  if [[ -f "$SCRIPT_DIR/sigil-validate.sh" ]]; then
-    tmux send-keys -t "$SESSION_NAME:0.3" "$SCRIPT_DIR/sigil-validate.sh --once" Enter
-    tmux send-keys -t "$SESSION_NAME:0.3" "echo ''" Enter
-    tmux send-keys -t "$SESSION_NAME:0.3" "echo 'Run sigil-validate.sh <file> to validate'" Enter
-  else
-    tmux send-keys -t "$SESSION_NAME:0.3" "echo 'Validation monitor not found'" Enter
-    tmux send-keys -t "$SESSION_NAME:0.3" "echo 'Run: sigil-validate.sh'" Enter
-  fi
+  # Pane 2 (bottom): Claude Code
+  log "  Pane 2: Claude Code"
+  tmux select-pane -t "$SESSION_NAME:0.2"
+  tmux send-keys "clear && echo ''" Enter
+  tmux send-keys "echo '  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓'" Enter
+  tmux send-keys "echo '  ┃                            CLAUDE CODE                                   ┃'" Enter
+  tmux send-keys "echo '  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "echo '  Starting Claude Code...'" Enter
+  tmux send-keys "echo ''" Enter
+  tmux send-keys "claude" Enter
 
   # Focus on Claude pane
-  tmux select-pane -t "$SESSION_NAME:0.0"
+  tmux select-pane -t "$SESSION_NAME:0.2"
 }
 
 attach_session() {
@@ -167,31 +171,37 @@ attach_session() {
   tmux attach-session -t "$SESSION_NAME"
 }
 
-# === Display Functions ===
+# === Display Functions (v1.2.4 - Adhesion aesthetic) ===
+
+# Adhesion-inspired ASCII header (monochrome, geometric)
+SIGIL_HEADER='
+███████╗██╗ ██████╗ ██╗██╗
+██╔════╝██║██╔════╝ ██║██║
+███████╗██║██║  ███╗██║██║
+╚════██║██║██║   ██║██║██║
+███████║██║╚██████╔╝██║███████╗
+╚══════╝╚═╝ ╚═════╝ ╚═╝╚══════╝'
+
 display_banner() {
   echo ""
-  echo -e "${BOLD}${CYAN}"
-  echo "╔═══════════════════════════════════════════════════════════╗"
-  echo "║            SIGIL WORKBENCH v1.0                           ║"
-  echo "║      Design Physics Engine Development Environment        ║"
-  echo "╚═══════════════════════════════════════════════════════════╝"
+  echo -e "${BOLD}${WHITE}"
+  echo "$SIGIL_HEADER"
+  echo ""
+  echo "  WORKBENCH v1.2.4"
+  echo "  See the diff. Feel the result. Learn by doing."
   echo -e "${NC}"
 }
 
 display_layout() {
   echo -e "${BOLD}PANEL LAYOUT${NC}"
   echo ""
-  echo "  ┌─────────────────┬─────────────────┐"
-  echo "  │                 │                 │"
-  echo "  │   Claude CLI    │   Preview       │"
-  echo "  │   (Pane 0)      │   (Pane 1)      │"
-  echo "  │                 │                 │"
-  echo "  ├─────────────────┼─────────────────┤"
-  echo "  │                 │                 │"
-  echo "  │   Tensions      │   Validation    │"
-  echo "  │   (Pane 2)      │   (Pane 3)      │"
-  echo "  │                 │                 │"
-  echo "  └─────────────────┴─────────────────┘"
+  echo "  ┌─────────────────┬─────────────────────────┐"
+  echo "  │   PHYSICS       │                         │"
+  echo "  │   + DIFF        │     BROWSER             │"
+  echo "  │   + A/B         │     (via Chrome MCP)    │"
+  echo "  ├─────────────────┴─────────────────────────┤"
+  echo "  │              CLAUDE CODE                  │"
+  echo "  └───────────────────────────────────────────┘"
   echo ""
 }
 
@@ -201,36 +211,41 @@ display_keybindings() {
   echo "  Navigation:"
   echo "    Ctrl+b ↑/↓/←/→   Move between panes"
   echo "    Ctrl+b o         Cycle through panes"
-  echo "    Ctrl+b q         Show pane numbers"
   echo "    Ctrl+b z         Toggle pane zoom"
+  echo ""
+  echo "  A/B Toggle:"
+  echo "    Space            Switch between Before/After"
   echo ""
   echo "  Session:"
   echo "    Ctrl+b d         Detach from session"
-  echo "    Ctrl+b &         Kill window"
+  echo "    q                Quit workbench"
   echo ""
   echo -e "${DIM}  Reattach with: tmux attach -t $SESSION_NAME${NC}"
   echo ""
 }
 
 display_commands() {
-  echo -e "${BOLD}SIGIL COMMANDS${NC}"
-  echo ""
-  echo "  Setup:"
-  echo "    /envision    Capture product soul"
-  echo "    /codify      Define materials"
-  echo "    /map         Configure zones"
+  echo -e "${BOLD}SIGIL COMMANDS (v1.2.4)${NC}"
   echo ""
   echo "  Generation:"
-  echo "    /craft       Generate components with physics"
-  echo "    /validate    Check against constraints"
+  echo "    /craft       Generate component using zone recipe"
+  echo "    /sandbox     Enable raw physics for experimentation"
+  echo "    /codify      Extract physics from sandbox to recipe"
   echo ""
-  echo "  Approval:"
-  echo "    /approve     Taste Key ruling"
-  echo "    /greenlight  Concept approval"
+  echo "  Analysis:"
+  echo "    /inherit     Scan existing codebase for patterns"
+  echo "    /validate    Check recipe compliance"
+  echo "    /garden      Health report (coverage, sandboxes)"
   echo ""
-  echo "  Maintenance:"
-  echo "    /garden      Check for drift"
-  echo ""
+}
+
+# === Status Bar Configuration (Monochrome - Adhesion aesthetic) ===
+configure_status_bar() {
+  tmux set-option -t "$SESSION_NAME" status-style "bg=black,fg=white"
+  tmux set-option -t "$SESSION_NAME" status-left "#[fg=white,bold] SIGIL "
+  tmux set-option -t "$SESSION_NAME" status-right "#[fg=white] [A]Before [B]After │ Space:Toggle │ q:Quit "
+  tmux set-option -t "$SESSION_NAME" status-left-length 30
+  tmux set-option -t "$SESSION_NAME" status-right-length 60
 }
 
 # === Individual Command Mode ===
@@ -240,9 +255,12 @@ run_individual() {
   echo "Run these commands in separate terminals:"
   echo ""
   echo "  Terminal 1: claude"
-  echo "  Terminal 2: sigil-tensions.sh"
-  echo "  Terminal 3: sigil-validate.sh"
-  echo "  Terminal 4: npm run dev (your dev server)"
+  echo "  Terminal 2: Open $DEV_URL in browser"
+  echo "  Terminal 3: npm run dev (your dev server)"
+  echo ""
+  echo "Install tmux for full workbench experience:"
+  echo "  brew install tmux (macOS)"
+  echo "  apt install tmux (Linux)"
   echo ""
 }
 
@@ -264,7 +282,8 @@ main() {
     echo "  -h, --help   Show this help message"
     echo ""
     echo "Environment variables:"
-    echo "  SIGIL_SESSION  Session name (default: sigil-workbench)"
+    echo "  SIGIL_SESSION   Session name (default: sigil-workbench)"
+    echo "  SIGIL_DEV_URL   Dev server URL (default: http://localhost:3000)"
     echo ""
     exit 0
   fi
@@ -324,6 +343,7 @@ main() {
 
   create_session
   launch_panels
+  configure_status_bar
   attach_session
 }
 

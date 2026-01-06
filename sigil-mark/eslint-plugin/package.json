@@ -1,0 +1,30 @@
+{
+  "name": "eslint-plugin-sigil",
+  "version": "1.2.4",
+  "description": "ESLint rules for Sigil design physics framework",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "rules/**/*.js"
+  ],
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "sigil",
+    "design-physics",
+    "framer-motion"
+  ],
+  "peerDependencies": {
+    "eslint": ">=8.0.0"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/sigil"
+  }
+}
