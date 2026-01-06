@@ -7,35 +7,50 @@
 
 Design Physics Framework for AI-assisted development. Separates Truth (Core physics) from Experience (Lens rendering).
 
-## Philosophy: Reality Engine
+## Philosophy
 
-### The Insight
+### The Problem
 
-Traditional design systems conflate physics (what happens) with rendering (how it looks). Sigil v2.0 separates these:
+AI agents generate UI without understanding your product's soul. Every generation is a coin flip—sometimes it matches your vision, sometimes it doesn't. Design systems help, but they're too abstract for AI to reason about.
 
-1. **Core Layer (Truth)** — Physics engines that manage state and time
-2. **Layout Layer (Zones)** — Structural containers that provide context
-3. **Lens Layer (Experience)** — Interchangeable UI renderers
+Meanwhile, design debates consume hours. "Should this button be blue or green?" "Is this animation too slow?" These aren't physics problems—they're taste problems. But without a framework, every decision becomes a debate.
 
-When you change a lens, the physics remain the same. When you move to a different zone, the appropriate lens is auto-selected.
+### The Insight: Truth vs Experience
 
-### Architecture (3 Layers)
+Sigil v2.0 separates **Truth** (what happens) from **Experience** (how it looks):
 
-```
-┌────────────────────────────────────────────────────────────┐
-│  CORE LAYER — Physics engines (Truth)                     │
-│  useCriticalAction → State Stream                         │
-│  { status, timeAuthority, selfPrediction, worldTruth }    │
-├────────────────────────────────────────────────────────────┤
-│  LAYOUT LAYER — Zones + Structural Physics                │
-│  CriticalZone, MachineryLayout, GlassLayout               │
-│  Layouts ARE Zones. Physics is DOM, not lint.             │
-├────────────────────────────────────────────────────────────┤
-│  LENS LAYER — Interchangeable UIs (Experience)            │
-│  useLens() → Lens components                              │
-│  DefaultLens, StrictLens, A11yLens                        │
-└────────────────────────────────────────────────────────────┘
-```
+- **Truth can't be argued with.** Server-authoritative data MUST show pending states—this isn't a preference, it's a constraint.
+- **Experience is swappable.** The same physics can render as DefaultLens, StrictLens, or A11yLens without changing behavior.
+
+When you frame constraints as physics, AI agents follow them without question. Humans stop debating and start building.
+
+### Core Principles
+
+**1. Feel Before Form**
+
+Design is about how things *feel*, not how they *look*. A checkout button and a browse button might be visually identical—same color, same size, same font. But they *behave* differently because they're in different zones. Checkout is heavy and deliberate. Browse is light and instant.
+
+**2. Layouts ARE Zones**
+
+The same component behaves differently based on where it lives. Wrap in `<CriticalZone>` and it inherits critical physics. Wrap in `<GlassLayout>` and it becomes exploratory. No config files needed—the structure IS the zone.
+
+**3. Constraints Enable Creativity**
+
+Unlimited options produce paralysis. Physics constraints free you to focus on what matters. When the agent knows financial buttons MUST use StrictLens, it stops asking and starts building.
+
+**4. Diagnose Before Prescribe**
+
+When something feels wrong, don't jump to solutions. "Make it faster" might break the system. Often, the "problem" is actually physics working correctly—checkout *should* feel deliberate.
+
+**5. Entropy Is Inevitable**
+
+Products drift. What felt right at launch feels stale at scale. Plan for evolution, not perfection.
+
+### The Hierarchy
+
+1. **IMPOSSIBLE** — Physics violations. Cannot be generated. (e.g., optimistic updates in server-tick zones)
+2. **BLOCK** — Lens forced. StrictLens in financial zones can't be overridden.
+3. **WARN** — Suggestions only. User lens preference respected outside critical zones.
 
 ## Quick Start
 
@@ -43,6 +58,20 @@ When you change a lens, the physics remain the same. When you move to a differen
 
 ```bash
 npm install sigil-mark
+```
+
+### Mount onto Existing Repository
+
+```bash
+# One-liner install (adds skills and commands)
+curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash
+
+# Start Claude Code
+claude
+
+# Initialize and capture soul
+/setup
+/envision
 ```
 
 ### Basic Usage
@@ -82,6 +111,81 @@ function PaymentForm({ amount }) {
     </CriticalZone>
   );
 }
+```
+
+## Best Practices
+
+### The Setup Flow
+
+Run these commands in order when starting a new project:
+
+```
+/setup      → Creates state zone structure
+/envision   → Captures product soul (interview)
+/codify     → Defines zone rules
+```
+
+**Time investment:** ~15 minutes
+**Payoff:** Every future generation inherits your design physics automatically.
+
+### 1. Start with Soul, Not Rules
+
+Run `/envision` before anything else. The soul interview captures *why* your product feels the way it does.
+
+**Bad**: "Use blue buttons with 8px radius"
+**Good**: "Checkout should feel like confirming a bank transfer—heavy and deliberate."
+
+### 2. Let Layouts Define Zones
+
+Don't configure file paths. Use layout primitives:
+
+```tsx
+// This IS your zone definition
+<CriticalZone financial>
+  {/* StrictLens forced, server-tick required */}
+</CriticalZone>
+
+<MachineryLayout>
+  {/* Keyboard nav, optimistic OK */}
+</MachineryLayout>
+
+<GlassLayout>
+  {/* Hover physics, playful */}
+</GlassLayout>
+```
+
+### 3. Use /craft Diagnostically
+
+When something "feels wrong," ask for diagnosis:
+
+**Bad**: `/craft "make the button faster"`
+**Good**: `/craft "the claim button feels slow, diagnose why"`
+
+Often, "feels slow" is physics working correctly. Checkout *should* feel deliberate.
+
+### 4. Garden Regularly
+
+Run `/garden` monthly to catch drift:
+- Components straying from patterns
+- Stale sandbox experiments
+- v1.2.5 deprecated API usage
+
+## Architecture (3 Layers)
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  CORE LAYER — Physics engines (Truth)                     │
+│  useCriticalAction → State Stream                         │
+│  { status, timeAuthority, selfPrediction, worldTruth }    │
+├────────────────────────────────────────────────────────────┤
+│  LAYOUT LAYER — Zones + Structural Physics                │
+│  CriticalZone, MachineryLayout, GlassLayout               │
+│  Layouts ARE Zones. Physics is DOM, not lint.             │
+├────────────────────────────────────────────────────────────┤
+│  LENS LAYER — Interchangeable UIs (Experience)            │
+│  useLens() → Lens components                              │
+│  DefaultLens, StrictLens, A11yLens                        │
+└────────────────────────────────────────────────────────────┘
 ```
 
 ## Core Layer
@@ -209,8 +313,9 @@ Note: CriticalZone with `financial={true}` still forces StrictLens.
 
 | Command | Purpose |
 |---------|---------|
+| `/setup` | Initialize Sigil on a repo |
+| `/envision` | Capture product soul (interview) |
 | `/craft` | Get design guidance with zone context |
-| `/sandbox` | Experiment with physics (no constraints) |
 | `/codify` | Define zone rules |
 | `/inherit` | Bootstrap from existing codebase |
 | `/validate` | Check physics compliance |
@@ -221,19 +326,24 @@ Note: CriticalZone with `financial={true}` still forces StrictLens.
 ```
 sigil-mark/
 ├── index.ts              # Main entry point
-├── core/                 # Physics engines
-│   ├── useCriticalAction.ts
-│   ├── useLocalCache.ts
+├── moodboard.md          # Product feel + references
+├── rules.md              # Design rules by category
+│
+├── core/                 # Physics engines (Truth)
+│   ├── use-critical-action.ts
+│   ├── use-local-cache.ts
 │   └── proprioception.ts
+│
 ├── layouts/              # Zone primitives
-│   ├── CriticalZone.tsx
-│   ├── MachineryLayout.tsx
-│   └── GlassLayout.tsx
-├── lenses/               # UI renderers
+│   ├── critical-zone.tsx
+│   ├── machinery-layout.tsx
+│   └── glass-layout.tsx
+│
+├── lenses/               # UI renderers (Experience)
 │   ├── default/
 │   ├── strict/
 │   └── a11y/
-├── recipes/              # v1.2.5 recipes (deprecated)
+│
 └── __examples__/         # Usage examples
 ```
 
