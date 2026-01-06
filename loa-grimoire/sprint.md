@@ -121,39 +121,39 @@ This plan implements Sigil v2.0, the "Reality Engine" that separates Truth (Core
 
 ### Tasks
 
-- [ ] **S2-T1: Create proprioception module**
+- [x] **S2-T1: Create proprioception module**
   - Create `sigil-mark/core/proprioception.ts`
   - Define `createProprioception()` factory
   - Implement self-prediction state management
   - Implement confidence decay over maxDrift
   - **Acceptance:** Self predictions work with configurable decay
 
-- [ ] **S2-T2: Implement position prediction with ghost rendering**
+- [x] **S2-T2: Implement position prediction with ghost rendering**
   - Add `position.render: 'ghost' | 'solid' | 'hidden'`
   - Implement ghost position state
   - Implement confidence decay
   - **Acceptance:** Ghost position shows predicted location
 
-- [ ] **S2-T3: Implement reconciliation strategies**
+- [x] **S2-T3: Implement reconciliation strategies**
   - Add `position.reconcile: 'snap' | 'lerp' | 'ignore'`
   - Implement snap (instant correction)
   - Implement lerp (smooth interpolation)
   - **Acceptance:** Reconciliation works correctly
 
-- [ ] **S2-T4: Create useLocalCache hook**
+- [x] **S2-T4: Create useLocalCache hook**
   - Create `sigil-mark/core/useLocalCache.ts`
   - Implement Cache interface: get, set, update, append, remove, revert
   - Support optimistic updates
   - **Acceptance:** Cache operations work, revert restores previous state
 
-- [ ] **S2-T5: Integrate proprioception with useCriticalAction**
+- [x] **S2-T5: Integrate proprioception with useCriticalAction**
   - Wire proprioception config into hook
   - Update selfPrediction state on action start
   - Update worldTruth state on server response
   - Reconcile on response
   - **Acceptance:** Full proprioception flow works end-to-end
 
-- [ ] **S2-T6: Create useCriticalAction tests**
+- [x] **S2-T6: Create useCriticalAction tests**
   - Test server-tick authority flow
   - Test optimistic authority with rollback
   - Test hybrid authority with sync indicator
@@ -528,7 +528,7 @@ From PRD §7:
 | Sprint | Status | Completed |
 |--------|--------|-----------|
 | Sprint 1 | COMPLETED | 2026-01-05 |
-| Sprint 2 | PENDING | - |
+| Sprint 2 | COMPLETED | 2026-01-05 |
 | Sprint 3 | PENDING | - |
 | Sprint 4 | PENDING | - |
 | Sprint 5 | PENDING | - |

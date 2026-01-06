@@ -7,7 +7,7 @@
  * @module core/useCriticalAction
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type {
   CriticalActionOptions,
   CriticalActionState,
@@ -15,66 +15,11 @@ import type {
   Cache,
 } from './types';
 import { createInitialState } from './types';
-
-// =============================================================================
-// SIMPLE CACHE IMPLEMENTATION
-// =============================================================================
-
-/**
- * Simple in-memory cache for optimistic updates.
- * In production, this would integrate with your state management solution.
- */
-function createSimpleCache(): Cache {
-  const store = new Map<string, unknown>();
-  const history = new Map<string, unknown[]>();
-
-  const saveHistory = (key: string) => {
-    const current = store.get(key);
-    const keyHistory = history.get(key) || [];
-    keyHistory.push(structuredClone(current));
-    history.set(key, keyHistory);
-  };
-
-  return {
-    get<T>(key: string): T | undefined {
-      return store.get(key) as T | undefined;
-    },
-
-    set<T>(key: string, value: T): void {
-      saveHistory(key);
-      store.set(key, value);
-    },
-
-    update<T>(key: string, updater: (value: T) => T): void {
-      saveHistory(key);
-      const current = store.get(key) as T;
-      store.set(key, updater(current));
-    },
-
-    append<T>(key: string, item: T): void {
-      saveHistory(key);
-      const current = (store.get(key) as T[]) || [];
-      store.set(key, [...current, item]);
-    },
-
-    remove<T>(key: string, predicate: (item: T) => boolean): void {
-      saveHistory(key);
-      const current = (store.get(key) as T[]) || [];
-      store.set(key, current.filter((item) => !predicate(item)));
-    },
-
-    revert(key: string): void {
-      const keyHistory = history.get(key);
-      if (keyHistory && keyHistory.length > 0) {
-        const previous = keyHistory.pop();
-        store.set(key, previous);
-      }
-    },
-  };
-}
+import { createProprioception, type ProprioceptionManager } from './proprioception';
+import { createCache } from './useLocalCache';
 
 // Global cache instance (in production, use context or state management)
-const globalCache = createSimpleCache();
+const globalCache = createCache();
 
 // =============================================================================
 // HOOK IMPLEMENTATION
@@ -151,6 +96,29 @@ export function useCriticalAction<TData = unknown, TVariables = void>(
   const lastVariablesRef = useRef<TVariables | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Proprioception manager for position predictions
+  const proprioceptionManagerRef = useRef<ProprioceptionManager | null>(null);
+
+  // Initialize proprioception manager if config provided
+  useEffect(() => {
+    if (proprioception) {
+      proprioceptionManagerRef.current = createProprioception(
+        proprioception,
+        (propState) => {
+          // Update state when proprioception changes (confidence decay)
+          setState((prev) => ({
+            ...prev,
+            selfPrediction: propState.selfPrediction,
+          }));
+        }
+      );
+    }
+
+    return () => {
+      proprioceptionManagerRef.current?.dispose();
+    };
+  }, [proprioception]);
+
   // ==========================================================================
   // COMMIT — Execute the action
   // ==========================================================================
@@ -186,8 +154,41 @@ export function useCriticalAction<TData = unknown, TVariables = void>(
           optimistic(globalCache, variables);
         }
 
-        // Apply self-predictions immediately
-        if (proprioception?.self) {
+        // Apply self-predictions immediately via proprioception manager
+        if (proprioception?.self && proprioceptionManagerRef.current) {
+          const manager = proprioceptionManagerRef.current;
+
+          // Build prediction state
+          const prediction: {
+            animation?: string | null;
+            rotation?: number | null;
+            position?: { predicted: unknown; confidence: number; render: 'ghost' | 'solid' | 'hidden' } | null;
+          } = {};
+
+          if (proprioception.self.animation?.optimistic) {
+            prediction.animation = 'active';
+          }
+
+          if (proprioception.self.rotation?.instant) {
+            prediction.rotation = 1;
+          }
+
+          if (proprioception.self.position?.enabled) {
+            prediction.position = {
+              predicted: variables, // The predicted state
+              confidence: 1,
+              render: proprioception.self.position.render || 'ghost',
+            };
+          }
+
+          manager.predict(prediction);
+
+          setState((prev) => ({
+            ...prev,
+            status: 'pending',
+            selfPrediction: manager.getState().selfPrediction,
+          }));
+        } else if (proprioception?.self) {
           setState((prev) => ({
             ...prev,
             status: 'pending',
@@ -211,11 +212,25 @@ export function useCriticalAction<TData = unknown, TVariables = void>(
         try {
           const data = await mutation(variables);
 
+          // Reconcile proprioception with server truth
+          if (proprioceptionManagerRef.current) {
+            proprioceptionManagerRef.current.setWorldTruth({
+              confirmed: true,
+              position: data,
+            });
+            proprioceptionManagerRef.current.reconcile();
+          }
+
           setState((prev) => ({
             ...prev,
             status: 'confirmed',
             data,
-            worldTruth: { confirmed: true },
+            worldTruth: { confirmed: true, position: data },
+            selfPrediction: {
+              position: null,
+              rotation: null,
+              animation: null,
+            },
             error: null,
           }));
 
@@ -226,10 +241,18 @@ export function useCriticalAction<TData = unknown, TVariables = void>(
             rollback(globalCache, variables);
           }
 
+          // Reset proprioception
+          proprioceptionManagerRef.current?.reset();
+
           // Reset to idle silently (no error shown for optimistic)
           setState((prev) => ({
             ...prev,
             status: 'idle',
+            selfPrediction: {
+              position: null,
+              rotation: null,
+              animation: null,
+            },
             error: null, // Silent rollback
           }));
 
@@ -288,27 +311,71 @@ export function useCriticalAction<TData = unknown, TVariables = void>(
           optimistic(globalCache, variables);
         }
 
-        // Show pending with sync indicator
-        setState((prev) => ({
-          ...prev,
-          status: 'pending',
-          selfPrediction: {
-            ...prev.selfPrediction,
-            animation: proprioception?.self?.animation?.optimistic
-              ? 'active'
-              : null,
-          },
-        }));
+        // Apply self-predictions immediately via proprioception manager
+        if (proprioception?.self && proprioceptionManagerRef.current) {
+          const manager = proprioceptionManagerRef.current;
+
+          const prediction: {
+            animation?: string | null;
+            rotation?: number | null;
+            position?: { predicted: unknown; confidence: number; render: 'ghost' | 'solid' | 'hidden' } | null;
+          } = {};
+
+          if (proprioception.self.animation?.optimistic) {
+            prediction.animation = 'active';
+          }
+
+          if (proprioception.self.rotation?.instant) {
+            prediction.rotation = 1;
+          }
+
+          if (proprioception.self.position?.enabled) {
+            prediction.position = {
+              predicted: variables,
+              confidence: 1,
+              render: proprioception.self.position.render || 'ghost',
+            };
+          }
+
+          manager.predict(prediction);
+
+          setState((prev) => ({
+            ...prev,
+            status: 'pending',
+            selfPrediction: manager.getState().selfPrediction,
+          }));
+        } else {
+          // Show pending with sync indicator
+          setState((prev) => ({
+            ...prev,
+            status: 'pending',
+            selfPrediction: {
+              ...prev.selfPrediction,
+              animation: proprioception?.self?.animation?.optimistic
+                ? 'active'
+                : null,
+            },
+          }));
+        }
 
         try {
           const data = await mutation(variables);
+
+          // Reconcile proprioception with server truth
+          if (proprioceptionManagerRef.current) {
+            proprioceptionManagerRef.current.setWorldTruth({
+              confirmed: true,
+              position: data,
+            });
+            proprioceptionManagerRef.current.reconcile();
+          }
 
           // Reconcile self-prediction with server truth
           setState((prev) => ({
             ...prev,
             status: 'confirmed',
             data,
-            worldTruth: { confirmed: true },
+            worldTruth: { confirmed: true, position: data },
             selfPrediction: {
               position: null,
               rotation: null,
@@ -326,9 +393,17 @@ export function useCriticalAction<TData = unknown, TVariables = void>(
             rollback(globalCache, variables);
           }
 
+          // Reset proprioception
+          proprioceptionManagerRef.current?.reset();
+
           setState((prev) => ({
             ...prev,
             status: 'failed',
+            selfPrediction: {
+              position: null,
+              rotation: null,
+              animation: null,
+            },
             error,
           }));
 

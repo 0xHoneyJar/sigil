@@ -30,6 +30,23 @@
 // Main physics hook
 export { useCriticalAction } from './useCriticalAction';
 
+// Local cache hook
+export { useLocalCache, createCache } from './useLocalCache';
+
+// Proprioception
+export {
+  createProprioception,
+  lerp,
+  lerpPosition,
+  createInitialPrediction,
+  createPositionPrediction,
+  SERVER_TICK_CONFIG,
+  GAME_MOVEMENT_CONFIG,
+  OPTIMISTIC_UI_CONFIG,
+  type ProprioceptionState,
+  type ProprioceptionManager,
+} from './proprioception';
+
 // Core types
 export {
   createInitialState,
