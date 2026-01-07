@@ -1,4 +1,4 @@
-# Sigil v2.6 — Lens Array
+# Sigil v3.0 — Lens Array (Personas)
 # User personas with physics and constraints
 #
 # Philosophy: "Same feature, different truth. Not simplified - just appropriate."
@@ -9,7 +9,7 @@
 # - mobile (Thumbzone): Touch-optimized, gesture-aware
 # - accessibility (A11y): Screen-reader first, high contrast
 
-version: "2.6.0"
+version: "3.0.0"
 
 lenses:
   power_user:

@@ -1,12 +1,16 @@
-# Sigil v2.6 — Vibe Checks
-# Micro-surveys for qualitative feedback
+# Sigil v3.0 — Vibe Checks
+# Micro-surveys for qualitative feedback + Behavioral signals for observation
 #
 # Philosophy: "Ask at the moment of emotion, not after it's gone."
 #
-# These are lightweight surveys triggered by specific events.
-# Keep them short (1 question), non-intrusive, and respectful of cooldowns.
+# Two modes:
+# 1. Triggers: Explicit surveys shown to users
+# 2. Behavioral Signals: Passive observation patterns for UX insights
+#
+# Keep surveys short (1 question), non-intrusive, and respectful of cooldowns.
+# Behavioral signals are passive — they observe, never interrupt.
 
-version: "2.6.0"
+version: "3.0.0"
 
 triggers:
   # ==========================================================================
@@ -181,3 +185,149 @@ limits:
   max_per_session: 2
   max_per_day: 3
   min_interval_minutes: 30
+
+# ==========================================================================
+# BEHAVIORAL SIGNALS (v3.0)
+# ==========================================================================
+# Passive observation patterns for UX insights.
+# These DON'T interrupt the user — they observe and record.
+#
+# Philosophy: "Observe behavior, don't survey it. Users show us more than they tell us."
+
+behavioral_signals:
+  # --------------------------------------------------------------------------
+  # INFORMATION SEEKING PATTERNS
+  # --------------------------------------------------------------------------
+
+  - id: information_seeking
+    name: Information Seeking
+    description: "User is looking for more information before acting"
+    triggers:
+      - event: tooltip_hover
+        duration_ms: 2000
+      - event: help_icon_click
+      - event: faq_expand
+      - event: terms_scroll
+    insight: "User wants more context before committing"
+    recommendation: "Consider showing more upfront information or simplifying the decision"
+    zones: ["critical", "onboarding"]
+    severity: info
+    enabled: true
+
+  - id: confirmation_friction
+    name: Confirmation Friction
+    description: "User hesitates at confirmation dialogs"
+    triggers:
+      - event: confirmation_dialog_open
+        idle_time_ms: 5000
+      - event: confirmation_cancel
+        within_ms: 3000
+    insight: "User is uncertain about the action they're about to take"
+    recommendation: "Review confirmation copy for clarity, ensure fees/impact are visible"
+    zones: ["critical"]
+    severity: warning
+    enabled: true
+
+  # --------------------------------------------------------------------------
+  # FRUSTRATION PATTERNS
+  # --------------------------------------------------------------------------
+
+  - id: rage_clicking
+    name: Rage Clicking
+    description: "User clicks repeatedly on same element (frustration indicator)"
+    triggers:
+      - event: element_click
+        count_threshold: 3
+        within_ms: 2000
+    insight: "User expects something to happen that isn't happening"
+    recommendation: "Check if element is disabled without clear indication, or if loading state is unclear"
+    zones: []  # All zones
+    severity: high
+    enabled: true
+
+  - id: back_button_loop
+    name: Back Button Loop
+    description: "User navigates back multiple times quickly"
+    triggers:
+      - event: navigation_back
+        count_threshold: 2
+        within_ms: 5000
+    insight: "User may be lost or trying to find something"
+    recommendation: "Review navigation flow, consider adding breadcrumbs"
+    zones: []  # All zones
+    severity: warning
+    enabled: true
+
+  - id: form_abandonment
+    name: Form Abandonment
+    description: "User starts but doesn't complete a form"
+    triggers:
+      - event: form_field_focus
+        followed_by: navigation_away
+        without: form_submit
+    insight: "Form may be too complex or asking for unexpected information"
+    recommendation: "Review form length, field labels, and required vs optional fields"
+    zones: ["critical", "onboarding"]
+    severity: warning
+    enabled: true
+
+  # --------------------------------------------------------------------------
+  # TRUST PATTERNS
+  # --------------------------------------------------------------------------
+
+  - id: security_checking
+    name: Security Checking
+    description: "User is verifying security indicators"
+    triggers:
+      - event: address_bar_focus
+      - event: ssl_indicator_hover
+      - event: security_badge_click
+    insight: "User is cautious about security (good sign of awareness)"
+    recommendation: "Ensure security indicators are prominent and trustworthy"
+    zones: ["critical"]
+    severity: info
+    enabled: true
+
+  - id: price_comparison
+    name: Price Comparison
+    description: "User is comparing prices or fees"
+    triggers:
+      - event: fee_tooltip_hover
+        duration_ms: 3000
+      - event: price_breakdown_expand
+    insight: "User is price-sensitive or wants to understand costs"
+    recommendation: "Consider more transparent fee disclosure or competitive messaging"
+    zones: ["critical"]
+    severity: info
+    enabled: true
+
+  # --------------------------------------------------------------------------
+  # ENGAGEMENT PATTERNS
+  # --------------------------------------------------------------------------
+
+  - id: content_skimming
+    name: Content Skimming
+    description: "User scrolls quickly past content"
+    triggers:
+      - event: scroll
+        velocity: fast
+        content_visibility_ms: 500
+    insight: "Content may not be engaging or user is looking for something specific"
+    recommendation: "Review content hierarchy, add clear section headers"
+    zones: ["marketing", "landing"]
+    severity: info
+    enabled: true
+
+  - id: deep_engagement
+    name: Deep Engagement
+    description: "User spends significant time on content"
+    triggers:
+      - event: content_visible
+        duration_ms: 30000
+      - event: scroll
+        velocity: slow
+    insight: "User is highly engaged with this content"
+    recommendation: "This content resonates — consider what makes it effective"
+    zones: ["marketing", "landing"]
+    severity: positive
+    enabled: true

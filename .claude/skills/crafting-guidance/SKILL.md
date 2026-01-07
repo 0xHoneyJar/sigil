@@ -2,11 +2,12 @@
 zones:
   state:
     paths:
+      - sigil-mark/moodboard/
       - sigil-mark/moodboard.md
       - sigil-mark/rules.md
-      - sigil-mark/core/physics.ts
+      - sigil-mark/vocabulary/vocabulary.yaml
       - sigil-mark/constitution/protected-capabilities.yaml
-      - sigil-mark/lens-array/lenses.yaml
+      - sigil-mark/personas/personas.yaml
       - sigil-mark/consultation-chamber/decisions/
       - .sigilrc.yaml
     permission: read
@@ -16,192 +17,202 @@ zones:
     permission: read
 ---
 
-# Sigil Crafting Skill (v2.6)
+# Crafting Guidance (v3.0)
 
 ## Purpose
 
-Provide design guidance during implementation with full **Process Context**:
-1. **Constitution** — Protected capabilities that MUST always work
-2. **Locked Decisions** — Design decisions that are time-locked
-3. **Persona Physics** — User persona constraints and preferences
-4. **Zone Context** — File path to zone + persona mapping
-5. **Moodboard** — Product feel and anti-patterns
-6. **Rules** — Design rules by category
+Provide design guidance during implementation with full Process context. Present **options with tradeoffs** — do NOT make taste decisions for the craftsman.
 
-## Philosophy
+## Philosophy (v3.0)
 
-> "Context before code. Constitution before creativity."
-> "Engineers learn by seeing diffs and feeling the physics."
-> "Make the right path easy. Make the wrong path visible."
+> "Sweat the art. We handle the mechanics. Return to flow."
 
-Do NOT lecture. Do NOT explain unless asked. Make the change. The diff + feel is the lesson.
+### What This Means
 
-**NEW in v2.6:** Always surface Process context (Constitution, Decisions, Persona) before implementation guidance.
+1. **Present options, not mandates** — Show tradeoffs, let craftsman choose
+2. **Surface context, not opinions** — Constitution, decisions, vocabulary
+3. **Respect locked decisions** — Flag conflicts, don't override
+4. **Agent handles mechanics** — Physics, zones, materials
+5. **Craftsman handles taste** — Color choices, copy, feel
+
+### What This Skill Does
+
+- Surfaces Process context (Constitution, Vocabulary, Decisions, Persona)
+- Presents implementation options with clear tradeoffs
+- Shows relevant locked decisions
+- Warns about Constitution constraints (informational, not blocking)
+- Provides code with appropriate Layout + Lens
+
+### What This Skill Does NOT Do
+
+- Make design decisions for the craftsman
+- Refuse to implement something based on opinion
+- Choose between equivalent options without asking
+- Override craftsman preferences
+
+## Process Context (Agent-Only)
+
+⚠️ **v3.0 Change:** Process layer is agent-only. Do NOT generate code that imports from `sigil-mark/process`.
+
+The agent reads Process context during code generation:
+- `sigil-mark/constitution/protected-capabilities.yaml`
+- `sigil-mark/vocabulary/vocabulary.yaml`
+- `sigil-mark/personas/personas.yaml`
+- `sigil-mark/consultation-chamber/decisions/*.yaml`
+
+Runtime code receives configuration via **props**, not ProcessContext.
 
 ## Pre-Flight Checks
 
 1. **Sigil Setup**: Verify `.sigil-setup-complete` exists
-2. **Process Context**: Load Constitution, Decisions, Personas (NEW in v2.6)
-3. **Design Context**: Check for moodboard.md and rules.md (warn if missing)
-4. **Zone Config**: Load zones from `.sigilrc.yaml`
-5. **Physics**: Load from `sigil-mark/core/physics.ts`
+2. **Design Context**: Check for moodboard/ folder OR moodboard.md, and rules.md
+3. **Zone Config**: Load zones from `.sigilrc.yaml`
+4. **Vocabulary**: Load from `sigil-mark/vocabulary/vocabulary.yaml`
+5. **Moodboard (v3.1)**: Load from `sigil-mark/moodboard/` if folder exists
 
-## Context Loading (v2.6)
+## Context Loading
 
-### Process Layer (NEW — Load First)
+### Process Layer (Read First)
 
 ```
 sigil-mark/constitution/protected-capabilities.yaml
 ├── protected[] — Capabilities that MUST always work
-│   ├── withdraw, deposit, risk_alert, etc.
-│   └── enforcement: block | warn | log
-└── override_audit — When overrides occurred
+└── enforcement: block | warn | log
+
+sigil-mark/vocabulary/vocabulary.yaml
+├── terms[] — Product terms with feel recommendations
+│   ├── pot: { material: glass, motion: warm }
+│   └── vault: { material: machinery, motion: deliberate }
+
+sigil-mark/personas/personas.yaml (renamed from lens-array)
+├── power_user, newcomer, mobile, accessibility
+├── preferences: { motion, help, density }
+└── default_lens: strict | default | guided
 
 sigil-mark/consultation-chamber/decisions/*.yaml
-├── Active decisions for current zone
-├── Lock status and expiry dates
+├── Locked decisions for current zone
 └── LOCK_PERIODS: { strategic: 180, direction: 90, execution: 30 }
-
-sigil-mark/lens-array/lenses.yaml
-├── Personas: power_user, newcomer, mobile, accessibility
-├── physics: { tap_targets, input_method, shortcuts }
-├── constraints: { max_actions_per_screen, reading_level }
-└── stacking: { allowed_combinations, conflict_resolution }
 ```
 
-### Design Layer (Original)
+### Design Layer
 
 ```
-sigil-mark/moodboard.md
-├── Reference Products
-├── Feel Descriptors (by context)
-├── Anti-Patterns
-└── Key Moments
+sigil-mark/moodboard/ — Inspiration collection (v3.1)
+├── references/     — Product inspiration by source
+├── articles/       — Synthesized design learnings
+├── anti-patterns/  — Patterns to avoid (with severity)
+├── gtm/            — Brand voice, messaging
+├── screenshots/    — Visual references
+└── index.yaml      — Optional curated highlights
 
-sigil-mark/rules.md
-├── Colors
-├── Typography
-├── Spacing
-├── Motion (by zone)
-└── Components
-
-sigil-mark/core/physics.ts
-├── PHYSICS.decisive (spring: 180/12, tap: 0.98)
-├── PHYSICS.machinery (spring: 400/30, tap: 0.96)
-└── PHYSICS.glass (spring: 200/20, tap: 0.97)
-
-.sigilrc.yaml
-├── zones (paths → material mapping)
-└── rejections (patterns to warn about)
+sigil-mark/moodboard.md — Legacy feel document (if no folder)
+sigil-mark/rules.md — Colors, typography, spacing, motion
+.sigilrc.yaml — Zone definitions
 ```
 
-### Zone Detection (v2.6)
+### Moodboard Loading (v3.1)
 
-If a file path is provided, determine zone from `.sigilrc.yaml`:
+If `sigil-mark/moodboard/` folder exists, use `readMoodboard()` to:
 
-- `critical` → decisive physics (heavy, deliberate) → **power_user** persona
-- `checkout` → decisive physics → **power_user** persona
-- `admin` → machinery physics (instant, efficient) → **power_user** persona
-- `marketing` → glass physics (smooth, delightful) → **newcomer** persona
-- `landing` → glass physics → **newcomer** persona
-- `mobile` → touch physics → **mobile** persona
-- `a11y` → accessible physics → **accessibility** persona
-- `default` → glass physics → **newcomer** persona
+1. **Get zone-relevant references**: `getEntriesForZone(moodboard, zone)`
+2. **Get anti-patterns**: `getAntiPatterns(moodboard)`
+3. **Get featured references**: `getFeaturedReferences(moodboard)`
+4. **Search by term**: `getEntriesForTerm(moodboard, term)`
 
-## Response Format (v2.6)
+Include 1-3 relevant references in the DESIGN CONTEXT output.
 
-### Always Start with Process Context
+## Zone Detection (Layout-Based)
 
-Before any implementation guidance, surface:
+Zones are declared by Layout components, NOT file paths:
+
+```tsx
+<CriticalZone financial>  // Zone: critical
+<MachineryLayout>         // Zone: admin
+<GlassLayout>             // Zone: marketing
+```
+
+| Zone | Layout | Default Persona | Time Authority |
+|------|--------|-----------------|----------------|
+| critical | CriticalZone | power_user | server-tick |
+| admin | MachineryLayout | power_user | optimistic |
+| marketing | GlassLayout | newcomer | optimistic |
+
+## Response Format
+
+### Always Start with Context
 
 ```
 ═══════════════════════════════════════════════════════════
-                     PROCESS CONTEXT
+                     DESIGN CONTEXT
 ═══════════════════════════════════════════════════════════
 
-ZONE: {zone} ({sub-zone if applicable})
+ZONE: {zone}
 PERSONA: {persona_id} ({alias})
-  Input: {input_method}
-  Tap targets: {min_size}
-  Max actions/screen: {max_actions_per_screen}
+  Preferences: {motion}, {density}, {help}
+
+VOCABULARY:
+  Term: {term} → {material}, {motion}, {tone}
+  Mental model: "{mental_model}"
+
+MOODBOARD (v3.1):
+  References: {1-3 relevant entries from getEntriesForZone or searchMoodboard}
+  Anti-patterns: {Relevant anti-patterns to avoid}
+  Featured: {Any featured references for this context}
 
 CONSTITUTION:
-  {List protected capabilities for this zone}
-  {Or "None for this zone"}
+  {List protected capabilities, or "No constraints for this zone"}
 
 LOCKED DECISIONS:
-  {List active locked decisions for this zone}
-  {Or "None for this zone"}
+  {List relevant decisions, or "None for this zone"}
 ```
 
-### When Asked About Physics
+### Present Options with Tradeoffs
 
-Show the actual values with persona context:
-
-```
-Zone Physics:
-  decisive: spring(180, 12), tap 0.98, minPending 600ms
-  machinery: spring(400, 30), tap 0.96, minPending 0ms
-  glass: spring(200, 20), tap 0.97, minPending 200ms
-
-Persona Physics (power_user):
-  tap_targets: 32px min
-  input_method: keyboard
-  shortcuts: enabled
-  reading_level: advanced
-```
-
-### When Given a File Path
-
-```
-/craft src/features/checkout/Button.tsx
-```
-
-Response:
+When there are multiple valid approaches:
 
 ```
 ═══════════════════════════════════════════════════════════
-                     PROCESS CONTEXT
+                     YOUR CALL
 ═══════════════════════════════════════════════════════════
 
-ZONE: critical (checkout)
-PERSONA: power_user (Chef)
-  Input: keyboard
-  Tap targets: 32px min
-  Max actions/screen: 10
+**Option A: {description}**
+  Tradeoff: {pros and cons}
+  Code: {brief code example}
 
-CONSTITUTION:
-  ⚠️ PROTECTED: withdraw (enforcement: block)
-  ⚠️ PROTECTED: deposit (enforcement: block)
+**Option B: {description}**
+  Tradeoff: {pros and cons}
+  Code: {brief code example}
 
-LOCKED DECISIONS:
-  🔒 DEC-2026-003: Confirmation flow (2-step) — 90 days remaining
+Which approach works better for your use case?
+```
 
+### Implementation Section
+
+After craftsman chooses (or if only one approach makes sense):
+
+```
 ═══════════════════════════════════════════════════════════
                      IMPLEMENTATION
 ═══════════════════════════════════════════════════════════
 
-Zone: critical
-Material: decisive
-Physics: spring(180, 12)
-Layout: CriticalZone (financial=true)
-Lens: StrictLens (forced)
-Time Authority: server-tick
+Layout: {CriticalZone | MachineryLayout | GlassLayout}
+Lens: {StrictLens | DefaultLens | A11yLens}
+Material: {machinery | glass | decisive}
+Time Authority: {server-tick | optimistic | hybrid}
 
-Use <CriticalZone financial> with useCriticalAction
-Component must follow 2-step confirmation per locked decision.
+{Code implementation}
 ```
 
-### When Implementing
+## Code Generation (v3.0)
 
-Don't explain, just write the code with Process context awareness:
+**IMPORTANT:** Do NOT import from `sigil-mark/process` in client code.
+
+### Correct (v3.0)
 
 ```tsx
 import { useCriticalAction, CriticalZone, useLens } from 'sigil-mark';
-import { useProcessContext } from 'sigil-mark/process';
 
-function ConfirmPurchase() {
-  const { constitution, decisions } = useProcessContext();
+function ConfirmPurchase({ amount }: { amount: number }) {
   const Lens = useLens();
 
   const payment = useCriticalAction({
@@ -212,109 +223,109 @@ function ConfirmPurchase() {
   return (
     <CriticalZone financial>
       {/* 2-step confirmation per DEC-2026-003 */}
-      <Lens.CriticalButton state={payment.state} onAction={payment.execute}>
-        Confirm Purchase
-      </Lens.CriticalButton>
+      <CriticalZone.Content>
+        <h2>Confirm Payment</h2>
+        <p>${amount}</p>
+      </CriticalZone.Content>
+      <CriticalZone.Actions>
+        <Lens.CriticalButton state={payment.state} onAction={payment.commit}>
+          Confirm Purchase
+        </Lens.CriticalButton>
+      </CriticalZone.Actions>
     </CriticalZone>
   );
 }
 ```
 
-## Warning About Rejected Patterns
+### Wrong (v2.6 - Removed)
 
-When user mentions a rejected pattern:
+```tsx
+// ❌ DO NOT USE - crashes in browser
+import { useProcessContext } from 'sigil-mark/process';
 
-1. Note the rejection reason (from .sigilrc.yaml)
-2. Offer alternatives
-3. Allow override - never refuse
-
-Example:
-
-```
-User: "Add a spinner to checkout"
-
-Spinners are noted in rejections for critical zones.
-
-Alternatives:
-1. Skeleton loading
-2. Progress with copy
-3. Confirmation animation
-
-If you still want a spinner, I can add it.
+const { constitution } = useProcessContext();
 ```
 
-## Constitution Warnings (NEW in v2.6)
+## Constitution Warnings
 
 When component affects a protected capability:
 
 ```
-⚠️ CONSTITUTION WARNING
+⚠️ CONSTITUTION NOTE
 
-Action 'withdraw' is PROTECTED
+Action '{capability}' is PROTECTED
 
-Enforcement: block
-Rationale: Users must always be able to withdraw their funds
+Enforcement: {block | warn | log}
+Rationale: {rationale}
 
-DO NOT:
-  - Disable this button based on external conditions
-  - Hide this capability behind feature flags
-  - Gate behind unnecessary verification steps
-
-This capability MUST always be functional for users with funds.
+Consider:
+  - Keep this capability always accessible
+  - Don't gate behind unnecessary verification
+  - Surface warnings don't block implementation
 ```
 
-**Important:** Constitution warnings are informational, not blocking. The agent surfaces the warning but proceeds with implementation.
+**Important:** Constitution warnings are informational. The agent surfaces them but proceeds with implementation per craftsman request.
 
-## Locked Decision Warnings (NEW in v2.6)
+## Locked Decision Conflicts
 
-When implementation contradicts a locked decision:
+When implementation might contradict a locked decision:
 
 ```
-🔒 DECISION CONFLICT DETECTED
+🔒 LOCKED DECISION
 
-Decision: DEC-2026-003
-Topic: Confirmation flow
-Locked value: 2-step confirmation
-Your implementation: 1-step confirmation
+Decision: {id}
+Topic: {topic}
+Current lock: {decision_value}
 
-This decision was locked 45 days ago and expires in 45 days.
+Your implementation appears to {conflict description}.
 
 Options:
-1. Update implementation to match locked decision (recommended)
-2. Request early unlock: /consult --unlock DEC-2026-003
-3. Proceed anyway (will be flagged in /garden)
+1. Align with locked decision (shown below)
+2. Proceed differently (will be flagged in /garden)
+3. Unlock decision: /consult {id} --unlock
+
+Which approach do you prefer?
 ```
 
-## Layout + Persona Selection
+Do NOT refuse to implement. Present options, let craftsman choose.
 
-| Zone | Layout | Lens | Persona | Time Authority |
-|------|--------|------|---------|----------------|
-| critical | CriticalZone | StrictLens (forced) | power_user | server-tick |
-| checkout | CriticalZone | StrictLens (forced) | power_user | server-tick |
-| admin | MachineryLayout | User preference | power_user | optimistic |
-| marketing | GlassLayout | User preference | newcomer | optimistic |
-| landing | GlassLayout | User preference | newcomer | optimistic |
-| mobile | CriticalZone/Glass | User preference | mobile | any |
-| a11y | Any | A11yLens | accessibility | any |
+## Vocabulary Integration (v3.0)
+
+When a term has vocabulary entry, apply its feel:
+
+```
+User: "Create a UI for the user's Pot"
+
+Agent reads vocabulary:
+  pot:
+    mental_model: "Piggy bank, casual saving"
+    recommended:
+      material: glass
+      motion: warm
+      tone: friendly
+
+Applies glass material + warm motion to the component,
+even if zone default would be different.
+```
+
+**Vocabulary overrides zone defaults for specific terms.**
 
 ## Error Handling
 
 | Situation | Response |
 |-----------|----------|
-| No moodboard.md | "Run `/envision` to capture product feel." |
+| No moodboard/ folder AND no moodboard.md | "Run `/envision` to capture product feel, or drop files in `sigil-mark/moodboard/`." |
+| Empty moodboard/ folder | "Moodboard folder exists but is empty. Drop inspiration files into `sigil-mark/moodboard/references/`." |
 | No rules.md | "Run `/codify` to define design rules." |
-| No constitution | "Run `/sigil-setup` to initialize Process layer." |
+| No vocabulary | "No vocabulary defined. Using zone defaults." |
 | No decisions | "No locked decisions for this zone." |
 | Unknown zone | "Using default (glass) physics with newcomer persona." |
-| Unknown persona | "Using default persona (newcomer)." |
-| Missing Process files | Graceful degradation - use defaults, surface warning |
 
 ## Key Principles
 
-1. **Process context first**: Always surface Constitution, Decisions, Persona before code
-2. **Show, don't tell**: Write code, show diffs
-3. **Context-aware**: Components inherit from zone + persona
-4. **Physics tokens**: Single source of truth
-5. **Never refuse**: Warn, offer alternatives, allow override
-6. **Respect locks**: Flag conflicts with locked decisions
-7. **Protect constitution**: Surface warnings for protected capabilities
+1. **Options, not mandates** — Present tradeoffs, let craftsman choose
+2. **Context, not opinions** — Surface Constitution, Vocabulary, Decisions
+3. **Never refuse** — Warn, offer alternatives, implement per request
+4. **Respect locks** — Flag conflicts, don't override
+5. **Agent-only Process** — Don't generate `useProcessContext` imports
+6. **Vocabulary before zone** — Term feel overrides zone defaults

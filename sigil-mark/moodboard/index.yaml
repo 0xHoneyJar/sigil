@@ -1,0 +1,35 @@
+# Sigil Moodboard Index
+# Curated highlights and tag mappings
+# See README.md for usage
+
+version: "1.0"
+
+featured:
+  - path: references/stripe/checkout-confirmation.md
+    why: "Gold standard for financial confirmation patterns"
+
+  - path: anti-patterns/spinner-anxiety.md
+    why: "Core principle we never violate in critical zones"
+
+  - path: articles/motion-design-principles.md
+    why: "Foundation for all motion decisions"
+
+tags:
+  # Motion-related entries
+  motion:
+    - references/stripe/checkout-confirmation.md
+    - articles/motion-design-principles.md
+
+  # Critical zone patterns
+  critical_patterns:
+    - references/stripe/checkout-confirmation.md
+    - anti-patterns/spinner-anxiety.md
+
+  # Financial UX
+  financial:
+    - references/stripe/checkout-confirmation.md
+    - anti-patterns/spinner-anxiety.md
+
+  # Loading states
+  loading:
+    - anti-patterns/spinner-anxiety.md

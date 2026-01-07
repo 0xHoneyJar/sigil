@@ -201,7 +201,7 @@ const DEFAULT_STACKING: StackingConfig = {
  * Default empty lens array.
  */
 export const DEFAULT_LENS_ARRAY: LensArray = {
-  version: '2.6.0',
+  version: '3.0.0',
   lenses: {},
   immutable_properties: [],
   stacking: DEFAULT_STACKING,
@@ -308,7 +308,7 @@ function validateLensArray(parsed: unknown): LensArray {
   const obj = parsed as Record<string, unknown>;
 
   // Validate version
-  const version = typeof obj.version === 'string' ? obj.version : '2.6.0';
+  const version = typeof obj.version === 'string' ? obj.version : '3.0.0';
 
   // Validate lenses
   const lenses: Record<string, Persona> = {};

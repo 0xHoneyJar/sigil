@@ -6,6 +6,17 @@ This document tracks all sprint artifacts and their approval status.
 
 ## Sprint Status Summary
 
+### Sigil v3.0 (Living Engine — Agent-Time/Runtime Split)
+
+| Sprint | Theme | Status | Reviewer | Auditor |
+|--------|-------|--------|----------|---------|
+| 1 | Critical Fixes (P0) | COMPLETED | Approved | Approved |
+| 2 | Foundation (P1) | COMPLETED | Approved | Approved |
+| 3 | User Fluidity (P2) | COMPLETED | Approved | Approved |
+| 4 | Living Market (P3) | COMPLETED | Approved | Approved |
+
+---
+
 ### Sigil v2.6 (Craftsman's Flow — Process + Core)
 
 | Sprint | Theme | Status | Reviewer | Auditor |
@@ -17,6 +28,8 @@ This document tracks all sprint artifacts and their approval status.
 | 5 | Vibe Checks | COMPLETED | Approved | Approved |
 | 6 | Claude Commands | COMPLETED | Approved | Approved |
 | 7 | Documentation & Migration | COMPLETED | Approved | Approved |
+
+**Security Audit:** APPROVED - LET'S FUCKING GO (2026-01-06)
 
 ---
 
@@ -246,7 +259,8 @@ This document tracks all sprint artifacts and their approval status.
 | v1.0.0 | 2026-01-05 | v1.0-1 to v1.0-12 | Full Workbench | Released |
 | v1.2.4 | 2026-01-05 | 1-10 | Diff + Feel | Released |
 | v2.0.0 | 2026-01-05 | 1-8 | Reality Engine | Released |
-| v2.6.0 | 2026-01-06 | 1-7 | Craftsman's Flow | In Progress |
+| v2.6.0 | 2026-01-06 | 1-7 | Craftsman's Flow | Released |
+| v3.0.0 | 2026-01-06 | 1-4 | Living Engine | Released |
 
 ---
 
@@ -275,5 +289,109 @@ This document tracks all sprint artifacts and their approval status.
 
 ---
 
+---
+
+## v3.0 Sprint 1: Critical Fixes (P0)
+
+**Duration:** 1 sprint
+**Theme:** Fix fatal bugs that block any v3.0 use
+**Status:** COMPLETED
+
+### Artifacts
+- [reviewer.md](./v3.0-sprint-1/reviewer.md) - Implementation report
+- [engineer-feedback.md](./v3.0-sprint-1/engineer-feedback.md) - Tech lead review (APPROVED)
+- [auditor-sprint-feedback.md](./v3.0-sprint-1/auditor-sprint-feedback.md) - Security audit (APPROVED)
+- [COMPLETED](./v3.0-sprint-1/COMPLETED) - Completion marker
+
+### Key Deliverables
+- Remove ProcessContextProvider from exports (fs-in-browser fix)
+- Update Process layer documentation (agent-only)
+- Rewrite skills for philosophy alignment
+
+### Tasks
+- [x] S1-T1: Remove ProcessContextProvider from exports
+- [x] S1-T2: Update Process layer documentation
+- [x] S1-T3: Rewrite consulting-decisions skill
+- [x] S1-T4: Rewrite crafting-guidance skill
+- [x] S1-T5: Audit all skills for philosophy alignment
+
+---
+
+## v3.0 Sprint 2: Foundation (P1)
+
+**Duration:** 1 sprint
+**Theme:** Core architectural changes for v3.0
+
+### Key Deliverables
+- Vocabulary layer (vocabulary.yaml + reader)
+- Persona rename (lens-array → personas)
+- Layout-only zone documentation
+
+### Tasks
+- [x] S2-T1: Create vocabulary.yaml schema and initial terms
+- [x] S2-T2: Implement vocabulary-reader.ts
+- [x] S2-T3: Rename lens-array to personas
+- [x] S2-T4: Update CLAUDE.md with vocabulary protocol
+- [x] S2-T5: Remove path-based zone detection claims
+- [x] S2-T6: Add vocabulary-reader tests (41 tests)
+
+---
+
+## v3.0 Sprint 3: User Fluidity (P2)
+
+**Duration:** 1 sprint
+**Theme:** Persona context and zone overrides for adaptive UX
+**Status:** COMPLETED
+
+### Artifacts
+- [reviewer.md](./v3.0-sprint-3/reviewer.md) - Implementation report
+- [engineer-feedback.md](./v3.0-sprint-3/engineer-feedback.md) - Tech lead review (APPROVED)
+- [auditor-sprint-feedback.md](./v3.0-sprint-3/auditor-sprint-feedback.md) - Security audit (APPROVED)
+- [COMPLETED](./v3.0-sprint-3/COMPLETED) - Completion marker
+
+### Key Deliverables
+- Philosophy layer (philosophy.yaml + reader)
+- PersonaProvider runtime context
+- Zone-persona integration
+- 39 philosophy-reader tests
+
+### Tasks
+- [x] S3-T1: Create philosophy.yaml schema and content (7 principles, 6 rules)
+- [x] S3-T2: Implement philosophy-reader.ts (resolveConflict with context)
+- [x] S3-T3: Create PersonaProvider runtime context (auto-detection)
+- [x] S3-T4: Add persona_overrides to .sigilrc.yaml
+- [x] S3-T5: Update zone context with persona integration
+- [x] S3-T6: Add philosophy-reader tests (39 tests)
+
+---
+
+## v3.0 Sprint 4: Living Market (P3)
+
+**Duration:** 1 sprint
+**Theme:** Prepare for runtime configuration and behavioral observation
+**Status:** COMPLETED
+
+### Artifacts
+- [reviewer.md](./v3.0-sprint-4/reviewer.md) - Implementation report
+- [engineer-feedback.md](./v3.0-sprint-4/engineer-feedback.md) - Tech lead review (APPROVED)
+- [auditor-sprint-feedback.md](./v3.0-sprint-4/auditor-sprint-feedback.md) - Security audit (APPROVED)
+- [COMPLETED](./v3.0-sprint-4/COMPLETED) - Completion marker
+
+### Key Deliverables
+- Remote config schema (marketing/engineering separation)
+- Behavioral signals (8 passive UX observation patterns)
+- Final documentation (README, MIGRATION, CHANGELOG)
+- v3.0 Release preparation (.sigil-version.json, CHANGELOG.md)
+
+### Tasks
+- [x] S4-T1: Create remote-config.yaml schema
+- [x] S4-T2: Add behavioral signals to vibe-checks.yaml
+- [x] S4-T3: Update vibe-check-reader for behavioral signals
+- [x] S4-T4: Document remote config architecture
+- [x] S4-T5: Final documentation update
+- [x] S4-T6: v3.0 Release preparation
+
+---
+
 *Last Updated: 2026-01-06*
-*Current Version: Sigil v2.6.0 "Craftsman's Flow" (In Progress)*
+*Current Version: Sigil v3.0.0 "Living Engine" — RELEASED*

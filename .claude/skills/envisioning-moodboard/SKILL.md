@@ -2,6 +2,7 @@
 zones:
   state:
     paths:
+      - sigil-mark/moodboard/
       - sigil-mark/moodboard.md
       - sigil-mark/soul-binder/immutable-values.yaml
       - sigil-mark/lens-array/lenses.yaml
@@ -33,6 +34,40 @@ This skill captures both intended soul (values) and sets up the framework for pr
 1. **Sigil Setup**: Verify `.sigil-setup-complete` exists
 2. **Existing State**: Check for existing files and offer to update vs replace
 3. **Section Focus**: If section argument provided, skip other sections
+4. **Moodboard Folder**: Check if `sigil-mark/moodboard/` exists for v3.1 inspiration collection
+
+## Moodboard Folder (v3.1)
+
+Before or after the interview, prompt users about the moodboard folder:
+
+```
+Sigil supports a moodboard folder for collecting design inspiration:
+
+  sigil-mark/moodboard/
+  ├── references/     → Product screenshots, flows (organize by source)
+  ├── articles/       → Design article syntheses
+  ├── anti-patterns/  → Patterns to avoid
+  ├── gtm/            → Brand voice, messaging
+  └── screenshots/    → Quick visual drops
+
+You can drop files here anytime. I'll reference them during /craft.
+
+Would you like to:
+1. Continue with the interview (creates moodboard.md)
+2. Start dropping files in the folder (skip interview)
+3. Do both (interview + folder for artifacts)
+```
+
+If the folder already has content, acknowledge it:
+
+```
+I found {N} entries in your moodboard folder:
+  - {X} references
+  - {Y} anti-patterns
+  - {Z} articles
+
+I'll use these during /craft. The interview adds structured feel descriptors.
+```
 
 ## Workflow
 
@@ -573,6 +608,11 @@ Captured:
   - Z immutable values (N blocking, M warning)
   - L user lenses
 
+Moodboard Folder (v3.1):
+  sigil-mark/moodboard/ is ready for inspiration artifacts.
+  Drop screenshots, articles, and references anytime.
+  See sigil-mark/moodboard/README.md for usage.
+
 Strictness Level: [current from .sigilrc.yaml]
   [Description of what this means]
 
@@ -580,6 +620,7 @@ Next steps:
   - /codify to define design rules
   - /canonize to protect emergent behaviors
   - /craft to get design guidance
+  - Drop inspiration into sigil-mark/moodboard/
 ```
 
 ## Error Handling

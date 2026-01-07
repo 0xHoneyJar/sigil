@@ -10,7 +10,7 @@
 # - Lens selection
 # - User preferences
 
-version: "2.6.0"
+version: "3.0.0"
 enforcement: block
 
 protected:

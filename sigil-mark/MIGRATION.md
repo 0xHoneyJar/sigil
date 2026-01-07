@@ -373,3 +373,206 @@ All Process layer features gracefully degrade. Missing files return defaults:
 | No lenses.yaml | Returns default personas |
 
 Your v2.0 code continues to work without any Process layer files.
+
+---
+
+# Migration Guide: v2.6 → v3.0
+
+This section covers migration from v2.6 "Craftsman's Flow" to v3.0 "Living Engine".
+
+## Overview
+
+v3.0 introduces a fundamental architectural split: **Agent-Time** (process layer) vs **Runtime** (React components). The Process layer no longer runs in the browser.
+
+## Breaking Changes
+
+### 1. ProcessContextProvider Removed from Client
+
+**v2.6 (BROKEN in v3.0):**
+```tsx
+// This crashes in browser - fs not available
+import { ProcessContextProvider } from 'sigil-mark';
+
+<ProcessContextProvider>
+  <App />
+</ProcessContextProvider>
+```
+
+**v3.0 (CORRECT):**
+```tsx
+// Process layer is agent-only (reads YAML at generation time)
+// Use new runtime providers instead:
+import { PersonaProvider, ZoneProvider } from 'sigil-mark';
+
+<PersonaProvider defaultPersona="power_user">
+  <ZoneProvider zone="critical">
+    <App />
+  </ZoneProvider>
+</PersonaProvider>
+```
+
+### 2. Lens Array → Personas Rename
+
+**v2.6:**
+```tsx
+import { readLensArray, type LensArray } from 'sigil-mark/process';
+```
+
+**v3.0:**
+```tsx
+import { readPersonas, type PersonaArray } from 'sigil-mark/process';
+
+// Deprecated aliases still work with console warning:
+import { readLensArray, type LensArray } from 'sigil-mark/process'; // ⚠️ deprecated
+```
+
+### 3. Process Layer is Agent-Only
+
+The `sigil-mark/process/` module now has `@server-only` JSDoc and must NOT be imported in browser code:
+
+```tsx
+// ❌ WRONG - crashes in browser
+import { readConstitution } from 'sigil-mark/process';
+
+// ✅ CORRECT - agent reads at generation time, embeds in code
+// Agent reads: sigil-mark/constitution/protected-capabilities.yaml
+// Agent generates code with embedded values
+```
+
+## New Features
+
+### 1. Vocabulary Layer
+
+Vocabulary is Sigil's public API—the bridge between human concepts and code:
+
+```yaml
+# sigil-mark/vocabulary/vocabulary.yaml
+version: "3.0.0"
+terms:
+  - id: vault
+    engineering_name: PositionDisplay
+    user_facing: ["Vault", "Position"]
+    mental_model: "A secure container for assets"
+    feel:
+      critical: { material: fortress, motion: deliberate }
+      dashboard: { material: glass, motion: responsive }
+```
+
+**Agent Protocol:**
+1. User says "create vault display"
+2. Agent looks up `vault` → `PositionDisplay`
+3. Agent checks zone → gets appropriate feel
+4. Agent generates code with embedded physics
+
+### 2. Philosophy Layer (Intent)
+
+Capture the "why" behind design decisions:
+
+```yaml
+# sigil-mark/soul-binder/philosophy.yaml
+version: "3.0.0"
+primary_intent: "Make DeFi feel trustworthy, not scary"
+principles:
+  - id: security_first
+    statement: "Security indicators must be visible"
+    priority: 1
+    zones: ["critical"]
+```
+
+### 3. User Fluidity (Persona + Zone = Experience)
+
+```tsx
+import { usePersona, useZone, useEffectivePhysics } from 'sigil-mark';
+
+function MyComponent() {
+  const persona = usePersona();     // "power_user"
+  const zone = useZone();           // "critical"
+  const physics = useEffectivePhysics(); // Combined from both
+
+  // Physics adapts: power_user + critical = keyboard nav, heavy motion
+}
+```
+
+### 4. Behavioral Signals
+
+Passive observation patterns in vibe-checks.yaml:
+
+```yaml
+behavioral_signals:
+  - id: rage_clicking
+    name: Rage Clicking
+    triggers:
+      - event: element_click
+        count_threshold: 3
+        within_ms: 2000
+    insight: "User expects something to happen that isn't"
+    severity: high
+```
+
+### 5. Remote Configuration
+
+Marketing vs Engineering controlled values:
+
+```yaml
+# sigil-mark/remote-config/remote-config.yaml
+marketing_controlled:
+  copy:
+    hero_headline: { value: "Your Crypto, Your Way" }
+  feature_flags:
+    show_new_dashboard: { enabled: false }
+
+engineering_controlled:
+  physics: local_only  # NEVER remote
+  rate_limits:
+    api_general: { requests_per_minute: 60 }
+```
+
+## Migration Checklist
+
+### Breaking Changes (Required)
+
+- [ ] Remove `ProcessContextProvider` from all client code
+- [ ] Replace `readLensArray` → `readPersonas` (or accept deprecation warning)
+- [ ] Replace `LensArray` → `PersonaArray` types
+- [ ] Ensure no `sigil-mark/process/` imports in browser bundles
+
+### New Features (Optional)
+
+- [ ] Create `vocabulary.yaml` with product terms
+- [ ] Create `philosophy.yaml` with design principles
+- [ ] Add behavioral signals to `vibe-checks.yaml`
+- [ ] Configure `remote-config.yaml` for dynamic values
+
+### Runtime Setup (Optional)
+
+```tsx
+// Wrap app with new providers
+import { PersonaProvider, ZoneProvider } from 'sigil-mark';
+
+function App() {
+  return (
+    <PersonaProvider defaultPersona="newcomer">
+      <ZoneProvider zone="marketing">
+        {/* App content */}
+      </ZoneProvider>
+    </PersonaProvider>
+  );
+}
+```
+
+## Graceful Degradation
+
+All v3.0 features gracefully degrade. Missing files return defaults:
+
+| Missing | Behavior |
+|---------|----------|
+| No vocabulary.yaml | Returns empty terms array |
+| No philosophy.yaml | Returns default empty philosophy |
+| No behavioral_signals | Returns empty signals array |
+| No remote-config.yaml | Uses local_yaml fallback |
+
+## Need Help?
+
+- See [CLAUDE.md](../CLAUDE.md) for AI agent documentation
+- Check [__examples__/](./__examples__/) for complete examples
+- Run `/craft` command for guided component generation

@@ -1,37 +1,36 @@
 /**
- * Sigil v2.6 — Craftsman's Flow
+ * Sigil v3.0 — Living Engine
  *
- * Design physics framework with Process Layer for human-AI collaboration.
+ * Design physics framework for AI-assisted UI development.
  *
- * ## Architecture (4 Layers)
+ * ## Architecture
  *
  * ```
- * ┌────────────────────────────────────────────────────────────┐
- * │  PROCESS LAYER — Human decisions (NEW in v2.6)            │
- * │  Constitution, Lens Array, Consultation Chamber, Surveys  │
- * │  YAML/Markdown captured by Claude, referenced in code     │
- * ├────────────────────────────────────────────────────────────┤
- * │  CORE LAYER — Physics engines (Truth)                     │
- * │  useCriticalAction → State Stream                         │
- * │  { status, timeAuthority, selfPrediction, worldTruth }    │
- * ├────────────────────────────────────────────────────────────┤
- * │  LAYOUT LAYER — Zones + Structural Physics                │
- * │  CriticalZone, MachineryLayout, GlassLayout               │
- * │  Layouts ARE Zones. Physics is DOM, not lint.             │
- * ├────────────────────────────────────────────────────────────┤
- * │  LENS LAYER — Interchangeable UIs (Experience)            │
- * │  useLens() → Lens components                              │
- * │  DefaultLens, StrictLens, A11yLens                        │
- * └────────────────────────────────────────────────────────────┘
+ * ┌─────────────────────────────────────────────────────────────────────────┐
+ * │                        AGENT TIME (Generation)                         │
+ * │  Constitution, Vocabulary, Personas, Philosophy — YAML                 │
+ * │  Agent reads during code generation. NOT bundled for browser.          │
+ * │                                                                         │
+ * │  To access Process: import { readConstitution } from 'sigil-mark/process'│
+ * └─────────────────────────────────────────────────────────────────────────┘
+ *                                │
+ *                                ↓
+ * ┌─────────────────────────────────────────────────────────────────────────┐
+ * │                         RUNTIME (Browser)                              │
+ * │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                  │
+ * │  │     Core     │  │    Layout    │  │     Lens     │                  │
+ * │  │  (Hooks,     │  │ (CriticalZone│  │ (DefaultLens │                  │
+ * │  │   Physics)   │  │  Machinery)  │  │  StrictLens) │                  │
+ * │  └──────────────┘  └──────────────┘  └──────────────┘                  │
+ * │                                                                         │
+ * │               Pure React, no fs, no YAML parsing                        │
+ * └─────────────────────────────────────────────────────────────────────────┘
  * ```
  *
  * ## Quick Start
  *
  * ```tsx
  * import {
- *   // Process (v2.6)
- *   useProcessContext,
- *   ProcessContextProvider,
  *   // Core
  *   useCriticalAction,
  *   // Layouts
@@ -41,7 +40,6 @@
  * } from 'sigil-mark';
  *
  * function PaymentForm({ amount }: { amount: number }) {
- *   const { constitution, decisions } = useProcessContext();
  *   const payment = useCriticalAction({
  *     mutation: () => api.pay(amount),
  *     timeAuthority: 'server-tick',
@@ -65,69 +63,59 @@
  * }
  * ```
  *
+ * ## Process Layer (Agent-Only)
+ *
+ * The Process layer (Constitution, Personas, Decisions, etc.) is for
+ * AGENT USE ONLY during code generation. Do NOT import in client code.
+ *
+ * ```typescript
+ * // In agent/build context only:
+ * import { readConstitution } from 'sigil-mark/process';
+ * ```
+ *
  * @module sigil-mark
- * @version 2.6.0
+ * @version 3.0.0
  */
 
 // =============================================================================
-// PROCESS LAYER — Human Decisions (v2.6)
+// PROCESS LAYER — REMOVED FROM RUNTIME EXPORTS (v3.0)
 // =============================================================================
 
-export {
-  // Context
-  ProcessContextProvider,
-  ProcessContext,
-  useProcessContext,
-  useConstitution,
-  useLensArray,
-  useDecisions,
-  useCurrentPersona,
-  useDecisionsForCurrentZone,
-  // Constitution
-  readConstitution,
-  isCapabilityProtected,
-  getCapabilityEnforcement,
-  validateAction,
-  DEFAULT_CONSTITUTION,
-  // Decisions
-  readAllDecisions,
-  getDecisionsForZone,
-  isDecisionExpired,
-  getDaysRemaining,
-  lockDecision,
-  unlockDecision,
-  LOCK_PERIODS,
-  // Personas
-  readLensArray,
-  getPersona,
-  getAllPersonas,
-  getPhysicsForPersona,
-  validateLensStack,
-  DEFAULT_LENS_ARRAY,
-  // Vibe Checks
-  readVibeChecks,
-  getTriggerById,
-  shouldTriggerSurvey,
-  recordSurveyResponse,
-  DEFAULT_VIBE_CHECKS,
-  // Types
-  type ProcessContextValue,
-  type Constitution,
-  type ProtectedCapability,
-  type EnforcementLevel,
-  type Decision,
-  type DecisionScope,
-  type DecisionStatus,
-  type LensArray,
-  type Persona,
-  type PersonaPhysics,
-  type PersonaConstraints,
-  type VibeChecks,
-  type SurveyTrigger,
+/**
+ * @deprecated ProcessContextProvider has been removed in v3.0.
+ *
+ * The Process layer (Constitution, Personas, Decisions, Vibe Checks) is now
+ * AGENT-ONLY. It reads YAML files using Node.js `fs` and cannot run in browser.
+ *
+ * Migration:
+ * - Remove ProcessContextProvider from your app
+ * - Process context is embedded at code generation time by the agent
+ * - Runtime components receive configuration via props, not context
+ *
+ * For agent/build-time access, import directly:
+ * ```typescript
+ * import { readConstitution } from 'sigil-mark/process';
+ * ```
+ */
+
+// Re-export types only (no runtime functions) for backwards compatibility
+export type {
+  Constitution,
+  ProtectedCapability,
+  EnforcementLevel,
+  Decision,
+  DecisionScope,
+  DecisionStatus,
+  LensArray,
+  Persona,
+  PersonaPhysics,
+  PersonaConstraints,
+  VibeChecks,
+  SurveyTrigger,
 } from './process';
 
+// Zone-Persona integration remains (pure TypeScript, no fs)
 export {
-  // Zone-Persona Integration (v2.6)
   getPersonaForZone,
   resolveZoneWithPersona,
   DEFAULT_ZONE_PERSONA_MAP,
@@ -282,7 +270,7 @@ export {
 // =============================================================================
 
 /** Sigil version */
-export const VERSION = '2.6.0';
+export const VERSION = '3.0.0';
 
 /** Architecture codename */
-export const CODENAME = "Craftsman's Flow";
+export const CODENAME = "Living Engine";

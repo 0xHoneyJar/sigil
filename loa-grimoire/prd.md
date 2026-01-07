@@ -1,500 +1,611 @@
-# Product Requirements Document: Sigil v2.6
+# Sigil v3.0 PRD — "Living Engine"
 
-**Version**: 2.6.0
-**Status**: Draft
-**Date**: 2026-01-06
-**Codename**: Craftsman's Flow
+**Version:** 3.0.0
+**Codename:** Living Engine
+**Status:** Draft
+**Date:** 2026-01-06
+
+> *"Sweat the art. We handle the mechanics. Return to flow."*
 
 ---
 
 ## Executive Summary
 
-Sigil v2.6 introduces a **two-tier architecture** that separates human design decisions (Sigil Process) from implementation primitives (Sigil Core). This evolution recognizes that design systems serve two distinct purposes: capturing *what* and *why* (human decisions) and providing *how* (code primitives).
+Sigil v3.0 evolves from a "Physics Engine for a closed system" to a "Product Engine for a living market." This release addresses fatal runtime bugs, naming confusion, and fundamental product strategy gaps identified in the v2.6 review.
 
-> *"Sweat the art. We handle the mechanics. Return to flow."*
+**Core Insight:** Users are fluid, markets are living, and soul must resonate — not just enforce.
 
-**Architecture**:
-```
-┌─────────────────────────────────────────────────┐
-│              SIGIL PROCESS                      │
-│   Human interaction layer                       │
-│   Constitution, Lenses, Consultation, Surveys   │
-│   Commands: /envision, /consult, /craft         │
-└─────────────────────────────────────────────────┘
-                      ↓
-              design decisions flow down
-                      ↓
-┌─────────────────────────────────────────────────┐
-│              SIGIL CORE                         │
-│   React primitives layer                        │
-│   Hooks, Layouts, Lens Components               │
-│   useCriticalAction, CriticalZone, StrictLens   │
-└─────────────────────────────────────────────────┘
-```
+### Key Changes
 
-**Sources**: sigil-v2.6.zip/README.md, User clarification (Process/Core separation)
+| Area | v2.6 (Current) | v3.0 (Target) |
+|------|----------------|---------------|
+| Process Layer | Runtime (crashes in browser) | Agent-only (generation time) |
+| Personas | Called "Lenses" (confusing) | Renamed, distinct from UI Lenses |
+| Zone Detection | Path-based claims, layout-based code | Layout-based only |
+| User Experience | One persona per zone | Persona fluidity per zone |
+| Vocabulary | None | Rosetta Stone (term → feel mapping) |
+| Philosophy | Implicit | Explicit Intent Layer |
+| Vibe Testing | Git commits only | Remote config for marketing |
 
 ---
 
-## 1. Problem Statement
+## Problem Statement
 
-### 1.1 The Flow Problem
+### What We Built (v2.6)
+A sophisticated design physics engine with clean Core/Layout/Lens separation, Constitution-based governance, and time-locked decisions.
 
-Craftsmen (product engineers and designers) lose flow state due to:
+### What's Broken
 
-| Interruption | Impact |
-|--------------|--------|
-| Context loss after time away | "Where was I? What did we decide?" |
-| Re-arguing settled questions | Bikeshedding on decisions already made |
-| Consistency tracking burden | Manual enforcement of design rules |
-| Implementation mechanics | Boilerplate distracts from feel |
+1. **Fatal Runtime Bug:** Process layer uses Node.js `fs` but is marked `'use client'` — crashes in browser
+2. **Naming Collision:** "Lens" means both UI components AND user personas
+3. **Philosophy Drift:** Skills contradict agreed principles
+4. **Static World Model:** Same zone = same experience, regardless of user type
+5. **No Vocabulary:** "Pot" and "Vault" have same physics but need different feels
+6. **Locked Soul:** Marketing can't test vibes without engineering PRs
 
-### 1.2 The Two-System Problem
+### Success Criteria
 
-Current design systems conflate two concerns:
-
-| Concern | What It Is | Who Owns It |
-|---------|------------|-------------|
-| **Process** | Design decisions, constraints, rules | Humans (designers, PMs, leads) |
-| **Core** | Implementation primitives, components | Code (React, TypeScript) |
-
-Mixing these creates friction: humans fight code, code can't capture intent.
-
-### 1.3 v2.6 Solution
-
-**Sigil Process** captures human decisions in YAML/markdown:
-- Constitution (protected capabilities that ALWAYS work)
-- Lens Array (user personas viewing same truth)
-- Consultation Chamber (locked decisions with time periods)
-- Vibe Checks (qualitative feedback surveys)
-
-**Sigil Core** provides implementation primitives:
-- React hooks (`useCriticalAction`, `useLocalCache`)
-- Layout components (`CriticalZone`, `MachineryLayout`)
-- Lens components (`DefaultLens`, `StrictLens`, `A11yLens`)
-
-**Sources**: sigil-v2.6.zip/README.md:67-74, CLAUDE.md:1-50
+| Metric | Target |
+|--------|--------|
+| Runtime crashes from Process layer | 0 |
+| Naming collisions in documentation | 0 |
+| Skill files matching philosophy | 100% |
+| Vocabulary coverage for core terms | 100% |
+| Agent can generate correct code | Yes |
 
 ---
 
-## 2. Product Vision
+## User Personas
 
-### 2.1 Vision Statement
+### Primary: The Craftsman (Agent User)
 
-Sigil v2.6 protects the craftsman's flow state by:
-1. **Capturing decisions** in durable, queryable format (Constitution, Consultation)
-2. **Restoring context** after time away (/craft command)
-3. **Handling mechanics** so humans focus on feel
-4. **Locking settled questions** to prevent bikeshedding
+The developer using Claude Code with Sigil installed. They want to:
+- Generate UI that feels right without manual design decisions
+- Get clear guidance on zones, materials, and motions
+- Focus on product logic, not design system mechanics
 
-### 2.2 Philosophy
+**Pain Points (v2.6):**
+- Agent tries to use missing components (InspectorOverlay, VibeSurvey)
+- Confusing "Lens" terminology
+- Skills say "decide fast" but philosophy says "sweat the art"
 
-**PROTECT:**
-- Deep thinking about feel and soul
-- Time for inspiration and observation
-- The joy of sweating the right details
-- Deep dives when the craft demands it
+### Secondary: The Newcomer (End User - Henlocker)
 
-**REMOVE:**
-- Implementation mechanics
-- Consistency tracking
-- Context loss after time away
-- Re-arguing settled questions
+A novice user visiting high-stakes pages. They need:
+- Reassurance and warmth
+- Guidance through complex flows
+- Clear error messages and recovery paths
 
-### 2.3 Key Insight
+**Pain Point (v2.6):** Gets same "power user" experience as experts because zone = path.
 
-> "The craftsman SHOULD sweat the details — that's the essence of craft. Sigil removes the *wrong* cognitive load so you can focus on the *right* details."
+### Secondary: The Power User (End User - Chef)
 
-**Sources**: sigil-v2.6.zip/README.md:9-27
+An expert user who lives in the product. They need:
+- Density and speed
+- Keyboard shortcuts
+- Minimal hand-holding
 
----
-
-## 3. Target Users
-
-### 3.1 Primary Users
-
-**Product Engineers**
-- Build interfaces using Sigil Core primitives
-- Reference Constitution for protected capabilities
-- Use /craft to restore context after time away
-- Lock decisions with /consult to prevent revisiting
-
-**Product Designers**
-- Capture product feel with /envision
-- Define user personas in Lens Array
-- Set protected capabilities in Constitution
-- Review locked decisions in Consultation Chamber
-
-**AI Agents (Claude Code)**
-- Read Constitution before generating UI code
-- Check Consultation Chamber for locked decisions
-- Surface relevant context when files are opened
-- Warn (don't block) on violations
-
-### 3.2 User Stories
-
-| As a... | I want to... | So that... |
-|---------|--------------|------------|
-| Engineer | Restore context after vacation | I don't waste time figuring out where I was |
-| Engineer | Lock the button color decision | Team stops bikeshedding on settled question |
-| Designer | Capture product feel before it fades | Intent survives after meetings end |
-| Designer | Define user personas | Different users get appropriate experiences |
-| PM | Set protected capabilities | Core features can't be accidentally disabled |
-| AI Agent | Know locked decisions | I don't suggest changes to settled areas |
-| AI Agent | Read Constitution | I ensure protected capabilities work |
-
-**Sources**: sigil-v2.6.zip/README.md:61-74, FLOWS.md:1-50
+**Pain Point (v2.6):** Gets same "newcomer" experience as novices in marketing zones.
 
 ---
 
-## 4. Architecture
+## Functional Requirements
 
-### 4.1 Two-Tier Model
+### FR-1: Agent-Only Process Layer (P0)
 
-```
-SIGIL PROCESS (Human Layer)
-├── Constitution           # Protected capabilities (immutable)
-├── Lens Array            # User personas (multiple truths)
-├── Consultation Chamber  # Locked decisions (time-boxed)
-├── Surveys               # Vibe checks (qualitative)
-├── Moodboard             # Product feel (vision)
-└── Rules                 # Design rules (codified taste)
+**Problem:** Process readers use `fs` module but ProcessContextProvider is `'use client'`.
 
-              ↓ Design decisions flow down ↓
+**Solution:** Process layer becomes agent-context-only. The agent reads YAML during code generation. Runtime never touches these files.
 
-SIGIL CORE (Implementation Layer)
-├── Core Hooks            # useCriticalAction, useLocalCache
-├── Layouts               # CriticalZone, MachineryLayout, GlassLayout
-├── Lenses                # DefaultLens, StrictLens, A11yLens
-├── Profiler              # Ergonomic validation
-└── Integrity             # Lens classification
+**Changes:**
+- Remove `ProcessContextProvider` from exports
+- Remove `'use client'` directive from process files
+- Add agent protocol to CLAUDE.md for Process context loading
+- Document clearly: "Process = Generation Time, Core = Runtime"
+
+**Acceptance Criteria:**
+- [ ] No `fs` imports in any file that could be bundled for browser
+- [ ] CLAUDE.md clearly states Process is agent-only
+- [ ] Agent can load Constitution, Personas, Decisions during generation
+- [ ] No runtime errors when using Sigil in Next.js app
+
+---
+
+### FR-2: Vocabulary Layer — The Rosetta Stone (P1)
+
+**Problem:** Same physics can apply to different concepts that need different feels.
+
+**Solution:** Add vocabulary.yaml that maps product terms to recommended materials and motions.
+
+**Schema:**
+```yaml
+# sigil-mark/vocabulary.yaml
+version: "3.0.0"
+
+terms:
+  pot:
+    engineering_name: "savings_container"
+    user_facing: "Pot"
+    mental_model: "Piggy bank, casual saving"
+    recommended:
+      material: glass
+      motion: warm
+      tone: friendly
+    zones: [marketing, dashboard]
+
+  vault:
+    engineering_name: "savings_container"  # Same backend!
+    user_facing: "Vault"
+    mental_model: "Bank vault, security"
+    recommended:
+      material: machinery
+      motion: deliberate
+      tone: serious
+    zones: [critical]
+
+  claim:
+    engineering_name: "reward_claim"
+    user_facing: "Claim"
+    mental_model: "Receiving earned reward"
+    recommended:
+      material: decisive
+      motion: celebratory_then_deliberate
+      tone: exciting
+    zones: [critical]
 ```
 
-### 4.2 Sigil Process Components
+**Agent Protocol:**
+1. Agent identifies the noun being rendered (e.g., "Pot")
+2. Agent looks up term in vocabulary.yaml
+3. Agent applies term's recommended material/motion, not just zone's default
+4. Zone physics still apply, but material adapts to noun
 
-#### 4.2.1 Constitution (Protected Capabilities)
-
-Capabilities that ALWAYS work, regardless of:
-- Remote configuration
-- Marketing campaigns
-- A/B tests
-- Lens selection
-- User preferences
-
-| Capability | Description | Enforcement |
-|------------|-------------|-------------|
-| `withdraw` | User can always exit position | Block |
-| `deposit` | User can always add to position | Block |
-| `risk_alert` | Warnings shown for high-risk actions | Block |
-| `slippage_warning` | Slippage displayed before trades | Block |
-| `fee_disclosure` | All fees shown before confirmation | Block |
-| `balance_visible` | User can always see balance | Block |
-| `error_messages` | Errors never suppressed | Block |
-| `help_access` | Help available on every screen | Warn |
-
-**Philosophy**: *"Marketing needs levers. Product needs brakes."*
-
-**Sources**: sigil-v2.6.zip/sigil-mark/constitution/protected-capabilities.yaml
-
-#### 4.2.2 Lens Array (User Personas)
-
-Different perspectives viewing the same core product:
-
-| Lens | Alias | Mental Model | Interaction Style |
-|------|-------|--------------|-------------------|
-| `power_user` | Chef | Financial instrument | Keyboard-driven, dense |
-| `newcomer` | Henlocker | Physical jar | Tactile, forgiving |
-| `mobile` | Thumbzone | Pocket app | Thumb-reachable, gestural |
-| `accessibility` | A11y | Structured document | Sequential, announced |
-
-Each lens defines:
-- Target audience
-- Physics (tap targets, input method, shortcuts)
-- Constraints (required vs optional)
-- Validation rules
-
-**Philosophy**: *"Multiple truths coexist on top of core."*
-
-**Sources**: sigil-v2.6.zip/sigil-mark/lens-array/lenses.yaml
-
-#### 4.2.3 Consultation Chamber (Locked Decisions)
-
-After deliberation, lock decisions to prevent bikeshedding:
-
-| Scope | Lock Period | Use Case |
-|-------|-------------|----------|
-| Strategic | 180 days | Fundamental direction |
-| Direction | 90 days | Pattern choice |
-| Execution | 30 days | Implementation detail |
-
-Example:
-```
-Decision: Primary CTA is Blue
-ID: DEC-2026-001
-Scope: Direction
-Lock: 90 days
-```
-
-**Philosophy**: *"After you've thought deeply, lock it. Stop re-arguing."*
-
-**Sources**: sigil-v2.6.zip/.claude/commands/consult.md
-
-#### 4.2.4 Vibe Checks (Micro-Surveys)
-
-Capture qualitative intent, not just quantitative clicks:
-
-| Trigger | Question | Purpose |
-|---------|----------|---------|
-| Strategy change | "What were you looking for?" | Understand WHY users switched views |
-| First deposit | "What brought you to us?" | Attribution |
-| First withdraw | "Why are you withdrawing?" | Churn understanding |
-| Card expanded | "What did you want to see?" | Information architecture |
-| Transaction failed | "What happened?" | Error diagnosis |
-
-**Philosophy**: *"'Expanded card 5x' tells us WHAT. 'Looking for fees' tells us WHY."*
-
-**Sources**: sigil-v2.6.zip/sigil-mark/surveys/vibe-checks.yaml
-
-### 4.3 Sigil Core Components
-
-(Retained from v2.0 "Reality Engine")
-
-| Component | Purpose |
-|-----------|---------|
-| `useCriticalAction` | State stream with time authorities |
-| `useLocalCache` | Local-first state management |
-| `CriticalZone` | Layout for financial/critical actions |
-| `MachineryLayout` | Keyboard-navigable list layout |
-| `GlassLayout` | Hover-enabled marketing layout |
-| `DefaultLens` | Standard UI rendering |
-| `StrictLens` | Forced in critical zones |
-| `A11yLens` | High contrast, large targets |
-
-**Sources**: loa-grimoire/archive/prd-v2.0.md
+**Acceptance Criteria:**
+- [ ] vocabulary.yaml schema defined with JSON Schema validation
+- [ ] Agent protocol documented in CLAUDE.md
+- [ ] README mentions vocabulary as API surface
+- [ ] At least 10 core terms defined for initial vocabulary
 
 ---
 
-## 5. Functional Requirements
+### FR-3: Persona Rename (P1)
 
-### 5.1 Sigil Process Requirements
+**Problem:** "Lens" means both UI components and user personas.
 
-**FR-PROC-001**: Constitution Enforcement
-- Protected capabilities cannot be overridden by remote config
-- Violations logged with justification requirement
-- Audit trail for any override attempts
+**Solution:** Rename `lens-array/` to `personas/` throughout codebase.
 
-**FR-PROC-002**: Lens Array Management
-- Lenses can be stacked (e.g., power_user + accessibility)
-- Conflict resolution by priority order
-- Immutable properties never vary between lenses
+**Changes:**
+| Old | New |
+|-----|-----|
+| `sigil-mark/lens-array/` | `sigil-mark/personas/` |
+| `sigil-mark/lens-array/lenses.yaml` | `sigil-mark/personas/personas.yaml` |
+| `LensArray` type | `PersonaArray` type |
+| `readLensArray()` | `readPersonaArray()` |
+| `getPersona()` (from lens-array) | `getPersona()` (from personas) |
 
-**FR-PROC-003**: Decision Locking
-- Decisions locked with ID, scope, and duration
-- Unlock requires justification
-- /craft surfaces locked decisions for relevant files
+**Keep "Lens" for:**
+- `sigil-mark/lenses/` — UI rendering components (DefaultLens, StrictLens, A11yLens)
+- `useLens()` hook — Returns UI Lens based on zone + preference
+- `LensProvider` — Context for user lens preference
 
-**FR-PROC-004**: Vibe Check Collection
-- Cooldown periods prevent survey fatigue
-- Max 1 survey per session
-- Pattern detection for research insights
-
-**FR-PROC-005**: Zone Configuration
-- Zones defined by path patterns in .sigilrc.yaml
-- Zone determines motion, timing, lens enforcement
-- Critical zones force strict lens
-
-### 5.2 Sigil Core Requirements
-
-(Retained from v2.0)
-
-**FR-CORE-001**: Critical Action Hook
-- State stream with time authorities
-- Optimistic, server-tick, hybrid modes
-
-**FR-CORE-002**: Layout Primitives
-- CriticalZone: 32px gap, max 3 actions
-- MachineryLayout: Keyboard navigation
-- GlassLayout: Hover physics
-
-**FR-CORE-003**: Lens System
-- Built-in lenses: Default, Strict, A11y
-- Ergonomic profiler validation
-- Zone-based enforcement
-
-### 5.3 Command Requirements
-
-| Command | Input | Output | Human Effort |
-|---------|-------|--------|--------------|
-| `/setup` | None | .sigilrc.yaml, sigil-mark/ | Low |
-| `/envision` | Interview | moodboard.md | Medium |
-| `/codify` | Interview | rules.md | Medium |
-| `/craft` | File path (optional) | Context restoration | Low |
-| `/consult` | Topic | Locked decision | Low |
-| `/garden` | None | Health report | Low |
-| `/inherit` | Codebase | Bootstrap rules | Medium |
-
-**Sources**: sigil-v2.6.zip/PROCESS.md, .claude/commands/*
+**Acceptance Criteria:**
+- [ ] No file or type uses "Lens" to mean persona
+- [ ] Documentation consistently uses "Persona" for user archetypes
+- [ ] Documentation consistently uses "Lens" for UI rendering variants
 
 ---
 
-## 6. Technical Requirements
+### FR-4: Persona Fluidity (P2)
 
-### 6.1 Technology Stack
+**Problem:** Zone determines experience. Novice and expert in same zone get same treatment.
 
-| Component | Technology |
-|-----------|------------|
-| Process Layer | YAML, Markdown |
-| Core Layer | React 18+, TypeScript |
-| Styling | Tailwind CSS |
-| Distribution | Mount script (sigil-mark/) |
-| Configuration | .sigilrc.yaml |
+**Solution:** Persona overrides per zone. Zone provides default, but persona can customize.
 
-### 6.2 File Structure
-
-```
-sigil-mark/
-├── constitution/                  # Protected capabilities
-│   └── protected-capabilities.yaml
-├── lens-array/                    # User personas
-│   └── lenses.yaml
-├── consultation-chamber/          # Locked decisions
-│   ├── config.yaml
-│   └── decisions/
-│       └── *.yaml
-├── surveys/                       # Vibe checks
-│   └── vibe-checks.yaml
-├── moodboard.md                   # Product feel
-├── rules.md                       # Design rules
-│
-├── core/                          # Physics engines (Core)
-│   ├── use-critical-action.ts
-│   ├── use-local-cache.ts
-│   └── types.ts
-├── layouts/                       # Layout primitives (Core)
-│   ├── critical-zone.tsx
-│   ├── machinery-layout.tsx
-│   └── glass-layout.tsx
-├── lenses/                        # UI renderers (Core)
-│   ├── default/
-│   ├── strict/
-│   └── a11y/
-└── index.ts                       # Public API
+**Schema:**
+```yaml
+# .sigilrc.yaml
+zones:
+  critical:
+    layout: CriticalZone
+    default_persona: power_user
+    persona_overrides:
+      newcomer:
+        lens: guided          # Softer UI
+        motion: reassuring    # Slower, more explanatory
+        show_help: always
+      power_user:
+        lens: strict
+        motion: snappy
+        show_help: on_demand
 ```
 
-### 6.3 Integration Points
+**Runtime Behavior:**
+1. User's persona is determined (from preferences, onboarding, or detection)
+2. Zone provides base configuration
+3. Persona override (if present) modifies zone behavior
+4. Final config = Zone defaults + Persona overrides
 
-| System | Integration |
-|--------|-------------|
-| Loa | After Loa builds, use /craft to refine interface |
-| Claude Code | Reads Constitution, Consultation before generating UI |
-| Remote Config | Marketing can control aliases, themes (not Constitution) |
-| Analytics | Vibe check responses → research dashboard |
-
----
-
-## 7. Scope & Prioritization
-
-### 7.1 MVP Scope
-
-**Phase 1: Process Foundation**
-1. Constitution system (protected capabilities)
-2. Consultation Chamber (locked decisions)
-3. /craft command (context restoration)
-4. /consult command (decision locking)
-5. .sigilrc.yaml zone configuration
-
-**Phase 2: Persona System**
-1. Lens Array (user personas)
-2. Lens stacking and conflict resolution
-3. Zone-based lens enforcement
-4. Validation rules per lens
-
-**Phase 3: Feedback Loop**
-1. Vibe Checks (micro-surveys)
-2. Pattern detection
-3. Research dashboard integration
-
-### 7.2 Out of Scope
-
-- Multi-player sync engine (Figma-style CRDT)
-- Server-side rendering support
-- Native mobile (React Native)
-- Custom lens marketplace
-- Real-time collaboration on decisions
+**Acceptance Criteria:**
+- [ ] persona_overrides schema defined in .sigilrc.yaml
+- [ ] Agent can read persona overrides and apply them
+- [ ] Documentation shows persona fluidity example
+- [ ] At least critical + marketing zones have persona overrides defined
 
 ---
 
-## 8. Success Metrics
+### FR-5: Philosophy Alignment (P0)
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Context restoration time | < 30 seconds | Time from /craft to productive work |
-| Decision re-argument rate | 0 | Locked decisions that get reopened |
-| Constitution violations | 0 in production | Protected capabilities always work |
-| Vibe check response rate | > 30% | Survey completion rate |
-| Lens validation pass rate | 100% | All lenses pass ergonomic profiler |
+**Problem:** Skills say "Decide fast. Lock it. Move on." Philosophy says "Sweat the art."
 
----
+**Solution:** Rewrite all skill files to match agreed philosophy.
 
-## 9. Risks & Mitigations
+**Philosophy Principles:**
+1. **Craftsman SHOULD think deeply** — Deliberation is valuable
+2. **Agent handles mechanics** — Not taste decisions
+3. **/consult locks AFTER deliberation** — Not to shortcut thinking
+4. **Return to flow** — Remove friction, not judgment
 
-### 9.1 Process Risks
+**Skill Rewrites:**
+| Skill | Current Problem | Fix |
+|-------|-----------------|-----|
+| consulting-decisions | "Decide fast" | "Record your deliberated decision" |
+| crafting-guidance | "Just pick one" | "Here are the tradeoffs to consider" |
+| gardening-entropy | "Fix this pattern" | "This pattern may need attention" |
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Constitution too restrictive | Medium | High | Allow justified overrides with audit |
-| Lock periods too long/short | Medium | Medium | Configurable per-decision |
-| Survey fatigue | Medium | Low | Cooldowns, max per session |
-
-### 9.2 Integration Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Process/Core coupling | Medium | High | Clear separation, typed interfaces |
-| AI misinterprets Constitution | Low | High | CLAUDE.md instructions, examples |
-| Remote config override abuse | Low | High | Engineering controls (not remote) |
+**Acceptance Criteria:**
+- [ ] All skill files reviewed for philosophy alignment
+- [ ] No skill encourages rushing decisions
+- [ ] Skills present options with tradeoffs, not mandates
+- [ ] CLAUDE.md philosophy section is explicit and cited in skills
 
 ---
 
-## 10. Glossary
+### FR-6: Intent Layer (P2)
 
-| Term | Definition |
-|------|------------|
-| **Constitution** | Protected capabilities that always work |
-| **Lens** | User persona with physics and constraints |
-| **Consultation** | Process for locking deliberated decisions |
-| **Vibe Check** | Micro-survey capturing qualitative intent |
-| **Zone** | Area of product with specific motion/timing |
-| **Sigil Process** | Human interaction layer (YAML/markdown) |
-| **Sigil Core** | Implementation layer (React/TypeScript) |
+**Problem:** Constitution governs what's protected, but no explicit "why."
+
+**Solution:** Add philosophy.yaml that documents intent hierarchy.
+
+**Schema:**
+```yaml
+# sigil-mark/soul-binder/philosophy.yaml
+version: "3.0.0"
+
+intent:
+  primary: "Protect user trust in high-stakes moments"
+  secondary: "Enable power user efficiency without sacrificing newcomer safety"
+
+principles:
+  - id: trust_over_speed
+    when: "Trust conflicts with speed"
+    decision: "Trust wins"
+    rationale: "Speed can be recovered. Trust cannot."
+
+  - id: newcomer_safety
+    when: "Newcomer needs conflict with power user preferences"
+    decision: "Newcomer safety first"
+    rationale: "Power users can customize. Newcomers can't recover from mistakes."
+
+  - id: security_over_marketing
+    when: "Marketing wants to modify protected capabilities"
+    decision: "Security wins"
+    rationale: "Constitution exists for a reason."
+
+conflict_resolution:
+  - trust_vs_speed: trust_wins
+  - newcomer_vs_power_user: newcomer_safety_first
+  - marketing_vs_security: security_wins
+```
+
+**Agent Protocol:**
+When generating UI, agent checks philosophy for:
+1. Does this decision involve conflicting concerns?
+2. What does the intent hierarchy say?
+3. Apply the winning principle
+
+**Acceptance Criteria:**
+- [ ] philosophy.yaml schema defined
+- [ ] At least 5 principles documented
+- [ ] Agent protocol for conflict resolution documented
+- [ ] CLAUDE.md references philosophy for decision-making
 
 ---
 
-## 11. Next Steps
+### FR-7: Layout-Only Zone Detection (P1)
 
-1. `/architect` — Create Software Design Document
-2. `/sprint-plan` — Break down into implementation sprints
-3. `/implement sprint-1` — Begin with Constitution system
+**Problem:** Documentation claims path-based zones, code uses layout-based zones.
+
+**Solution:** Remove all path-based zone claims. Zones are declared via Layout components.
+
+**Changes:**
+- Remove `component_paths` from .sigilrc.yaml (deprecated)
+- Remove path-based examples from CLAUDE.md
+- Update zone detection documentation to layout-only
+- Remove `get-zone.sh` references (never implemented)
+
+**Zone Declaration:**
+```tsx
+// Zones are declared by wrapping in Layout components
+<CriticalZone financial>
+  {/* This is now in critical zone */}
+</CriticalZone>
+
+<MachineryLayout>
+  {/* This is now in admin zone */}
+</MachineryLayout>
+
+<GlassLayout>
+  {/* This is now in marketing zone */}
+</GlassLayout>
+```
+
+**Acceptance Criteria:**
+- [ ] No documentation mentions path-based zone detection
+- [ ] .sigilrc.yaml zones section only configures layout behavior
+- [ ] Agent instructions use layout-based zone examples only
 
 ---
 
-## Appendix: Source Tracing
+### FR-8: Remote Soul Configuration (P3)
 
-| Section | Sources |
-|---------|---------|
-| Executive Summary | sigil-v2.6.zip/README.md, User clarification |
-| Problem Statement | sigil-v2.6.zip/README.md:67-74, CLAUDE.md |
-| Vision | sigil-v2.6.zip/README.md:9-27 |
-| Architecture | sigil-v2.6.zip structure, User clarification |
-| Constitution | sigil-v2.6.zip/sigil-mark/constitution/protected-capabilities.yaml |
-| Lens Array | sigil-v2.6.zip/sigil-mark/lens-array/lenses.yaml |
-| Consultation | sigil-v2.6.zip/.claude/commands/consult.md |
-| Vibe Checks | sigil-v2.6.zip/sigil-mark/surveys/vibe-checks.yaml |
-| Core Components | loa-grimoire/archive/prd-v2.0.md |
-| Commands | sigil-v2.6.zip/PROCESS.md, .claude/commands/* |
-| File Structure | sigil-v2.6.zip directory structure |
+**Problem:** Marketing can't test vibe changes without code commits.
+
+**Solution:** Support remote config for marketing-controlled aspects, while engineering controls Constitution.
+
+**Schema:**
+```yaml
+# sigil-mark/remote-config.yaml
+version: "3.0.0"
+
+marketing_controlled:
+  - campaigns.seasonal_vibe     # Summer gold, winter silver
+  - landing.hero_energy         # Playful vs professional
+  - onboarding.warmth_level     # How friendly vs direct
+
+engineering_controlled:
+  - constitution                # Protected capabilities
+  - protected_capabilities      # Never remote
+  - physics                     # Core timing unchanged
+
+integration:
+  provider: "launchdarkly"  # or statsig, split, etc.
+  fallback: "local_yaml"    # When offline
+```
+
+**Constraint:** Physics (Core) stays immutable. Vibe (Material tones, copy warmth) can be remote.
+
+**Acceptance Criteria:**
+- [ ] remote-config.yaml schema defined
+- [ ] Clear separation: physics local, vibe remote-capable
+- [ ] Agent knows which aspects can be dynamic
+- [ ] Fallback to local YAML when offline
 
 ---
 
-*PRD generated from sigil-v2.6.zip context and v2.0 archive*
-*Architecture: Sigil Process (human) + Sigil Core (implementation)*
+### FR-9: Observer Pattern for Vibe Checks (P3)
+
+**Problem:** Polling favors existing users, misses potential users.
+
+**Solution:** Add behavioral triggers to vibe checks, not just explicit surveys.
+
+**Schema:**
+```yaml
+# sigil-mark/surveys/vibe-checks.yaml
+version: "3.0.0"
+
+# Existing: Explicit surveys (keep)
+explicit_checks:
+  - id: claim_flow_satisfaction
+    trigger: after_claim_success
+    type: micro_survey
+
+# New: Behavioral observations
+behavioral_signals:
+  - id: information_seeking
+    trigger: "card_expanded_5x_in_session"
+    insight: "User seeking information not immediately visible"
+    recommendation: "Consider surfacing key data earlier"
+
+  - id: confirmation_friction
+    trigger: "abandon_at_confirmation_step"
+    insight: "Confirmation may be too heavy"
+    recommendation: "Review deliberate motion timing"
+
+  - id: rage_clicking
+    trigger: "same_element_clicked_3x_in_2s"
+    insight: "Element not responding as expected"
+    recommendation: "Check loading states and feedback"
+```
+
+**Agent Protocol:**
+Agent can reference behavioral signals when making recommendations:
+- "Based on `information_seeking` signal, consider surfacing X"
+- "Based on `confirmation_friction` signal, review timing"
+
+**Acceptance Criteria:**
+- [ ] behavioral_signals schema added to vibe-checks.yaml
+- [ ] At least 5 behavioral signals defined
+- [ ] Agent can cite behavioral signals in recommendations
+- [ ] /garden report includes behavioral signal analysis
+
+---
+
+## Non-Functional Requirements
+
+### NFR-1: No Runtime Dependencies on Process Layer
+
+The Process layer (YAML readers) must not be bundled for browser. All Process access happens at agent generation time or build time.
+
+### NFR-2: Documentation Consistency
+
+Every concept must have exactly one name:
+- "Persona" = user archetype (power_user, newcomer)
+- "Lens" = UI rendering variant (DefaultLens, StrictLens)
+- "Zone" = Layout-declared context (CriticalZone, MachineryLayout)
+- "Material" = deprecated v1 concept, use Zone
+
+### NFR-3: Vocabulary as API Surface
+
+The vocabulary.yaml is the primary interface between product and engineering:
+- Product defines terms and mental models
+- Engineering implements with appropriate materials
+- README prominently features vocabulary concept
+
+### NFR-4: Backward Compatibility
+
+v2.6 code should work in v3.0 with deprecation warnings:
+- Old imports work but warn
+- Old file locations work but warn
+- Migration guide provided
+
+---
+
+## Out of Scope (v3.0)
+
+| Feature | Reason | Future Version |
+|---------|--------|----------------|
+| ESLint plugin enforcement | Requires build tooling | v3.1 |
+| CI/CD integration | Requires pipeline work | v3.1 |
+| Real-time collaboration | Complex infrastructure | v4.0 |
+| Visual editor for vocabulary | Nice-to-have | v4.0 |
+| A/B testing integration | Requires analytics | v3.2 |
+
+---
+
+## Architecture Changes
+
+### v2.6 Architecture
+```
+Process (YAML) ──runtime──> ProcessContext (React) ──> Core ──> Layout ──> Lens
+       ↑
+       └── fs module (CRASHES IN BROWSER)
+```
+
+### v3.0 Architecture
+```
+Process (YAML) ──agent reads──> CLAUDE.md context ──> Agent generates code
+                                                              ↓
+                                              Core ──> Layout ──> Lens (runtime)
+```
+
+**Key Change:** Process layer is agent-context-only. No runtime YAML reading.
+
+---
+
+## Migration Guide
+
+### From v2.6 to v3.0
+
+1. **Remove ProcessContextProvider** — No longer exported
+2. **Rename imports:**
+   - `readLensArray` → `readPersonaArray`
+   - `lens-array/` → `personas/`
+3. **Update .sigilrc.yaml:**
+   - Remove `component_paths`
+   - Add `persona_overrides` to zones
+4. **Add vocabulary.yaml** — Define your product terms
+5. **Add philosophy.yaml** — Document your intent hierarchy
+
+---
+
+## Success Metrics
+
+| Metric | v2.6 Baseline | v3.0 Target |
+|--------|---------------|-------------|
+| Runtime errors from Process | Crashes | 0 |
+| Naming confusion reports | High | 0 |
+| Agent code generation accuracy | ~70% | 95% |
+| Time to add new product term | N/A | <5 min |
+| Philosophy alignment in skills | 0% | 100% |
+
+---
+
+## Timeline
+
+| Phase | Duration | Deliverables |
+|-------|----------|--------------|
+| P0 Fixes | 1 sprint | fs removal, philosophy alignment |
+| P1 Fixes | 1 sprint | Persona rename, layout-only zones, vocabulary |
+| P2 Features | 1 sprint | Persona fluidity, intent layer |
+| P3 Features | 1 sprint | Remote config, observer pattern |
+| Documentation | Continuous | README, CLAUDE.md, migration guide |
+
+---
+
+## Appendix A: Vocabulary Layer README Section
+
+```markdown
+## Vocabulary — The API Surface
+
+Sigil's vocabulary layer maps product terms to design recommendations.
+
+### Why Vocabulary Matters
+
+A "Pot" and a "Vault" might share the same backend (`savings_container`),
+but they evoke completely different mental models:
+
+| Term | Mental Model | Recommended Feel |
+|------|--------------|------------------|
+| Pot | Piggy bank | Warm, glass, friendly |
+| Vault | Bank vault | Cold, machinery, secure |
+
+### Defining Terms
+
+```yaml
+# sigil-mark/vocabulary.yaml
+terms:
+  pot:
+    user_facing: "Pot"
+    mental_model: "Piggy bank, casual saving"
+    recommended:
+      material: glass
+      motion: warm
+```
+
+### Agent Protocol
+
+When generating UI for a "Pot," the agent will:
+1. Check vocabulary.yaml for "pot"
+2. Apply recommended material (glass) and motion (warm)
+3. Zone physics still apply, but material adapts to the noun
+
+This ensures consistent UX across the product without manual specification.
+```
+
+---
+
+## Appendix B: Philosophy Section for CLAUDE.md
+
+```markdown
+## Philosophy
+
+> "Sweat the art. We handle the mechanics. Return to flow."
+
+### What This Means
+
+1. **Sweat the art** — Craftsman deliberation is valuable. Don't rush decisions.
+2. **We handle the mechanics** — Agent manages physics, zones, materials.
+3. **Return to flow** — Once decided, lock it and move on.
+
+### Decision Hierarchy
+
+When concerns conflict, apply this hierarchy:
+
+| Conflict | Winner | Rationale |
+|----------|--------|-----------|
+| Trust vs Speed | Trust | Speed can be recovered. Trust cannot. |
+| Newcomer vs Power User | Newcomer safety | Power users can customize. |
+| Marketing vs Security | Security | Constitution exists for a reason. |
+
+### Agent Role
+
+The agent:
+- Presents options with tradeoffs
+- Does NOT make taste decisions
+- Respects locked decisions
+- Cites philosophy when relevant
+```
+
+---
+
+*Sources: loa-grimoire/context/SIGIL-v2.6-REVIEW.md, v2.6 implementation*

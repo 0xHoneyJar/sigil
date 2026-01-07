@@ -1,10 +1,12 @@
 /**
- * Sigil v2.6 — Vibe Check Reader
+ * Sigil v3.0 — Vibe Check Reader
  *
- * Reads and manages micro-surveys for qualitative feedback.
- * Implements cooldown management and response recording.
+ * Reads and manages:
+ * 1. Micro-surveys for qualitative feedback (triggers)
+ * 2. Behavioral signals for passive UX observation (v3.0)
  *
  * Philosophy: "Ask at the moment of emotion, not after it's gone."
+ * Philosophy (v3.0): "Observe behavior, don't survey it."
  *
  * @module process/vibe-check-reader
  */
@@ -47,6 +49,50 @@ export type DisplayPosition = 'bottom-right' | 'bottom-left' | 'center' | 'inlin
  * Display theme.
  */
 export type DisplayTheme = 'light' | 'dark' | 'system';
+
+/**
+ * Behavioral signal severity.
+ */
+export type SignalSeverity = 'info' | 'warning' | 'high' | 'positive';
+
+/**
+ * A behavioral signal trigger event.
+ */
+export interface SignalTriggerEvent {
+  event: string;
+  duration_ms?: number;
+  idle_time_ms?: number;
+  within_ms?: number;
+  count_threshold?: number;
+  velocity?: 'slow' | 'fast';
+  content_visibility_ms?: number;
+  followed_by?: string;
+  without?: string;
+}
+
+/**
+ * A behavioral signal definition.
+ */
+export interface BehavioralSignal {
+  /** Unique identifier */
+  id: string;
+  /** Human-readable name */
+  name: string;
+  /** Description of the behavior */
+  description: string;
+  /** Events that trigger this signal */
+  triggers: SignalTriggerEvent[];
+  /** What this behavior indicates */
+  insight: string;
+  /** Recommended action */
+  recommendation: string;
+  /** Zones where this applies */
+  zones: string[];
+  /** Severity level */
+  severity: SignalSeverity;
+  /** Whether this signal is active */
+  enabled: boolean;
+}
 
 /**
  * A response option for a survey.
@@ -125,6 +171,8 @@ export interface VibeChecks {
   feedback: FeedbackConfig;
   display: DisplayConfig;
   limits: LimitsConfig;
+  /** Behavioral signals for passive observation (v3.0) */
+  behavioral_signals: BehavioralSignal[];
 }
 
 /**
@@ -191,11 +239,12 @@ const DEFAULT_LIMITS: LimitsConfig = {
  * Default empty vibe checks.
  */
 export const DEFAULT_VIBE_CHECKS: VibeChecks = {
-  version: '2.6.0',
+  version: '3.0.0',
   triggers: [],
   feedback: DEFAULT_FEEDBACK,
   display: DEFAULT_DISPLAY,
   limits: DEFAULT_LIMITS,
+  behavioral_signals: [],
 };
 
 /**
@@ -226,6 +275,65 @@ function isValidTriggerType(value: unknown): value is TriggerType {
  */
 function isValidSurveyType(value: unknown): value is SurveyType {
   return ['scale', 'choice', 'text', 'emoji'].includes(value as string);
+}
+
+/**
+ * Validates a signal severity.
+ */
+function isValidSignalSeverity(value: unknown): value is SignalSeverity {
+  return ['info', 'warning', 'high', 'positive'].includes(value as string);
+}
+
+/**
+ * Validates a behavioral signal object.
+ */
+function isValidBehavioralSignal(value: unknown): boolean {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const obj = value as Record<string, unknown>;
+
+  return (
+    typeof obj.id === 'string' &&
+    obj.id.length > 0 &&
+    typeof obj.description === 'string' &&
+    typeof obj.insight === 'string' &&
+    typeof obj.recommendation === 'string' &&
+    Array.isArray(obj.triggers)
+  );
+}
+
+/**
+ * Normalizes a behavioral signal object.
+ */
+function normalizeBehavioralSignal(obj: Record<string, unknown>): BehavioralSignal | null {
+  if (!isValidBehavioralSignal(obj)) {
+    return null;
+  }
+
+  const triggers: SignalTriggerEvent[] = [];
+  if (Array.isArray(obj.triggers)) {
+    for (const t of obj.triggers) {
+      if (typeof t === 'object' && t !== null && typeof (t as Record<string, unknown>).event === 'string') {
+        triggers.push(t as SignalTriggerEvent);
+      }
+    }
+  }
+
+  return {
+    id: obj.id as string,
+    name: typeof obj.name === 'string' ? obj.name : obj.id as string,
+    description: obj.description as string,
+    triggers,
+    insight: obj.insight as string,
+    recommendation: obj.recommendation as string,
+    zones: Array.isArray(obj.zones)
+      ? obj.zones.filter((z): z is string => typeof z === 'string')
+      : [],
+    severity: isValidSignalSeverity(obj.severity) ? obj.severity : 'info',
+    enabled: typeof obj.enabled === 'boolean' ? obj.enabled : true,
+  };
 }
 
 /**
@@ -291,7 +399,7 @@ function validateVibeChecks(parsed: unknown): VibeChecks {
   const obj = parsed as Record<string, unknown>;
 
   // Validate version
-  const version = typeof obj.version === 'string' ? obj.version : '2.6.0';
+  const version = typeof obj.version === 'string' ? obj.version : '3.0.0';
 
   // Validate triggers
   const triggers: SurveyTrigger[] = [];
@@ -355,12 +463,26 @@ function validateVibeChecks(parsed: unknown): VibeChecks {
     };
   }
 
+  // Validate behavioral signals (v3.0)
+  const behavioral_signals: BehavioralSignal[] = [];
+  if (Array.isArray(obj.behavioral_signals)) {
+    for (const s of obj.behavioral_signals) {
+      const signal = normalizeBehavioralSignal(s as Record<string, unknown>);
+      if (signal) {
+        behavioral_signals.push(signal);
+      } else {
+        console.warn(`[Sigil VibeChecks] Skipping invalid behavioral signal`);
+      }
+    }
+  }
+
   return {
     version,
     triggers,
     feedback,
     display,
     limits,
+    behavioral_signals,
   };
 }
 
@@ -485,6 +607,93 @@ export function getTriggersByType(
   triggerType: TriggerType
 ): SurveyTrigger[] {
   return vibeChecks.triggers.filter((t) => t.enabled && t.trigger === triggerType);
+}
+
+// =============================================================================
+// BEHAVIORAL SIGNAL HELPERS (v3.0)
+// =============================================================================
+
+/**
+ * Gets all behavioral signals.
+ *
+ * @param vibeChecks - The vibe checks config
+ * @returns Array of all behavioral signals
+ */
+export function getBehavioralSignals(vibeChecks: VibeChecks): BehavioralSignal[] {
+  return vibeChecks.behavioral_signals || [];
+}
+
+/**
+ * Gets enabled behavioral signals.
+ *
+ * @param vibeChecks - The vibe checks config
+ * @returns Array of enabled behavioral signals
+ */
+export function getEnabledBehavioralSignals(vibeChecks: VibeChecks): BehavioralSignal[] {
+  return (vibeChecks.behavioral_signals || []).filter((s) => s.enabled);
+}
+
+/**
+ * Gets a behavioral signal by ID.
+ *
+ * @param vibeChecks - The vibe checks config
+ * @param signalId - The signal ID to find
+ * @returns The signal, or undefined if not found
+ */
+export function getBehavioralSignalById(
+  vibeChecks: VibeChecks,
+  signalId: string
+): BehavioralSignal | undefined {
+  return (vibeChecks.behavioral_signals || []).find((s) => s.id === signalId);
+}
+
+/**
+ * Gets behavioral signals for a specific zone.
+ *
+ * @param vibeChecks - The vibe checks config
+ * @param zone - The zone to filter by
+ * @returns Array of signals for the zone
+ */
+export function getBehavioralSignalsForZone(
+  vibeChecks: VibeChecks,
+  zone: string
+): BehavioralSignal[] {
+  return (vibeChecks.behavioral_signals || []).filter((s) => {
+    if (!s.enabled) return false;
+    // If no zones specified, applies to all
+    if (!s.zones || s.zones.length === 0) return true;
+    return s.zones.includes(zone);
+  });
+}
+
+/**
+ * Gets behavioral signals by severity.
+ *
+ * @param vibeChecks - The vibe checks config
+ * @param severity - The severity to filter by
+ * @returns Array of matching signals
+ */
+export function getBehavioralSignalsBySeverity(
+  vibeChecks: VibeChecks,
+  severity: SignalSeverity
+): BehavioralSignal[] {
+  return (vibeChecks.behavioral_signals || []).filter(
+    (s) => s.enabled && s.severity === severity
+  );
+}
+
+/**
+ * Formats a behavioral signal for display.
+ *
+ * @param signal - The signal to format
+ * @returns Formatted string
+ */
+export function formatBehavioralSignalSummary(signal: BehavioralSignal): string {
+  return `${signal.id}: ${signal.name}
+  Description: ${signal.description}
+  Insight: ${signal.insight}
+  Severity: ${signal.severity}
+  Enabled: ${signal.enabled}`;
 }
 
 // =============================================================================

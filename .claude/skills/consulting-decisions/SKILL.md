@@ -12,57 +12,71 @@ zones:
     permission: read
 ---
 
-# Consulting Decisions (v2.6)
+# Consulting Decisions (v3.0)
 
 ## Purpose
 
-Guide the user through a consultation process for design decisions. Determines the appropriate decision tier (strategic/direction/execution) and facilitates the consultation process.
+Help craftsmen **record their deliberated decisions**. This skill captures decisions that have already been made through careful thought, not decisions that need to be rushed.
 
-**NEW in v2.6:**
-- Early unlock support (`--unlock` flag)
-- Decision status checking (`--status` flag)
-- Integration with ProcessContext for /craft surfacing
-- LOCK_PERIODS constant: `{ strategic: 180, direction: 90, execution: 30 }`
+## Philosophy (v3.0)
 
-## Philosophy
+> "Sweat the art. We handle the mechanics. Return to flow."
 
-> "Direction was consulted. Decision was made."
+### What This Means
 
-Not every decision needs community input. The Consultation Chamber routes decisions to the appropriate authority level and locks them once made.
+1. **Craftsman deliberation is valuable** — Take time to consider tradeoffs
+2. **This skill records decisions, not makes them** — You bring the judgment
+3. **/consult locks AFTER deliberation** — Not to shortcut thinking
+4. **Return to flow** — Once locked, stop second-guessing
+
+### What This Skill Does
+
+- Records the decision you've already made
+- Applies appropriate time lock based on scope
+- Creates audit trail for future reference
+- Prevents future bikeshedding on decided topics
+
+### What This Skill Does NOT Do
+
+- Make decisions for the craftsman
+- Rush the deliberation process
+- Override existing locked decisions without justification
+- Pressure you into quick choices
+
+## Decision Tiers
+
+| Tier | Scope | Lock Period | Process |
+|------|-------|-------------|---------|
+| **Strategic** | New features, major changes | 180 days | Community input optional |
+| **Direction** | Visual style, tone, patterns | 90 days | Team discussion optional |
+| **Execution** | Pixel details, specific impl | 30 days | Craftsman decides |
+
+**LOCK_PERIODS:** `{ strategic: 180, direction: 90, execution: 30 }`
 
 ## Pre-Flight Checks
 
 1. **Sigil Setup**: Verify `.sigil-setup-complete` exists
 2. **Consultation Config**: Check `sigil-mark/consultation-chamber/config.yaml` exists
-   - If missing, create with default settings
 3. **Strictness Level**: Load from `.sigilrc.yaml`
-
-## Decision Layers
-
-| Layer | Scope | Process | Authority |
-|-------|-------|---------|-----------|
-| **Strategic** | New features, major changes | Community poll | Binding vote |
-| **Direction** | Visual style A vs B, tone | Sentiment gathering | Taste Owner |
-| **Execution** | Pixel-level details | None | Taste Owner dictates |
 
 ## Workflow
 
-### Step 1: Identify the Topic
+### Step 1: Understand the Topic
 
 If topic not provided, ask:
 
 ```
-question: "What design decision would you like to consult on?"
+question: "What design decision would you like to record?"
 header: "Topic"
 ```
 
-### Step 2: Determine Layer
+### Step 2: Determine Scope
 
-Ask the user to help classify the decision:
+Ask the craftsman to classify:
 
 ```
-question: "What type of decision is this?"
-header: "Layer"
+question: "What scope is this decision?"
+header: "Scope"
 options:
   - label: "Strategic"
     description: "New features, major changes, affects product direction"
@@ -70,180 +84,51 @@ options:
     description: "Visual style choices, tone, experience patterns"
   - label: "Execution"
     description: "Pixel-level details, specific implementation choices"
-  - label: "Not sure"
-    description: "Help me determine the appropriate layer"
+  - label: "Help me decide"
+    description: "I need help understanding the scope"
 multiSelect: false
 ```
 
-If "Not sure", ask clarifying questions:
+If "Help me decide", present the following for consideration:
 
 ```
-question: "Does this decision affect product strategy or roadmap?"
-header: "Scope"
-options:
-  - label: "Yes - major impact"
-    description: "→ Strategic layer"
-  - label: "No - within existing strategy"
-    description: "Could be Direction or Execution"
-multiSelect: false
+Consider these questions:
+
+**Strategic (180-day lock):**
+- Does this change product direction?
+- Would reversing this require significant rework?
+- Should the community have input?
+
+**Direction (90-day lock):**
+- Is this about style, tone, or patterns?
+- Does it affect multiple components?
+- Should the team weigh in?
+
+**Execution (30-day lock):**
+- Is this a specific implementation detail?
+- Can it be changed with minimal impact?
+- Is this your call as the implementer?
+
+What scope feels right for this decision?
 ```
 
-### Step 3: Layer-Specific Process
+### Step 3: Capture the Decision
 
-#### Strategic Layer
-
-Output format for community poll:
-
-```markdown
-## Strategic Decision: {topic}
-
-**Question:** {formatted question}
-
-**Options:**
-1. {option_a} - {description}
-2. {option_b} - {description}
-3. Abstain / No strong opinion
-
-**Context:**
-{background_context}
-
-**Voting Period:** {duration} days
-**Threshold:** Simple majority (50%+1) or configured threshold
-
-Post this to your community channels. Results will be recorded in the decision record.
-```
-
-##### Platform-Specific Poll Templates
-
-**Discord Poll Template:**
-```
-**POLL: {topic}**
-
-We need your input on an important decision.
-
-**Question:** {formatted question}
-
-React with:
-:one: for **{option_a}**
-:two: for **{option_b}**
-:grey_question: for **Abstain**
-
-**Context:**
-{background_context}
-
-Poll closes: {end_date}
-
-Your vote matters! This is a binding community decision.
-```
-
-**Slack Poll Template:**
-```
-:ballot_box: *{topic}*
-
-We're gathering community input on this strategic decision.
-
-*Question:* {formatted question}
-
-Please react:
-:one: {option_a}
-:two: {option_b}
-:grey_question: Abstain
-
-*Context:* {background_context}
-
-_Poll closes {end_date}. Results will be binding._
-```
-
-**Twitter/X Poll Template:**
-```
-{topic}
-
-{formatted question}
-
-[Poll Options]
-- {option_a}
-- {option_b}
-- No strong opinion
-
-Context thread below...
-
-Poll Duration: {duration} days
-```
-
-**General Poll Template (for Linear, GitHub Discussions, etc.):**
-```markdown
-# [POLL] {topic}
-
-## Question
-{formatted question}
-
-## Options
-- [ ] **Option A:** {option_a}
-  {option_a_description}
-
-- [ ] **Option B:** {option_b}
-  {option_b_description}
-
-- [ ] **Abstain**
-  No strong opinion either way
-
-## Context
-{background_context}
-
-## Timeline
-- **Opens:** {start_date}
-- **Closes:** {end_date}
-- **Duration:** {duration} days
-
-## How to Vote
-React or comment with your choice. This is a binding community decision.
-
----
-*Generated by Sigil Constitutional Framework*
-```
-
-#### Direction Layer
-
-Output format for sentiment gathering:
-
-```markdown
-## 📊 Direction Decision: {topic}
-
-**Comparing:**
-| Option A | Option B |
-|----------|----------|
-| {description} | {description} |
-| {pros} | {pros} |
-
-**Gathering Sentiment:**
-Share these options with your team/community and record:
-- Overall preference (A vs B)
-- Key themes in positive feedback
-- Key themes in concerns
-
-**Duration:** {duration} days
-
-After gathering sentiment, the Taste Owner will make the final call.
-```
-
-#### Execution Layer
-
-Output format:
+Ask for the decision details:
 
 ```
-ℹ️ EXECUTION DECISION
-
-This is a Taste Owner decision.
-
-**Topic:** {topic}
-
-No community consultation required. The Taste Owner should:
-1. Make the decision based on design principles
-2. Document the reasoning
-3. Lock the decision
-
-Would you like me to record this decision now?
+question: "What is your decision?"
+header: "Decision"
 ```
+
+Then ask for context:
+
+```
+question: "What tradeoffs did you consider? What alternatives did you reject and why?"
+header: "Rationale"
+```
+
+**Important:** The rationale is valuable for future you. Don't rush this.
 
 ### Step 4: Create Decision Record
 
@@ -253,115 +138,75 @@ Create decision record at `sigil-mark/consultation-chamber/decisions/{id}.yaml`:
 
 ```yaml
 id: "{id}"
-created_at: "{ISO-8601}"
-created_by: "/consult"
+topic: "{topic}"
+decision: "{decision}"
+scope: "{strategic|direction|execution}"
+locked_at: "{ISO-8601}"
+expires_at: "{ISO-8601 + lock_period}"
+status: locked
 
-decision:
-  title: "{topic}"
-  scope: "{strategic|direction|execution}"
+context:
+  zone: "{zone if applicable}"
+  considerations: "{what was considered}"
+  rejected_alternatives:
+    - "{alternative 1}: {why rejected}"
+    - "{alternative 2}: {why rejected}"
 
-description: |
-  {Description of the decision}
+rationale: |
+  {Full rationale from craftsman}
 
-options:
-  - id: "{option_a_id}"
-    label: "{Option A}"
-    description: "{Description}"
-  - id: "{option_b_id}"
-    label: "{Option B}"
-    description: "{Description}"
-
-consultation:
-  method: "{poll|sentiment_gathering|none}"
-  duration_days: {7|14|0}
-  started_at: "{ISO-8601}"
-  ended_at: null  # Filled when complete
-
-  # Filled during/after consultation
-  sentiment: {}
-  key_themes:
-    positive: []
-    negative: []
-
-outcome:
-  decision: null  # Filled when decided
-  decided_by: null
-  decided_at: null
-  reasoning: null
-  override_sentiment: false
-
-lock:
-  locked: false
-  locked_at: null
-  unlock_date: null
-  message: null
+unlock_history: []
 ```
 
-### Step 5: Report
+### Step 5: Confirm Lock
 
 ```
-✅ DECISION RECORD CREATED
+✅ DECISION RECORDED AND LOCKED
 
 Decision: {id}
-Layer: {strategic|direction|execution}
 Topic: {topic}
+Scope: {scope}
+Lock expires: {expires_at} ({days} days)
 
-{Layer-specific output from Step 3}
+Your decision:
+  {decision}
 
-Next steps:
-- {For Strategic: Run poll, then /consult {id} --record-outcome}
-- {For Direction: Gather sentiment, then /consult {id} --record-outcome}
-- {For Execution: Make decision, then /consult {id} --decide}
+Your rationale:
+  {rationale summary}
 
-View decision: sigil-mark/consultation-chamber/decisions/{id}.yaml
+This decision will be surfaced by /craft when relevant.
+To unlock early: /consult {id} --unlock
 ```
 
-## Recording Outcomes
+## Status Check (--status)
 
-When called with `--record-outcome` or `--decide`:
+When called with `--status`:
 
-1. Load existing decision record
-2. Ask for outcome details:
-   - Which option was chosen?
-   - Reasoning for the decision
-   - Override sentiment? (if applicable)
-3. Update record with outcome
-4. Lock the decision (for direction/execution)
-5. Set unlock date based on config
+```
+📋 DECISION STATUS
 
-## Lock Duration
+ID: {id}
+Topic: {topic}
+Scope: {scope}
+Status: {locked | unlocked | expired}
 
-Default lock durations from config:
+Decision: {decision}
+Locked at: {locked_at}
+Expires: {expires_at}
+Days remaining: {calculated}
 
-```yaml
-# sigil-mark/consultation-chamber/config.yaml
-lock_durations:
-  strategic: 180  # 6 months
-  direction: 90   # 3 months
-  execution: 30   # 1 month
+Rationale:
+  {rationale}
+
+Unlock history:
+  {List of previous unlocks, or "(none)"}
 ```
 
-## Early Unlock Flow (NEW in v2.6)
+## Early Unlock (--unlock)
 
 When called with `--unlock`:
 
-### Step 1: Load Decision
-
-```bash
-decision_file="sigil-mark/consultation-chamber/decisions/${decision_id}.yaml"
-```
-
-### Step 2: Verify Locked Status
-
-If not locked:
-
-```
-⚠️ Decision {id} is not currently locked.
-
-Current status: {status}
-```
-
-### Step 3: Show Decision Context
+### Step 1: Show Decision Context
 
 ```
 🔓 EARLY UNLOCK REQUEST
@@ -369,91 +214,51 @@ Current status: {status}
 Decision: {id}
 Topic: {topic}
 Scope: {scope}
-Locked at: {locked_at}
-Expires: {expires_at} ({days_remaining} days remaining)
+Days remaining: {days}
+
+Original decision:
+  {decision}
 
 Original rationale:
-  {decision.outcome.reasoning}
-  Decided by: {decision.outcome.decided_by}
-  Scope: {decision.scope}
+  {rationale}
 
-⚠️ WARNING: Early unlocks should be rare and justified.
+⚠️ Note: Early unlocks are recorded in decision history.
+   Consider whether this truly needs to change, or if
+   you're revisiting a decision that was already deliberated.
 ```
 
-### Step 4: Request Justification
+### Step 2: Request Justification
 
 ```
 question: "Why do you need to unlock this decision early?"
 header: "Justification"
+
+Note: "Changed my mind" is a valid reason if accompanied by
+what new information or perspective led to reconsideration.
 ```
 
-User must provide a justification. This is recorded in unlock_history.
-
-### Step 5: Update Decision Record
+### Step 3: Update Record
 
 ```yaml
-lock:
-  locked: false
-  locked_at: "{original_locked_at}"  # Keep for history
-  unlock_date: null
-
+status: unlocked
 unlock_history:
-  - unlocked_at: "{current ISO-8601 timestamp}"
-    unlocked_by: "{user or agent}"
+  - unlocked_at: "{current timestamp}"
+    unlocked_by: "{user}"
     justification: "{user's justification}"
-    remaining_days: {days_that_were_remaining}
+    remaining_days: {days that were remaining}
 ```
 
-### Step 6: Confirm Unlock
+### Step 4: Confirm
 
 ```
 🔓 DECISION UNLOCKED
 
 Decision: {id}
-Unlocked at: {now}
 Justification: {justification}
-Previous lock: {scope_duration} days ({remaining_days} days remaining)
-
-Note: This unlock has been recorded in the decision history.
-/garden will flag this decision as manually unlocked.
 
 The decision can now be modified or re-consulted.
+Note: /garden will show this as manually unlocked.
 ```
-
-## Decision Status Flow (NEW in v2.6)
-
-When called with `--status`:
-
-### Output Format
-
-```
-📋 DECISION STATUS
-
-ID: {id}
-Topic: {title}
-Scope: {scope}
-Status: {locked | unlocked | pending}
-
-Decision: {outcome.decision}
-Decided by: {outcome.decided_by}
-Decided at: {outcome.decided_at}
-
-Lock:
-  Locked at: {lock.locked_at}
-  Expires: {lock.unlock_date}
-  Days remaining: {calculated}
-
-Unlock history:
-  {List of previous unlocks, or "(none)"}
-
-Related decisions:
-  {List of decisions in same zone, or "(none)"}
-```
-
-## Strictness Behavior
-
-Consultation is always allowed regardless of strictness level.
-Lock enforcement is strictness-aware (see `/craft` SKILL.md).
 
 ## Error Handling
 
@@ -461,28 +266,15 @@ Lock enforcement is strictness-aware (see `/craft` SKILL.md).
 |-----------|----------|
 | No setup | "Sigil not initialized. Run `/setup` first." |
 | No config | Create default consultation config |
-| Decision exists | "Decision {id} already exists. View or update it?" |
-| Invalid layer | Default to Direction, ask for confirmation |
+| Decision exists | "Decision {id} already exists. View with --status or modify." |
 | Decision not found | "Decision {id} not found." |
 | Already unlocked | "Decision {id} is not currently locked." |
-| No justification | "Justification required for early unlock." |
+| No justification | "Please provide justification for early unlock." |
 
-## Philosophy
+## Key Principles
 
-The three-tier system prevents:
-- **Over-consultation**: Not every button color needs a poll
-- **Under-consultation**: Strategic changes should involve community
-- **Endless debates**: Decisions lock after being made
-
-Do NOT:
-- Skip layer detection
-- Create decisions without proper classification
-- Allow execution decisions to trigger community polls
-- Unlock without justification
-
-DO:
-- Help users understand the difference between layers
-- Generate appropriate output for each layer
-- Lock decisions promptly after outcomes are recorded
-- Record all unlocks with justification
-- Warn about unlock implications (/garden will flag)
+1. **Record, don't rush** — This skill records deliberated decisions
+2. **Rationale matters** — Future you will thank present you
+3. **Locks prevent bikeshedding** — Not reconsideration
+4. **Unlocks are valid** — With justification
+5. **Respect the process** — Deliberate, decide, lock, flow

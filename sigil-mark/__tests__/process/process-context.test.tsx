@@ -29,7 +29,7 @@ vi.mock('../../process/constitution-reader', async () => {
   return {
     ...actual,
     readConstitution: vi.fn().mockResolvedValue({
-      version: '2.6.0',
+      version: '3.0.0',
       enforcement: 'block',
       protected: [
         { id: 'withdraw', name: 'Withdraw', description: 'Withdraw funds', enforcement: 'block', rationale: 'Critical' },
@@ -45,7 +45,7 @@ vi.mock('../../process/lens-array-reader', async () => {
   return {
     ...actual,
     readLensArray: vi.fn().mockResolvedValue({
-      version: '2.6.0',
+      version: '3.0.0',
       lenses: {
         power_user: {
           id: 'power_user',
@@ -147,7 +147,7 @@ describe('ProcessContextProvider', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.constitution.version).toBe('2.6.0');
+    expect(result.current.constitution.version).toBe('3.0.0');
     expect(result.current.constitution.protected.length).toBe(2);
     expect(result.current.constitution.protected[0].id).toBe('withdraw');
   });
@@ -161,7 +161,7 @@ describe('ProcessContextProvider', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.lensArray.version).toBe('2.6.0');
+    expect(result.current.lensArray.version).toBe('3.0.0');
     expect(Object.keys(result.current.lensArray.lenses).length).toBe(2);
     expect(result.current.lensArray.lenses['power_user'].alias).toBe('Chef');
   });

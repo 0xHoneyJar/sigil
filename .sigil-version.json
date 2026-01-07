@@ -1,17 +1,30 @@
 {
-  "sigil_version": "1.2.5",
-  "framework_version": "1.2.5",
-  "schema_version": 3,
-  "philosophy": "Zone Provider",
-  "description": "Context-based physics, one component library",
+  "sigil_version": "3.0.0",
+  "framework_version": "3.0.0",
+  "schema_version": 4,
+  "philosophy": "Living Engine",
+  "description": "Agent-time/Runtime split, Vocabulary as API surface, User Fluidity",
   "zones": {
     "system": ".claude/",
     "state": "sigil-mark/"
   },
   "core": {
     "physics_tokens": "sigil-mark/core/physics.ts",
-    "zone_context": "sigil-mark/core/SigilZone.tsx",
+    "zone_context": "sigil-mark/core/zone-context.tsx",
+    "persona_context": "sigil-mark/core/persona-context.tsx",
     "zone_resolver": "sigil-mark/core/zone-resolver.ts"
+  },
+  "process": {
+    "path": "sigil-mark/process/",
+    "agent_only": true,
+    "readers": [
+      "constitution-reader.ts",
+      "vocabulary-reader.ts",
+      "persona-reader.ts",
+      "decision-reader.ts",
+      "philosophy-reader.ts",
+      "vibe-check-reader.ts"
+    ]
   },
   "components": {
     "path": "sigil-mark/components/",
@@ -20,7 +33,7 @@
   "materials": ["decisive", "machinery", "glass"],
   "hooks": {
     "path": "sigil-mark/hooks/",
-    "list": ["useServerTick"]
+    "list": ["useCriticalAction", "useLens", "useZone", "usePersona"]
   },
   "workbench": {
     "ab_toggle": "sigil-mark/workbench/ab-toggle.ts",
@@ -35,13 +48,17 @@
     "reports_path": "sigil-mark/reports/"
   },
   "migration": {
-    "from_version": "1.2.4",
+    "from_version": "2.6.0",
     "migrated_at": "2026-01-06T00:00:00Z",
     "changes": [
-      "Recipes → Physics Tokens",
-      "CSS vars → React Context",
-      "Multiple Buttons → One Button",
-      "Recipe imports → SigilZone wrapper"
+      "Agent-time vs Runtime architecture split",
+      "ProcessContextProvider removed from runtime",
+      "Vocabulary layer added",
+      "Philosophy layer added",
+      "Lens Array renamed to Personas",
+      "Behavioral signals added to vibe checks",
+      "Remote config schema added",
+      "PersonaProvider and ZoneProvider added"
     ]
   },
   "setup_completed_at": "2026-01-05T00:00:00Z",

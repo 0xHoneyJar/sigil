@@ -1,13 +1,21 @@
 /**
- * Sigil v2.6 — Process Context
+ * Sigil v3.0 — Process Context (DEPRECATED)
  *
- * React context provider for the Process layer.
- * Provides Constitution, LensArray, and Decisions to all child components.
+ * @deprecated ProcessContextProvider has been removed in v3.0.
+ *
+ * This file is kept for backwards compatibility during migration.
+ * The Process layer is now AGENT-ONLY and does not run in browsers.
+ *
+ * Migration:
+ * 1. Remove ProcessContextProvider from your app
+ * 2. Process context is embedded at code generation time by the agent
+ * 3. Runtime components receive configuration via props, not context
  *
  * @module process/process-context
  */
 
-'use client';
+// NOTE: 'use client' directive REMOVED in v3.0
+// This module should NOT be imported in client code
 
 import React, {
   createContext,

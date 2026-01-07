@@ -25,7 +25,7 @@ import {
 // =============================================================================
 
 const VALID_CONSTITUTION: Constitution = {
-  version: '2.6.0',
+  version: '3.0.0',
   enforcement: 'block',
   protected: [
     {
@@ -85,7 +85,7 @@ describe('readConstitution', () => {
       path.join(process.cwd(), 'constitution/protected-capabilities.yaml')
     );
 
-    expect(constitution.version).toBe('2.6.0');
+    expect(constitution.version).toBe('3.0.0');
     expect(constitution.enforcement).toBe('block');
     expect(constitution.protected.length).toBeGreaterThan(0);
     expect(constitution.protected[0].id).toBe('withdraw');

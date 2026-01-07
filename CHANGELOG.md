@@ -5,6 +5,194 @@ All notable changes to Sigil will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-01-06 — "Living Engine"
+
+### Summary
+
+v3.0 introduces a fundamental architectural split between **Agent-Time** (YAML processing) and **Runtime** (React components). The Process layer is now agent-only and cannot be imported in browser code.
+
+### Breaking Changes
+
+- **ProcessContextProvider removed from runtime** — The `ProcessContextProvider` component no longer works in browser environments. Process layer is now agent-context-only. Use `PersonaProvider` and `ZoneProvider` for runtime context.
+
+  ```tsx
+  // v2.6 (BROKEN)
+  import { ProcessContextProvider } from 'sigil-mark';
+
+  // v3.0 (CORRECT)
+  import { PersonaProvider, ZoneProvider } from 'sigil-mark';
+  ```
+
+- **Lens Array renamed to Personas** — The `lens-array/` directory is renamed to `personas/`. Types `LensArray` renamed to `PersonaArray`. Deprecated aliases available with console warnings.
+
+  ```tsx
+  // v2.6
+  import { readLensArray, type LensArray } from 'sigil-mark/process';
+
+  // v3.0
+  import { readPersonas, type PersonaArray } from 'sigil-mark/process';
+  ```
+
+- **Process layer is agent-only** — All YAML readers in `sigil-mark/process/` use Node.js `fs` and will crash if imported in browser bundles.
+
+### Added
+
+- **Vocabulary Layer** — Maps product terms to design recommendations. Vocabulary is Sigil's public API surface.
+
+  ```yaml
+  # sigil-mark/vocabulary/vocabulary.yaml
+  terms:
+    - id: vault
+      engineering_name: PositionDisplay
+      user_facing: ["Vault", "Position"]
+      feel:
+        critical: { material: fortress, motion: deliberate }
+  ```
+
+- **Philosophy Layer (Soul Binder)** — Captures intent hierarchy, principles, and conflict resolution rules.
+
+  ```yaml
+  # sigil-mark/soul-binder/philosophy.yaml
+  primary_intent: "Make DeFi feel trustworthy"
+  principles:
+    - id: security_first
+      statement: "Security indicators must be visible"
+      priority: 1
+  ```
+
+- **User Fluidity** — Persona (who) + Zone (where) = Effective Experience. New runtime providers:
+
+  ```tsx
+  <PersonaProvider defaultPersona="power_user">
+    <ZoneProvider zone="critical">
+      <App />
+    </ZoneProvider>
+  </PersonaProvider>
+  ```
+
+- **Behavioral Signals** — Passive observation patterns in vibe-checks.yaml for UX insights without user interruption:
+  - `rage_clicking` — User frustration indicator
+  - `back_button_loop` — User may be lost
+  - `form_abandonment` — Form complexity issues
+  - `deep_engagement` — Positive content resonance
+  - `information_seeking` — User wants more context
+  - `confirmation_friction` — Uncertainty at confirmation dialogs
+  - `security_checking` — User verifying security indicators
+  - `price_comparison` — Price sensitivity detection
+
+- **Remote Configuration Schema** — Clear separation between marketing-controlled and engineering-controlled values:
+
+  ```yaml
+  # sigil-mark/remote-config/remote-config.yaml
+  marketing_controlled:
+    copy: { hero_headline: { value: "Your Crypto, Your Way" }}
+    feature_flags: { show_new_dashboard: { enabled: false }}
+  engineering_controlled:
+    physics: local_only  # Constitutional constraint
+  ```
+
+- **vocabulary-reader.ts** — Functions for reading and querying vocabulary:
+  - `readVocabulary()`, `readVocabularySync()`
+  - `getTerm()`, `getTermFeel()`, `getTermsForZone()`
+  - `formatVocabularySummary()`
+
+- **philosophy-reader.ts** — Functions for reading philosophy and resolving conflicts:
+  - `readPhilosophy()`, `readPhilosophySync()`
+  - `getPrinciple()`, `getPrinciplesByPriority()`
+  - `resolveConflict()`, `getPrimaryIntent()`
+
+- **persona-context.tsx** — Runtime persona provider with localStorage persistence
+- **zone-context.tsx** — Runtime zone provider with zone override support
+
+### Changed
+
+- **Zone detection is layout-based** — Zones declared via `<CriticalZone>`, `<MachineryLayout>`, `<GlassLayout>` components, not file paths.
+- **Skills rewritten for philosophy alignment** — Skills present options with tradeoffs, not mandates. No more "decide fast" language.
+- **Process module has @server-only JSDoc** — Clear documentation that process layer is agent-only.
+
+### Deprecated
+
+- `readLensArray()` — Use `readPersonas()` instead
+- `LensArray` type — Use `PersonaArray` instead
+- `DEFAULT_LENS_ARRAY` — Use `DEFAULT_PERSONA_ARRAY` instead
+
+### Fixed
+
+- **Browser crash on ProcessContextProvider import** — Process layer now properly separated from runtime
+- **Path-based zone detection inconsistencies** — Zones now declared by Layout components
+
+---
+
+## [2.6.0] - 2026-01-05 — "Craftsman's Flow"
+
+### Added
+
+- Process Layer for human-AI collaboration
+- Constitution system (protected capabilities)
+- Decision locking with time-based expiry
+- Persona system (zone-persona mapping)
+- Vibe Checks (micro-surveys)
+- `/consult` command for decision locking
+- `/garden` command for health reports
+
+---
+
+## [2.0.0] - 2025-12-01 — "Reality Engine"
+
+### Added
+
+- Truth vs Experience architecture (Core/Layout/Lens)
+- `useCriticalAction` hook with time authority
+- `CriticalZone`, `MachineryLayout`, `GlassLayout` components
+- `useLens` hook for automatic lens selection
+- `DefaultLens`, `StrictLens`, `A11yLens` variants
+
+### Breaking Changes
+
+- `SigilZone` replaced with Layout components
+- `useServerTick` replaced with `useCriticalAction`
+- `useSigilPhysics` replaced with `useLens`
+
+---
+
+## [1.2.5] - 2025-11-01 — "Zone Provider"
+
+### Added
+
+- Context-based physics via SigilZone
+- Zone configuration via file paths
+- Material-based styling
+
+---
+
+## [1.0.0] - 2025-10-01 — "Full Workbench"
+
+### Added
+
+- 4-panel tmux workbench
+- Material system (decisive, machinery, glass)
+- Recipe-based components
+
+---
+
+## [0.5.0] - 2025-09-01 — "Design Physics Engine"
+
+### Added
+
+- Simplified physics model
+- Hook-based API
+
+---
+
+## [0.4.x] - 2025-08-01 — "Soul Engine"
+
+### Added
+
+- npm package
+- React hooks
+
+---
+
 ## [0.3.0] - 2026-01-02
 
 ### Why This Release

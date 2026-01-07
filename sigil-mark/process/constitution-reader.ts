@@ -77,7 +77,7 @@ export interface Constitution {
  * Default empty constitution returned when file is missing or invalid.
  */
 export const DEFAULT_CONSTITUTION: Constitution = {
-  version: '2.6.0',
+  version: '3.0.0',
   enforcement: 'warn',
   protected: [],
   override_audit: {
@@ -137,7 +137,7 @@ function validateConstitution(parsed: unknown): Constitution {
   const obj = parsed as Record<string, unknown>;
 
   // Validate version
-  const version = typeof obj.version === 'string' ? obj.version : '2.6.0';
+  const version = typeof obj.version === 'string' ? obj.version : '3.0.0';
 
   // Validate enforcement
   const enforcement = isValidEnforcement(obj.enforcement) ? obj.enforcement : 'warn';

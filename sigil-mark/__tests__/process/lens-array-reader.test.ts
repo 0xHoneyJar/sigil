@@ -35,7 +35,7 @@ describe('Constants', () => {
 
   it('should export DEFAULT_LENS_ARRAY with correct structure', () => {
     expect(DEFAULT_LENS_ARRAY).toEqual({
-      version: '2.6.0',
+      version: '3.0.0',
       lenses: {},
       immutable_properties: [],
       stacking: {
@@ -63,7 +63,7 @@ describe('readLensArray', () => {
     const lensPath = path.join(process.cwd(), 'lens-array/lenses.yaml');
     const result = await readLensArray(lensPath);
 
-    expect(result.version).toBe('2.6.0');
+    expect(result.version).toBe('3.0.0');
     expect(Object.keys(result.lenses).length).toBe(4);
     expect(result.lenses['power_user']).toBeDefined();
     expect(result.lenses['newcomer']).toBeDefined();
@@ -377,7 +377,7 @@ describe('formatLensArraySummary', () => {
 
     const summary = formatLensArraySummary(lensArray);
 
-    expect(summary).toContain('Sigil Lens Array v2.6.0');
+    expect(summary).toContain('Sigil Lens Array v3.0.0');
     expect(summary).toContain('Personas (4)');
     expect(summary).toContain('Chef');
     expect(summary).toContain('Henlocker');
@@ -411,7 +411,7 @@ describe('Graceful Degradation', () => {
   it('should skip invalid personas and continue', async () => {
     const tempPath = path.join(process.cwd(), '__tests__/temp-partial.yaml');
     const content = `
-version: "2.6.0"
+version: "3.0.0"
 lenses:
   valid_persona:
     name: Valid

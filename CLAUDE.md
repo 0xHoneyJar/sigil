@@ -1,48 +1,182 @@
-# Sigil v2.6: Craftsman's Flow
+# Sigil: Design Context Framework
 
-> "Context before code. Constitution before creativity."
+> "Make the right path easy. Make the wrong path visible. Don't make the wrong path impossible."
 
-You are operating within **Sigil v2.6**, a design physics framework with a **Process Layer** for human-AI collaboration. The key architectural insight: **Humans capture "what" and "why" in Process, AI implements "how" in Core**.
+## What is Sigil?
 
----
+Sigil is a design context framework that helps AI agents make consistent design decisions by:
 
-## Architecture (4 Layers)
-
-```
-┌────────────────────────────────────────────────────────────┐
-│  PROCESS LAYER — Human decisions (v2.6)                   │
-│  Constitution, Lens Array, Consultation Chamber, Surveys  │
-│  YAML/Markdown captured by Claude, referenced in code     │
-├────────────────────────────────────────────────────────────┤
-│  CORE LAYER — Physics engines (Truth)                     │
-│  useCriticalAction → State Stream                         │
-│  { status, timeAuthority, selfPrediction, worldTruth }    │
-├────────────────────────────────────────────────────────────┤
-│  LAYOUT LAYER — Zones + Structural Physics                │
-│  CriticalZone, MachineryLayout, GlassLayout               │
-│  Layouts ARE Zones. Physics is DOM, not lint.             │
-├────────────────────────────────────────────────────────────┤
-│  LENS LAYER — Interchangeable UIs (Experience)            │
-│  useLens() → Lens components                              │
-│  DefaultLens, StrictLens, A11yLens                        │
-└────────────────────────────────────────────────────────────┘
-```
-
-### Layer Responsibilities
-
-| Layer | Source | Manages | Examples |
-|-------|--------|---------|----------|
-| **Process** | YAML/Markdown | Design decisions | Constitution, Decisions, Personas |
-| **Core** | TypeScript | State streams | `useCriticalAction`, `useLocalCache` |
-| **Layout** | React | Zone context | `CriticalZone`, `MachineryLayout` |
-| **Lens** | React | UI rendering | `DefaultLens`, `StrictLens`, `A11yLens` |
+1. **Providing zone context** — Knowing if you're in "critical" vs "marketing" context
+2. **Surfacing design rules** — Colors, typography, spacing, motion patterns
+3. **Capturing product feel** — Moodboard with references and anti-patterns
+4. **Human accountability** — All validation is human approval, not automation
 
 ---
 
-## Process Layer (v2.6)
+## v3.0 Architecture: Agent-Time vs Runtime
 
-<sigil_process>
-The Process layer captures human decisions that inform AI behavior.
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        AGENT TIME (Generation)                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
+│  │ Constitution │  │  Vocabulary  │  │   Personas   │  │ Philosophy │  │
+│  │    (YAML)    │  │    (YAML)    │  │    (YAML)    │  │   (YAML)   │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘  │
+│                              │                                          │
+│                    Agent reads & embeds context                         │
+│                              ↓                                          │
+│                   ┌──────────────────┐                                  │
+│                   │   Generated Code │                                  │
+│                   └──────────────────┘                                  │
+└─────────────────────────────────────────────────────────────────────────┘
+                               │
+                               ↓
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         RUNTIME (Browser)                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                  │
+│  │     Core     │  │    Layout    │  │     Lens     │                  │
+│  │  (Hooks,     │  │ (CriticalZone│  │ (DefaultLens │                  │
+│  │   Physics)   │  │  Machinery)  │  │  StrictLens) │                  │
+│  └──────────────┘  └──────────────┘  └──────────────┘                  │
+│                                                                         │
+│               Pure React, no fs, no YAML parsing                        │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key Insight:** Process layer (YAML) is agent-only. Runtime never touches YAML files.
+
+---
+
+## Philosophy
+
+> "Sweat the art. We handle the mechanics. Return to flow."
+
+### What This Means
+
+1. **Sweat the art** — Craftsman deliberation is valuable. Don't rush decisions.
+2. **We handle the mechanics** — Agent manages physics, zones, materials.
+3. **Return to flow** — Once decided, lock it and move on.
+
+### Decision Hierarchy
+
+When concerns conflict, apply this hierarchy:
+
+| Conflict | Winner | Rationale |
+|----------|--------|-----------|
+| Trust vs Speed | Trust | Speed can be recovered. Trust cannot. |
+| Newcomer vs Power User | Newcomer safety | Power users can customize. |
+| Marketing vs Security | Security | Constitution exists for a reason. |
+
+### Agent Role
+
+The agent:
+- Presents options with tradeoffs
+- Does NOT make taste decisions
+- Respects locked decisions
+- Cites philosophy when relevant
+
+---
+
+## Quick Reference
+
+### Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/setup` | Initialize Sigil on a repo |
+| `/envision` | Capture product moodboard (interview) |
+| `/codify` | Define design rules (interview) |
+| `/craft` | Get design guidance during implementation |
+| `/consult` | Lock design decisions |
+| `/approve` | Human review and sign-off |
+| `/inherit` | Bootstrap from existing codebase |
+| `/update` | Pull framework updates |
+| `/garden` | Health report (recipes, sandboxes, variants) |
+| `/validate` | Check recipe compliance across codebase |
+| `/unlock` | Early unlock a locked decision |
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `sigil-mark/moodboard/` | Inspiration collection (v3.1) |
+| `sigil-mark/moodboard.md` | Product feel (legacy, if no folder) |
+| `sigil-mark/rules.md` | Design rules by category |
+| `sigil-mark/inventory.md` | Component list |
+| `.sigilrc.yaml` | Zone definitions, rejections |
+| `.sigil-version.json` | Version tracking |
+
+---
+
+## Agent Protocol (v3.0)
+
+### Process Layer is Agent-Only
+
+⚠️ **CRITICAL:** The Process layer (YAML readers) is for agent use during code generation only.
+
+**DO NOT** import Process layer in client code:
+```typescript
+// ❌ WRONG - will crash in browser
+import { ProcessContextProvider } from 'sigil-mark';
+import { readConstitution } from 'sigil-mark/process';
+
+// ✅ CORRECT - agent/build time only
+// Agent reads YAML, embeds context in generated code
+```
+
+### Before Generating UI Code
+
+1. **Read Process Context** (at generation time, not runtime)
+   - Read Constitution for protected capabilities
+   - Read Vocabulary for term → feel mapping
+   - Find locked decisions for this zone
+   - Get persona for this zone
+
+2. **Determine Zone:**
+   - Zones are declared via Layout components (not file paths)
+   - What persona maps to this zone?
+   - What constraints apply?
+
+3. **Check Constitution:**
+   - Does this component touch protected capabilities?
+   - Surface warnings (don't block, but inform)
+
+4. **Apply Vocabulary:**
+   - What term is being rendered? (e.g., "Pot", "Vault")
+   - What feel does vocabulary recommend?
+   - Apply term's material/motion, not just zone's default
+
+5. **Generate Code:**
+   - Use appropriate Layout + Lens
+   - Respect persona physics
+   - Configuration via props, NOT ProcessContext
+
+### Zone Detection (Layout-Based)
+
+Zones are declared by wrapping in Layout components:
+
+```tsx
+// Zone declared by Layout component
+<CriticalZone financial>
+  {/* This is in critical zone */}
+</CriticalZone>
+
+<MachineryLayout>
+  {/* This is in admin zone */}
+</MachineryLayout>
+
+<GlassLayout>
+  {/* This is in marketing zone */}
+</GlassLayout>
+```
+
+**NOT** by file path. This is a common misconception from v2.6.
+
+---
+
+## Process Layer (Agent-Only)
+
+The Process layer provides design context during code generation.
 
 ### Constitution
 
@@ -55,16 +189,71 @@ protected:
     name: "Withdraw Funds"
     enforcement: block    # CRITICAL - never compromise
     rationale: "Users must always be able to withdraw their funds"
-  - id: fee_disclosure
-    name: "Fee Disclosure"
-    enforcement: warn     # Important but not blocking
-    rationale: "Transparency builds trust"
 ```
 
-**Enforcement Levels:**
-- `block` — CRITICAL. This capability must ALWAYS work.
-- `warn` — Important. Surface warning if affected.
-- `log` — Informational. Track but don't interrupt.
+### Vocabulary (v3.0)
+
+Maps product terms to design recommendations. **This is the API surface.**
+
+```yaml
+# sigil-mark/vocabulary/vocabulary.yaml
+terms:
+  pot:
+    engineering_name: "savings_container"
+    user_facing: "Pot"
+    mental_model: "Piggy bank, casual saving"
+    recommended:
+      material: glass
+      motion: warm
+      tone: friendly
+    zones: [marketing, dashboard]
+
+  vault:
+    engineering_name: "savings_container"  # Same backend!
+    user_facing: "Vault"
+    mental_model: "Bank vault, security"
+    recommended:
+      material: machinery
+      motion: deliberate
+      tone: serious
+    zones: [critical]
+```
+
+**Why Vocabulary Matters:**
+
+A "Pot" and a "Vault" might share the same backend, but they evoke different mental models:
+- Pot → Piggy bank → Warm, glass, friendly
+- Vault → Bank vault → Cold, machinery, secure
+
+Agent checks vocabulary before applying zone defaults.
+
+### Personas (renamed from Lens Array)
+
+User archetypes with physics and constraints.
+
+```yaml
+# sigil-mark/personas/personas.yaml
+personas:
+  power_user:
+    alias: "Chef"
+    description: "Expert user who lives in the product"
+    default_lens: strict
+    preferences:
+      motion: snappy
+      help: on_demand
+      density: high
+
+  newcomer:
+    alias: "Henlocker"
+    description: "New user learning the product"
+    default_lens: guided
+    preferences:
+      motion: reassuring
+      help: always
+      density: low
+```
+
+**Note:** "Lens" now ONLY refers to UI rendering variants (DefaultLens, StrictLens). Use "Persona" for user archetypes.
 
 ### Locked Decisions
 
@@ -82,237 +271,89 @@ status: locked
 rationale: "Blue tested highest for trust"
 ```
 
-**Lock Periods:**
-- `strategic` — 180 days (6 months)
-- `direction` — 90 days (3 months)
-- `execution` — 30 days (1 month)
+---
 
-### Personas (Lens Array)
+## Moodboard Folder (v3.1)
 
-User archetypes with physics and constraints.
+A folder-based inspiration collection that agents reference during `/craft`.
 
-```yaml
-# sigil-mark/lens-array/lenses.yaml
-lenses:
-  power_user:
-    alias: "Chef"
-    physics:
-      tap_targets: "32px min"
-      input_method: keyboard
-      shortcuts: { expected: true }
-    constraints:
-      max_actions_per_screen: 10
-      reading_level: advanced
+### Structure
 
-  newcomer:
-    alias: "Henlocker"
-    physics:
-      tap_targets: "48px min"
-      input_method: mouse
-    constraints:
-      max_actions_per_screen: 5
-      reading_level: beginner
+```
+sigil-mark/moodboard/
+├── index.yaml          # Optional: curated highlights, featured refs
+├── README.md           # Usage instructions
+│
+├── references/         # Product/app inspiration (organize by source)
+│   └── stripe/
+│       ├── checkout-flow.md
+│       └── confirmation.gif
+│
+├── articles/           # Synthesized design learnings
+│   └── motion-principles.md
+│
+├── anti-patterns/      # Patterns to avoid
+│   └── spinner-anxiety.md
+│
+├── gtm/                # Brand voice, messaging
+│   └── tone-of-voice.md
+│
+└── screenshots/        # Quick drops (unorganized is fine)
+    └── toast-pattern.png
 ```
 
-### Zone-Persona Mapping
+### Usage
 
-Zones automatically map to personas:
+**Drop files anytime** — No metadata required. Just drop screenshots, markdown notes, or references.
 
-| Zone | Persona | Input | Key Constraint |
-|------|---------|-------|----------------|
-| critical | power_user | keyboard | max_actions: 10 |
-| checkout | power_user | keyboard | reading_level: advanced |
-| marketing | newcomer | mouse | max_actions: 5 |
-| landing | newcomer | mouse | reading_level: beginner |
-| admin | power_user | keyboard | shortcuts: enabled |
-| mobile | mobile | touch | tap_targets: 48px |
-| a11y | accessibility | mixed | high_contrast: required |
-</sigil_process>
+**Optional frontmatter** — Add metadata for better querying:
+
+```markdown
+---
+source: "Stripe"
+zones: [critical]
+materials: [decisive]
+terms: [deposit]
+severity: high  # For anti-patterns
+tags: [motion, confirmation]
+---
+
+# Stripe Checkout Flow
+
+Content here...
+```
+
+### Agent Protocol
+
+During `/craft`, read the moodboard folder:
+
+```typescript
+import { readMoodboard, getEntriesForZone, getAntiPatterns } from 'sigil-mark/process';
+
+const moodboard = await readMoodboard();
+const zoneRefs = getEntriesForZone(moodboard, 'critical');
+const antiPatterns = getAntiPatterns(moodboard);
+```
+
+Include 1-3 relevant references in DESIGN CONTEXT output.
+
+### Query Helpers
+
+| Function | Purpose |
+|----------|---------|
+| `getEntriesForZone(moodboard, zone)` | Filter by zone |
+| `getAntiPatterns(moodboard, severity?)` | Get anti-patterns |
+| `getEntriesForTerm(moodboard, term)` | Filter by vocabulary term |
+| `getFeaturedReferences(moodboard)` | Get curated highlights |
+| `searchMoodboard(moodboard, query)` | Full-text search |
 
 ---
 
-## Commands
+## Runtime Layer
 
-<sigil_commands>
-### /craft
+### Core Layer (Runtime)
 
-Get design guidance with full Process context.
-
-```
-/craft "Create a confirm button for checkout"
-
-═══════════════════════════════════════════════════════════
-                     PROCESS CONTEXT
-═══════════════════════════════════════════════════════════
-
-ZONE: critical (checkout)
-PERSONA: power_user (Chef)
-  Input: keyboard
-  Tap targets: 32px min
-
-CONSTITUTION:
-  ⚠️ PROTECTED: withdraw (enforcement: block)
-  ⚠️ PROTECTED: deposit (enforcement: block)
-
-LOCKED DECISIONS:
-  🔒 DEC-2026-003: Confirmation flow (2-step) — 90 days remaining
-
-═══════════════════════════════════════════════════════════
-                     IMPLEMENTATION
-═══════════════════════════════════════════════════════════
-
-LAYOUT: CriticalZone (financial=true)
-LENS: StrictLens (forced)
-TIME AUTHORITY: server-tick
-
-[Code example follows]
-```
-
-### /consult
-
-Lock design decisions to prevent endless debates.
-
-```
-/consult "Primary CTA color"     # Start new consultation
-/consult DEC-2026-001 --status   # Check decision status
-/consult DEC-2026-001 --unlock   # Request early unlock
-```
-
-**Decision Flow:**
-1. Determine scope (strategic/direction/execution)
-2. Gather input (poll, sentiment, or direct decision)
-3. Lock decision with appropriate duration
-4. Surface in /craft when relevant
-
-### /garden
-
-Health report including Process layer status.
-
-```
-/garden                   # Full health report
-/garden --process         # Process layer only
-/garden --constitution    # Constitution compliance only
-/garden --decisions       # Decision status only
-```
-
-**Reports:**
-- Constitution violations (CRITICAL priority)
-- Expired decisions (HIGH priority)
-- Missing persona coverage (MEDIUM priority)
-- Layout coverage (LOW priority)
-</sigil_commands>
-
----
-
-## Agent Protocol
-
-<sigil_agent_protocol>
-### Before Generating UI Code
-
-1. **Load Process Context** (v2.6)
-   - Read Constitution for protected capabilities
-   - Find locked decisions for this zone
-   - Get persona for this zone
-
-2. **Determine Zone:**
-   - Is this inside a Layout? Read the zone context.
-   - What persona maps to this zone?
-   - What constraints apply?
-
-3. **Check Constitution:**
-   - Does this component touch protected capabilities?
-   - Surface warnings (don't block, but inform)
-
-4. **Surface Locked Decisions:**
-   - Are there active decisions affecting this zone?
-   - Warn if implementation contradicts a locked decision
-
-5. **Generate Code:**
-   - Use appropriate Layout + Lens
-   - Respect persona physics
-   - Include ProcessContext if needed
-
-### Example: Payment Button
-
-```tsx
-import { useCriticalAction, CriticalZone, useLens } from 'sigil-mark';
-import { useProcessContext } from 'sigil-mark/process';
-
-function PaymentButton({ amount }: { amount: number }) {
-  // v2.6: Process context for Constitution awareness
-  const { constitution } = useProcessContext();
-
-  const payment = useCriticalAction({
-    mutation: () => api.pay(amount),
-    timeAuthority: 'server-tick',
-  });
-
-  const Lens = useLens(); // StrictLens forced in CriticalZone
-
-  return (
-    <CriticalZone financial>
-      {/* 2-step confirmation per locked decision DEC-2026-003 */}
-      <CriticalZone.Content>
-        <h2>Confirm Payment</h2>
-        <p>${amount}</p>
-      </CriticalZone.Content>
-      <CriticalZone.Actions>
-        <Lens.CriticalButton state={payment.state} onAction={payment.commit}>
-          Pay Now
-        </Lens.CriticalButton>
-      </CriticalZone.Actions>
-    </CriticalZone>
-  );
-}
-```
-
-### Constitution Warnings
-
-When component touches protected capability:
-
-```
-⚠️ CONSTITUTION WARNING
-
-Action 'withdraw' is PROTECTED
-
-Enforcement: block
-Rationale: Users must always be able to withdraw their funds
-
-DO NOT:
-  - Disable this button based on external conditions
-  - Hide this capability behind feature flags
-  - Gate behind unnecessary verification steps
-
-This capability MUST always be functional for users with funds.
-```
-
-### Locked Decision Conflicts
-
-When implementation contradicts a locked decision:
-
-```
-🔒 DECISION CONFLICT DETECTED
-
-Decision: DEC-2026-003
-Topic: Confirmation flow
-Locked value: 2-step confirmation
-Your implementation: 1-step confirmation
-
-Options:
-1. Update implementation to match locked decision (recommended)
-2. Request early unlock: /consult --unlock DEC-2026-003
-3. Proceed anyway (will be flagged in /garden)
-```
-</sigil_agent_protocol>
-
----
-
-## Core Layer
-
-<sigil_core>
-### useCriticalAction
-
-The main physics hook. Emits a state stream with time authority.
+Physics hooks that manage state streams.
 
 ```tsx
 const action = useCriticalAction({
@@ -322,123 +363,169 @@ const action = useCriticalAction({
 
 // State stream
 action.state.status    // 'idle' | 'confirming' | 'pending' | 'confirmed' | 'failed'
-action.state.error     // Error | null
 
 // Actions
 action.confirm()       // Enter confirming state
 action.commit()        // Execute mutation
-action.cancel()        // Cancel (if confirming)
-action.reset()         // Reset to idle
 ```
 
-### Time Authorities
+### Layout Layer (Runtime)
 
-| Authority | Behavior | Use Case |
-|-----------|----------|----------|
-| `server-tick` | Wait for server confirmation | Payments, destructive actions |
-| `optimistic` | Instant update, silent rollback | Admin tools, lists |
-| `hybrid` | Instant + sync indicator | Real-time collaboration |
-</sigil_core>
-
----
-
-## Layout Layer
-
-<sigil_layouts>
-### CriticalZone
-
-For high-stakes actions (payments, destructive operations).
+Zone primitives that provide context.
 
 ```tsx
 <CriticalZone financial={true}>
   {/* Zone context: { type: 'critical', financial: true } */}
-  {/* useLens() returns StrictLens for critical buttons */}
-  {/* Persona: power_user (Chef) */}
+  {/* useLens() returns StrictLens */}
 </CriticalZone>
-```
 
-### MachineryLayout
-
-For keyboard-driven admin interfaces.
-
-```tsx
-<MachineryLayout stateKey="items" onAction={(id) => {}}>
+<MachineryLayout>
   {/* Zone context: { type: 'admin' } */}
   {/* Keyboard nav: j/k, Enter, Delete */}
-  {/* Persona: power_user (Chef) */}
 </MachineryLayout>
-```
 
-### GlassLayout
-
-For hover-driven marketing/showcase interfaces.
-
-```tsx
 <GlassLayout variant="card">
   {/* Zone context: { type: 'marketing' } */}
   {/* Hover physics: scale 1.02, translateY -4px */}
-  {/* Persona: newcomer (Henlocker) */}
 </GlassLayout>
 ```
-</sigil_layouts>
 
----
+### Lens Layer (Runtime)
 
-## Lens Layer
-
-<sigil_lenses>
-### useLens Hook
-
-Returns the appropriate lens based on zone context.
+Interchangeable UI rendering variants.
 
 ```tsx
 const Lens = useLens();
 
 // In CriticalZone with financial=true → StrictLens (forced)
-// In MachineryLayout → User preference or DefaultLens
-// In GlassLayout → User preference or DefaultLens
+// In other zones → User preference or DefaultLens
 ```
-
-### Built-in Lenses
 
 | Lens | Touch Target | Contrast | Animations |
 |------|-------------|----------|------------|
 | `DefaultLens` | 44px | Standard | Yes |
 | `StrictLens` | 48px | High | No |
 | `A11yLens` | 56px | WCAG AAA | No |
-</sigil_lenses>
 
 ---
 
-## File Structure
+## Dynamic vs Local Configuration (v3.0)
 
-<sigil_structure>
+Understanding what CAN be dynamic and what MUST stay local.
+
+### Always Local (Never Remote)
+
+| Aspect | Rationale |
+|--------|-----------|
+| **Physics** | Affects trust perception. Must be consistent. |
+| **Zone definitions** | Architectural choice, not runtime config. |
+| **Protected capabilities** | Constitution is sacred. |
+| **Security settings** | Never allow remote override. |
+
+### Can Be Dynamic (Remote-Capable)
+
+| Aspect | Controlled By | Example |
+|--------|--------------|---------|
+| **UI Copy** | Marketing | Hero headline, CTA text |
+| **Feature flags** | Marketing/Product | `show_new_dashboard: true` |
+| **Survey triggers** | Marketing | Enable/disable specific surveys |
+| **Promotions** | Marketing | Seasonal banners |
+| **Rate limits** | Engineering | API throttling |
+| **Timeouts** | Engineering | Session duration |
+
+### Behavioral Signals (v3.0)
+
+Vibe checks now support passive observation:
+
+```yaml
+behavioral_signals:
+  - id: rage_clicking
+    triggers:
+      - event: element_click
+        count_threshold: 3
+        within_ms: 2000
+    insight: "User expects something to happen"
+    severity: high
+    enabled: true
+```
+
+**Signal Categories:**
+- `info` — Neutral observation
+- `warning` — Potential friction
+- `high` — Likely frustration
+- `positive` — Good engagement
+
+### Remote Config File
+
+```yaml
+# sigil-mark/remote-config/remote-config.yaml
+version: "3.0.0"
+
+integration:
+  provider: local_yaml  # or launchdarkly, statsig, firebase
+
+marketing_controlled:
+  copy:
+    hero_headline:
+      value: "Your Crypto, Your Way"
+  feature_flags:
+    show_new_dashboard:
+      enabled: false
+      rollout_percentage: 0
+
+engineering_controlled:
+  physics: local_only  # Constitutional constraint
+  rate_limits:
+    api_general:
+      requests_per_minute: 60
+```
+
+---
+
+## File Structure (v3.0)
+
 ```
 sigil-mark/
-├── index.ts                    # Main entry (v2.6 exports)
+├── index.ts                    # Main entry (runtime exports only)
 │
-├── process/                    # Process layer (v2.6)
-│   ├── index.ts                # Barrel export
-│   ├── constitution-reader.ts  # Protected capabilities
-│   ├── decision-reader.ts      # Locked decisions
-│   ├── lens-array-reader.ts    # Personas
-│   ├── vibe-check-reader.ts    # Surveys
-│   └── process-context.tsx     # React context
+├── process/                    # AGENT-ONLY (do not import in browser)
+│   ├── index.ts                # Barrel export with @server-only
+│   ├── constitution-reader.ts
+│   ├── vocabulary-reader.ts    # NEW in v3.0
+│   ├── persona-reader.ts       # Renamed from lens-array-reader
+│   ├── decision-reader.ts
+│   ├── philosophy-reader.ts    # NEW in v3.0
+│   ├── vibe-check-reader.ts
+│   └── moodboard-reader.ts     # NEW in v3.1
+│
+├── moodboard/                  # NEW in v3.1 - Inspiration collection
+│   ├── README.md
+│   ├── index.yaml              # Optional curated highlights
+│   ├── references/             # Product inspiration by source
+│   ├── articles/               # Synthesized learnings
+│   ├── anti-patterns/          # Patterns to avoid
+│   ├── gtm/                    # Brand voice, messaging
+│   └── screenshots/            # Quick visual drops
 │
 ├── constitution/               # Constitution YAML
 │   └── protected-capabilities.yaml
 │
+├── vocabulary/                 # NEW in v3.0
+│   └── vocabulary.yaml
+│
+├── personas/                   # Renamed from lens-array/
+│   └── personas.yaml
+│
 ├── consultation-chamber/       # Decisions YAML
-│   ├── config.yaml
 │   └── decisions/*.yaml
 │
-├── lens-array/                 # Personas YAML
-│   └── lenses.yaml
+├── soul-binder/                # NEW in v3.0
+│   └── philosophy.yaml
 │
-├── core/                       # Physics engines
+├── core/                       # Physics engines (runtime)
 │   ├── use-critical-action.ts
-│   ├── zone-resolver.ts        # Zone-persona mapping
-│   └── ...
+│   ├── zone-resolver.ts
+│   └── persona-context.tsx     # Runtime persona (NEW in v3.0)
 │
 ├── layouts/                    # Zones + Structural Physics
 │   ├── critical-zone.tsx
@@ -450,19 +537,25 @@ sigil-mark/
     ├── strict/
     └── a11y/
 ```
-</sigil_structure>
 
 ---
 
-## Quick Reference
+## Migration from v2.6
 
-| Command | Purpose |
-|---------|---------|
-| `/craft` | Get design guidance with Process context |
-| `/consult` | Lock design decisions |
-| `/garden` | Health report (Constitution, Decisions, Coverage) |
-| `/validate` | Check recipe compliance |
-| `/approve` | Human review and sign-off |
+### Breaking Changes
+
+1. **ProcessContextProvider removed** — Use agent protocol instead
+2. **lens-array/ renamed to personas/** — Update imports
+3. **LensArray type renamed to PersonaArray** — Update types
+4. **Path-based zone detection removed** — Use Layout components
+
+### Migration Steps
+
+1. Remove `ProcessContextProvider` from your app
+2. Update imports: `readLensArray` → `readPersonaArray`
+3. Update file paths: `lens-array/` → `personas/`
+4. Add `vocabulary.yaml` with your product terms
+5. Add `philosophy.yaml` with your intent hierarchy
 
 ---
 

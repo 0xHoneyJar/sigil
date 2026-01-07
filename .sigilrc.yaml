@@ -1,8 +1,8 @@
-# Sigil v2.0 Configuration
+# Sigil v3.0 Configuration
 # "Truth is Core. Experience is Lens. Layouts ARE Zones."
 
-sigil: "2.0.0"
-codename: "Reality Engine"
+sigil: "3.0.0"
+codename: "Living Engine"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # PROJECT METADATA
@@ -27,6 +27,23 @@ zones:
       optimistic_ui: forbidden
       loading_spinners: warn
       animations: warn
+    # Persona-specific overrides for this zone
+    persona_overrides:
+      newcomer:
+        lens: guided          # Newcomers get guided lens even in critical zone
+        help: always
+        density: low
+        motion: reassuring
+      power_user:
+        lens: strict          # Power users keep strict lens
+        help: on_demand
+        density: medium       # Slightly less dense in critical zone
+        motion: deliberate
+      accessibility:
+        lens: a11y
+        help: always
+        density: low
+        motion: reduced
 
   # MachineryLayout — Keyboard-driven admin interfaces
   admin:
@@ -35,6 +52,15 @@ zones:
     lens: user-preference     # Respects user's lens choice
     constraints:
       raw_physics: allowed
+    persona_overrides:
+      newcomer:
+        lens: guided
+        help: always
+        density: medium
+      power_user:
+        lens: default         # Power users use default in admin (faster)
+        help: never
+        density: high
 
   # GlassLayout — Hover-driven marketing/showcase
   marketing:
@@ -42,6 +68,14 @@ zones:
     timeAuthority: optimistic
     lens: user-preference
     constraints: {}           # No constraints for marketing
+    persona_overrides:
+      power_user:
+        density: high         # Power users see more in marketing
+        help: never
+      newcomer:
+        density: low
+        help: contextual
+        motion: warm
 
   # Default zone (no layout wrapper)
   default:
@@ -49,6 +83,7 @@ zones:
     timeAuthority: optimistic
     lens: default
     constraints: {}
+    persona_overrides: {}
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # LENS CONFIGURATION
@@ -79,28 +114,12 @@ lenses:
     description: "WCAG AAA compliant, 56px targets, bold focus rings"
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# v1.2.5 LEGACY (deprecated)
-# These settings are preserved for backwards compatibility
+# v3.0 TERMINOLOGY NOTE
+# - "Persona" = User archetype (power_user, newcomer, mobile, accessibility)
+# - "Lens" = UI rendering variant (DefaultLens, StrictLens, A11yLens)
+# - Zone detection is Layout-based (CriticalZone, MachineryLayout, GlassLayout)
+# - Path-based zone detection was REMOVED in v2.0
 # ═══════════════════════════════════════════════════════════════════════════════
-
-# @deprecated Use zones.admin instead
-recipes: machinery
-
-# @deprecated Use zones configuration instead
-component_paths:
-  - "components/**"
-  - "src/components/**"
-  - "app/components/**"
-  - "packages/*/src/**"
-  - "src/features/**/components/**"
-
-# @deprecated Use zones.critical.timeAuthority instead
-# sync: server_authoritative
-# tick: 600ms
-
-# @deprecated Use zones configuration instead
-# constraints:
-#   optimistic_ui: forbidden
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # SANDBOX FILES (managed by /sandbox command)

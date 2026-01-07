@@ -41,7 +41,7 @@ describe('Constants', () => {
 
   it('should export DEFAULT_VIBE_CHECKS with correct structure', () => {
     expect(DEFAULT_VIBE_CHECKS).toEqual({
-      version: '2.6.0',
+      version: '3.0.0',
       triggers: [],
       feedback: {
         destination: 'console',
@@ -60,6 +60,7 @@ describe('Constants', () => {
         max_per_day: 3,
         min_interval_minutes: 30,
       },
+      behavioral_signals: [],
     });
   });
 });
@@ -78,7 +79,7 @@ describe('readVibeChecks', () => {
     const vibeChecksPath = path.join(process.cwd(), 'surveys/vibe-checks.yaml');
     const result = await readVibeChecks(vibeChecksPath);
 
-    expect(result.version).toBe('2.6.0');
+    expect(result.version).toBe('3.0.0');
     expect(result.triggers.length).toBeGreaterThan(0);
   });
 
@@ -474,7 +475,7 @@ describe('formatVibeChecksSummary', () => {
 
     const summary = formatVibeChecksSummary(vibeChecks);
 
-    expect(summary).toContain('Sigil Vibe Checks v2.6.0');
+    expect(summary).toContain('Sigil Vibe Checks v3.0.0');
     expect(summary).toContain('Triggers:');
     expect(summary).toContain('Limits:');
   });
