@@ -115,68 +115,69 @@ REFINEMENT (Evolve)       MAINTENANCE (Tend)
 
 ---
 
-## Sprint 2: /envision & /codify Evolution
+## Sprint 2: /envision & /codify Evolution ✅
 
 **Goal:** Update capture tools with progressive disclosure and auto-setup.
+**Status:** COMPLETED
 
 ### Tasks
 
-#### v4.0-S2-T1: /envision Progressive Disclosure
+#### v4.0-S2-T1: /envision Progressive Disclosure ✅
 - **Description:** Implement L1/L2/L3 grip levels for /envision
 - **Acceptance Criteria:**
-  - [ ] L1: Full interview with sensible defaults
-  - [ ] L2: `--quick` flag for minimal interview
-  - [ ] L3: `--from <file>` extracts from existing documentation
-  - [ ] Auto-detects existing codebase (inherits from /inherit)
+  - [x] L1: Full interview with sensible defaults
+  - [x] L2: `--quick` flag for minimal interview
+  - [x] L3: `--from <file>` extracts from existing documentation
+  - [x] Auto-detects existing codebase (inherits from /inherit)
 - **Dependencies:** v4.0-S1-T1 (persona schema)
 - **Testing:** Interview flow tests
 
-#### v4.0-S2-T2: /envision Product-Specific Personas
+#### v4.0-S2-T2: /envision Product-Specific Personas ✅
 - **Description:** Interview asks for product-specific users, not generic archetypes
 - **Acceptance Criteria:**
-  - [ ] Interview prompts for product domain
-  - [ ] Asks for evidence source (analytics, GTM, etc.)
-  - [ ] Creates personas with `source` and `evidence` fields populated
-  - [ ] Asks about journey stages
+  - [x] Interview prompts for product domain
+  - [x] Asks for evidence source (analytics, GTM, etc.)
+  - [x] Creates personas with `source` and `evidence` fields populated
+  - [x] Asks about journey stages
 - **Dependencies:** v4.0-S2-T1
 - **Testing:** Persona creation tests
 
-#### v4.0-S2-T3: /codify Progressive Disclosure
+#### v4.0-S2-T3: /codify Progressive Disclosure ✅
 - **Description:** Implement L1/L2/L3 grip levels for /codify
 - **Acceptance Criteria:**
-  - [ ] L1: Guided interview for design tokens
-  - [ ] L2: `--zone <name>` defines single zone
-  - [ ] L3: `--from <design-system.json>` imports existing system
+  - [x] L1: Guided interview for design tokens
+  - [x] L2: `--zone <name>` defines single zone
+  - [x] L3: `--from <design-system.json>` imports existing system
 - **Dependencies:** v4.0-S1-T2 (zone schema)
 - **Testing:** Rule creation tests
 
-#### v4.0-S2-T4: /codify Journey-Based Zones
+#### v4.0-S2-T4: /codify Journey-Based Zones ✅
 - **Description:** Zone creation includes journey context
 - **Acceptance Criteria:**
-  - [ ] Interview asks about journey stage
-  - [ ] Asks which persona is likely in this zone
-  - [ ] Captures trust state (building/established/critical)
-  - [ ] Evidence field available for zone data
+  - [x] Interview asks about journey stage
+  - [x] Asks which persona is likely in this zone
+  - [x] Captures trust state (building/established/critical)
+  - [x] Evidence field available for zone data
 - **Dependencies:** v4.0-S2-T3
 - **Testing:** Zone creation tests
 
-#### v4.0-S2-T5: Auto-Setup Integration
+#### v4.0-S2-T5: Auto-Setup Integration ✅
 - **Description:** Remove requirement for explicit /setup command
 - **Acceptance Criteria:**
-  - [ ] First /envision or /codify initializes Sigil automatically
-  - [ ] Creates `sigil-mark/` if not exists
-  - [ ] Initializes `.sigilrc.yaml` if not exists
-  - [ ] No error if already initialized
+  - [x] First /envision or /codify initializes Sigil automatically
+  - [x] Creates `sigil-mark/` if not exists
+  - [x] Initializes `.sigilrc.yaml` if not exists
+  - [x] No error if already initialized
 - **Dependencies:** v4.0-S2-T1, v4.0-S2-T3
 - **Testing:** First-run tests
 
-#### v4.0-S2-T6: Update Skill Files
+#### v4.0-S2-T6: Update Skill Files ✅
 - **Description:** Update skill SKILL.md files for new progressive disclosure
 - **Acceptance Criteria:**
-  - [ ] `envisioning-moodboard/SKILL.md` updated
-  - [ ] `codifying-rules/SKILL.md` updated
-  - [ ] L1/L2/L3 documented in each skill
-  - [ ] "When to Ask vs Proceed" section included
+  - [x] `envisioning-moodboard/SKILL.md` updated
+  - [x] `codifying-rules/SKILL.md` updated
+  - [x] L1/L2/L3 documented in each skill
+  - [x] "When to Ask vs Proceed" section included
 - **Dependencies:** v4.0-S2-T1 through T5
 - **Testing:** Manual review
 

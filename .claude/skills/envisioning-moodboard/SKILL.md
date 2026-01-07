@@ -4,72 +4,141 @@ zones:
     paths:
       - sigil-mark/moodboard/
       - sigil-mark/moodboard.md
-      - sigil-mark/soul-binder/immutable-values.yaml
-      - sigil-mark/lens-array/lenses.yaml
+      - sigil-mark/personas/
+      - sigil-mark/personas/personas.yaml
+      - sigil-mark/evidence/
     permission: read-write
   config:
     paths:
       - .sigil-setup-complete
       - .sigilrc.yaml
-    permission: read
+    permission: read-write
 ---
 
-# Sigil Envisioning Skill (v0.3)
+# Sigil Envisioning Skill (v4.0)
 
 ## Purpose
 
-Capture the product's soul through an interview-based workflow. Creates:
+Capture the product's soul through an interview-based workflow with progressive disclosure. Creates:
 1. **Moodboard** — Product feel, references, anti-patterns
-2. **Immutable Values** — Core principles with enforcement rules
-3. **Lens Definitions** — User persona perspectives
+2. **Personas** — Evidence-based user archetypes with journey stages
+3. **Evidence Files** — Optional analytics/interview data to ground personas
 
 ## Philosophy
 
 > "Culture is the Reality. Code is Just the Medium."
 
-This skill captures both intended soul (values) and sets up the framework for protecting emergent soul (flaws via /canonize).
+v4.0 emphasizes **evidence-based personas** over generic archetypes. Ask for YOUR users, not generic "power user" templates.
+
+---
+
+## Progressive Disclosure (v4.0)
+
+### L1: Full Interview (Default)
+```
+/envision
+```
+Full guided interview with sensible defaults. Best for new projects or when starting fresh.
+
+### L2: Quick Capture
+```
+/envision --quick
+```
+Minimal interview focusing on:
+- Product domain
+- Primary user type
+- Key feel descriptors
+- One anti-pattern
+
+### L3: Extract from Documentation
+```
+/envision --from <file>
+```
+Extracts product soul from existing documentation:
+- README.md, PRD, GTM docs
+- Attempts to infer personas, feel, and anti-patterns
+- Confirms findings with user before writing
+
+### Auto-Inherit (v4.0)
+If an existing codebase is detected, /envision offers to inherit:
+```
+/envision --inherit
+```
+Combines /inherit analysis with /envision interview:
+- Extracts patterns from existing code
+- Surfaces implicit personas
+- Confirms before codifying
+
+---
+
+## Auto-Setup (v4.0)
+
+No need for explicit `/setup`. If Sigil is not initialized:
+
+1. Create `sigil-mark/` directory structure
+2. Create `.sigilrc.yaml` with defaults
+3. Create `sigil-mark/personas/` and `sigil-mark/evidence/`
+4. Continue with interview
+
+```
+I notice Sigil hasn't been set up yet. I'll initialize it now...
+
+Created:
+  - sigil-mark/
+  - sigil-mark/moodboard/
+  - sigil-mark/personas/
+  - sigil-mark/evidence/
+  - .sigilrc.yaml
+
+Now let's capture your product's soul.
+```
+
+---
 
 ## Pre-Flight Checks
 
-1. **Sigil Setup**: Verify `.sigil-setup-complete` exists
+1. **Auto-Setup**: If `.sigil-setup-complete` missing, initialize Sigil
 2. **Existing State**: Check for existing files and offer to update vs replace
 3. **Section Focus**: If section argument provided, skip other sections
 4. **Moodboard Folder**: Check if `sigil-mark/moodboard/` exists for v3.1 inspiration collection
 
-## Moodboard Folder (v3.1)
+---
 
-Before or after the interview, prompt users about the moodboard folder:
+## Interview Flow
 
-```
-Sigil supports a moodboard folder for collecting design inspiration:
+### Section 0: Product Domain (v4.0 - NEW)
 
-  sigil-mark/moodboard/
-  ├── references/     → Product screenshots, flows (organize by source)
-  ├── articles/       → Design article syntheses
-  ├── anti-patterns/  → Patterns to avoid
-  ├── gtm/            → Brand voice, messaging
-  └── screenshots/    → Quick visual drops
-
-You can drop files here anytime. I'll reference them during /craft.
-
-Would you like to:
-1. Continue with the interview (creates moodboard.md)
-2. Start dropping files in the folder (skip interview)
-3. Do both (interview + folder for artifacts)
-```
-
-If the folder already has content, acknowledge it:
+**Question 0.1: Product Identity**
 
 ```
-I found {N} entries in your moodboard folder:
-  - {X} references
-  - {Y} anti-patterns
-  - {Z} articles
-
-I'll use these during /craft. The interview adds structured feel descriptors.
+question: "What's the name of your product?"
+header: "Product"
 ```
 
-## Workflow
+**Question 0.2: Product Domain**
+
+```
+question: "What domain is this product in?"
+header: "Domain"
+options:
+  - label: "DeFi / Financial"
+    description: "Tokens, transactions, deposits, claims"
+  - label: "E-Commerce"
+    description: "Shopping, checkout, orders"
+  - label: "SaaS / Productivity"
+    description: "Tools, dashboards, workflows"
+  - label: "Gaming"
+    description: "Games, achievements, progression"
+  - label: "Community / Social"
+    description: "Forums, messaging, profiles"
+  - label: "Other"
+    description: "Describe your domain"
+multiSelect: false
+```
+
+This context shapes all subsequent questions.
+
+---
 
 ### Section 1: Moodboard (Product Feel)
 
@@ -191,201 +260,171 @@ For each key moment, use free-form follow-up:
 2. "Describe your ideal celebration - what does a major win look like?"
 3. "Describe your ideal recovery - what does bouncing back from an error look like?"
 
-### Section 2: Immutable Values (Soul Binder)
+---
 
-#### Question 2.1: Shared Values
+### Section 2: Product-Specific Personas (v4.0 - UPDATED)
+
+v4.0 asks for YOUR users, not generic archetypes.
+
+#### Question 2.1: Evidence Source
 
 ```
-question: "Which shared values are non-negotiable for your product?"
-header: "Core Values"
+question: "How do you know about your users?"
+header: "Evidence"
 options:
-  - label: "Security First"
-    description: "No compromises on user safety or data protection"
-  - label: "Accessibility"
-    description: "All users can interact with the product"
-  - label: "Performance"
-    description: "Fast, responsive, no blocking operations"
-  - label: "Privacy"
-    description: "Minimal data collection, user control"
+  - label: "Analytics"
+    description: "Usage data, funnels, cohorts"
+  - label: "User Interviews"
+    description: "Direct conversations with users"
+  - label: "GTM Documents"
+    description: "Market research, personas from marketing"
+  - label: "Observation"
+    description: "Support tickets, user feedback"
+  - label: "Just starting"
+    description: "Hypotheses only, no data yet"
 multiSelect: true
 ```
 
-For each selected value, ask:
-- "What's the enforcement level? (block = hard stop, warn = allow with warning, review = flag for review)"
-- "Any specific constraints? For example: 'No API keys in code' for Security"
+This determines the `source` field for personas.
 
-#### Question 2.2: Project-Specific Values
+#### Question 2.2: Primary Users (Product-Specific)
 
-```
-question: "Any values specific to THIS project?"
-header: "Project Values"
-```
-
-Free-form input. For each value mentioned:
-- "What enforcement level? (block/warn/review)"
-- "Any specific constraints or patterns to check?"
-
-#### Question 2.3: Domain Values
+Instead of generic archetypes, ask for product-specific users:
 
 ```
-question: "What domain is this product in?"
-header: "Domain"
-options:
-  - label: "DeFi / Financial"
-    description: "Adds: Transaction safety, exploit prevention"
-  - label: "Creative Tools"
-    description: "Adds: Export reliability, performance"
-  - label: "Community Platform"
-    description: "Adds: Content moderation, abuse prevention"
-  - label: "Gaming"
-    description: "Adds: Fair play, skill expression"
-  - label: "General / Other"
-    description: "No domain-specific values"
-multiSelect: false
+question: "Who are your primary user types? Be specific to YOUR product."
+header: "Your Users"
 ```
 
-Each domain auto-suggests relevant values:
-- DeFi: transaction_safety, no_exploits
-- Creative: export_reliability, no_data_loss
-- Community: content_safety, no_abuse_vectors
-- Gaming: fair_play, skill_expression
+**Follow-up prompts:**
+- "In [domain], who are the main user groups?"
+- "What do you call these users internally?"
+- "What distinguishes each group?"
 
-### Section 3: Lens Definitions (Lens Array)
+**Example for DeFi:**
+- "Depositors" (not "power users")
+- "Claimers" (not "occasional users")
+- "Watchers" (not "browsers")
 
-Per SDD Section 3.4, lenses represent user perspectives/avatars that interpret the same core product differently. Each lens needs: name, description, priority, constraints, and validation rules.
+**Example for E-Commerce:**
+- "Buyers"
+- "Browsers"
+- "Returners"
 
-#### Question 3.1: User Types
+#### Question 2.3: Persona Details (Per User Type)
 
+For EACH identified user type:
+
+**Question 2.3.1: Persona Name & Alias**
 ```
-question: "Who are your primary user types?"
-header: "Users"
-options:
-  - label: "Power Users"
-    description: "Experienced, efficiency-focused"
-  - label: "Newcomers"
-    description: "First-time users needing guidance"
-  - label: "Mobile Users"
-    description: "Touch-first, limited screen"
-  - label: "Accessibility Users"
-    description: "Screen reader, keyboard-only"
-  - label: "Custom"
-    description: "Define a custom user type"
-multiSelect: true
-```
-
-#### Question 3.2: Lens Details (Per Selected User Type)
-
-For EACH selected user type, conduct detailed interview:
-
-**Question 3.2.1: Lens Name**
-```
-question: "What should we call this lens? (e.g., 'power_user', 'newcomer')"
+question: "What should we call this persona? (ID: lowercase_with_underscores)"
 header: "Name"
 ```
 
-Use lowercase with underscores for the ID.
-
-**Question 3.2.2: Lens Description**
+**Question 2.3.2: Evidence**
 ```
-question: "Who does this lens represent? Describe the target user."
-header: "Description"
+question: "What evidence supports this persona? (e.g., '2,993 depositors in 30 days')"
+header: "Evidence"
 ```
 
-Capture:
-- Who they are (daily active users, first-time visitors, etc.)
-- What they're optimizing for (efficiency, learning, accessibility)
-- Their context (desktop, mobile, assistive technology)
+Capture as array of strings in `evidence` field.
 
-**Question 3.2.3: Priority**
+**Question 2.3.3: Trust Level**
 ```
-question: "What priority is this lens? (1 = most constrained, used as truth test)"
-header: "Priority"
+question: "How much trust has this user built with your product?"
+header: "Trust"
 options:
-  - label: "1 - Truth Test"
-    description: "Most constrained lens - if it breaks here, it's rejected"
-  - label: "2 - High Priority"
-    description: "Important to validate, but not the ultimate test"
-  - label: "3 - Standard"
-    description: "Normal priority validation"
-  - label: "4 - Low Priority"
-    description: "Nice to have, not critical"
+  - label: "Low"
+    description: "New, skeptical, needs proof"
+  - label: "Medium"
+    description: "Familiar but cautious"
+  - label: "High"
+    description: "Established, confident"
 multiSelect: false
 ```
 
-**Note**: The lens with priority 1 is the "truth test" - assets that fail in this lens are rejected.
-
-**Question 3.2.4: Constraints**
+**Question 2.3.4: Journey Stages (v4.0)**
 ```
-question: "What constraints apply to this lens? List the key requirements."
+question: "What journey stages is this persona active in?"
+header: "Journey"
+options:
+  - label: "Discovery"
+    description: "Finding and evaluating the product"
+  - label: "Onboarding"
+    description: "First-time setup and learning"
+  - label: "Active Use"
+    description: "Regular product usage"
+  - label: "Power Use"
+    description: "Advanced features, optimization"
+  - label: "Recovery"
+    description: "After errors or issues"
+  - label: "Claiming/Exit"
+    description: "Withdrawing value, leaving"
+multiSelect: true
+```
+
+**Question 2.3.5: Physics (Interaction Style)**
+```
+question: "How does this user interact with the product?"
+header: "Input"
+options:
+  - label: "Keyboard-first"
+    description: "Desktop, keyboard shortcuts"
+  - label: "Mouse-primary"
+    description: "Desktop, pointer-based"
+  - label: "Touch"
+    description: "Mobile or tablet"
+  - label: "Mixed"
+    description: "Varies by context"
+multiSelect: false
+```
+
+**Question 2.3.6: Constraints**
+```
+question: "What constraints apply to this user?"
 header: "Constraints"
 ```
 
-For each constraint, capture:
-- Constraint ID (e.g., `keyboard_shortcuts`)
-- Description (e.g., "All actions accessible via keyboard")
-- Required (true/false - is this mandatory?)
+Capture:
+- Max actions per screen
+- Reading level
+- Error tolerance
+- Accessibility needs
 
-Example prompts:
-- "What MUST work for this user type?"
-- "What would break their experience if missing?"
-
-**Common constraints by lens type:**
-- Power Users: keyboard_shortcuts, dense_display, batch_operations
-- Newcomers: clear_onboarding, contextual_help, forgiving_interactions
-- Mobile: touch_targets, responsive_layout, reduced_data
-- Accessibility: screen_reader, high_contrast, reduced_motion
-
-**Question 3.2.5: Validation Rules**
-```
-question: "What validation rules should we check for this lens?"
-header: "Validation"
-```
-
-Capture specific checks that can be performed:
-- "All interactive elements have tabindex" (for keyboard users)
-- "Touch targets >= 44px" (for mobile)
-- "ARIA labels on all interactive elements" (for accessibility)
-- "No jargon without explanation" (for newcomers)
-
-These become actionable validation criteria during `/craft`.
-
-#### Question 3.3: Lens Stacking
+#### Question 2.4: Persona Stacking
 
 ```
-question: "Can lenses be combined? Select allowed combinations."
+question: "Can these personas overlap? (e.g., 'depositor + mobile')"
 header: "Stacking"
-options:
-  - label: "Power User + Accessibility"
-    description: "Keyboard experts using screen readers"
-  - label: "Newcomer + Mobile"
-    description: "First-time mobile users"
-  - label: "Mobile + Accessibility"
-    description: "Mobile users with assistive needs"
-  - label: "No stacking"
-    description: "Lenses are mutually exclusive"
-multiSelect: true
 ```
 
-#### Question 3.4: Immutable Properties
+Define allowed combinations and conflict resolution.
+
+---
+
+### Section 3: Moodboard Folder Prompt
+
+Prompt users about the moodboard folder:
 
 ```
-question: "What properties should NEVER vary between user types?"
-header: "Immutable"
-options:
-  - label: "Security"
-    description: "All users get same security protections"
-  - label: "Core Logic"
-    description: "Business rules don't change per user"
-  - label: "Data Integrity"
-    description: "Data handling is consistent"
-  - label: "API Contracts"
-    description: "Request/response shapes are identical"
-  - label: "Custom"
-    description: "Specify your own"
-multiSelect: true
+Sigil supports a moodboard folder for collecting design inspiration:
+
+  sigil-mark/moodboard/
+  ├── references/     → Product screenshots, flows (organize by source)
+  ├── articles/       → Design article syntheses
+  ├── anti-patterns/  → Patterns to avoid
+  ├── gtm/            → Brand voice, messaging
+  └── screenshots/    → Quick visual drops
+
+You can drop files here anytime. I'll reference them during /craft.
+
+Would you like to:
+1. Continue (creates moodboard.md)
+2. Drop files first (skip interview for now)
+3. Both (interview + folder)
 ```
 
-These properties remain constant across ALL lenses - lenses only affect presentation, never core behavior.
+---
 
 ## Output Generation
 
@@ -396,7 +435,8 @@ Write to `sigil-mark/moodboard.md`:
 ```markdown
 # Product Moodboard
 
-**Product**: [Inferred from context or ask]
+**Product**: [Name from Q0.1]
+**Domain**: [Domain from Q0.2]
 **Created**: [Current date]
 **Updated**: [Current date]
 
@@ -416,10 +456,10 @@ Write to `sigil-mark/moodboard.md`:
 
 | Context | Feel | Reference |
 |---------|------|-----------|
-| Transactions | [Answer from Q1.2] | [Relevant reference] |
-| Success states | [Answer from Q1.3] | [Relevant reference] |
-| Loading | [Answer from Q1.4] | [Relevant reference] |
-| Errors | [Answer from Q1.5] | [Relevant reference] |
+| Transactions | [Answer] | [Reference] |
+| Success states | [Answer] | [Reference] |
+| Loading | [Answer] | [Reference] |
+| Errors | [Answer] | [Reference] |
 
 ---
 
@@ -443,144 +483,109 @@ Write to `sigil-mark/moodboard.md`:
 [From Q1.7]
 ```
 
-### Immutable Values Output
+### Personas Output (v4.0)
 
-Write to `sigil-mark/soul-binder/immutable-values.yaml`:
+Write to `sigil-mark/personas/personas.yaml`:
 
 ```yaml
-# Soul Binder — Immutable Values
-# Core principles that hard-block violations
+# Sigil Personas v4.0
+# Evidence-based user archetypes
 # Generated through /envision interview
 
-version: "1.0"
+version: "4.0.0"
 generated_by: "/envision"
 generated_at: "[timestamp]"
 
-values:
-  security:
-    name: "Security First"
-    description: "[from interview]"
-    type: "shared"
-    enforcement:
-      level: "block"  # block | warn | review
-      constraints:
-        - name: "no_exposed_keys"
-          description: "API keys and secrets must not appear in code"
-          pattern: "(?i)(api[_-]?key|secret|password|token)\\s*[:=]"
-          scope: ["**/*.ts", "**/*.js", "**/*.yaml"]
+personas:
+  depositor:  # Product-specific ID
+    name: "Depositor"
+    alias: "Henlocker"
+    description: "Users who deposit tokens into the protocol"
 
-  # Additional values from interview...
-```
+    # v4.0: Evidence-based
+    source: analytics
+    evidence:
+      - "2,993 depositors in Henlo product"
+      - "Average 3.2 transactions/month"
+    trust_level: high
+    journey_stages:
+      - active_use
+      - claiming
+    last_refined: "[date]"
 
-### Lens Array Output
+    default_lens: default
+    priority: 1
 
-Write to `sigil-mark/lens-array/lenses.yaml`:
-
-```yaml
-# Lens Array — User Persona Definitions
-# Multiple truths coexist on top of core
-# Generated through /envision interview
-# Schema: SDD Section 3.4
-
-version: "1.0"
-generated_by: "/envision"
-generated_at: "[timestamp]"
-
-lenses:
-  power_user:
-    name: "Power User"
-    description: "Experienced users optimizing for efficiency"
-    priority: 1  # Lower = more constrained = truth test
-
-    target_audience:
-      - "Daily active users"
-      - "Keyboard-first users"
-      - "High-volume transaction users"
+    physics:
+      input_method: mixed
+      tap_targets:
+        min_size: "44px"
+      shortcuts:
+        expected: true
+      motion:
+        reduced: false
 
     constraints:
-      - id: "keyboard_shortcuts"
-        description: "All actions accessible via keyboard"
-        required: true
+      max_actions_per_screen: 5
+      error_tolerance: low
+      cognitive_load: moderate
 
-      - id: "dense_display"
-        description: "Information-dense layouts preferred"
-        required: false
+    preferences:
+      motion: deliberate
+      help: contextual
+      density: medium
 
-      - id: "batch_operations"
-        description: "Bulk actions available"
-        required: true
-
-    validation:
-      - "All interactive elements have tabindex"
-      - "No hover-only interactions"
-      - "Shortcuts documented in UI"
-
-  newcomer:
-    name: "Newcomer"
-    description: "First-time users needing guidance"
-    priority: 2
-
-    target_audience:
-      - "New signups"
-      - "Infrequent users"
-      - "Users from competing products"
-
-    constraints:
-      - id: "clear_onboarding"
-        description: "Guided first experience"
-        required: true
-
-      - id: "contextual_help"
-        description: "Tooltips and help available"
-        required: true
-
-      - id: "forgiving_interactions"
-        description: "Undo available for destructive actions"
-        required: true
-
-    validation:
-      - "Help button visible on every screen"
-      - "No jargon without explanation"
-      - "Confirmation for destructive actions"
-
-  # Additional lenses from interview...
+  # Additional personas...
 
 immutable_properties:
-  description: |
-    These properties MUST be identical across all lenses.
-    Lenses only affect presentation, never core behavior.
-  properties:
-    - name: "core_logic"
-      description: "Business rules and calculations"
-    - name: "security"
-      description: "Authentication, authorization, encryption"
-    - name: "data_integrity"
-      description: "Validation rules, constraints"
-    - name: "api_contracts"
-      description: "Request/response shapes"
+  - security
+  - core_logic
+  - data_integrity
 
 stacking:
-  description: "Lenses can be combined for specific scenarios"
   allowed_combinations:
-    - ["power_user"]
-    - ["newcomer"]
-    - ["mobile"]
-    - ["accessibility"]
-    - ["power_user", "accessibility"]
-    - ["newcomer", "mobile"]
-    - ["mobile", "accessibility"]
-
-  conflict_resolution:
-    priority_order: ["accessibility", "power_user", "newcomer", "mobile"]
-    rule: "When lenses conflict, higher priority wins"
+    - [depositor]
+    - [depositor, mobile]
+    - [claimer]
+  conflict_resolution: priority
+  max_stack_depth: 2
 ```
+
+### Evidence Output (Optional)
+
+If user provides analytics data, write to `sigil-mark/evidence/[source]-[date].yaml`:
+
+```yaml
+source: analytics
+collected_at: "[date]"
+period: "[date range]"
+description: "User data from initial /envision interview"
+
+metrics:
+  - key: total_depositors
+    value: 2993
+    label: "Total Depositors"
+    unit: users
+  - key: avg_transactions
+    value: 3.2
+    label: "Avg Monthly Transactions"
+    unit: transactions/month
+
+applies_to:
+  personas:
+    - depositor
+  journey_stages:
+    - active_use
+```
+
+---
 
 ## Handling Existing State
 
 If files already exist:
 
 ```
-question: "Existing [moodboard/values/lenses] found. What would you like to do?"
+question: "Existing [moodboard/personas] found. What would you like to do?"
 header: "Existing"
 options:
   - label: "Update existing"
@@ -592,6 +597,8 @@ options:
 multiSelect: false
 ```
 
+---
+
 ## Success Output
 
 ```
@@ -599,49 +606,72 @@ Product Soul Captured!
 
 Written to:
   - sigil-mark/moodboard.md
-  - sigil-mark/soul-binder/immutable-values.yaml
-  - sigil-mark/lens-array/lenses.yaml
+  - sigil-mark/personas/personas.yaml
+  [- sigil-mark/evidence/analytics-2026-01-07.yaml]
 
 Captured:
   - X reference products
   - Y feel descriptors
-  - Z immutable values (N blocking, M warning)
-  - L user lenses
+  - Z product-specific personas (with evidence)
+  - N journey stages mapped
 
-Moodboard Folder (v3.1):
+Personas Created:
+  - depositor (analytics, high trust)
+  - claimer (analytics, medium trust)
+  - watcher (observation, low trust)
+
+Moodboard Folder:
   sigil-mark/moodboard/ is ready for inspiration artifacts.
   Drop screenshots, articles, and references anytime.
-  See sigil-mark/moodboard/README.md for usage.
-
-Strictness Level: [current from .sigilrc.yaml]
-  [Description of what this means]
 
 Next steps:
-  - /codify to define design rules
-  - /canonize to protect emergent behaviors
+  - /codify to define design rules and zones
   - /craft to get design guidance
-  - Drop inspiration into sigil-mark/moodboard/
+  - /garden to check configuration health
 ```
+
+---
 
 ## Error Handling
 
 | Situation | Response |
 |-----------|----------|
-| No setup complete | "Sigil not initialized. Run `/setup` first." |
+| No setup complete | Auto-initialize Sigil (v4.0 auto-setup) |
 | User cancels | Save partial state, note incomplete sections |
 | Empty selections | Use sensible defaults, note in output |
-| Invalid enforcement | Default to "warn", note the fallback |
+| No evidence | Mark personas with `source: generic` |
+
+---
+
+## When to Ask vs Proceed
+
+| Context | Ask | Proceed |
+|---------|-----|---------|
+| No existing files | ✓ Full interview | |
+| Files exist, --quick flag | | ✓ Minimal interview |
+| Files exist, no flag | ✓ Update or replace? | |
+| --from flag with file | | ✓ Extract and confirm |
+| --inherit flag | | ✓ Analyze code first |
+
+---
 
 ## Philosophy
 
-This interview captures the INTENDED soul. The EMERGENT soul develops over time and is protected via `/canonize`. Both are equally important.
+This interview captures the INTENDED soul with EVIDENCE. v4.0 emphasizes:
+
+1. **Product-specific personas** over generic archetypes
+2. **Evidence-based** characteristics over assumptions
+3. **Journey stages** to map where personas appear
+4. **Progressive disclosure** to match user expertise
 
 Do NOT:
 - Rush the interview
+- Suggest generic "power user" / "newcomer" unless truly applicable
+- Skip evidence questions
 - Make assumptions without asking
-- Skip sections without user consent
 
 DO:
-- Explain why each question matters
-- Offer examples when helpful
+- Ask for THEIR user terminology
+- Capture specific numbers when available
+- Map users to journey stages
 - Save progress incrementally
