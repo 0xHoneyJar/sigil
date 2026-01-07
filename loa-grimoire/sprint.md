@@ -250,83 +250,84 @@ REFINEMENT (Evolve)       MAINTENANCE (Tend)
 
 ---
 
-## Sprint 4: /observe Communication Layer
+## Sprint 4: /observe Communication Layer ✅
 
 **Goal:** Implement visual feedback loop via Claude in Chrome MCP.
+**Status:** COMPLETED
 
 ### Tasks
 
-#### v4.0-S4-T1: MCP Availability Detection
+#### v4.0-S4-T1: MCP Availability Detection ✅
 - **Description:** Check for Claude in Chrome MCP connection
 - **Acceptance Criteria:**
-  - [ ] Uses `mcp__claude-in-chrome__tabs_context_mcp` to check availability
-  - [ ] Graceful fallback message if MCP not available
-  - [ ] Offers manual screenshot upload as alternative
+  - [x] Uses `mcp__claude-in-chrome__tabs_context_mcp` to check availability
+  - [x] Graceful fallback message if MCP not available
+  - [x] Offers manual screenshot upload as alternative
 - **Dependencies:** None
 - **Testing:** MCP detection tests
 
-#### v4.0-S4-T2: Screenshot Capture
+#### v4.0-S4-T2: Screenshot Capture ✅
 - **Description:** Capture visual state via MCP
 - **Acceptance Criteria:**
-  - [ ] Uses `mcp__claude-in-chrome__computer` with `action: screenshot`
-  - [ ] Stores screenshot in `.sigil-observations/screenshots/`
-  - [ ] Filename includes timestamp and component name
+  - [x] Uses `mcp__claude-in-chrome__computer` with `action: screenshot`
+  - [x] Stores screenshot in `.sigil-observations/screenshots/`
+  - [x] Filename includes timestamp and component name
 - **Dependencies:** v4.0-S4-T1
 - **Testing:** Screenshot capture tests
 
-#### v4.0-S4-T3: Structural Analysis
+#### v4.0-S4-T3: Structural Analysis ✅
 - **Description:** Analyze screenshot against zone expectations
 - **Acceptance Criteria:**
-  - [ ] Checks for expected zone wrappers (CriticalZone, etc.)
-  - [ ] Checks for expected component patterns
-  - [ ] Returns pass/fail for each structural check
+  - [x] Checks for expected zone wrappers (CriticalZone, etc.)
+  - [x] Checks for expected component patterns
+  - [x] Returns pass/fail for each structural check
 - **Dependencies:** v4.0-S4-T2
 - **Testing:** Structural analysis tests
 
-#### v4.0-S4-T4: Measurable Property Comparison
+#### v4.0-S4-T4: Measurable Property Comparison ✅
 - **Description:** Compare visual properties against rules.md
 - **Acceptance Criteria:**
-  - [ ] Reads expected values from rules.md
-  - [ ] Compares border-radius, colors, spacing, animation timing
-  - [ ] Returns delta for each mismatch
+  - [x] Reads expected values from rules.md
+  - [x] Compares border-radius, colors, spacing, animation timing
+  - [x] Returns delta for each mismatch
 - **Dependencies:** v4.0-S4-T2
 - **Testing:** Property comparison tests
 
-#### v4.0-S4-T5: Feedback Question Generation
+#### v4.0-S4-T5: Feedback Question Generation ✅
 - **Description:** Generate targeted questions for human judgment
 - **Acceptance Criteria:**
-  - [ ] Creates question for each measurable delta
-  - [ ] Options: "Yes — update rules" / "No — fix component"
-  - [ ] Includes context about why property matters
+  - [x] Creates question for each measurable delta
+  - [x] Options: "Yes — update rules" / "No — fix component"
+  - [x] Includes context about why property matters
 - **Dependencies:** v4.0-S4-T4
 - **Testing:** Question generation tests
 
-#### v4.0-S4-T6: Feedback Storage
+#### v4.0-S4-T6: Feedback Storage ✅
 - **Description:** Record feedback to YAML files
 - **Acceptance Criteria:**
-  - [ ] Creates feedback file in `.sigil-observations/feedback/`
-  - [ ] Includes observation_id, timestamp, component
-  - [ ] Records structural checks, measurable properties, human answers
-  - [ ] Sets `applied: false` for new feedback
+  - [x] Creates feedback file in `.sigil-observations/feedback/`
+  - [x] Includes observation_id, timestamp, component
+  - [x] Records structural checks, measurable properties, human answers
+  - [x] Sets `applied: false` for new feedback
 - **Dependencies:** v4.0-S4-T5
 - **Testing:** Feedback storage tests
 
-#### v4.0-S4-T7: Progressive Disclosure for /observe
+#### v4.0-S4-T7: Progressive Disclosure for /observe ✅
 - **Description:** Implement L1/L2/L3 grip levels
 - **Acceptance Criteria:**
-  - [ ] L1: `/observe` captures current screen
-  - [ ] L2: `--component ClaimButton` focuses analysis
-  - [ ] L3: `--screenshot manual.png --rules border-radius` manual mode
+  - [x] L1: `/observe` captures current screen
+  - [x] L2: `--component ClaimButton` focuses analysis
+  - [x] L3: `--screenshot manual.png --rules border-radius` manual mode
 - **Dependencies:** v4.0-S4-T1 through T6
 - **Testing:** /observe invocation tests
 
-#### v4.0-S4-T8: Create observing-visual Skill
+#### v4.0-S4-T8: Create observing-visual Skill ✅
 - **Description:** Create new skill directory and files
 - **Acceptance Criteria:**
-  - [ ] `observing-visual/index.yaml` created
-  - [ ] `observing-visual/SKILL.md` created with execution steps
-  - [ ] MCP requirement documented
-  - [ ] Output format documented
+  - [x] `observing-visual/index.yaml` created
+  - [x] `observing-visual/SKILL.md` created with execution steps
+  - [x] MCP requirement documented
+  - [x] Output format documented
 - **Dependencies:** v4.0-S4-T1 through T7
 - **Testing:** Manual review
 
