@@ -333,77 +333,78 @@ REFINEMENT (Evolve)       MAINTENANCE (Tend)
 
 ---
 
-## Sprint 5: /refine Incremental Updates
+## Sprint 5: /refine Incremental Updates ✅
 
 **Goal:** Implement incremental context updates with evidence.
+**Status:** COMPLETED
 
 ### Tasks
 
-#### v4.0-S5-T1: Evidence File Parsing
+#### v4.0-S5-T1: Evidence File Parsing ✅
 - **Description:** Parse evidence files from `evidence/` directory
 - **Acceptance Criteria:**
-  - [ ] Reads YAML evidence files
-  - [ ] Validates against evidence schema
-  - [ ] Extracts metrics, insights, source type
+  - [x] Reads YAML evidence files
+  - [x] Validates against evidence schema
+  - [x] Extracts metrics, insights, source type
 - **Dependencies:** v4.0-S1-T3 (evidence schema)
 - **Testing:** Evidence parsing tests
 
-#### v4.0-S5-T2: Persona Update Flow
+#### v4.0-S5-T2: Persona Update Flow ✅
 - **Description:** Update existing personas with new evidence
 - **Acceptance Criteria:**
-  - [ ] Loads existing persona from personas.yaml
-  - [ ] Merges new evidence citations
-  - [ ] Updates characteristics if evidence contradicts
-  - [ ] Updates `last_refined` timestamp
+  - [x] Loads existing persona from personas.yaml
+  - [x] Merges new evidence citations
+  - [x] Updates characteristics if evidence contradicts
+  - [x] Updates `last_refined` timestamp
 - **Dependencies:** v4.0-S5-T1
 - **Testing:** Persona update tests
 
-#### v4.0-S5-T3: Persona Creation Flow
+#### v4.0-S5-T3: Persona Creation Flow ✅
 - **Description:** Create new personas via interview
 - **Acceptance Criteria:**
-  - [ ] Asks for description, evidence source, characteristics
-  - [ ] Asks for journey stages (which zones?)
-  - [ ] Creates persona with all v4.0 fields
-  - [ ] Writes to personas.yaml
+  - [x] Asks for description, evidence source, characteristics
+  - [x] Asks for journey stages (which zones?)
+  - [x] Creates persona with all v4.0 fields
+  - [x] Writes to personas.yaml
 - **Dependencies:** v4.0-S1-T1 (persona schema)
 - **Testing:** Persona creation tests
 
-#### v4.0-S5-T4: Zone Update/Creation
+#### v4.0-S5-T4: Zone Update/Creation ✅
 - **Description:** Update or create zones via /refine
 - **Acceptance Criteria:**
-  - [ ] `/refine --zone claim_moment` updates existing zone
-  - [ ] Creates new zone if doesn't exist
-  - [ ] Asks for journey_stage, persona_likely, trust_state
-  - [ ] Updates `.sigilrc.yaml`
+  - [x] `/refine --zone claim_moment` updates existing zone
+  - [x] Creates new zone if doesn't exist
+  - [x] Asks for journey_stage, persona_likely, trust_state
+  - [x] Updates `.sigilrc.yaml`
 - **Dependencies:** v4.0-S1-T2 (zone schema)
 - **Testing:** Zone update tests
 
-#### v4.0-S5-T5: Feedback Application
+#### v4.0-S5-T5: Feedback Application ✅
 - **Description:** Apply feedback from /observe sessions
 - **Acceptance Criteria:**
-  - [ ] `/refine` shows unapplied feedback
-  - [ ] "Yes — update rules" updates rules.md
-  - [ ] "No — fix component" noted (no context change)
-  - [ ] Marks feedback as `applied: true`
+  - [x] `/refine` shows unapplied feedback
+  - [x] "Yes — update rules" updates rules.md
+  - [x] "No — fix component" noted (no context change)
+  - [x] Marks feedback as `applied: true`
 - **Dependencies:** v4.0-S4-T6 (feedback storage)
 - **Testing:** Feedback application tests
 
-#### v4.0-S5-T6: Progressive Disclosure for /refine
+#### v4.0-S5-T6: Progressive Disclosure for /refine ✅
 - **Description:** Implement L1/L2/L3 grip levels
 - **Acceptance Criteria:**
-  - [ ] L1: Interactive mode, reviews unapplied feedback
-  - [ ] L2: `--persona depositor` specific persona
-  - [ ] L3: `--persona depositor --evidence analytics.yaml` file-based
+  - [x] L1: Interactive mode, reviews unapplied feedback
+  - [x] L2: `--persona depositor` specific persona
+  - [x] L3: `--persona depositor --evidence analytics.yaml` file-based
 - **Dependencies:** v4.0-S5-T1 through T5
 - **Testing:** /refine invocation tests
 
-#### v4.0-S5-T7: Create refining-context Skill
+#### v4.0-S5-T7: Create refining-context Skill ✅
 - **Description:** Create new skill directory and files
 - **Acceptance Criteria:**
-  - [ ] `refining-context/index.yaml` created
-  - [ ] `refining-context/SKILL.md` created
-  - [ ] Evidence sources documented
-  - [ ] Interview questions documented
+  - [x] `refining-context/index.yaml` created
+  - [x] `refining-context/SKILL.md` created
+  - [x] Evidence sources documented
+  - [x] Interview questions documented
 - **Dependencies:** v4.0-S5-T1 through T6
 - **Testing:** Manual review
 
