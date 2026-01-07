@@ -633,78 +633,79 @@ REFINEMENT (Evolve)       MAINTENANCE (Tend)
 
 ---
 
-## Sprint 9: Migration & Deprecation
+## Sprint 9: Migration & Deprecation ✅
 
 **Goal:** Implement deprecation warnings and migration guide.
+**Status:** COMPLETED
 
 ### Tasks
 
-#### v4.0-S9-T1: Deprecation Warning System
+#### v4.0-S9-T1: Deprecation Warning System ✅
 - **Description:** System for showing deprecation warnings
 - **Acceptance Criteria:**
-  - [ ] Detects when deprecated command is invoked
-  - [ ] Shows clear deprecation message
-  - [ ] Points to replacement command
-  - [ ] Logs deprecation usage
+  - [x] Detects when deprecated command is invoked
+  - [x] Shows clear deprecation message
+  - [x] Points to replacement command
+  - [x] Logs deprecation usage
 - **Dependencies:** None
 - **Testing:** Warning system tests
 
-#### v4.0-S9-T2: /setup Deprecation
+#### v4.0-S9-T2: /setup Deprecation ✅
 - **Description:** Deprecate /setup command
 - **Acceptance Criteria:**
-  - [ ] /setup shows: "Setup is automatic. First /envision or /codify initializes Sigil."
-  - [ ] Still works (no error) for backwards compatibility
+  - [x] /setup shows: "Setup is automatic. First /envision or /codify initializes Sigil."
+  - [x] Still works (no error) for backwards compatibility
 - **Dependencies:** v4.0-S9-T1
 - **Testing:** /setup deprecation test
 
-#### v4.0-S9-T3: /approve Deprecation
+#### v4.0-S9-T3: /approve Deprecation ✅
 - **Description:** Deprecate /approve command
 - **Acceptance Criteria:**
-  - [ ] /approve shows: "Use /consult to record decisions."
-  - [ ] Forwards to /consult internally
+  - [x] /approve shows: "Use /consult to record decisions."
+  - [x] Forwards to /consult internally
 - **Dependencies:** v4.0-S9-T1
 - **Testing:** /approve deprecation test
 
-#### v4.0-S9-T4: /canonize Deprecation
+#### v4.0-S9-T4: /canonize Deprecation ✅
 - **Description:** Deprecate /canonize command
 - **Acceptance Criteria:**
-  - [ ] /canonize shows: "Use /consult 'behavior' --protect"
-  - [ ] Forwards to /consult --protect internally
+  - [x] /canonize shows: "Use /consult 'behavior' --protect"
+  - [x] Forwards to /consult --protect internally
 - **Dependencies:** v4.0-S9-T1
 - **Testing:** /canonize deprecation test
 
-#### v4.0-S9-T5: /unlock Deprecation
+#### v4.0-S9-T5: /unlock Deprecation ✅
 - **Description:** Deprecate /unlock command
 - **Acceptance Criteria:**
-  - [ ] /unlock shows: "Use /consult <id> --unlock 'reason'"
-  - [ ] Forwards to /consult --unlock internally
+  - [x] /unlock shows: "Use /consult <id> --unlock 'reason'"
+  - [x] Forwards to /consult --unlock internally
 - **Dependencies:** v4.0-S9-T1
 - **Testing:** /unlock deprecation test
 
-#### v4.0-S9-T6: /validate Deprecation
+#### v4.0-S9-T6: /validate Deprecation ✅
 - **Description:** Deprecate /validate command
 - **Acceptance Criteria:**
-  - [ ] /validate shows: "Use /garden --validate"
-  - [ ] Forwards to /garden --validate internally
+  - [x] /validate shows: "Use /garden --validate"
+  - [x] Forwards to /garden --validate internally
 - **Dependencies:** v4.0-S9-T1
 - **Testing:** /validate deprecation test
 
-#### v4.0-S9-T7: /inherit Deprecation
+#### v4.0-S9-T7: /inherit Deprecation ✅
 - **Description:** Deprecate /inherit command
 - **Acceptance Criteria:**
-  - [ ] /inherit shows: "/envision auto-detects existing codebase"
-  - [ ] Forwards to /envision internally
+  - [x] /inherit shows: "/envision auto-detects existing codebase"
+  - [x] Forwards to /envision internally
 - **Dependencies:** v4.0-S9-T1
 - **Testing:** /inherit deprecation test
 
-#### v4.0-S9-T8: Migration Guide
+#### v4.0-S9-T8: Migration Guide ✅
 - **Description:** Create v3.0 → v4.0 migration guide
 - **Acceptance Criteria:**
-  - [ ] `MIGRATION-v4.md` created
-  - [ ] Schema migration steps documented
-  - [ ] Command mapping documented
-  - [ ] Breaking changes documented
-  - [ ] Backwards compatibility notes
+  - [x] `MIGRATION-v4.md` created
+  - [x] Schema migration steps documented
+  - [x] Command mapping documented
+  - [x] Breaking changes documented
+  - [x] Backwards compatibility notes
 - **Dependencies:** v4.0-S9-T1 through T7
 - **Testing:** Manual review
 
