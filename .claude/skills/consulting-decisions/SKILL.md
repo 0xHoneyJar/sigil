@@ -4,6 +4,8 @@ zones:
     paths:
       - sigil-mark/consultation-chamber/decisions/
       - sigil-mark/consultation-chamber/config.yaml
+      - sigil-mark/evidence/
+      - sigil-mark/.sigil-observations/feedback/
     permission: read-write
   config:
     paths:
@@ -12,269 +14,311 @@ zones:
     permission: read
 ---
 
-# Consulting Decisions (v3.0)
+# Consulting Decisions Skill (v4.0)
 
 ## Purpose
 
-Help craftsmen **record their deliberated decisions**. This skill captures decisions that have already been made through careful thought, not decisions that need to be rushed.
+Record deliberated decisions with time locks. Consolidates /approve, /canonize, and /unlock into single /consult command.
 
-## Philosophy (v3.0)
+## Philosophy (v4.0)
 
 > "Sweat the art. We handle the mechanics. Return to flow."
 
-### What This Means
+v4.0 consolidates decision recording:
+- `/consult` replaces /approve for decisions
+- `--protect` replaces /canonize for protected capabilities
+- `--unlock` replaces /unlock command
 
-1. **Craftsman deliberation is valuable** — Take time to consider tradeoffs
-2. **This skill records decisions, not makes them** — You bring the judgment
-3. **/consult locks AFTER deliberation** — Not to shortcut thinking
-4. **Return to flow** — Once locked, stop second-guessing
+---
 
-### What This Skill Does
+## Progressive Disclosure (v4.0)
 
-- Records the decision you've already made
-- Applies appropriate time lock based on scope
-- Creates audit trail for future reference
-- Prevents future bikeshedding on decided topics
+### L1: Quick Decision (Default)
+```
+/consult "2-step confirmation for transactions > $100"
+```
+Creates decision with default 30-day execution lock.
 
-### What This Skill Does NOT Do
+### L2: Scoped Decision
+```
+/consult "button border radius is 8px" --scope critical --lock 90d
+/consult "use deliberate motion" --scope ClaimButton
+```
+Adds zone/component scope and custom lock duration.
 
-- Make decisions for the craftsman
-- Rush the deliberation process
-- Override existing locked decisions without justification
-- Pressure you into quick choices
+### L3: Protected Decision
+```
+/consult "withdraw must always work" --protect
+/consult "fee disclosure must show before confirmation" --protect --evidence OBS-2026-001
+```
+Protected decisions (like /canonize) with 365-day default lock.
 
-## Decision Tiers
+---
 
-| Tier | Scope | Lock Period | Process |
-|------|-------|-------------|---------|
-| **Strategic** | New features, major changes | 180 days | Community input optional |
-| **Direction** | Visual style, tone, patterns | 90 days | Team discussion optional |
-| **Execution** | Pixel details, specific impl | 30 days | Craftsman decides |
+## Core Decision Recording (v4.0-S6-T1)
 
-**LOCK_PERIODS:** `{ strategic: 180, direction: 90, execution: 30 }`
-
-## Pre-Flight Checks
-
-1. **Sigil Setup**: Verify `.sigil-setup-complete` exists
-2. **Consultation Config**: Check `sigil-mark/consultation-chamber/config.yaml` exists
-3. **Strictness Level**: Load from `.sigilrc.yaml`
-
-## Workflow
-
-### Step 1: Understand the Topic
-
-If topic not provided, ask:
+### Decision Creation
 
 ```
-question: "What design decision would you like to record?"
-header: "Topic"
+/consult "decision text"
 ```
 
-### Step 2: Determine Scope
+1. Generate ID: `DEC-{YYYY}-{NNN}`
+2. Default 30-day execution lock
+3. Write to `consultation-chamber/decisions/`
 
-Ask the craftsman to classify:
-
-```
-question: "What scope is this decision?"
-header: "Scope"
-options:
-  - label: "Strategic"
-    description: "New features, major changes, affects product direction"
-  - label: "Direction"
-    description: "Visual style choices, tone, experience patterns"
-  - label: "Execution"
-    description: "Pixel-level details, specific implementation choices"
-  - label: "Help me decide"
-    description: "I need help understanding the scope"
-multiSelect: false
-```
-
-If "Help me decide", present the following for consideration:
-
-```
-Consider these questions:
-
-**Strategic (180-day lock):**
-- Does this change product direction?
-- Would reversing this require significant rework?
-- Should the community have input?
-
-**Direction (90-day lock):**
-- Is this about style, tone, or patterns?
-- Does it affect multiple components?
-- Should the team weigh in?
-
-**Execution (30-day lock):**
-- Is this a specific implementation detail?
-- Can it be changed with minimal impact?
-- Is this your call as the implementer?
-
-What scope feels right for this decision?
-```
-
-### Step 3: Capture the Decision
-
-Ask for the decision details:
-
-```
-question: "What is your decision?"
-header: "Decision"
-```
-
-Then ask for context:
-
-```
-question: "What tradeoffs did you consider? What alternatives did you reject and why?"
-header: "Rationale"
-```
-
-**Important:** The rationale is valuable for future you. Don't rush this.
-
-### Step 4: Create Decision Record
-
-Generate unique ID: `DEC-{YYYY}-{NNN}`
-
-Create decision record at `sigil-mark/consultation-chamber/decisions/{id}.yaml`:
+### Decision File Format
 
 ```yaml
-id: "{id}"
-topic: "{topic}"
-decision: "{decision}"
-scope: "{strategic|direction|execution}"
-locked_at: "{ISO-8601}"
-expires_at: "{ISO-8601 + lock_period}"
+id: "DEC-2026-007"
+topic: "2-step confirmation for transactions > $100"
+decision: "All transactions over $100 require explicit confirm step"
+scope: execution
+locked_at: "2026-01-07T14:30:00Z"
+expires_at: "2026-02-06T14:30:00Z"
 status: locked
 
+# v4.0 additions
+protected: false
+evidence: []
+
 context:
-  zone: "{zone if applicable}"
-  considerations: "{what was considered}"
-  rejected_alternatives:
-    - "{alternative 1}: {why rejected}"
-    - "{alternative 2}: {why rejected}"
+  zone: null  # or specific zone if scoped
+  components: []  # or specific components if scoped
 
 rationale: |
-  {Full rationale from craftsman}
+  User research shows anxiety at checkout for large amounts.
+  2-step reduces accidental purchases.
 
 unlock_history: []
 ```
 
-### Step 5: Confirm Lock
+---
+
+## Scope and Lock Options (v4.0-S6-T2)
+
+### Zone Scope
 
 ```
-✅ DECISION RECORDED AND LOCKED
-
-Decision: {id}
-Topic: {topic}
-Scope: {scope}
-Lock expires: {expires_at} ({days} days)
-
-Your decision:
-  {decision}
-
-Your rationale:
-  {rationale summary}
-
-This decision will be surfaced by /craft when relevant.
-To unlock early: /consult {id} --unlock
+/consult "decision" --scope critical
 ```
 
-## Status Check (--status)
+Limits decision to specific zone:
 
-When called with `--status`:
-
-```
-📋 DECISION STATUS
-
-ID: {id}
-Topic: {topic}
-Scope: {scope}
-Status: {locked | unlocked | expired}
-
-Decision: {decision}
-Locked at: {locked_at}
-Expires: {expires_at}
-Days remaining: {calculated}
-
-Rationale:
-  {rationale}
-
-Unlock history:
-  {List of previous unlocks, or "(none)"}
+```yaml
+context:
+  zone: "critical"
+  components: []
 ```
 
-## Early Unlock (--unlock)
+### Component Scope
 
-When called with `--unlock`:
+```
+/consult "decision" --scope ClaimButton
+/consult "decision" --scope "Checkout*"
+```
 
-### Step 1: Show Decision Context
+Limits decision to specific components (glob patterns allowed):
+
+```yaml
+context:
+  zone: null
+  components: ["ClaimButton", "Checkout*"]
+```
+
+### Custom Lock Duration
+
+```
+/consult "decision" --lock 90d
+/consult "decision" --lock 180d
+```
+
+| Duration | Use Case |
+|----------|----------|
+| 30d | Execution (default) |
+| 90d | Direction |
+| 180d | Strategic |
+| 365d | Protected (default for --protect) |
+
+---
+
+## Decision Unlock (v4.0-S6-T3)
+
+### Unlock Command
+
+```
+/consult DEC-2026-007 --unlock "New user research shows users prefer single-click"
+```
+
+### Requirements
+
+- Reason is **required** (cannot be empty)
+- Updates decision history
+- Sets `status: unlocked`
+
+### Unlock Flow
 
 ```
 🔓 EARLY UNLOCK REQUEST
 
-Decision: {id}
-Topic: {topic}
-Scope: {scope}
-Days remaining: {days}
+Decision: DEC-2026-007
+Topic: 2-step confirmation for transactions > $100
+Days remaining: 25
 
 Original decision:
-  {decision}
+  All transactions over $100 require explicit confirm step
 
-Original rationale:
-  {rationale}
-
-⚠️ Note: Early unlocks are recorded in decision history.
-   Consider whether this truly needs to change, or if
-   you're revisiting a decision that was already deliberated.
+Please provide justification for unlocking.
 ```
 
-### Step 2: Request Justification
-
-```
-question: "Why do you need to unlock this decision early?"
-header: "Justification"
-
-Note: "Changed my mind" is a valid reason if accompanied by
-what new information or perspective led to reconsideration.
-```
-
-### Step 3: Update Record
+### After Unlock
 
 ```yaml
 status: unlocked
 unlock_history:
-  - unlocked_at: "{current timestamp}"
-    unlocked_by: "{user}"
-    justification: "{user's justification}"
-    remaining_days: {days that were remaining}
+  - unlocked_at: "2026-01-10T10:00:00Z"
+    justification: "New user research shows users prefer single-click"
+    remaining_days: 25
 ```
 
-### Step 4: Confirm
+---
+
+## Protected Capabilities (v4.0-S6-T4)
+
+### Protect Flag
+
+```
+/consult "withdraw must always work" --protect
+```
+
+Creates protected decision:
+
+```yaml
+protected: true
+scope: strategic
+locked_at: "2026-01-07"
+expires_at: "2027-01-07"  # 365 days
+```
+
+### Protected vs Regular
+
+| Aspect | Regular | Protected |
+|--------|---------|-----------|
+| Default lock | 30 days | 365 days |
+| Scope | execution | strategic |
+| /garden priority | HIGH | CRITICAL |
+| Unlock | Standard | Requires strong justification |
+
+---
+
+## Evidence Linking (v4.0-S6-T5)
+
+### Link Observation Feedback
+
+```
+/consult "border-radius is 4px" --evidence OBS-2026-0107-001
+```
+
+Links to /observe feedback:
+
+```yaml
+evidence:
+  - type: observation
+    id: "OBS-2026-0107-001"
+    summary: "4px observed in ClaimButton, confirmed as intended"
+```
+
+### Link Evidence File
+
+```
+/consult "depositors prefer deliberate motion" --evidence analytics-2026-01.yaml
+```
+
+Links to evidence file:
+
+```yaml
+evidence:
+  - type: evidence_file
+    path: "evidence/analytics-2026-01.yaml"
+    summary: "Analytics show 80% completion with deliberate motion"
+```
+
+---
+
+## Decision Tiers
+
+| Tier | Scope | Lock Period | Use Case |
+|------|-------|-------------|----------|
+| Execution | execution | 30 days | Pixel details, specific impl |
+| Direction | direction | 90 days | Visual style, tone, patterns |
+| Strategic | strategic | 180 days | New features, major changes |
+| Protected | strategic | 365 days | Core behaviors that must work |
+
+---
+
+## Response Format
+
+### Decision Created
+
+```
+✅ DECISION RECORDED
+
+ID: DEC-2026-007
+Topic: 2-step confirmation for transactions > $100
+Scope: execution
+Lock: 30 days (expires 2026-02-06)
+
+Decision:
+  All transactions over $100 require explicit confirm step
+
+Evidence:
+  - OBS-2026-0107-001: User observed confusion at checkout
+
+This decision will be surfaced by /craft when relevant.
+To unlock: /consult DEC-2026-007 --unlock "reason"
+```
+
+### Decision Unlocked
 
 ```
 🔓 DECISION UNLOCKED
 
-Decision: {id}
-Justification: {justification}
+ID: DEC-2026-007
+Justification: New user research shows users prefer single-click
 
 The decision can now be modified or re-consulted.
 Note: /garden will show this as manually unlocked.
 ```
 
+---
+
+## Migration from v3.0
+
+| v3.0 Command | v4.0 Equivalent |
+|--------------|-----------------|
+| /approve "decision" | /consult "decision" |
+| /canonize "capability" | /consult "capability" --protect |
+| /unlock DEC-001 | /consult DEC-001 --unlock "reason" |
+
+---
+
 ## Error Handling
 
 | Situation | Response |
 |-----------|----------|
-| No setup | "Sigil not initialized. Run `/setup` first." |
-| No config | Create default consultation config |
-| Decision exists | "Decision {id} already exists. View with --status or modify." |
+| No setup | Auto-initialize Sigil |
+| Decision exists | "Decision {id} already exists. View with --status." |
 | Decision not found | "Decision {id} not found." |
 | Already unlocked | "Decision {id} is not currently locked." |
-| No justification | "Please provide justification for early unlock." |
+| No justification | "Please provide justification for unlock." |
+| Invalid evidence | "Evidence file/observation not found." |
 
-## Key Principles
+---
+
+## Philosophy
 
 1. **Record, don't rush** — This skill records deliberated decisions
-2. **Rationale matters** — Future you will thank present you
+2. **Evidence matters** — Link decisions to observations and data
 3. **Locks prevent bikeshedding** — Not reconsideration
 4. **Unlocks are valid** — With justification
-5. **Respect the process** — Deliberate, decide, lock, flow
+5. **Protection is strategic** — For behaviors that must always work

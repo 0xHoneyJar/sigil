@@ -410,66 +410,67 @@ REFINEMENT (Evolve)       MAINTENANCE (Tend)
 
 ---
 
-## Sprint 6: /consult Consolidation
+## Sprint 6: /consult Consolidation ✅
 
 **Goal:** Consolidate decision recording into single /consult command.
+**Status:** COMPLETED
 
 ### Tasks
 
-#### v4.0-S6-T1: Core Decision Recording
+#### v4.0-S6-T1: Core Decision Recording ✅
 - **Description:** Basic decision recording with time lock
 - **Acceptance Criteria:**
-  - [ ] `/consult "decision"` creates decision file
-  - [ ] Default 30-day time lock
-  - [ ] Generates DEC-YYYY-NNN ID
-  - [ ] Writes to `consultation-chamber/decisions/`
+  - [x] `/consult "decision"` creates decision file
+  - [x] Default 30-day time lock
+  - [x] Generates DEC-YYYY-NNN ID
+  - [x] Writes to `consultation-chamber/decisions/`
 - **Dependencies:** None
 - **Testing:** Decision creation tests
 
-#### v4.0-S6-T2: Scope and Lock Options
+#### v4.0-S6-T2: Scope and Lock Options ✅
 - **Description:** L2 options for scope and lock duration
 - **Acceptance Criteria:**
-  - [ ] `--scope critical` limits to specific zones
-  - [ ] `--scope ClaimButton` limits to specific components
-  - [ ] `--lock 90d` custom lock duration
-  - [ ] Scope stored in decision file
+  - [x] `--scope critical` limits to specific zones
+  - [x] `--scope ClaimButton` limits to specific components
+  - [x] `--lock 90d` custom lock duration
+  - [x] Scope stored in decision file
 - **Dependencies:** v4.0-S6-T1
 - **Testing:** Scope/lock tests
 
-#### v4.0-S6-T3: Decision Unlock
+#### v4.0-S6-T3: Decision Unlock ✅
 - **Description:** Unlock existing decisions with reason
 - **Acceptance Criteria:**
-  - [ ] `/consult DEC-001 --unlock "reason"` unlocks decision
-  - [ ] Requires reason (cannot be empty)
-  - [ ] Updates decision history
-  - [ ] Sets `locked: false`
+  - [x] `/consult DEC-001 --unlock "reason"` unlocks decision
+  - [x] Requires reason (cannot be empty)
+  - [x] Updates decision history
+  - [x] Sets `status: unlocked`
 - **Dependencies:** v4.0-S6-T1
 - **Testing:** Unlock tests
 
-#### v4.0-S6-T4: Protected Capabilities
+#### v4.0-S6-T4: Protected Capabilities ✅
 - **Description:** Mark decisions as protected (canonize replacement)
 - **Acceptance Criteria:**
-  - [ ] `/consult "behavior" --protect` creates protected decision
-  - [ ] Protected decisions have longer default lock (365d)
-  - [ ] Protected flag in decision file
+  - [x] `/consult "behavior" --protect` creates protected decision
+  - [x] Protected decisions have longer default lock (365d)
+  - [x] Protected flag in decision file
 - **Dependencies:** v4.0-S6-T1
 - **Testing:** Protection tests
 
-#### v4.0-S6-T5: Evidence Linking
+#### v4.0-S6-T5: Evidence Linking ✅
 - **Description:** Link decisions to evidence
 - **Acceptance Criteria:**
-  - [ ] Decision can cite observation feedback
-  - [ ] Decision can cite evidence files
-  - [ ] Evidence stored in decision file
+  - [x] Decision can cite observation feedback
+  - [x] Decision can cite evidence files
+  - [x] Evidence stored in decision file
 - **Dependencies:** v4.0-S6-T1, v4.0-S5 (feedback)
 - **Testing:** Evidence linking tests
 
-#### v4.0-S6-T6: Update consulting-decisions Skill
+#### v4.0-S6-T6: Update consulting-decisions Skill ✅
 - **Description:** Update skill for consolidated /consult
 - **Acceptance Criteria:**
-  - [ ] `consulting-decisions/SKILL.md` updated
-  - [ ] Progressive disclosure documented
-  - [ ] Migration from /approve, /canonize, /unlock documented
+  - [x] `consulting-decisions/SKILL.md` updated
+  - [x] Progressive disclosure documented
+  - [x] Migration from /approve, /canonize, /unlock documented
 - **Dependencies:** v4.0-S6-T1 through T5
 - **Testing:** Manual review
 
