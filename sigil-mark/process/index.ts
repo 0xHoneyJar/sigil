@@ -1,5 +1,5 @@
 /**
- * Sigil v3.0 — Process Layer (AGENT-ONLY)
+ * Sigil v4.0 — Process Layer (AGENT-ONLY)
  *
  * @server-only
  *
@@ -9,9 +9,16 @@
  *
  * The Process layer provides design context to the agent during code generation:
  * - Constitution: Protected capabilities that always work
- * - Personas: User archetypes with physics and constraints (renamed from Lens Array)
+ * - Personas: User archetypes with evidence-based characteristics and journey stages (v4.0)
+ * - Zones: Context-specific UI with journey stages and trust states (v4.0)
  * - Consultation Chamber: Locked decisions with time-based expiry
  * - Vibe Checks: Micro-surveys and behavioral signals
+ *
+ * ## v4.0 Additions
+ *
+ * - Evidence-based personas: source, evidence[], journey_stages[], last_refined
+ * - Journey-based zones: journey_stage, persona_likely, trust_state, evidence[]
+ * - Zone reader: resolveZoneFromPath() for agent-time file → zone mapping
  *
  * ## Agent Protocol
  *
@@ -20,14 +27,19 @@
  * 3. Runtime components receive configuration via props
  * 4. No YAML reading happens at runtime
  *
- * ## Migration from v2.6
+ * ## Migration from v3.0
  *
  * ```typescript
- * // v2.6 (BROKEN - crashes in browser)
- * import { ProcessContextProvider } from 'sigil-mark';
+ * // v3.0
+ * import { readPersonas } from 'sigil-mark/process';
  *
- * // v3.0 (CORRECT - agent-only)
- * import { readConstitution } from 'sigil-mark/process'; // Agent/build only
+ * // v4.0 - same imports, new fields available
+ * import { readPersonas, readZones } from 'sigil-mark/process';
+ * const personas = await readPersonas();
+ * console.log(personas.personas.power_user.evidence); // v4.0 field
+ *
+ * const zones = await readZones();
+ * console.log(zones.zones.critical.journey_stage); // v4.0 field
  * ```
  *
  * @module process
@@ -121,20 +133,29 @@ export {
 } from './decision-reader';
 
 // =============================================================================
-// PERSONAS (v3.0 - renamed from Lens Array)
+// PERSONAS (v4.0 - evidence-based with journey stages)
 // =============================================================================
 
 export {
-  // Reader (v3.0)
+  // Reader
   readPersonas,
   readPersonasSync,
-  // Helpers (v3.0)
+  // Helpers (core)
   getPersonaById,
   getAllPersonas,
   getPhysicsForPersona,
   getConstraintsForPersona,
   getPreferencesForPersona,
   getDefaultLensForPersona,
+  // Helpers (v4.0 - evidence-based)
+  getEvidenceSourceForPersona,
+  getEvidenceForPersona,
+  getTrustLevelForPersona,
+  getJourneyStagesForPersona,
+  getPersonasForJourneyStage,
+  getPersonasByTrustLevel,
+  hasEvidence,
+  getPersonasWithoutEvidence,
   // Display
   formatPersonaSummary,
   formatPersonaArraySummary,
@@ -162,6 +183,9 @@ export {
   type MotionConfig,
   type FeedbackConfig,
   type AccessibilityRequirements,
+  // v4.0 types
+  type EvidenceSource,
+  type TrustLevel,
   // Backwards compatibility (deprecated)
   readLensArray,
   readLensArraySync,
@@ -170,6 +194,46 @@ export {
   DEFAULT_LENS_ARRAY_PATH,
   type LensArray,
 } from './persona-reader';
+
+// =============================================================================
+// ZONES (v4.0 - journey-based with trust states)
+// =============================================================================
+
+export {
+  // Reader
+  readZones,
+  readZonesSync,
+  // Helpers (core)
+  getZoneById,
+  getAllZones,
+  resolveZoneFromPath,
+  getEffectivePreferences,
+  // Helpers (v4.0 - journey-based)
+  getJourneyStageForZone,
+  getPersonaLikelyForZone,
+  getTrustStateForZone,
+  getZonesByTrustState,
+  getZonesForJourneyStage,
+  hasJourneyContext,
+  getZonesWithoutJourneyContext,
+  // Display
+  formatZoneSummary,
+  formatZoneConfigSummary,
+  // Constants
+  DEFAULT_ZONE_CONFIG,
+  DEFAULT_SIGILRC_PATH,
+  // Types
+  type ZoneConfig,
+  type Zone,
+  type ZoneLayout,
+  type TimeAuthority,
+  type TrustState,
+  type ZoneLens,
+  type ZoneMotion,
+  type ConstraintLevel,
+  type ZoneConstraints,
+  type PersonaOverride,
+} from './zone-reader';
 
 // =============================================================================
 // PROCESS CONTEXT (React)

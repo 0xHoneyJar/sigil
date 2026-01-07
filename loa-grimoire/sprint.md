@@ -1,489 +1,843 @@
-# Sprint Plan: Sigil v3.0 — "Living Engine"
+# Sprint Plan: Sigil v4.0 — "Sharp Tools"
 
-**Version:** 3.0.0
-**Codename:** Living Engine
-**Generated:** 2026-01-06
-**Sprints:** 4
-**Priority:** P0 → P1 → P2 → P3
+**Version:** 4.0.0
+**Codename:** Sharp Tools
+**Generated:** 2026-01-07
+**Sprints:** 10
+**Priority:** Foundation → Tools → Integration
 
 ---
 
 ## Overview
 
-This sprint plan addresses the fatal bugs and product strategy gaps identified in the v2.6 review. Work is organized by priority:
+This sprint plan implements Sigil v4.0 "Sharp Tools" — the transformation from 37 commands to 7 discrete tools with progressive disclosure, /observe communication layer, /refine incremental updates, and build-time export.
 
-| Sprint | Priority | Theme | Key Deliverables |
-|--------|----------|-------|------------------|
-| 1 | P0 | Critical Fixes | fs removal, philosophy alignment |
-| 2 | P1 | Foundation | Persona rename, vocabulary layer, layout-only zones |
-| 3 | P2 | User Fluidity | Persona context, zone overrides, intent layer |
-| 4 | P3 | Living Market | Remote config schema, behavioral signals |
+| Sprint | Focus | Key Deliverables |
+|--------|-------|------------------|
+| 1 | Schema Foundation | Evidence-based personas, journey zones |
+| 2 | /envision & /codify | Progressive disclosure, auto-setup |
+| 3 | /craft Enhancement | Gap detection, context loading |
+| 4 | /observe Communication | MCP integration, visual feedback |
+| 5 | /refine Updates | Evidence application, feedback loop |
+| 6 | /consult Consolidation | Decision stamping |
+| 7 | /garden Health | Drift detection, validation |
+| 8 | Build-Time Export | CLI command, runtime provider |
+| 9 | Migration | Deprecation warnings, migration guide |
+| 10 | Integration | End-to-end testing, documentation |
 
-### Architecture Summary
+### The Seven Tools
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        AGENT TIME (Generation)                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
-│  │ Constitution │  │  Vocabulary  │  │   Personas   │  │ Philosophy │  │
-│  │    (YAML)    │  │    (YAML)    │  │    (YAML)    │  │   (YAML)   │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  └────────────┘  │
-│                              │                                          │
-│                    Agent reads & embeds context                         │
-│                              ↓                                          │
-│                   ┌──────────────────┐                                  │
-│                   │   CLAUDE.md +    │                                  │
-│                   │   Generated Code │                                  │
-│                   └──────────────────┘                                  │
-└─────────────────────────────────────────────────────────────────────────┘
-                               │
-                               ↓
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         RUNTIME (Browser)                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                  │
-│  │     Core     │  │    Layout    │  │     Lens     │                  │
-│  │  (Hooks,     │  │ (CriticalZone│  │ (DefaultLens │                  │
-│  │   Physics)   │  │  Machinery)  │  │  StrictLens) │                  │
-│  └──────────────┘  └──────────────┘  └──────────────┘                  │
-│                              │                                          │
-│               Pure React, no fs, no YAML parsing                        │
-└─────────────────────────────────────────────────────────────────────────┘
+CAPTURE (Setup)           CREATION (Build)        OBSERVATION (See)
+─────────────────         ────────────────        ─────────────────
+/envision                 /craft                  /observe (NEW)
+/codify
+
+REFINEMENT (Evolve)       MAINTENANCE (Tend)
+───────────────────       ────────────────────
+/refine (NEW)             /garden
+/consult
 ```
 
-**Key Insight:** Process layer is agent-context-only. Runtime never touches YAML files.
+---
+
+## MVP Definition
+
+**MVP Scope (Sprints 1-5):**
+- Schema evolution (backwards compatible)
+- /envision and /codify with progressive disclosure
+- /craft with gap detection
+- /observe with MCP integration
+- /refine for incremental context updates
+
+**Post-MVP (Sprints 6-10):**
+- /consult consolidation
+- /garden health checks
+- Build-time export CLI
+- Full migration path
 
 ---
 
-## Sprint 1: Critical Fixes (P0)
+## Sprint 1: Schema Foundation ✅
 
-**Theme:** Fix fatal bugs that block any v3.0 use
-**Goal:** Runtime stability and philosophy alignment
-
-### Tasks
-
-#### S1-T1: Remove ProcessContextProvider from exports
-**Description:** Remove the ProcessContextProvider from main exports to prevent browser crashes. The Process layer becomes agent-only.
-
-**Acceptance Criteria:**
-- [ ] Remove `ProcessContextProvider` export from `sigil-mark/index.ts`
-- [ ] Remove `'use client'` directive from any process files
-- [ ] Add `@server-only` JSDoc comment to `sigil-mark/process/index.ts`
-- [ ] Verify `sigil-mark/process/` is not imported by any runtime code
-
-**Testing:**
-- Unit test: Verify Process module throws clear error if imported in browser context
-- Integration test: Next.js build succeeds without bundling Process layer
-
----
-
-#### S1-T2: Update Process layer documentation
-**Description:** Document that Process layer is agent-context-only. Update CLAUDE.md with agent protocol.
-
-**Acceptance Criteria:**
-- [ ] CLAUDE.md has "Agent Protocol" section explaining Process is agent-only
-- [ ] CLAUDE.md has clear "DO NOT import in client code" warning
-- [ ] README mentions architecture split (Agent-time vs Runtime)
-- [ ] Migration guide explains ProcessContextProvider removal
-
-**Testing:**
-- Documentation review: Clear distinction between agent-time and runtime
-
----
-
-#### S1-T3: Rewrite consulting-decisions skill
-**Description:** Align skill with "sweat the art" philosophy. Remove "decide fast" language.
-
-**Acceptance Criteria:**
-- [ ] SKILL.md says "Record your deliberated decision" not "Decide fast"
-- [ ] Skill does NOT rush craftsman decisions
-- [ ] Skill respects existing locked decisions
-- [ ] Philosophy section added citing "sweat the art"
-
-**Testing:**
-- Code review: No language encouraging rushed decisions
-
----
-
-#### S1-T4: Rewrite crafting-guidance skill
-**Description:** Align skill with philosophy. Present options with tradeoffs, not mandates.
-
-**Acceptance Criteria:**
-- [ ] SKILL.md presents options with tradeoffs format
-- [ ] Skill does NOT make taste decisions for craftsman
-- [ ] "Your Call" section added to output format
-- [ ] Vocabulary references added to guidance
-
-**Testing:**
-- Code review: Options presented as tradeoffs, not mandates
-
----
-
-#### S1-T5: Audit all skills for philosophy alignment
-**Description:** Review all skill files and ensure they match agreed philosophy.
-
-**Acceptance Criteria:**
-- [ ] All skill files reviewed (initializing, envisioning, codifying, crafting, approving, inheriting, updating)
-- [ ] No skill encourages rushing decisions
-- [ ] All skills present options, not mandates
-- [ ] Philosophy section consistent across skills
-
-**Testing:**
-- Full skill audit checklist completed
-
----
-
-## Sprint 2: Foundation (P1)
-
-**Theme:** Core architectural changes for v3.0
-**Goal:** Vocabulary layer, persona rename, layout-only zones
-
-### Tasks
-
-#### S2-T1: Create vocabulary.yaml schema and initial terms
-**Description:** Create the vocabulary layer with JSON Schema validation and at least 10 core terms.
-
-**Acceptance Criteria:**
-- [ ] `sigil-mark/vocabulary/vocabulary.yaml` created with 10+ terms
-- [ ] `sigil-mark/vocabulary/schemas/vocabulary.schema.json` created
-- [ ] Terms include: pot, vault, claim, deposit, withdraw, stake, dashboard, settings, pending, confirmed
-- [ ] Each term has engineering_name, user_facing, mental_model, recommended, zones
-
-**Testing:**
-- Unit test: vocabulary.yaml validates against schema
-- Unit test: All terms have required fields
-
----
-
-#### S2-T2: Implement vocabulary-reader.ts
-**Description:** Create the vocabulary reader with graceful degradation.
-
-**Acceptance Criteria:**
-- [ ] `sigil-mark/process/vocabulary-reader.ts` created per SDD
-- [ ] `readVocabulary()` async function implemented
-- [ ] `readVocabularySync()` sync function implemented
-- [ ] `getTerm()` helper function implemented
-- [ ] `getTermFeel()` helper with zone fallback implemented
-- [ ] DEFAULT_VOCABULARY constant for graceful degradation
-- [ ] Full validation with type guards
-
-**Testing:**
-- Unit tests: 20+ tests covering read, validation, helpers, edge cases
-
----
-
-#### S2-T3: Rename lens-array to personas
-**Description:** Rename the lens-array directory and types to personas.
-
-**Acceptance Criteria:**
-- [ ] `sigil-mark/lens-array/` renamed to `sigil-mark/personas/`
-- [ ] `lenses.yaml` renamed to `personas.yaml`
-- [ ] `lens-array-reader.ts` renamed to `persona-reader.ts`
-- [ ] All `LensArray` types renamed to `PersonaArray`
-- [ ] Backwards compatibility aliases added with deprecation warnings
-- [ ] Documentation updated to use "Persona" terminology
-
-**Testing:**
-- Unit test: Old imports still work with deprecation warning
-- Integration test: No broken imports after rename
-
----
-
-#### S2-T4: Update CLAUDE.md with vocabulary protocol
-**Description:** Document the vocabulary layer and agent protocol in CLAUDE.md.
-
-**Acceptance Criteria:**
-- [ ] Vocabulary section added to CLAUDE.md
-- [ ] Agent protocol for vocabulary lookup documented
-- [ ] Term → feel mapping explained with examples
-- [ ] README prominently features vocabulary concept
-
-**Testing:**
-- Documentation review: Clear vocabulary protocol
-
----
-
-#### S2-T5: Remove path-based zone detection claims
-**Description:** Clean up documentation to only reference layout-based zones.
-
-**Acceptance Criteria:**
-- [ ] Remove `component_paths` from .sigilrc.yaml
-- [ ] Remove path-based zone examples from CLAUDE.md
-- [ ] Remove `get-zone.sh` references (never implemented)
-- [ ] All documentation shows layout-based zone declaration
-
-**Testing:**
-- Grep verification: No path-based zone references in docs
-
----
-
-#### S2-T6: Add vocabulary-reader tests
-**Description:** Comprehensive test suite for vocabulary reader.
-
-**Acceptance Criteria:**
-- [ ] `__tests__/process/vocabulary-reader.test.ts` created
-- [ ] Tests: read valid vocabulary
-- [ ] Tests: handle missing file gracefully
-- [ ] Tests: handle invalid YAML gracefully
-- [ ] Tests: validate term structure
-- [ ] Tests: getTerm helper
-- [ ] Tests: getTermFeel with fallbacks
-- [ ] 20+ test cases total
-
-**Testing:**
-- All tests pass
-
----
-
-## Sprint 3: User Fluidity (P2) ✅
-
-**Theme:** Persona context and zone overrides for adaptive UX
-**Goal:** Different users get different experiences in same zone
+**Goal:** Evolve persona and zone schemas to support evidence and journey context (non-breaking).
 **Status:** COMPLETED
 
 ### Tasks
 
-#### S3-T1: Create philosophy.yaml schema and content ✅
-**Description:** Create the philosophy/intent layer with conflict resolution.
+#### v4.0-S1-T1: Update Persona Schema ✅
+- **Description:** Add `source`, `evidence`, `journey_stages`, and `last_refined` fields to persona schema
+- **Acceptance Criteria:**
+  - [x] JSON Schema updated at `sigil-mark/personas/schemas/personas.schema.json`
+  - [x] New fields are optional (backwards compatible)
+  - [x] Existing personas.yaml files validate successfully
+  - [x] TypeScript types updated in `persona-reader.ts`
+- **Dependencies:** None
+- **Testing:** Schema validation tests
 
-**Acceptance Criteria:**
-- [x] `sigil-mark/soul-binder/philosophy.yaml` created
-- [x] `sigil-mark/soul-binder/schemas/philosophy.schema.json` created
-- [x] Intent section with primary/secondary goals
-- [x] At least 5 principles defined (7 total)
-- [x] Conflict resolution rules defined (6 rules)
+#### v4.0-S1-T2: Update Zone Schema ✅
+- **Description:** Add `journey_stage`, `persona_likely`, `trust_state`, and `evidence` fields to zone schema
+- **Acceptance Criteria:**
+  - [x] Zone schema extracted to `sigil-mark/zones/schemas/zones.schema.json`
+  - [x] `.sigilrc.yaml` supports new zone fields
+  - [x] New fields are optional (backwards compatible)
+  - [x] TypeScript types updated in `zone-reader.ts`
+- **Dependencies:** None
+- **Testing:** Schema validation tests
 
-**Testing:**
-- Unit test: philosophy.yaml validates against schema ✅
+#### v4.0-S1-T3: Create Evidence Schema ✅
+- **Description:** Define schema for evidence files in `evidence/` directory
+- **Acceptance Criteria:**
+  - [x] Evidence schema at `sigil-mark/evidence/schemas/evidence.schema.json`
+  - [x] Supports analytics, interviews, observations formats
+  - [x] Example evidence file created
+- **Dependencies:** None
+- **Testing:** Schema validation
 
----
+#### v4.0-S1-T4: Create Feedback Schema ✅
+- **Description:** Define schema for observation feedback files
+- **Acceptance Criteria:**
+  - [x] Feedback schema at `sigil-mark/.sigil-observations/schemas/feedback.schema.json`
+  - [x] Supports structural checks, measurable properties, human feedback
+  - [x] `applied` field for tracking processed feedback
+- **Dependencies:** None
+- **Testing:** Schema validation
 
-#### S3-T2: Implement philosophy-reader.ts ✅
-**Description:** Create the philosophy reader with conflict resolution.
-
-**Acceptance Criteria:**
-- [x] `sigil-mark/process/philosophy-reader.ts` created per SDD
-- [x] `readPhilosophy()` async function implemented
-- [x] `resolveConflict()` helper implemented
-- [x] DEFAULT_PHILOSOPHY constant for graceful degradation
-- [x] Full validation with type guards
-
-**Testing:**
-- Unit tests: 39 tests covering read, validation, conflict resolution ✅
-
----
-
-#### S3-T3: Create PersonaProvider runtime context ✅
-**Description:** Create React context for runtime persona management.
-
-**Acceptance Criteria:**
-- [x] `sigil-mark/core/persona-context.tsx` created per SDD
-- [x] PersonaProvider component implemented
-- [x] usePersona hook implemented
-- [x] Auto-detection: mobile, accessibility, newcomer
-- [x] localStorage persistence for preference
-- [x] Sensible defaults when no provider
-
-**Testing:**
-- Unit tests: Provider, hook, detection, persistence ✅
-
----
-
-#### S3-T4: Add persona_overrides to .sigilrc.yaml ✅
-**Description:** Extend zone configuration with persona-specific overrides.
-
-**Acceptance Criteria:**
-- [x] `.sigilrc.yaml` schema updated with persona_overrides
-- [x] Critical zone has newcomer/power_user overrides
-- [x] Marketing zone has power_user override
-- [x] `getEffectivePreferences()` helper implemented
-- [x] Documentation shows persona override examples
-
-**Testing:**
-- Unit test: Zone + persona override merging ✅
+#### v4.0-S1-T5: Directory Structure Setup ✅
+- **Description:** Create new v4.0 directories
+- **Acceptance Criteria:**
+  - [x] `sigil-mark/evidence/` created
+  - [x] `sigil-mark/.sigil-observations/screenshots/` created
+  - [x] `sigil-mark/.sigil-observations/feedback/` created
+  - [x] `.gitkeep` files for empty directories
+- **Dependencies:** None
+- **Testing:** Directory existence
 
 ---
 
-#### S3-T5: Update zone context with persona integration ✅
-**Description:** Connect ZoneContext with PersonaContext for fluidity.
+## Sprint 2: /envision & /codify Evolution
 
-**Acceptance Criteria:**
-- [x] ZoneContextValue updated with defaultPersona, personaOverrides
-- [x] CriticalZone reads persona and applies overrides
-- [x] MachineryLayout applies persona-specific density
-- [x] GlassLayout applies persona-specific motion
-
-**Testing:**
-- Integration test: Newcomer in critical zone gets guided lens ✅
-- Integration test: Power user in marketing zone gets high density ✅
-
----
-
-#### S3-T6: Add philosophy-reader tests ✅
-**Description:** Comprehensive test suite for philosophy reader.
-
-**Acceptance Criteria:**
-- [x] `__tests__/process/philosophy-reader.test.ts` created
-- [x] Tests: read valid philosophy
-- [x] Tests: handle missing file gracefully
-- [x] Tests: validate principle structure
-- [x] Tests: resolveConflict helper
-- [x] 15+ test cases total (39 total)
-
-**Testing:**
-- All tests pass ✅
-
----
-
-## Sprint 4: Living Market (P3)
-
-**Theme:** Prepare for runtime configuration and behavioral observation
-**Goal:** Schema and patterns for future remote config and analytics
+**Goal:** Update capture tools with progressive disclosure and auto-setup.
 
 ### Tasks
 
-#### S4-T1: Create remote-config.yaml schema
-**Description:** Define schema for marketing vs engineering controlled config.
+#### v4.0-S2-T1: /envision Progressive Disclosure
+- **Description:** Implement L1/L2/L3 grip levels for /envision
+- **Acceptance Criteria:**
+  - [ ] L1: Full interview with sensible defaults
+  - [ ] L2: `--quick` flag for minimal interview
+  - [ ] L3: `--from <file>` extracts from existing documentation
+  - [ ] Auto-detects existing codebase (inherits from /inherit)
+- **Dependencies:** v4.0-S1-T1 (persona schema)
+- **Testing:** Interview flow tests
 
-**Acceptance Criteria:**
-- [ ] `sigil-mark/remote-config.yaml` created
-- [ ] `sigil-mark/remote-config/schemas/remote-config.schema.json` created
-- [ ] Clear separation: marketing_controlled vs engineering_controlled
-- [ ] Integration placeholder (launchdarkly, statsig)
-- [ ] Fallback to local_yaml documented
+#### v4.0-S2-T2: /envision Product-Specific Personas
+- **Description:** Interview asks for product-specific users, not generic archetypes
+- **Acceptance Criteria:**
+  - [ ] Interview prompts for product domain
+  - [ ] Asks for evidence source (analytics, GTM, etc.)
+  - [ ] Creates personas with `source` and `evidence` fields populated
+  - [ ] Asks about journey stages
+- **Dependencies:** v4.0-S2-T1
+- **Testing:** Persona creation tests
 
-**Testing:**
-- Unit test: schema validation
+#### v4.0-S2-T3: /codify Progressive Disclosure
+- **Description:** Implement L1/L2/L3 grip levels for /codify
+- **Acceptance Criteria:**
+  - [ ] L1: Guided interview for design tokens
+  - [ ] L2: `--zone <name>` defines single zone
+  - [ ] L3: `--from <design-system.json>` imports existing system
+- **Dependencies:** v4.0-S1-T2 (zone schema)
+- **Testing:** Rule creation tests
 
----
+#### v4.0-S2-T4: /codify Journey-Based Zones
+- **Description:** Zone creation includes journey context
+- **Acceptance Criteria:**
+  - [ ] Interview asks about journey stage
+  - [ ] Asks which persona is likely in this zone
+  - [ ] Captures trust state (building/established/critical)
+  - [ ] Evidence field available for zone data
+- **Dependencies:** v4.0-S2-T3
+- **Testing:** Zone creation tests
 
-#### S4-T2: Add behavioral signals to vibe-checks.yaml
-**Description:** Extend vibe checks with behavioral observation signals.
+#### v4.0-S2-T5: Auto-Setup Integration
+- **Description:** Remove requirement for explicit /setup command
+- **Acceptance Criteria:**
+  - [ ] First /envision or /codify initializes Sigil automatically
+  - [ ] Creates `sigil-mark/` if not exists
+  - [ ] Initializes `.sigilrc.yaml` if not exists
+  - [ ] No error if already initialized
+- **Dependencies:** v4.0-S2-T1, v4.0-S2-T3
+- **Testing:** First-run tests
 
-**Acceptance Criteria:**
-- [ ] `behavioral_signals` section added to vibe-checks.yaml
-- [ ] At least 5 behavioral signals: information_seeking, confirmation_friction, rage_clicking, etc.
-- [ ] Each signal has trigger, insight, recommendation
-- [ ] Vibe check reader updated to parse behavioral signals
-
-**Testing:**
-- Unit test: behavioral signals parsed correctly
-
----
-
-#### S4-T3: Update vibe-check-reader for behavioral signals
-**Description:** Extend vibe check reader to support behavioral observations.
-
-**Acceptance Criteria:**
-- [ ] `getBehavioralSignals()` function added
-- [ ] BehavioralSignal type exported
-- [ ] Reader validates behavioral signal structure
-- [ ] Graceful degradation if signals missing
-
-**Testing:**
-- Unit tests: behavioral signal reading and validation
-
----
-
-#### S4-T4: Document remote config architecture
-**Description:** Document the future remote config pattern in SDD and CLAUDE.md.
-
-**Acceptance Criteria:**
-- [ ] SDD section on remote config architecture
-- [ ] CLAUDE.md notes which aspects can be dynamic
-- [ ] Clear constraint: physics local, vibe remote-capable
-- [ ] Integration guide for LaunchDarkly/Statsig
-
-**Testing:**
-- Documentation review
-
----
-
-#### S4-T5: Final documentation update
-**Description:** Update all documentation for v3.0 release.
-
-**Acceptance Criteria:**
-- [ ] README updated with v3.0 architecture overview
-- [ ] Vocabulary as API surface prominently featured
-- [ ] Migration guide from v2.6 → v3.0 complete
-- [ ] CLAUDE.md philosophy section explicit
-- [ ] All commands documented
-
-**Testing:**
-- Documentation review: Complete and consistent
+#### v4.0-S2-T6: Update Skill Files
+- **Description:** Update skill SKILL.md files for new progressive disclosure
+- **Acceptance Criteria:**
+  - [ ] `envisioning-moodboard/SKILL.md` updated
+  - [ ] `codifying-rules/SKILL.md` updated
+  - [ ] L1/L2/L3 documented in each skill
+  - [ ] "When to Ask vs Proceed" section included
+- **Dependencies:** v4.0-S2-T1 through T5
+- **Testing:** Manual review
 
 ---
 
-#### S4-T6: v3.0 Release preparation
-**Description:** Version bump and release notes.
+## Sprint 3: /craft Enhancement
 
-**Acceptance Criteria:**
-- [ ] `.sigil-version.json` updated to 3.0.0
-- [ ] CHANGELOG.md created with v3.0 changes
-- [ ] Breaking changes documented
-- [ ] Migration checklist in README
+**Goal:** Enhance /craft with gap detection and improved context loading.
 
-**Testing:**
-- Version file correct
+### Tasks
+
+#### v4.0-S3-T1: Context Loading Improvements
+- **Description:** Graceful context loading with fallbacks
+- **Acceptance Criteria:**
+  - [ ] Loads moodboard, rules, personas, vocabulary, philosophy
+  - [ ] Missing files don't error, use sensible defaults
+  - [ ] Zone resolution from file path
+  - [ ] Persona resolution from zone's `persona_likely`
+- **Dependencies:** v4.0-S1 (schemas), v4.0-S2 (tools)
+- **Testing:** Context loading tests
+
+#### v4.0-S3-T2: Progressive Disclosure for /craft
+- **Description:** Implement L1/L2/L3 grip levels
+- **Acceptance Criteria:**
+  - [ ] L1: `/craft "button"` uses auto-detected context
+  - [ ] L2: `--zone critical` explicit zone context
+  - [ ] L3: `--zone --persona --lens --no-gaps` full control
+- **Dependencies:** v4.0-S3-T1
+- **Testing:** /craft invocation tests
+
+#### v4.0-S3-T3: Gap Detection System
+- **Description:** Detect and surface missing context at end of output
+- **Acceptance Criteria:**
+  - [ ] Detects undefined personas mentioned in request
+  - [ ] Detects undefined zones mentioned in request
+  - [ ] Detects missing vocabulary terms
+  - [ ] Surfaces gaps at END of output (not inline)
+  - [ ] Each gap includes `/refine` command to fix
+- **Dependencies:** v4.0-S3-T1
+- **Testing:** Gap detection tests
+
+#### v4.0-S3-T4: Decision Lock Checking
+- **Description:** Check active decisions before generating
+- **Acceptance Criteria:**
+  - [ ] Loads decisions from `consultation-chamber/decisions/`
+  - [ ] Warns if generated code conflicts with locked decision
+  - [ ] Respects decision scope (zones, components)
+- **Dependencies:** v4.0-S3-T1
+- **Testing:** Decision conflict tests
+
+#### v4.0-S3-T5: Journey Context in Output
+- **Description:** Surface journey context in /craft output
+- **Acceptance Criteria:**
+  - [ ] Shows resolved zone with journey_stage
+  - [ ] Shows resolved persona with trust_level
+  - [ ] Explains why certain patterns were chosen
+- **Dependencies:** v4.0-S3-T1, v4.0-S3-T2
+- **Testing:** Output format tests
+
+#### v4.0-S3-T6: Update crafting-guidance Skill
+- **Description:** Update SKILL.md for v4.0 /craft behavior
+- **Acceptance Criteria:**
+  - [ ] `crafting-guidance/SKILL.md` updated
+  - [ ] Context loading documented
+  - [ ] Gap detection behavior documented
+  - [ ] Progressive disclosure documented
+- **Dependencies:** v4.0-S3-T1 through T5
+- **Testing:** Manual review
 
 ---
 
-## Test Coverage Summary
+## Sprint 4: /observe Communication Layer
 
-| Sprint | Component | Tests |
-|--------|-----------|-------|
-| 1 | Skills audit | Manual review |
-| 2 | vocabulary-reader | 20+ |
-| 2 | persona-reader (renamed) | Update existing |
-| 3 | philosophy-reader | 15+ |
-| 3 | persona-context | 15+ |
-| 3 | zone-persona integration | 10+ |
-| 4 | vibe-check-reader (behavioral) | 10+ |
-| **Total** | | **70+** new/updated |
+**Goal:** Implement visual feedback loop via Claude in Chrome MCP.
+
+### Tasks
+
+#### v4.0-S4-T1: MCP Availability Detection
+- **Description:** Check for Claude in Chrome MCP connection
+- **Acceptance Criteria:**
+  - [ ] Uses `mcp__claude-in-chrome__tabs_context_mcp` to check availability
+  - [ ] Graceful fallback message if MCP not available
+  - [ ] Offers manual screenshot upload as alternative
+- **Dependencies:** None
+- **Testing:** MCP detection tests
+
+#### v4.0-S4-T2: Screenshot Capture
+- **Description:** Capture visual state via MCP
+- **Acceptance Criteria:**
+  - [ ] Uses `mcp__claude-in-chrome__computer` with `action: screenshot`
+  - [ ] Stores screenshot in `.sigil-observations/screenshots/`
+  - [ ] Filename includes timestamp and component name
+- **Dependencies:** v4.0-S4-T1
+- **Testing:** Screenshot capture tests
+
+#### v4.0-S4-T3: Structural Analysis
+- **Description:** Analyze screenshot against zone expectations
+- **Acceptance Criteria:**
+  - [ ] Checks for expected zone wrappers (CriticalZone, etc.)
+  - [ ] Checks for expected component patterns
+  - [ ] Returns pass/fail for each structural check
+- **Dependencies:** v4.0-S4-T2
+- **Testing:** Structural analysis tests
+
+#### v4.0-S4-T4: Measurable Property Comparison
+- **Description:** Compare visual properties against rules.md
+- **Acceptance Criteria:**
+  - [ ] Reads expected values from rules.md
+  - [ ] Compares border-radius, colors, spacing, animation timing
+  - [ ] Returns delta for each mismatch
+- **Dependencies:** v4.0-S4-T2
+- **Testing:** Property comparison tests
+
+#### v4.0-S4-T5: Feedback Question Generation
+- **Description:** Generate targeted questions for human judgment
+- **Acceptance Criteria:**
+  - [ ] Creates question for each measurable delta
+  - [ ] Options: "Yes — update rules" / "No — fix component"
+  - [ ] Includes context about why property matters
+- **Dependencies:** v4.0-S4-T4
+- **Testing:** Question generation tests
+
+#### v4.0-S4-T6: Feedback Storage
+- **Description:** Record feedback to YAML files
+- **Acceptance Criteria:**
+  - [ ] Creates feedback file in `.sigil-observations/feedback/`
+  - [ ] Includes observation_id, timestamp, component
+  - [ ] Records structural checks, measurable properties, human answers
+  - [ ] Sets `applied: false` for new feedback
+- **Dependencies:** v4.0-S4-T5
+- **Testing:** Feedback storage tests
+
+#### v4.0-S4-T7: Progressive Disclosure for /observe
+- **Description:** Implement L1/L2/L3 grip levels
+- **Acceptance Criteria:**
+  - [ ] L1: `/observe` captures current screen
+  - [ ] L2: `--component ClaimButton` focuses analysis
+  - [ ] L3: `--screenshot manual.png --rules border-radius` manual mode
+- **Dependencies:** v4.0-S4-T1 through T6
+- **Testing:** /observe invocation tests
+
+#### v4.0-S4-T8: Create observing-visual Skill
+- **Description:** Create new skill directory and files
+- **Acceptance Criteria:**
+  - [ ] `observing-visual/index.yaml` created
+  - [ ] `observing-visual/SKILL.md` created with execution steps
+  - [ ] MCP requirement documented
+  - [ ] Output format documented
+- **Dependencies:** v4.0-S4-T1 through T7
+- **Testing:** Manual review
 
 ---
 
-## Risk Assessment
+## Sprint 5: /refine Incremental Updates
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| Breaking existing imports | Medium | High | Deprecation aliases, clear migration guide |
-| Vocabulary term conflicts | Low | Medium | JSON Schema validation |
-| Persona detection accuracy | Medium | Low | Safe defaults (newcomer) |
-| Philosophy conflicts undefined | Low | Low | Default resolution rules |
+**Goal:** Implement incremental context updates with evidence.
+
+### Tasks
+
+#### v4.0-S5-T1: Evidence File Parsing
+- **Description:** Parse evidence files from `evidence/` directory
+- **Acceptance Criteria:**
+  - [ ] Reads YAML evidence files
+  - [ ] Validates against evidence schema
+  - [ ] Extracts metrics, insights, source type
+- **Dependencies:** v4.0-S1-T3 (evidence schema)
+- **Testing:** Evidence parsing tests
+
+#### v4.0-S5-T2: Persona Update Flow
+- **Description:** Update existing personas with new evidence
+- **Acceptance Criteria:**
+  - [ ] Loads existing persona from personas.yaml
+  - [ ] Merges new evidence citations
+  - [ ] Updates characteristics if evidence contradicts
+  - [ ] Updates `last_refined` timestamp
+- **Dependencies:** v4.0-S5-T1
+- **Testing:** Persona update tests
+
+#### v4.0-S5-T3: Persona Creation Flow
+- **Description:** Create new personas via interview
+- **Acceptance Criteria:**
+  - [ ] Asks for description, evidence source, characteristics
+  - [ ] Asks for journey stages (which zones?)
+  - [ ] Creates persona with all v4.0 fields
+  - [ ] Writes to personas.yaml
+- **Dependencies:** v4.0-S1-T1 (persona schema)
+- **Testing:** Persona creation tests
+
+#### v4.0-S5-T4: Zone Update/Creation
+- **Description:** Update or create zones via /refine
+- **Acceptance Criteria:**
+  - [ ] `/refine --zone claim_moment` updates existing zone
+  - [ ] Creates new zone if doesn't exist
+  - [ ] Asks for journey_stage, persona_likely, trust_state
+  - [ ] Updates `.sigilrc.yaml`
+- **Dependencies:** v4.0-S1-T2 (zone schema)
+- **Testing:** Zone update tests
+
+#### v4.0-S5-T5: Feedback Application
+- **Description:** Apply feedback from /observe sessions
+- **Acceptance Criteria:**
+  - [ ] `/refine` shows unapplied feedback
+  - [ ] "Yes — update rules" updates rules.md
+  - [ ] "No — fix component" noted (no context change)
+  - [ ] Marks feedback as `applied: true`
+- **Dependencies:** v4.0-S4-T6 (feedback storage)
+- **Testing:** Feedback application tests
+
+#### v4.0-S5-T6: Progressive Disclosure for /refine
+- **Description:** Implement L1/L2/L3 grip levels
+- **Acceptance Criteria:**
+  - [ ] L1: Interactive mode, reviews unapplied feedback
+  - [ ] L2: `--persona depositor` specific persona
+  - [ ] L3: `--persona depositor --evidence analytics.yaml` file-based
+- **Dependencies:** v4.0-S5-T1 through T5
+- **Testing:** /refine invocation tests
+
+#### v4.0-S5-T7: Create refining-context Skill
+- **Description:** Create new skill directory and files
+- **Acceptance Criteria:**
+  - [ ] `refining-context/index.yaml` created
+  - [ ] `refining-context/SKILL.md` created
+  - [ ] Evidence sources documented
+  - [ ] Interview questions documented
+- **Dependencies:** v4.0-S5-T1 through T6
+- **Testing:** Manual review
 
 ---
 
-## Success Criteria
+## Sprint 6: /consult Consolidation
 
-| Metric | v2.6 | v3.0 Target |
-|--------|------|-------------|
-| Runtime crashes from Process | Crashes | 0 |
-| Naming collisions | Multiple | 0 |
-| Philosophy alignment in skills | 0% | 100% |
-| Vocabulary coverage | 0 terms | 10+ terms |
-| Test coverage | 156 | 220+ |
+**Goal:** Consolidate decision recording into single /consult command.
+
+### Tasks
+
+#### v4.0-S6-T1: Core Decision Recording
+- **Description:** Basic decision recording with time lock
+- **Acceptance Criteria:**
+  - [ ] `/consult "decision"` creates decision file
+  - [ ] Default 30-day time lock
+  - [ ] Generates DEC-YYYY-NNN ID
+  - [ ] Writes to `consultation-chamber/decisions/`
+- **Dependencies:** None
+- **Testing:** Decision creation tests
+
+#### v4.0-S6-T2: Scope and Lock Options
+- **Description:** L2 options for scope and lock duration
+- **Acceptance Criteria:**
+  - [ ] `--scope critical` limits to specific zones
+  - [ ] `--scope ClaimButton` limits to specific components
+  - [ ] `--lock 90d` custom lock duration
+  - [ ] Scope stored in decision file
+- **Dependencies:** v4.0-S6-T1
+- **Testing:** Scope/lock tests
+
+#### v4.0-S6-T3: Decision Unlock
+- **Description:** Unlock existing decisions with reason
+- **Acceptance Criteria:**
+  - [ ] `/consult DEC-001 --unlock "reason"` unlocks decision
+  - [ ] Requires reason (cannot be empty)
+  - [ ] Updates decision history
+  - [ ] Sets `locked: false`
+- **Dependencies:** v4.0-S6-T1
+- **Testing:** Unlock tests
+
+#### v4.0-S6-T4: Protected Capabilities
+- **Description:** Mark decisions as protected (canonize replacement)
+- **Acceptance Criteria:**
+  - [ ] `/consult "behavior" --protect` creates protected decision
+  - [ ] Protected decisions have longer default lock (365d)
+  - [ ] Protected flag in decision file
+- **Dependencies:** v4.0-S6-T1
+- **Testing:** Protection tests
+
+#### v4.0-S6-T5: Evidence Linking
+- **Description:** Link decisions to evidence
+- **Acceptance Criteria:**
+  - [ ] Decision can cite observation feedback
+  - [ ] Decision can cite evidence files
+  - [ ] Evidence stored in decision file
+- **Dependencies:** v4.0-S6-T1, v4.0-S5 (feedback)
+- **Testing:** Evidence linking tests
+
+#### v4.0-S6-T6: Update consulting-decisions Skill
+- **Description:** Update skill for consolidated /consult
+- **Acceptance Criteria:**
+  - [ ] `consulting-decisions/SKILL.md` updated
+  - [ ] Progressive disclosure documented
+  - [ ] Migration from /approve, /canonize, /unlock documented
+- **Dependencies:** v4.0-S6-T1 through T5
+- **Testing:** Manual review
 
 ---
 
-## Dependencies
+## Sprint 7: /garden Health Monitoring
+
+**Goal:** Implement drift detection and health reporting.
+
+### Tasks
+
+#### v4.0-S7-T1: Health Check Framework
+- **Description:** Framework for running health checks
+- **Acceptance Criteria:**
+  - [ ] Check interface: id, name, severity, check function
+  - [ ] Supports critical/warning/info severity
+  - [ ] Returns CheckResult with pass and issues
+- **Dependencies:** None
+- **Testing:** Framework tests
+
+#### v4.0-S7-T2: Persona Evidence Check
+- **Description:** Check that personas have evidence
+- **Acceptance Criteria:**
+  - [ ] Warns if personas lack evidence field
+  - [ ] Lists personas without evidence
+  - [ ] Suggests `/refine --persona <name>`
+- **Dependencies:** v4.0-S7-T1
+- **Testing:** Evidence check tests
+
+#### v4.0-S7-T3: Feedback Applied Check
+- **Description:** Check for unapplied observation feedback
+- **Acceptance Criteria:**
+  - [ ] Scans `.sigil-observations/feedback/` for `applied: false`
+  - [ ] Lists unapplied feedback files
+  - [ ] Suggests `/refine --from-feedback`
+- **Dependencies:** v4.0-S7-T1
+- **Testing:** Feedback check tests
+
+#### v4.0-S7-T4: Zone Journey Check
+- **Description:** Check that zones have journey context
+- **Acceptance Criteria:**
+  - [ ] Info-level warning if zones lack journey_stage
+  - [ ] Lists zones without journey context
+  - [ ] Suggests `/refine --zone <name>`
+- **Dependencies:** v4.0-S7-T1
+- **Testing:** Journey check tests
+
+#### v4.0-S7-T5: Decision Expiry Check
+- **Description:** Check for expired decision locks
+- **Acceptance Criteria:**
+  - [ ] Info-level for expired locks
+  - [ ] Lists expired decisions
+  - [ ] Suggests review and re-lock or remove
+- **Dependencies:** v4.0-S7-T1
+- **Testing:** Expiry check tests
+
+#### v4.0-S7-T6: Schema Validation Mode
+- **Description:** `--validate` mode for CI/CD
+- **Acceptance Criteria:**
+  - [ ] `/garden --validate` validates all YAML against schemas
+  - [ ] Returns exit code 0/1 for CI
+  - [ ] Lists validation errors
+- **Dependencies:** v4.0-S7-T1
+- **Testing:** Validation mode tests
+
+#### v4.0-S7-T7: Health Report Format
+- **Description:** Formatted health report output
+- **Acceptance Criteria:**
+  - [ ] Groups by severity (Critical, Warning, Info)
+  - [ ] Shows context health percentage
+  - [ ] Suggests next action
+- **Dependencies:** v4.0-S7-T1 through T6
+- **Testing:** Report format tests
+
+#### v4.0-S7-T8: Create gardening-health Skill
+- **Description:** Create skill directory and files
+- **Acceptance Criteria:**
+  - [ ] `gardening-health/index.yaml` created
+  - [ ] `gardening-health/SKILL.md` created
+  - [ ] All checks documented
+  - [ ] Report format documented
+- **Dependencies:** v4.0-S7-T1 through T7
+- **Testing:** Manual review
+
+---
+
+## Sprint 8: Build-Time Export
+
+**Goal:** Implement CLI command for runtime configuration export.
+
+### Tasks
+
+#### v4.0-S8-T1: CLI Command Structure
+- **Description:** Create `sigil export-config` CLI command
+- **Acceptance Criteria:**
+  - [ ] Command registered in sigil-cli package
+  - [ ] `--output <path>` specifies output location
+  - [ ] `--minify` option for production
+  - [ ] Help documentation
+- **Dependencies:** None
+- **Testing:** CLI invocation tests
+
+#### v4.0-S8-T2: Config Builder
+- **Description:** Build exportable configuration from YAML
+- **Acceptance Criteria:**
+  - [ ] Reads personas, zones, vocabulary, philosophy
+  - [ ] Transforms to runtime-friendly format
+  - [ ] Includes version and timestamp
+- **Dependencies:** v4.0-S8-T1
+- **Testing:** Config builder tests
+
+#### v4.0-S8-T3: Export Runtime Personas
+- **Description:** Export persona subset for runtime
+- **Acceptance Criteria:**
+  - [ ] Exports name, trust_level, default_lens, preferences
+  - [ ] Exports journey_stages
+  - [ ] Excludes evidence (not needed at runtime)
+- **Dependencies:** v4.0-S8-T2
+- **Testing:** Persona export tests
+
+#### v4.0-S8-T4: Export Runtime Zones
+- **Description:** Export zone subset for runtime
+- **Acceptance Criteria:**
+  - [ ] Exports layout, persona_likely, trust_state, motion
+  - [ ] Excludes paths (agent-only)
+  - [ ] Excludes evidence
+- **Dependencies:** v4.0-S8-T2
+- **Testing:** Zone export tests
+
+#### v4.0-S8-T5: Watch Mode
+- **Description:** Development watch mode
+- **Acceptance Criteria:**
+  - [ ] `--watch` flag enables file watching
+  - [ ] Re-exports on YAML file changes
+  - [ ] Watches sigil-mark/ and .sigilrc.yaml
+- **Dependencies:** v4.0-S8-T2
+- **Testing:** Watch mode tests
+
+#### v4.0-S8-T6: React Provider (Optional)
+- **Description:** Optional SigilConfigProvider for React
+- **Acceptance Criteria:**
+  - [ ] `sigil-mark/runtime/provider.tsx` created
+  - [ ] `SigilConfigProvider` component
+  - [ ] `useSigilConfig`, `usePersona`, `useZone` hooks
+  - [ ] TypeScript types for config
+- **Dependencies:** v4.0-S8-T2
+- **Testing:** Provider tests
+
+#### v4.0-S8-T7: Documentation
+- **Description:** Document build-time export usage
+- **Acceptance Criteria:**
+  - [ ] CLI command documented in README
+  - [ ] Runtime usage examples
+  - [ ] CI/CD integration guide
+  - [ ] Watch mode usage
+- **Dependencies:** v4.0-S8-T1 through T6
+- **Testing:** Manual review
+
+---
+
+## Sprint 9: Migration & Deprecation
+
+**Goal:** Implement deprecation warnings and migration guide.
+
+### Tasks
+
+#### v4.0-S9-T1: Deprecation Warning System
+- **Description:** System for showing deprecation warnings
+- **Acceptance Criteria:**
+  - [ ] Detects when deprecated command is invoked
+  - [ ] Shows clear deprecation message
+  - [ ] Points to replacement command
+  - [ ] Logs deprecation usage
+- **Dependencies:** None
+- **Testing:** Warning system tests
+
+#### v4.0-S9-T2: /setup Deprecation
+- **Description:** Deprecate /setup command
+- **Acceptance Criteria:**
+  - [ ] /setup shows: "Setup is automatic. First /envision or /codify initializes Sigil."
+  - [ ] Still works (no error) for backwards compatibility
+- **Dependencies:** v4.0-S9-T1
+- **Testing:** /setup deprecation test
+
+#### v4.0-S9-T3: /approve Deprecation
+- **Description:** Deprecate /approve command
+- **Acceptance Criteria:**
+  - [ ] /approve shows: "Use /consult to record decisions."
+  - [ ] Forwards to /consult internally
+- **Dependencies:** v4.0-S9-T1
+- **Testing:** /approve deprecation test
+
+#### v4.0-S9-T4: /canonize Deprecation
+- **Description:** Deprecate /canonize command
+- **Acceptance Criteria:**
+  - [ ] /canonize shows: "Use /consult 'behavior' --protect"
+  - [ ] Forwards to /consult --protect internally
+- **Dependencies:** v4.0-S9-T1
+- **Testing:** /canonize deprecation test
+
+#### v4.0-S9-T5: /unlock Deprecation
+- **Description:** Deprecate /unlock command
+- **Acceptance Criteria:**
+  - [ ] /unlock shows: "Use /consult <id> --unlock 'reason'"
+  - [ ] Forwards to /consult --unlock internally
+- **Dependencies:** v4.0-S9-T1
+- **Testing:** /unlock deprecation test
+
+#### v4.0-S9-T6: /validate Deprecation
+- **Description:** Deprecate /validate command
+- **Acceptance Criteria:**
+  - [ ] /validate shows: "Use /garden --validate"
+  - [ ] Forwards to /garden --validate internally
+- **Dependencies:** v4.0-S9-T1
+- **Testing:** /validate deprecation test
+
+#### v4.0-S9-T7: /inherit Deprecation
+- **Description:** Deprecate /inherit command
+- **Acceptance Criteria:**
+  - [ ] /inherit shows: "/envision auto-detects existing codebase"
+  - [ ] Forwards to /envision internally
+- **Dependencies:** v4.0-S9-T1
+- **Testing:** /inherit deprecation test
+
+#### v4.0-S9-T8: Migration Guide
+- **Description:** Create v3.0 → v4.0 migration guide
+- **Acceptance Criteria:**
+  - [ ] `MIGRATION-v4.md` created
+  - [ ] Schema migration steps documented
+  - [ ] Command mapping documented
+  - [ ] Breaking changes documented
+  - [ ] Backwards compatibility notes
+- **Dependencies:** v4.0-S9-T1 through T7
+- **Testing:** Manual review
+
+---
+
+## Sprint 10: Integration & Polish
+
+**Goal:** End-to-end testing and documentation.
+
+### Tasks
+
+#### v4.0-S10-T1: Feedback Loop Integration Test
+- **Description:** Test /craft → /observe → /refine loop
+- **Acceptance Criteria:**
+  - [ ] Full loop works end-to-end
+  - [ ] Feedback from /observe updates context via /refine
+  - [ ] Updated context affects next /craft
+- **Dependencies:** Sprints 3-5
+- **Testing:** Integration test
+
+#### v4.0-S10-T2: Evidence Flow Integration Test
+- **Description:** Test evidence file → persona update flow
+- **Acceptance Criteria:**
+  - [ ] Evidence file parsed correctly
+  - [ ] Persona updated with evidence
+  - [ ] /garden shows improved health
+- **Dependencies:** Sprints 1, 5, 7
+- **Testing:** Integration test
+
+#### v4.0-S10-T3: Build Export Integration Test
+- **Description:** Test export → runtime usage flow
+- **Acceptance Criteria:**
+  - [ ] Export generates valid JSON
+  - [ ] Runtime can import and use config
+  - [ ] Watch mode updates on changes
+- **Dependencies:** Sprint 8
+- **Testing:** Integration test
+
+#### v4.0-S10-T4: MCP Integration Test
+- **Description:** Test /observe with real Claude in Chrome MCP
+- **Acceptance Criteria:**
+  - [ ] Screenshot capture works with MCP
+  - [ ] Analysis runs on captured screenshot
+  - [ ] Feedback questions presented
+  - [ ] Fallback works when MCP unavailable
+- **Dependencies:** Sprint 4
+- **Testing:** Manual MCP test
+
+#### v4.0-S10-T5: Update CLAUDE.md
+- **Description:** Update project CLAUDE.md for v4.0
+- **Acceptance Criteria:**
+  - [ ] Quick reference table updated (7 commands)
+  - [ ] Key files section updated
+  - [ ] Agent protocol updated for new tools
+  - [ ] Zone resolution updated
+- **Dependencies:** Sprints 1-9
+- **Testing:** Manual review
+
+#### v4.0-S10-T6: Update README.md
+- **Description:** Update project README for v4.0
+- **Acceptance Criteria:**
+  - [ ] Command table reflects 7 tools
+  - [ ] Getting started guide updated
+  - [ ] Migration section added
+  - [ ] MCP requirement documented
+- **Dependencies:** Sprints 1-9
+- **Testing:** Manual review
+
+#### v4.0-S10-T7: Version Bump
+- **Description:** Update version numbers
+- **Acceptance Criteria:**
+  - [ ] `.sigil-version.json` updated to 4.0.0
+  - [ ] Package versions updated
+  - [ ] CHANGELOG updated
+- **Dependencies:** v4.0-S10-T1 through T6
+- **Testing:** Version check
+
+---
+
+## Dependencies Graph
 
 ```
-Sprint 1 (P0)
-    └── Sprint 2 (P1)
-            └── Sprint 3 (P2)
-                    └── Sprint 4 (P3)
+Sprint 1 (Schema) ─────┬───────────────────────────────────────────────────┐
+                       │                                                   │
+                       ▼                                                   │
+Sprint 2 (Capture) ────┬───────────────────────────────────────────────────┤
+                       │                                                   │
+                       ▼                                                   │
+Sprint 3 (Craft) ──────┼───────────────────────────────────────────────────┤
+                       │                                                   │
+                       ▼                                                   │
+Sprint 4 (Observe) ────┬───────────────────────────────────────────────────┤
+                       │                                                   │
+                       ▼                                                   │
+Sprint 5 (Refine) ─────┴───────────────────────────────────────────────────┤
+                                                                           │
+Sprint 6 (Consult) ────────────────────────────────────────────────────────┤
+                                                                           │
+Sprint 7 (Garden) ─────────────────────────────────────────────────────────┤
+                                                                           │
+Sprint 8 (Export) ─────────────────────────────────────────────────────────┤
+                                                                           │
+Sprint 9 (Migration) ──────────────────────────────────────────────────────┤
+                                                                           │
+                                                                           ▼
+                                                               Sprint 10 (Polish)
 ```
 
-All sprints are sequential. P0 must complete before P1.
+---
+
+## Risk Mitigation
+
+| Risk | Sprint | Mitigation |
+|------|--------|------------|
+| Schema breaks existing files | 1 | All new fields optional |
+| MCP not available | 4 | Manual screenshot fallback |
+| Evidence format variance | 5 | Standard schema + validation |
+| Deprecation confusion | 9 | Clear messages + migration guide |
+| Integration failures | 10 | Early integration testing in prior sprints |
+
+---
+
+## Success Metrics
+
+| Metric | Measurement | Target |
+|--------|-------------|--------|
+| Commands | Count | 7 |
+| Time to first output | User testing | <10 min |
+| Schema validation | CI | 100% pass |
+| Deprecation coverage | Code review | All old commands handled |
+| Integration tests | Test suite | 100% pass |
+| Documentation | Review | Updated for v4.0 |
 
 ---
 
 ## Previous Version
 
-Sigil v2.6 "Craftsman's Flow" (completed 2026-01-06):
-- Sprint 1-7: Constitution, Consultation, Lens Array, Zone-Persona, Vibe Checks, Commands, Documentation
-- All sprints COMPLETED
-- Security audit APPROVED
+Sigil v3.0 "Living Engine" (completed 2026-01-06):
+- Sprint 1-3: Critical fixes, Foundation, User Fluidity (COMPLETED)
+- Sprint 4: Living Market (PENDING)
 
 ---
 
@@ -491,20 +845,27 @@ Sigil v2.6 "Craftsman's Flow" (completed 2026-01-06):
 
 | Sprint | Status | Completed |
 |--------|--------|-----------|
-| Sprint 1 (P0) | COMPLETED | 2026-01-06 |
-| Sprint 2 (P1) | COMPLETED | 2026-01-06 |
-| Sprint 3 (P2) | COMPLETED | 2026-01-06 |
-| Sprint 4 (P3) | PENDING | - |
+| Sprint 1 (Schema) | COMPLETED | 2026-01-07 |
+| Sprint 2 (Capture) | PENDING | - |
+| Sprint 3 (Craft) | PENDING | - |
+| Sprint 4 (Observe) | PENDING | - |
+| Sprint 5 (Refine) | PENDING | - |
+| Sprint 6 (Consult) | PENDING | - |
+| Sprint 7 (Garden) | PENDING | - |
+| Sprint 8 (Export) | PENDING | - |
+| Sprint 9 (Migration) | PENDING | - |
+| Sprint 10 (Polish) | PENDING | - |
 
 ---
 
 ## Next Step
 
 ```
-/implement sprint-1
+/implement v4.0-sprint-1
 ```
 
 ---
 
-*Generated: 2026-01-06*
-*Version: Sigil v3.0 "Living Engine"*
+*Generated: 2026-01-07*
+*Version: Sigil v4.0 "Sharp Tools"*
+*Sources: loa-grimoire/prd-v4.md, loa-grimoire/sdd-v4.md*

@@ -1,14 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://sigil.dev/schemas/personas.schema.json",
-  "title": "Sigil Personas Schema",
-  "description": "Schema for defining user personas (archetypes) with physics and constraints. Note: 'Persona' = user archetype, 'Lens' = UI rendering variant.",
+  "title": "Sigil Personas Schema v4.0",
+  "description": "Schema for defining user personas (archetypes) with evidence-based characteristics, journey stages, and physics. Note: 'Persona' = user archetype, 'Lens' = UI rendering variant.",
   "type": "object",
   "properties": {
     "version": {
       "type": "string",
       "description": "Schema version",
-      "default": "3.0.0"
+      "default": "4.0.0"
     },
     "personas": {
       "type": "object",
@@ -33,7 +33,7 @@
   "definitions": {
     "Persona": {
       "type": "object",
-      "description": "A user persona (archetype) with physics and constraints",
+      "description": "A user persona (archetype) with evidence-based characteristics, journey stages, and physics",
       "properties": {
         "name": {
           "type": "string",
@@ -46,6 +46,38 @@
         "description": {
           "type": "string",
           "description": "Description of who this persona represents"
+        },
+        "source": {
+          "type": "string",
+          "description": "Evidence source type for this persona (v4.0)",
+          "enum": ["generic", "analytics", "gtm", "interview", "observation"],
+          "default": "generic"
+        },
+        "evidence": {
+          "type": "array",
+          "description": "Evidence citations supporting this persona definition (v4.0)",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "trust_level": {
+          "type": "string",
+          "description": "Trust level of this persona (v4.0)",
+          "enum": ["low", "medium", "high"]
+        },
+        "journey_stages": {
+          "type": "array",
+          "description": "Journey stages where this persona is active (v4.0)",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "last_refined": {
+          "type": "string",
+          "description": "ISO date when persona was last refined (v4.0)",
+          "format": "date"
         },
         "default_lens": {
           "type": "string",

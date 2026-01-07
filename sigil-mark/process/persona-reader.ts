@@ -1,12 +1,17 @@
 /**
- * Sigil v3.0 — Persona Reader
+ * Sigil v4.0 — Persona Reader
  *
- * Reads and manages user personas (archetypes) with physics and constraints.
+ * Reads and manages user personas (archetypes) with evidence-based characteristics,
+ * journey stages, physics, and constraints.
  * Implements graceful degradation: never throws, always returns valid data.
  *
- * TERMINOLOGY (v3.0):
- * - "Persona" = User archetype (power_user, newcomer, mobile, accessibility)
+ * TERMINOLOGY (v4.0):
+ * - "Persona" = User archetype with evidence (power_user, newcomer, mobile, accessibility)
  * - "Lens" = UI rendering variant (DefaultLens, StrictLens, A11yLens)
+ *
+ * v4.0 ADDITIONS:
+ * - Evidence-based: source, evidence[], last_refined
+ * - Journey context: journey_stages[], trust_level
  *
  * Philosophy: "Same feature, different truth. Not simplified - just appropriate."
  *
@@ -55,6 +60,16 @@ export type ConflictResolution = 'priority' | 'merge' | 'first' | 'last';
  * Default UI lens type.
  */
 export type DefaultLensType = 'default' | 'strict' | 'guided' | 'a11y';
+
+/**
+ * Evidence source type (v4.0).
+ */
+export type EvidenceSource = 'generic' | 'analytics' | 'gtm' | 'interview' | 'observation';
+
+/**
+ * Trust level for a persona (v4.0).
+ */
+export type TrustLevel = 'low' | 'medium' | 'high';
 
 /**
  * Tap target configuration.
@@ -134,7 +149,8 @@ export interface PersonaPreferences {
 }
 
 /**
- * A user persona (archetype) with physics and constraints.
+ * A user persona (archetype) with evidence-based characteristics,
+ * journey stages, physics, and constraints.
  */
 export interface Persona {
   /** Persona ID (e.g., 'power_user', 'newcomer') */
@@ -145,6 +161,19 @@ export interface Persona {
   alias: string;
   /** Description of who this persona represents */
   description?: string;
+
+  // v4.0: Evidence-based fields
+  /** Evidence source type (v4.0) */
+  source?: EvidenceSource;
+  /** Evidence citations supporting this persona (v4.0) */
+  evidence?: string[];
+  /** Trust level for this persona (v4.0) */
+  trust_level?: TrustLevel;
+  /** Journey stages where this persona is active (v4.0) */
+  journey_stages?: string[];
+  /** ISO date when persona was last refined (v4.0) */
+  last_refined?: string;
+
   /** Default UI Lens for this persona */
   default_lens?: DefaultLensType;
   /** Physical interaction requirements */
@@ -225,11 +254,21 @@ const DEFAULT_STACKING: StackingConfig = {
  * Default empty persona array.
  */
 export const DEFAULT_PERSONA_ARRAY: PersonaArray = {
-  version: '3.0.0',
+  version: '4.0.0',
   personas: {},
   immutable_properties: [],
   stacking: DEFAULT_STACKING,
 };
+
+/**
+ * Valid evidence sources (v4.0).
+ */
+const VALID_EVIDENCE_SOURCES: EvidenceSource[] = ['generic', 'analytics', 'gtm', 'interview', 'observation'];
+
+/**
+ * Valid trust levels (v4.0).
+ */
+const VALID_TRUST_LEVELS: TrustLevel[] = ['low', 'medium', 'high'];
 
 /**
  * Default path to the personas file.
@@ -297,11 +336,38 @@ function normalizePersona(obj: Record<string, unknown>, id: string): Persona | n
   const constraints = obj.constraints as Record<string, unknown>;
   const preferences = obj.preferences as Record<string, unknown> | undefined;
 
+  // v4.0: Parse evidence-based fields
+  const source = VALID_EVIDENCE_SOURCES.includes(obj.source as EvidenceSource)
+    ? obj.source as EvidenceSource
+    : undefined;
+
+  const evidence = Array.isArray(obj.evidence)
+    ? obj.evidence.filter((e): e is string => typeof e === 'string')
+    : undefined;
+
+  const trust_level = VALID_TRUST_LEVELS.includes(obj.trust_level as TrustLevel)
+    ? obj.trust_level as TrustLevel
+    : undefined;
+
+  const journey_stages = Array.isArray(obj.journey_stages)
+    ? obj.journey_stages.filter((s): s is string => typeof s === 'string')
+    : undefined;
+
+  const last_refined = typeof obj.last_refined === 'string' ? obj.last_refined : undefined;
+
   return {
     id,
     name: obj.name as string,
     alias: obj.alias as string,
     description: typeof obj.description === 'string' ? obj.description : undefined,
+
+    // v4.0: Evidence-based fields
+    source,
+    evidence,
+    trust_level,
+    journey_stages,
+    last_refined,
+
     default_lens: typeof obj.default_lens === 'string' ? obj.default_lens as DefaultLensType : undefined,
     priority: typeof obj.priority === 'number' ? obj.priority : 0,
     physics: {
@@ -341,7 +407,7 @@ function validatePersonaArray(parsed: unknown): PersonaArray {
   const obj = parsed as Record<string, unknown>;
 
   // Validate version
-  const version = typeof obj.version === 'string' ? obj.version : '3.0.0';
+  const version = typeof obj.version === 'string' ? obj.version : '4.0.0';
 
   // Validate personas (can be under 'personas' or 'lenses' for backwards compat)
   const personasObj = obj.personas ?? obj.lenses;
@@ -569,6 +635,123 @@ export function getDefaultLensForPersona(
 ): DefaultLensType {
   const persona = getPersonaById(personaArray, personaId);
   return persona?.default_lens ?? 'default';
+}
+
+// =============================================================================
+// v4.0 HELPER FUNCTIONS
+// =============================================================================
+
+/**
+ * Gets the evidence source for a persona (v4.0).
+ *
+ * @param personaArray - The persona array to search
+ * @param personaId - The persona ID
+ * @returns The persona's evidence source, or 'generic' if not specified
+ */
+export function getEvidenceSourceForPersona(
+  personaArray: PersonaArray,
+  personaId: string
+): EvidenceSource {
+  const persona = getPersonaById(personaArray, personaId);
+  return persona?.source ?? 'generic';
+}
+
+/**
+ * Gets all evidence citations for a persona (v4.0).
+ *
+ * @param personaArray - The persona array to search
+ * @param personaId - The persona ID
+ * @returns Array of evidence citations, or empty array if none
+ */
+export function getEvidenceForPersona(
+  personaArray: PersonaArray,
+  personaId: string
+): string[] {
+  const persona = getPersonaById(personaArray, personaId);
+  return persona?.evidence ?? [];
+}
+
+/**
+ * Gets the trust level for a persona (v4.0).
+ *
+ * @param personaArray - The persona array to search
+ * @param personaId - The persona ID
+ * @returns The persona's trust level, or undefined if not specified
+ */
+export function getTrustLevelForPersona(
+  personaArray: PersonaArray,
+  personaId: string
+): TrustLevel | undefined {
+  const persona = getPersonaById(personaArray, personaId);
+  return persona?.trust_level;
+}
+
+/**
+ * Gets the journey stages for a persona (v4.0).
+ *
+ * @param personaArray - The persona array to search
+ * @param personaId - The persona ID
+ * @returns Array of journey stages, or empty array if none
+ */
+export function getJourneyStagesForPersona(
+  personaArray: PersonaArray,
+  personaId: string
+): string[] {
+  const persona = getPersonaById(personaArray, personaId);
+  return persona?.journey_stages ?? [];
+}
+
+/**
+ * Finds personas active in a given journey stage (v4.0).
+ *
+ * @param personaArray - The persona array to search
+ * @param journeyStage - The journey stage to match
+ * @returns Array of personas active in that journey stage
+ */
+export function getPersonasForJourneyStage(
+  personaArray: PersonaArray,
+  journeyStage: string
+): Persona[] {
+  return getAllPersonas(personaArray).filter(
+    (p) => p.journey_stages?.includes(journeyStage)
+  );
+}
+
+/**
+ * Finds personas with a given trust level (v4.0).
+ *
+ * @param personaArray - The persona array to search
+ * @param trustLevel - The trust level to match
+ * @returns Array of personas with that trust level
+ */
+export function getPersonasByTrustLevel(
+  personaArray: PersonaArray,
+  trustLevel: TrustLevel
+): Persona[] {
+  return getAllPersonas(personaArray).filter(
+    (p) => p.trust_level === trustLevel
+  );
+}
+
+/**
+ * Checks if a persona has evidence (v4.0).
+ *
+ * @param persona - The persona to check
+ * @returns true if the persona has evidence citations
+ */
+export function hasEvidence(persona: Persona): boolean {
+  return (persona.evidence?.length ?? 0) > 0;
+}
+
+/**
+ * Gets personas that lack evidence (v4.0).
+ * Useful for /garden health checks.
+ *
+ * @param personaArray - The persona array to search
+ * @returns Array of personas without evidence
+ */
+export function getPersonasWithoutEvidence(personaArray: PersonaArray): Persona[] {
+  return getAllPersonas(personaArray).filter((p) => !hasEvidence(p));
 }
 
 // =============================================================================

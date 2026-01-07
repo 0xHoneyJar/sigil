@@ -6,6 +6,23 @@ This document tracks all sprint artifacts and their approval status.
 
 ## Sprint Status Summary
 
+### Sigil v4.0 (Sharp Tools — 7 Discrete Tools)
+
+| Sprint | Theme | Status | Reviewer | Auditor |
+|--------|-------|--------|----------|---------|
+| 1 | Schema Foundation | COMPLETED | ✅ Approved | ✅ Approved |
+| 2 | /envision & /codify Evolution | PENDING | - | - |
+| 3 | /craft Enhancement | PENDING | - | - |
+| 4 | /observe Communication | PENDING | - | - |
+| 5 | /refine Updates | PENDING | - | - |
+| 6 | /consult Consolidation | PENDING | - | - |
+| 7 | /garden Health | PENDING | - | - |
+| 8 | Build-Time Export | PENDING | - | - |
+| 9 | Migration & Deprecation | PENDING | - | - |
+| 10 | Integration & Polish | PENDING | - | - |
+
+---
+
 ### Sigil v3.0 (Living Engine — Agent-Time/Runtime Split)
 
 | Sprint | Theme | Status | Reviewer | Auditor |
@@ -393,5 +410,35 @@ This document tracks all sprint artifacts and their approval status.
 
 ---
 
-*Last Updated: 2026-01-06*
-*Current Version: Sigil v3.0.0 "Living Engine" — RELEASED*
+---
+
+## v4.0 Sprint 1: Schema Foundation
+
+**Duration:** 1 sprint
+**Theme:** Evidence-based personas & journey zones (non-breaking)
+**Status:** COMPLETED
+
+### Artifacts
+- [reviewer.md](./v4.0-sprint-1/reviewer.md) - Implementation report
+- [engineer-feedback.md](./v4.0-sprint-1/engineer-feedback.md) - Tech lead review (✅ APPROVED)
+- [auditor-sprint-feedback.md](./v4.0-sprint-1/auditor-sprint-feedback.md) - Security audit (✅ APPROVED)
+- [COMPLETED](./v4.0-sprint-1/COMPLETED) - Completion marker
+
+### Key Deliverables
+- Persona schema v4.0 (source, evidence, trust_level, journey_stages, last_refined)
+- Zone schema v4.0 (paths, journey_stage, persona_likely, trust_state, evidence)
+- Evidence schema (analytics, interviews, gtm, observation)
+- Feedback schema (for /observe tool)
+- Zone reader (resolveZoneFromPath for agent-time detection)
+
+### Tasks
+- [x] v4.0-S1-T1: Update Persona Schema with v4.0 fields
+- [x] v4.0-S1-T2: Update Zone Schema with journey context
+- [x] v4.0-S1-T3: Create Evidence Schema for analytics/interviews
+- [x] v4.0-S1-T4: Create Feedback Schema for observations
+- [x] v4.0-S1-T5: Directory Structure Setup
+
+---
+
+*Last Updated: 2026-01-07*
+*Current Version: Sigil v4.0.0 "Sharp Tools" — IN DEVELOPMENT*
