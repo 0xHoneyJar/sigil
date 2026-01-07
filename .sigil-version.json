@@ -1,18 +1,28 @@
 {
-  "sigil_version": "3.0.0",
-  "framework_version": "3.0.0",
-  "schema_version": 4,
-  "philosophy": "Living Engine",
-  "description": "Agent-time/Runtime split, Vocabulary as API surface, User Fluidity",
+  "sigil_version": "4.0.0",
+  "framework_version": "4.0.0",
+  "schema_version": 5,
+  "philosophy": "Sharp Tools",
+  "description": "7 discrete tools with progressive disclosure, evidence-based context, visual feedback loop",
   "zones": {
     "system": ".claude/",
     "state": "sigil-mark/"
   },
-  "core": {
-    "physics_tokens": "sigil-mark/core/physics.ts",
-    "zone_context": "sigil-mark/core/zone-context.tsx",
-    "persona_context": "sigil-mark/core/persona-context.tsx",
-    "zone_resolver": "sigil-mark/core/zone-resolver.ts"
+  "tools": [
+    "/envision",
+    "/codify",
+    "/craft",
+    "/observe",
+    "/refine",
+    "/consult",
+    "/garden"
+  ],
+  "features": {
+    "progressive_disclosure": true,
+    "evidence_based_context": true,
+    "visual_feedback_loop": true,
+    "mcp_integration": "claude-in-chrome",
+    "build_time_export": true
   },
   "process": {
     "path": "sigil-mark/process/",
@@ -23,44 +33,48 @@
       "persona-reader.ts",
       "decision-reader.ts",
       "philosophy-reader.ts",
-      "vibe-check-reader.ts"
+      "vibe-check-reader.ts",
+      "moodboard-reader.ts",
+      "evidence-reader.ts",
+      "feedback-reader.ts",
+      "zone-reader.ts"
     ]
   },
-  "components": {
-    "path": "sigil-mark/components/",
-    "list": ["Button"]
-  },
-  "materials": ["decisive", "machinery", "glass"],
-  "hooks": {
-    "path": "sigil-mark/hooks/",
-    "list": ["useCriticalAction", "useLens", "useZone", "usePersona"]
-  },
-  "workbench": {
-    "ab_toggle": "sigil-mark/workbench/ab-toggle.ts",
-    "use_ab_toggle": "sigil-mark/workbench/useABToggle.ts"
-  },
-  "history": {
-    "path": "sigil-mark/history/",
-    "last_entry": null
+  "schemas": {
+    "persona": "sigil-mark/personas/schemas/personas.schema.json",
+    "zone": "sigil-mark/zones/schemas/zones.schema.json",
+    "evidence": "sigil-mark/evidence/schemas/evidence.schema.json",
+    "feedback": "sigil-mark/.sigil-observations/schemas/feedback.schema.json"
   },
   "garden": {
     "last_run": null,
     "reports_path": "sigil-mark/reports/"
   },
   "migration": {
-    "from_version": "2.6.0",
-    "migrated_at": "2026-01-06T00:00:00Z",
+    "from_version": "3.0.0",
+    "migrated_at": "2026-01-07T00:00:00Z",
+    "migration_guide": "MIGRATION-v4.md",
     "changes": [
-      "Agent-time vs Runtime architecture split",
-      "ProcessContextProvider removed from runtime",
-      "Vocabulary layer added",
-      "Philosophy layer added",
-      "Lens Array renamed to Personas",
-      "Behavioral signals added to vibe checks",
-      "Remote config schema added",
-      "PersonaProvider and ZoneProvider added"
+      "37 commands consolidated to 7 tools",
+      "Progressive disclosure (L1/L2/L3)",
+      "/observe visual feedback via MCP",
+      "/refine incremental context updates",
+      "/consult consolidated decision recording",
+      "Evidence-based personas and zones",
+      "Journey context for zones",
+      "/garden health monitoring with CI mode",
+      "Build-time export for runtime",
+      "Auto-setup (no explicit /setup required)"
     ]
   },
+  "deprecated": {
+    "/setup": "Automatic with first /envision or /codify",
+    "/inherit": "/envision auto-detects existing codebase",
+    "/approve": "/consult",
+    "/canonize": "/consult --protect",
+    "/unlock": "/consult --unlock",
+    "/validate": "/garden --validate"
+  },
   "setup_completed_at": "2026-01-05T00:00:00Z",
-  "last_updated": "2026-01-06T00:00:00Z"
+  "last_updated": "2026-01-07T00:00:00Z"
 }
