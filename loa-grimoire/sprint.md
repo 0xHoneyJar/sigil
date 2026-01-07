@@ -183,67 +183,68 @@ REFINEMENT (Evolve)       MAINTENANCE (Tend)
 
 ---
 
-## Sprint 3: /craft Enhancement
+## Sprint 3: /craft Enhancement ✅
 
 **Goal:** Enhance /craft with gap detection and improved context loading.
+**Status:** COMPLETED
 
 ### Tasks
 
-#### v4.0-S3-T1: Context Loading Improvements
+#### v4.0-S3-T1: Context Loading Improvements ✅
 - **Description:** Graceful context loading with fallbacks
 - **Acceptance Criteria:**
-  - [ ] Loads moodboard, rules, personas, vocabulary, philosophy
-  - [ ] Missing files don't error, use sensible defaults
-  - [ ] Zone resolution from file path
-  - [ ] Persona resolution from zone's `persona_likely`
+  - [x] Loads moodboard, rules, personas, vocabulary, philosophy
+  - [x] Missing files don't error, use sensible defaults
+  - [x] Zone resolution from file path
+  - [x] Persona resolution from zone's `persona_likely`
 - **Dependencies:** v4.0-S1 (schemas), v4.0-S2 (tools)
 - **Testing:** Context loading tests
 
-#### v4.0-S3-T2: Progressive Disclosure for /craft
+#### v4.0-S3-T2: Progressive Disclosure for /craft ✅
 - **Description:** Implement L1/L2/L3 grip levels
 - **Acceptance Criteria:**
-  - [ ] L1: `/craft "button"` uses auto-detected context
-  - [ ] L2: `--zone critical` explicit zone context
-  - [ ] L3: `--zone --persona --lens --no-gaps` full control
+  - [x] L1: `/craft "button"` uses auto-detected context
+  - [x] L2: `--zone critical` explicit zone context
+  - [x] L3: `--zone --persona --lens --no-gaps` full control
 - **Dependencies:** v4.0-S3-T1
 - **Testing:** /craft invocation tests
 
-#### v4.0-S3-T3: Gap Detection System
+#### v4.0-S3-T3: Gap Detection System ✅
 - **Description:** Detect and surface missing context at end of output
 - **Acceptance Criteria:**
-  - [ ] Detects undefined personas mentioned in request
-  - [ ] Detects undefined zones mentioned in request
-  - [ ] Detects missing vocabulary terms
-  - [ ] Surfaces gaps at END of output (not inline)
-  - [ ] Each gap includes `/refine` command to fix
+  - [x] Detects undefined personas mentioned in request
+  - [x] Detects undefined zones mentioned in request
+  - [x] Detects missing vocabulary terms
+  - [x] Surfaces gaps at END of output (not inline)
+  - [x] Each gap includes `/refine` command to fix
 - **Dependencies:** v4.0-S3-T1
 - **Testing:** Gap detection tests
 
-#### v4.0-S3-T4: Decision Lock Checking
+#### v4.0-S3-T4: Decision Lock Checking ✅
 - **Description:** Check active decisions before generating
 - **Acceptance Criteria:**
-  - [ ] Loads decisions from `consultation-chamber/decisions/`
-  - [ ] Warns if generated code conflicts with locked decision
-  - [ ] Respects decision scope (zones, components)
+  - [x] Loads decisions from `consultation-chamber/decisions/`
+  - [x] Warns if generated code conflicts with locked decision
+  - [x] Respects decision scope (zones, components)
 - **Dependencies:** v4.0-S3-T1
 - **Testing:** Decision conflict tests
 
-#### v4.0-S3-T5: Journey Context in Output
+#### v4.0-S3-T5: Journey Context in Output ✅
 - **Description:** Surface journey context in /craft output
 - **Acceptance Criteria:**
-  - [ ] Shows resolved zone with journey_stage
-  - [ ] Shows resolved persona with trust_level
-  - [ ] Explains why certain patterns were chosen
+  - [x] Shows resolved zone with journey_stage
+  - [x] Shows resolved persona with trust_level
+  - [x] Explains why certain patterns were chosen
 - **Dependencies:** v4.0-S3-T1, v4.0-S3-T2
 - **Testing:** Output format tests
 
-#### v4.0-S3-T6: Update crafting-guidance Skill
+#### v4.0-S3-T6: Update crafting-guidance Skill ✅
 - **Description:** Update SKILL.md for v4.0 /craft behavior
 - **Acceptance Criteria:**
-  - [ ] `crafting-guidance/SKILL.md` updated
-  - [ ] Context loading documented
-  - [ ] Gap detection behavior documented
-  - [ ] Progressive disclosure documented
+  - [x] `crafting-guidance/SKILL.md` updated
+  - [x] Context loading documented
+  - [x] Gap detection behavior documented
+  - [x] Progressive disclosure documented
 - **Dependencies:** v4.0-S3-T1 through T5
 - **Testing:** Manual review
 
