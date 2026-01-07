@@ -1,11 +1,11 @@
 # Sigil
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-> *"Truth is Core. Experience is Lens. Layouts ARE Zones."*
+> *"Context before code. Constitution before creativity."*
 
-Design Physics Framework for AI-assisted development. Separates Truth (Core physics) from Experience (Lens rendering).
+Design Physics Framework for AI-assisted development. **v2.6 "Craftsman's Flow"** adds a Process Layer for human-AI collaboration on design decisions.
 
 ## Philosophy
 
@@ -51,6 +51,34 @@ Products drift. What felt right at launch feels stale at scale. Plan for evoluti
 1. **IMPOSSIBLE** — Physics violations. Cannot be generated. (e.g., optimistic updates in server-tick zones)
 2. **BLOCK** — Lens forced. StrictLens in financial zones can't be overridden.
 3. **WARN** — Suggestions only. User lens preference respected outside critical zones.
+
+## What's New in v2.6
+
+**Process Layer** — Human decisions that inform AI behavior:
+
+| Component | Purpose | Key Feature |
+|-----------|---------|-------------|
+| **Constitution** | Protected capabilities | `withdraw`, `deposit` MUST always work |
+| **Decisions** | Locked design choices | Time-based locks prevent endless debates |
+| **Personas** | User archetypes | Physics/constraints per user type |
+| **Vibe Checks** | Micro-surveys | Qualitative feedback at key moments |
+
+**Commands** (v2.6):
+
+```bash
+/craft "Create checkout button"    # Design guidance with Process context
+/consult "Primary CTA color"       # Lock design decisions
+/consult DEC-001 --unlock          # Early unlock with justification
+/garden                            # Health report (Constitution + Decisions)
+```
+
+**Zone-Persona Mapping:**
+
+| Zone | Persona | Input | Constraint |
+|------|---------|-------|------------|
+| critical | power_user | keyboard | max_actions: 10 |
+| marketing | newcomer | mouse | reading_level: beginner |
+| mobile | mobile | touch | tap_targets: 48px |
 
 ## Quick Start
 

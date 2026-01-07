@@ -1,0 +1,9 @@
+Sprint 3: Lens Array Foundation
+Completed: 2026-01-06
+Tests: 35/35 passing
+
+Deliverables:
+- sigil-mark/lens-array/lenses.yaml
+- sigil-mark/lens-array/schemas/lens-array.schema.json
+- sigil-mark/process/lens-array-reader.ts
+- sigil-mark/__tests__/process/lens-array-reader.test.ts

@@ -272,3 +272,104 @@ However, we recommend migrating to the lens system for new code.
 - See [CLAUDE.md](../CLAUDE.md) for AI agent documentation
 - Check [__examples__/](./__examples__/) for complete examples
 - Run `/craft` command for guided component generation
+
+---
+
+# Migration Guide: v2.0 → v2.6
+
+This section covers migration from v2.0 "Reality Engine" to v2.6 "Craftsman's Flow".
+
+## Overview
+
+v2.6 adds the **Process Layer** — a human interaction layer for capturing design decisions. The Core, Layout, and Lens layers from v2.0 remain unchanged.
+
+**Breaking Changes:** None. v2.6 is fully backwards compatible with v2.0.
+
+## New Features
+
+### 1. Constitution System
+
+Define protected capabilities that MUST always work:
+
+```yaml
+# sigil-mark/constitution/protected-capabilities.yaml
+protected:
+  - id: withdraw
+    name: "Withdraw Funds"
+    enforcement: block
+    rationale: "Users must always be able to withdraw"
+```
+
+### 2. Decision Locking
+
+Lock design decisions to prevent endless debates:
+
+```bash
+/consult "Primary CTA color"      # Start consultation
+/consult DEC-2026-001 --status    # Check status
+/consult DEC-2026-001 --unlock    # Request early unlock
+```
+
+**Lock Periods:**
+- `strategic` — 180 days
+- `direction` — 90 days
+- `execution` — 30 days
+
+### 3. Persona System
+
+Zone-persona mapping for contextual constraints:
+
+| Zone | Persona | Input | Constraint |
+|------|---------|-------|------------|
+| critical | power_user | keyboard | max_actions: 10 |
+| checkout | power_user | keyboard | reading_level: advanced |
+| marketing | newcomer | mouse | max_actions: 5 |
+| mobile | mobile | touch | tap_targets: 48px |
+
+### 4. Enhanced Commands
+
+```bash
+/craft "button"           # Now surfaces Process context
+/consult "topic"          # Lock decisions
+/garden                   # Health report with Process layer
+```
+
+## New Imports
+
+```tsx
+// Process Context
+import {
+  ProcessContextProvider,
+  useProcessContext,
+  useConstitution,
+  useDecisions,
+  useCurrentPersona,
+} from 'sigil-mark';
+
+// Zone-Persona Mapping
+import {
+  getPersonaForZone,
+  resolveZoneWithPersona,
+  DEFAULT_ZONE_PERSONA_MAP,
+  LOCK_PERIODS,
+} from 'sigil-mark';
+```
+
+## Migration Steps
+
+1. **Update Package:** `npm update sigil-mark@2.6.0`
+2. **Initialize Process Layer (Optional):** Run `/setup`
+3. **Define Constitution (Optional):** Create protected capabilities
+4. **Add ProcessContextProvider (Optional):** Wrap app if using Process context
+
+## Graceful Degradation
+
+All Process layer features gracefully degrade. Missing files return defaults:
+
+| Missing | Behavior |
+|---------|----------|
+| No constitution file | Returns empty protected array |
+| No decisions directory | Returns empty decisions array |
+| No lenses.yaml | Returns default personas |
+
+Your v2.0 code continues to work without any Process layer files.

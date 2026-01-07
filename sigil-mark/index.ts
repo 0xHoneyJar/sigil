@@ -1,12 +1,16 @@
 /**
- * Sigil v2.0 — Reality Engine
+ * Sigil v2.6 — Craftsman's Flow
  *
- * Design physics framework that separates Truth (Core) from Experience (Lens).
+ * Design physics framework with Process Layer for human-AI collaboration.
  *
- * ## Architecture (3 Layers)
+ * ## Architecture (4 Layers)
  *
  * ```
  * ┌────────────────────────────────────────────────────────────┐
+ * │  PROCESS LAYER — Human decisions (NEW in v2.6)            │
+ * │  Constitution, Lens Array, Consultation Chamber, Surveys  │
+ * │  YAML/Markdown captured by Claude, referenced in code     │
+ * ├────────────────────────────────────────────────────────────┤
  * │  CORE LAYER — Physics engines (Truth)                     │
  * │  useCriticalAction → State Stream                         │
  * │  { status, timeAuthority, selfPrediction, worldTruth }    │
@@ -25,21 +29,19 @@
  *
  * ```tsx
  * import {
+ *   // Process (v2.6)
+ *   useProcessContext,
+ *   ProcessContextProvider,
  *   // Core
  *   useCriticalAction,
  *   // Layouts
  *   CriticalZone,
- *   MachineryLayout,
- *   GlassLayout,
  *   // Lenses
  *   useLens,
- *   LensProvider,
- *   DefaultLens,
- *   StrictLens,
- *   A11yLens,
  * } from 'sigil-mark';
  *
  * function PaymentForm({ amount }: { amount: number }) {
+ *   const { constitution, decisions } = useProcessContext();
  *   const payment = useCriticalAction({
  *     mutation: () => api.pay(amount),
  *     timeAuthority: 'server-tick',
@@ -64,8 +66,73 @@
  * ```
  *
  * @module sigil-mark
- * @version 2.0.0
+ * @version 2.6.0
  */
+
+// =============================================================================
+// PROCESS LAYER — Human Decisions (v2.6)
+// =============================================================================
+
+export {
+  // Context
+  ProcessContextProvider,
+  ProcessContext,
+  useProcessContext,
+  useConstitution,
+  useLensArray,
+  useDecisions,
+  useCurrentPersona,
+  useDecisionsForCurrentZone,
+  // Constitution
+  readConstitution,
+  isCapabilityProtected,
+  getCapabilityEnforcement,
+  validateAction,
+  DEFAULT_CONSTITUTION,
+  // Decisions
+  readAllDecisions,
+  getDecisionsForZone,
+  isDecisionExpired,
+  getDaysRemaining,
+  lockDecision,
+  unlockDecision,
+  LOCK_PERIODS,
+  // Personas
+  readLensArray,
+  getPersona,
+  getAllPersonas,
+  getPhysicsForPersona,
+  validateLensStack,
+  DEFAULT_LENS_ARRAY,
+  // Vibe Checks
+  readVibeChecks,
+  getTriggerById,
+  shouldTriggerSurvey,
+  recordSurveyResponse,
+  DEFAULT_VIBE_CHECKS,
+  // Types
+  type ProcessContextValue,
+  type Constitution,
+  type ProtectedCapability,
+  type EnforcementLevel,
+  type Decision,
+  type DecisionScope,
+  type DecisionStatus,
+  type LensArray,
+  type Persona,
+  type PersonaPhysics,
+  type PersonaConstraints,
+  type VibeChecks,
+  type SurveyTrigger,
+} from './process';
+
+export {
+  // Zone-Persona Integration (v2.6)
+  getPersonaForZone,
+  resolveZoneWithPersona,
+  DEFAULT_ZONE_PERSONA_MAP,
+  type PersonaId,
+} from './core/zone-resolver';
 
 // =============================================================================
 // CORE LAYER — Physics Engines (Truth)
@@ -215,7 +282,7 @@ export {
 // =============================================================================
 
 /** Sigil version */
-export const VERSION = '2.0.0';
+export const VERSION = '2.6.0';
 
 /** Architecture codename */
-export const CODENAME = 'Reality Engine';
+export const CODENAME = "Craftsman's Flow";

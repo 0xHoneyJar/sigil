@@ -1,24 +1,27 @@
 ---
 name: garden
-version: "2.0.0"
-description: Health report on Layouts, Lenses, and deprecated patterns
+version: "2.6.0"
+description: Health report including Process layer (Constitution, Decisions, Personas)
 agent: gardening-entropy
 agent_path: .claude/skills/gardening-entropy/SKILL.md
 preflight:
   - sigil_mark_exists
 ---
 
-# /garden
+# /garden (v2.6)
 
-Health report on Layouts, Lenses, and deprecated patterns. Detects drift and recommends maintenance actions.
+Health report including Process layer status. Detects drift, Constitution compliance, decision health, and recommends maintenance actions.
 
 ## Usage
 
 ```
-/garden                 # Show full health report
-/garden --layout [name] # Report for specific Layout
-/garden --deprecated    # Focus on v1.2.5 patterns
-/garden --drift         # Focus on pattern drift
+/garden                   # Show full health report (Core + Process)
+/garden --layout [name]   # Report for specific Layout
+/garden --deprecated      # Focus on deprecated patterns
+/garden --drift           # Focus on pattern drift
+/garden --process         # Focus on Process layer health (NEW)
+/garden --constitution    # Constitution compliance only (NEW)
+/garden --decisions       # Decision status only (NEW)
 ```
 
 ## What Gets Reported
@@ -31,24 +34,67 @@ Shows which Layouts are used and component coverage.
 
 Shows lens usage across the codebase.
 
-### 3. Deprecated Patterns
+### 3. Process Layer Health (NEW in v2.6)
 
-Lists v1.2.5 patterns that should be migrated.
+Shows Constitution compliance, decision status, and persona coverage.
 
-### 4. Pattern Drift
+### 4. Deprecated Patterns
 
-Components that have drifted from v2.0 patterns.
+Lists deprecated patterns that should be migrated.
 
-### 5. Recommendations
+### 5. Pattern Drift
+
+Components that have drifted from v2.6 patterns.
+
+### 6. Recommendations
 
 Prioritized actions based on findings.
 
-## Output Format
+## Output Format (v2.6)
 
 ```
 /garden
 
-SIGIL v2.0 HEALTH REPORT
+SIGIL v2.6 HEALTH REPORT
+═══════════════════════════════════════════════════════════
+
+                     PROCESS LAYER (NEW)
+═══════════════════════════════════════════════════════════
+
+CONSTITUTION COMPLIANCE
+┌─────────────────────────────────────────────────────────┐
+│ Capability      │ Enforcement │ Status                  │
+├─────────────────────────────────────────────────────────┤
+│ withdraw        │ block       │ ✓ Always available      │
+│ deposit         │ block       │ ✓ Always available      │
+│ risk_alert      │ warn        │ ✓ Properly displayed    │
+│ fee_disclosure  │ warn        │ ⚠️ Missing in 2 files   │
+│ balance_visible │ log         │ ✓ Visible               │
+└─────────────────────────────────────────────────────────┘
+
+DECISION STATUS
+┌─────────────────────────────────────────────────────────┐
+│ Decision        │ Status  │ Expires      │ Issues      │
+├─────────────────────────────────────────────────────────┤
+│ DEC-2026-001    │ 🔒 locked│ 90 days     │ None        │
+│ DEC-2026-002    │ 🔒 locked│ 30 days     │ None        │
+│ DEC-2026-003    │ ⚠️ expired│ -15 days   │ Re-consult  │
+│ DEC-2026-004    │ 🔓 unlocked│ Manual    │ Flagged     │
+└─────────────────────────────────────────────────────────┘
+
+PERSONA COVERAGE
+┌─────────────────────────────────────────────────────────┐
+│ Persona         │ Zones │ Components │ Coverage         │
+├─────────────────────────────────────────────────────────┤
+│ power_user      │ 3     │ 12         │ ████████████ 80% │
+│ newcomer        │ 2     │ 8          │ ████████░░░░ 60% │
+│ mobile          │ 1     │ 4          │ ██████░░░░░░ 50% │
+│ accessibility   │ 0     │ 0          │ ░░░░░░░░░░░░ 0%  │
+└─────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════
+
+                     CORE LAYER
 ═══════════════════════════════════════════════════════════
 
 LAYOUT COVERAGE
@@ -70,14 +116,13 @@ LENS DISTRIBUTION
 │ A11yLens    │ 0     │ Not enabled                      │
 └─────────────────────────────────────────────────────────┘
 
-DEPRECATED PATTERNS (v1.2.5)
+DEPRECATED PATTERNS
 ┌─────────────────────────────────────────────────────────┐
 │ Pattern          │ Files │ Migration                    │
 ├─────────────────────────────────────────────────────────┤
 │ SigilZone        │ 3     │ → CriticalZone/Machinery/Glass│
 │ useServerTick    │ 2     │ → useCriticalAction          │
 │ useSigilPhysics  │ 1     │ → useLens()                  │
-│ @sigil/recipes/* │ 4     │ → Lens components            │
 └─────────────────────────────────────────────────────────┘
 
 PATTERN DRIFT
@@ -89,23 +134,35 @@ PATTERN DRIFT
 │ src/admin/BulkAction.tsx       │ Wrong time authority   │
 └─────────────────────────────────────────────────────────┘
 
-RECOMMENDATIONS
+═══════════════════════════════════════════════════════════
+
+                     RECOMMENDATIONS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. MIGRATE DEPRECATED PATTERNS (Priority: HIGH)
-   Files: 10 files using v1.2.5 patterns
+1. FIX CONSTITUTION VIOLATIONS (Priority: CRITICAL)
+   Issue: fee_disclosure missing in 2 files
+   Files: src/checkout/Summary.tsx, src/wallet/Deposit.tsx
+   Action: Add fee disclosure per Constitution requirement
+
+2. RE-CONSULT EXPIRED DECISIONS (Priority: HIGH)
+   Decision: DEC-2026-003 expired 15 days ago
+   Action: /consult DEC-2026-003 --record-outcome (or delete)
+
+3. REVIEW MANUALLY UNLOCKED DECISIONS (Priority: HIGH)
+   Decision: DEC-2026-004 was manually unlocked
+   Action: Re-lock if still valid, or document justification
+
+4. ADD ACCESSIBILITY PERSONA COVERAGE (Priority: MEDIUM)
+   Issue: No components target accessibility persona
+   Action: Review critical paths for A11yLens support
+
+5. MIGRATE DEPRECATED PATTERNS (Priority: MEDIUM)
+   Files: 6 files using deprecated patterns
    Action: See sigil-mark/MIGRATION.md
-   Command: /validate --deprecated
 
-2. ADD LAYOUT CONTEXT (Priority: MEDIUM)
+6. ADD LAYOUT CONTEXT (Priority: LOW)
    Files: 4 components without Layout
-   - src/features/QuickAction.tsx
-   - src/features/ConfirmBtn.tsx
    Action: /craft [file] to get Layout recommendation
-
-3. FIX DRIFT (Priority: LOW)
-   Files: 3 components with pattern drift
-   Action: /validate [file] to see specific issues
 
 ═══════════════════════════════════════════════════════════
 Last Updated: 2026-01-06
@@ -186,11 +243,96 @@ Pattern drift occurs when:
 | SigilZone | HIGH | Core architecture change |
 | useServerTick | HIGH | Time authority pattern |
 | useSigilPhysics | MEDIUM | Lens resolution |
-| @sigil/recipes/* | LOW | Still functional |
+
+## Process Layer Reports (NEW in v2.6)
+
+### Constitution-Only Report
+
+```
+/garden --constitution
+
+CONSTITUTION COMPLIANCE REPORT
+════════════════════════════════════════════════════════════
+
+Protected Capabilities: 8
+Violations: 1
+
+VIOLATIONS:
+┌─────────────────────────────────────────────────────────┐
+│ Capability      │ File                 │ Issue          │
+├─────────────────────────────────────────────────────────┤
+│ fee_disclosure  │ src/checkout/Sum.tsx │ Not displayed  │
+│ fee_disclosure  │ src/wallet/Dep.tsx   │ Missing        │
+└─────────────────────────────────────────────────────────┘
+
+RECOMMENDATIONS:
+- Add fee disclosure component to affected files
+- Review Constitution rationale in protected-capabilities.yaml
+```
+
+### Decisions-Only Report
+
+```
+/garden --decisions
+
+DECISION STATUS REPORT
+════════════════════════════════════════════════════════════
+
+Total Decisions: 4
+Locked: 2
+Expired: 1
+Unlocked: 1
+
+ATTENTION REQUIRED:
+┌─────────────────────────────────────────────────────────┐
+│ Decision     │ Status   │ Action Needed                 │
+├─────────────────────────────────────────────────────────┤
+│ DEC-2026-003 │ expired  │ Re-consult or delete          │
+│ DEC-2026-004 │ unlocked │ Review justification          │
+└─────────────────────────────────────────────────────────┘
+
+HEALTHY:
+┌─────────────────────────────────────────────────────────┐
+│ Decision     │ Status │ Expires     │ Topic             │
+├─────────────────────────────────────────────────────────┤
+│ DEC-2026-001 │ locked │ 90 days    │ Primary CTA color  │
+│ DEC-2026-002 │ locked │ 30 days    │ Mobile nav pattern │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Process-Only Report
+
+```
+/garden --process
+
+PROCESS LAYER HEALTH
+════════════════════════════════════════════════════════════
+
+Constitution:
+  - Protected capabilities: 8
+  - Violations: 1 (warn level)
+  - Status: ⚠️ Needs attention
+
+Decisions:
+  - Total: 4
+  - Healthy: 2
+  - Expired: 1
+  - Unlocked: 1
+  - Status: ⚠️ Needs attention
+
+Personas:
+  - Defined: 4 (power_user, newcomer, mobile, accessibility)
+  - Active: 3 (accessibility not used)
+  - Status: ℹ️ Review accessibility coverage
+
+Overall Process Health: ⚠️ NEEDS ATTENTION
+```
 
 ## Next Steps
 
 Based on recommendations:
+- `/craft [file]` for guidance on specific files with Process context
+- `/consult --status [id]` to check decision details
+- `/consult --unlock [id]` for early unlock requests
 - `/validate` for detailed violation report
-- `/craft [file]` for guidance on specific files
 - See `sigil-mark/MIGRATION.md` for full migration guide

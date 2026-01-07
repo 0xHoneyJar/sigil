@@ -1,44 +1,79 @@
-# Product Requirements Document: Sigil v2.0
+# Product Requirements Document: Sigil v2.6
 
-**Version**: 2.0.0
+**Version**: 2.6.0
 **Status**: Draft
-**Date**: 2026-01-05
-**Evolution**: Additive iteration from v1.2.5 Zone Provider architecture
+**Date**: 2026-01-06
+**Codename**: Craftsman's Flow
 
 ---
 
 ## Executive Summary
 
-Sigil v2.0 evolves the existing v1.2.5 Zone Provider architecture into a **Reality Engine** — a comprehensive framework that separates Truth (Core physics) from Experience (Lenses). This additive evolution maintains backward compatibility with the mount-script distribution model while introducing six new architectural layers.
+Sigil v2.6 introduces a **two-tier architecture** that separates human design decisions (Sigil Process) from implementation primitives (Sigil Core). This evolution recognizes that design systems serve two distinct purposes: capturing *what* and *why* (human decisions) and providing *how* (code primitives).
 
-> *"Physics must be structural (DOM), not theoretical (AST). Multiple realities (Lenses) on a single truth (Physics)."*
+> *"Sweat the art. We handle the mechanics. Return to flow."*
 
-**Sources**: README.md:9, ARCHITECTURE.md:17-18, User interview (Evolution: Additive)
+**Architecture**:
+```
+┌─────────────────────────────────────────────────┐
+│              SIGIL PROCESS                      │
+│   Human interaction layer                       │
+│   Constitution, Lenses, Consultation, Surveys   │
+│   Commands: /envision, /consult, /craft         │
+└─────────────────────────────────────────────────┘
+                      ↓
+              design decisions flow down
+                      ↓
+┌─────────────────────────────────────────────────┐
+│              SIGIL CORE                         │
+│   React primitives layer                        │
+│   Hooks, Layouts, Lens Components               │
+│   useCriticalAction, CriticalZone, StrictLens   │
+└─────────────────────────────────────────────────┘
+```
+
+**Sources**: sigil-v2.6.zip/README.md, User clarification (Process/Core separation)
 
 ---
 
 ## 1. Problem Statement
 
-### 1.1 Current State (v1.2.5)
+### 1.1 The Flow Problem
 
-Sigil v1.2.5 provides Zone Provider + Physics Tokens:
-- `SigilZone` context provides physics to components
-- Three materials (decisive, machinery, glass) with spring/tap values
-- One Button component that inherits physics from context
-- `useServerTick` for server-authoritative actions
+Craftsmen (product engineers and designers) lose flow state due to:
 
-### 1.2 Limitations Addressed by v2.0
+| Interruption | Impact |
+|--------------|--------|
+| Context loss after time away | "Where was I? What did we decide?" |
+| Re-arguing settled questions | Bikeshedding on decisions already made |
+| Consistency tracking burden | Manual enforcement of design rules |
+| Implementation mechanics | Boilerplate distracts from feel |
 
-| Limitation | v2.0 Solution |
-|------------|---------------|
-| No time authority beyond server-tick | Temporal Governor (optimistic, server-tick, hybrid) |
-| No prediction/reconciliation | Proprioception (self vs world) |
-| All UI looks the same | Lens system (interchangeable UIs on same physics) |
-| Physics = lint rules | Layout Primitives (DOM-enforced physics) |
-| No accessibility validation | Ergonomic Profiler (hitbox, contrast, focus) |
-| No lens classification | Integrity Flags (cosmetic, utility, gameplay) |
+### 1.2 The Two-System Problem
 
-**Sources**: ARCHITECTURE.md:196-223 (Evolution rounds), sigil-v1.2.5 codebase
+Current design systems conflate two concerns:
+
+| Concern | What It Is | Who Owns It |
+|---------|------------|-------------|
+| **Process** | Design decisions, constraints, rules | Humans (designers, PMs, leads) |
+| **Core** | Implementation primitives, components | Code (React, TypeScript) |
+
+Mixing these creates friction: humans fight code, code can't capture intent.
+
+### 1.3 v2.6 Solution
+
+**Sigil Process** captures human decisions in YAML/markdown:
+- Constitution (protected capabilities that ALWAYS work)
+- Lens Array (user personas viewing same truth)
+- Consultation Chamber (locked decisions with time periods)
+- Vibe Checks (qualitative feedback surveys)
+
+**Sigil Core** provides implementation primitives:
+- React hooks (`useCriticalAction`, `useLocalCache`)
+- Layout components (`CriticalZone`, `MachineryLayout`)
+- Lens components (`DefaultLens`, `StrictLens`, `A11yLens`)
+
+**Sources**: sigil-v2.6.zip/README.md:67-74, CLAUDE.md:1-50
 
 ---
 
@@ -46,423 +81,392 @@ Sigil v1.2.5 provides Zone Provider + Physics Tokens:
 
 ### 2.1 Vision Statement
 
-Sigil v2.0 is a Reality Engine for product development that:
-1. **Enforces physics** (data truth, time truth, input truth)
-2. **Allows multiple experiences** (interchangeable lenses)
-3. **Prevents cheating** (StrictLens forced in critical zones)
-4. **Ensures accessibility** (ergonomic validation)
+Sigil v2.6 protects the craftsman's flow state by:
+1. **Capturing decisions** in durable, queryable format (Constitution, Consultation)
+2. **Restoring context** after time away (/craft command)
+3. **Handling mechanics** so humans focus on feel
+4. **Locking settled questions** to prevent bikeshedding
 
-### 2.2 Key Insight
+### 2.2 Philosophy
 
-> "Truth (Core) and Experience (Lens) must be decoupled. But the Lens cannot distort the Truth so much that it breaks the User's hand."
+**PROTECT:**
+- Deep thinking about feel and soul
+- Time for inspiration and observation
+- The joy of sweating the right details
+- Deep dives when the craft demands it
 
-**Sources**: ARCHITECTURE.md:17-18, CLAUDE.md:9-14
+**REMOVE:**
+- Implementation mechanics
+- Consistency tracking
+- Context loss after time away
+- Re-arguing settled questions
 
-### 2.3 Reference Products
+### 2.3 Key Insight
 
-| Product | Concept Borrowed |
-|---------|------------------|
-| OSRS | Client prediction, 117HD lens architecture |
-| Linear | Sync engine, optimistic updates |
-| Figma | Multiplayer reconciliation |
-| Phantom | Transaction simulation, server-tick truth |
+> "The craftsman SHOULD sweat the details — that's the essence of craft. Sigil removes the *wrong* cognitive load so you can focus on the *right* details."
 
-**Sources**: ARCHITECTURE.md:436-446
+**Sources**: sigil-v2.6.zip/README.md:9-27
 
 ---
 
 ## 3. Target Users
 
-### 3.1 Primary Users (Equal Priority)
-
-**AI Agents (Claude Code)**
-- Uses Sigil to make consistent design decisions
-- Reads zone configuration to determine time authority
-- Auto-selects appropriate lens for zone
-- Follows CLAUDE.md instructions
+### 3.1 Primary Users
 
 **Product Engineers**
-- Builds products using Sigil components
-- Uses core hooks for state management
-- Wraps UI in layout primitives
-- May create custom lenses
+- Build interfaces using Sigil Core primitives
+- Reference Constitution for protected capabilities
+- Use /craft to restore context after time away
+- Lock decisions with /consult to prevent revisiting
 
-**Sources**: User interview (Target User: Both equally), CLAUDE.md:1-302
+**Product Designers**
+- Capture product feel with /envision
+- Define user personas in Lens Array
+- Set protected capabilities in Constitution
+- Review locked decisions in Consultation Chamber
+
+**AI Agents (Claude Code)**
+- Read Constitution before generating UI code
+- Check Consultation Chamber for locked decisions
+- Surface relevant context when files are opened
+- Warn (don't block) on violations
 
 ### 3.2 User Stories
 
 | As a... | I want to... | So that... |
 |---------|--------------|------------|
-| AI Agent | Know the zone from file path | I use correct time authority and lens |
-| AI Agent | Have layout primitives enforce spacing | I don't need lint rules to validate |
-| Engineer | Use optimistic updates for Linear-style UX | Users see instant feedback |
-| Engineer | Have server-tick for financial actions | Users don't see false state |
-| User | Have consistent accessibility | I can use the product regardless of lens |
+| Engineer | Restore context after vacation | I don't waste time figuring out where I was |
+| Engineer | Lock the button color decision | Team stops bikeshedding on settled question |
+| Designer | Capture product feel before it fades | Intent survives after meetings end |
+| Designer | Define user personas | Different users get appropriate experiences |
+| PM | Set protected capabilities | Core features can't be accidentally disabled |
+| AI Agent | Know locked decisions | I don't suggest changes to settled areas |
+| AI Agent | Read Constitution | I ensure protected capabilities work |
+
+**Sources**: sigil-v2.6.zip/README.md:61-74, FLOWS.md:1-50
 
 ---
 
-## 4. Functional Requirements
+## 4. Architecture
 
-### 4.1 Core Layer (Physics Engines)
+### 4.1 Two-Tier Model
 
-**FR-CORE-001**: `useCriticalAction` hook
-- Emits state stream: status, timeAuthority, prediction, risk, error, data
-- Supports three time authorities: optimistic, server-tick, hybrid
-- Handles optimistic updates and rollback
-- Supports proprioceptive predictions
+```
+SIGIL PROCESS (Human Layer)
+├── Constitution           # Protected capabilities (immutable)
+├── Lens Array            # User personas (multiple truths)
+├── Consultation Chamber  # Locked decisions (time-boxed)
+├── Surveys               # Vibe checks (qualitative)
+├── Moodboard             # Product feel (vision)
+└── Rules                 # Design rules (codified taste)
 
-**FR-CORE-002**: State Stream Interface
-```typescript
-interface CriticalActionState<TData> {
-  status: 'idle' | 'confirming' | 'pending' | 'confirmed' | 'failed';
-  timeAuthority: 'optimistic' | 'server-tick' | 'hybrid';
-  selfPrediction: SelfPredictionState;
-  worldTruth: WorldTruthState;
-  risk: 'low' | 'medium' | 'high';
-  progress: number | null;
-  error: Error | null;
-  data: TData | null;
-}
+              ↓ Design decisions flow down ↓
+
+SIGIL CORE (Implementation Layer)
+├── Core Hooks            # useCriticalAction, useLocalCache
+├── Layouts               # CriticalZone, MachineryLayout, GlassLayout
+├── Lenses                # DefaultLens, StrictLens, A11yLens
+├── Profiler              # Ergonomic validation
+└── Integrity             # Lens classification
 ```
 
-**Sources**: src/core/useCriticalAction.ts:50-77, src/types/index.ts:56-65
+### 4.2 Sigil Process Components
 
-### 4.2 Temporal Governor
+#### 4.2.1 Constitution (Protected Capabilities)
 
-**FR-TIME-001**: Three time authorities
+Capabilities that ALWAYS work, regardless of:
+- Remote configuration
+- Marketing campaigns
+- A/B tests
+- Lens selection
+- User preferences
 
-| Authority | Client Update | Reconciliation | Use Case |
-|-----------|---------------|----------------|----------|
-| `optimistic` | Instant | Silent rollback | Linear (issues) |
-| `server-tick` | Wait for server | N/A | Banking (balance) |
-| `hybrid` | Instant + sync indicator | Visible | Figma (multiplayer) |
+| Capability | Description | Enforcement |
+|------------|-------------|-------------|
+| `withdraw` | User can always exit position | Block |
+| `deposit` | User can always add to position | Block |
+| `risk_alert` | Warnings shown for high-risk actions | Block |
+| `slippage_warning` | Slippage displayed before trades | Block |
+| `fee_disclosure` | All fees shown before confirmation | Block |
+| `balance_visible` | User can always see balance | Block |
+| `error_messages` | Errors never suppressed | Block |
+| `help_access` | Help available on every screen | Warn |
 
-**Sources**: ARCHITECTURE.md:124-132, .sigilrc.yaml:163-182
+**Philosophy**: *"Marketing needs levers. Product needs brakes."*
 
-### 4.3 Proprioception Layer
+**Sources**: sigil-v2.6.zip/sigil-mark/constitution/protected-capabilities.yaml
 
-**FR-PROP-001**: Self predictions (legal lies)
-- `rotation: { instant: true }` — Face target immediately
-- `animation: { optimistic: true }` — Start animation immediately
-- `position: { render: 'ghost', reconcile: 'lerp', maxDrift: 600 }` — Show predicted position
+#### 4.2.2 Lens Array (User Personas)
 
-**FR-PROP-002**: World truth (server-only)
-- `damage: 'server-only'`
-- `balance: 'server-only'`
-- `otherEntities: 'server-only'`
+Different perspectives viewing the same core product:
 
-**Sources**: src/types/index.ts:23-36, ARCHITECTURE.md:134-158, .sigilrc.yaml:120-137
+| Lens | Alias | Mental Model | Interaction Style |
+|------|-------|--------------|-------------------|
+| `power_user` | Chef | Financial instrument | Keyboard-driven, dense |
+| `newcomer` | Henlocker | Physical jar | Tactile, forgiving |
+| `mobile` | Thumbzone | Pocket app | Thumb-reachable, gestural |
+| `accessibility` | A11y | Structured document | Sequential, announced |
 
-### 4.4 Ergonomic Profiler
+Each lens defines:
+- Target audience
+- Physics (tap targets, input method, shortcuts)
+- Constraints (required vs optional)
+- Validation rules
 
-**FR-ERGO-001**: Lens validation requirements
+**Philosophy**: *"Multiple truths coexist on top of core."*
 
-| Check | Threshold | Action |
-|-------|-----------|--------|
-| Touch target | ≥ 44px | Lens rejected |
-| Center drift | ≤ 2px | Lens rejected |
-| Contrast (AA) | ≥ 4.5:1 | Lens rejected |
-| Contrast (Critical) | ≥ 7:1 | Lens rejected |
-| Focus indicator | Required | Lens rejected |
+**Sources**: sigil-v2.6.zip/sigil-mark/lens-array/lenses.yaml
 
-**FR-ERGO-002**: WCAG contrast calculation
-- Relative luminance per WCAG 2.1
-- Contrast ratio: `(L1 + 0.05) / (L2 + 0.05)`
+#### 4.2.3 Consultation Chamber (Locked Decisions)
 
-**Sources**: src/profiler/ergonomic.ts:17-33, ARCHITECTURE.md:162-170
+After deliberation, lock decisions to prevent bikeshedding:
 
-### 4.5 Integrity Flags
+| Scope | Lock Period | Use Case |
+|-------|-------------|----------|
+| Strategic | 180 days | Fundamental direction |
+| Direction | 90 days | Pattern choice |
+| Execution | 30 days | Implementation detail |
 
-**FR-INT-001**: Lens classifications
+Example:
+```
+Decision: Primary CTA is Blue
+ID: DEC-2026-001
+Scope: Direction
+Lock: 90 days
+```
 
-| Classification | Permissions | Restrictions |
-|----------------|-------------|--------------|
-| **Cosmetic** | Colors, fonts, animations | None |
-| **Utility** | + Overlays, highlights | Warning in critical |
-| **Gameplay** | + Input hints | Blocked in critical/financial |
+**Philosophy**: *"After you've thought deeply, lock it. Stop re-arguing."*
 
-**FR-INT-002**: Zone enforcement
-- Critical zones force StrictLens regardless of user preference
-- Financial flows block gameplay lenses
-- Competitive mode blocks gameplay lenses
+**Sources**: sigil-v2.6.zip/.claude/commands/consult.md
 
-**Sources**: src/integrity/index.ts:70-76, .sigilrc.yaml:30-77
+#### 4.2.4 Vibe Checks (Micro-Surveys)
 
-### 4.6 Layout Primitives
+Capture qualitative intent, not just quantitative clicks:
 
-**FR-LAYOUT-001**: CriticalZone
-- 32px gap between actions (CSS, not lint)
-- Critical buttons auto-sorted to last
-- Max 3 actions per zone
-- Context provides `financial` flag
+| Trigger | Question | Purpose |
+|---------|----------|---------|
+| Strategy change | "What were you looking for?" | Understand WHY users switched views |
+| First deposit | "What brought you to us?" | Attribution |
+| First withdraw | "Why are you withdrawing?" | Churn understanding |
+| Card expanded | "What did you want to see?" | Information architecture |
+| Transaction failed | "What happened?" | Error diagnosis |
 
-**FR-LAYOUT-002**: MachineryLayout
-- Keyboard navigation baked in
-- `role="option"` and `aria-selected` for a11y
+**Philosophy**: *"'Expanded card 5x' tells us WHAT. 'Looking for fees' tells us WHY."*
 
-**FR-LAYOUT-003**: GlassLayout
-- Hover physics baked in
-- Marketing/card use cases
+**Sources**: sigil-v2.6.zip/sigil-mark/surveys/vibe-checks.yaml
 
-**Sources**: src/layouts/CriticalZone.tsx:33-66, ARCHITECTURE.md:184-193
+### 4.3 Sigil Core Components
 
-### 4.7 Lens System
+(Retained from v2.0 "Reality Engine")
 
-**FR-LENS-001**: Built-in lenses
-- `DefaultLens` — Standard 44px targets, animations
-- `StrictLens` — Vanilla UI, forced in critical zones
-- `A11yLens` — High contrast, 56px targets, clear announcements
+| Component | Purpose |
+|-----------|---------|
+| `useCriticalAction` | State stream with time authorities |
+| `useLocalCache` | Local-first state management |
+| `CriticalZone` | Layout for financial/critical actions |
+| `MachineryLayout` | Keyboard-navigable list layout |
+| `GlassLayout` | Hover-enabled marketing layout |
+| `DefaultLens` | Standard UI rendering |
+| `StrictLens` | Forced in critical zones |
+| `A11yLens` | High contrast, large targets |
 
-**FR-LENS-002**: `useLens` hook
-- Returns appropriate lens for zone
-- Forces StrictLens in critical/financial zones
-- Logs warnings in development mode
-
-**FR-LENS-003**: Lens registration
-- Lenses must pass ergonomic profiler
-- Rejected lenses throw `LensRejection` error
-
-**Sources**: src/lenses/index.ts:59-101, src/lenses/default/index.tsx:203-209
+**Sources**: loa-grimoire/archive/prd-v2.0.md
 
 ---
 
-## 5. Technical Requirements
+## 5. Functional Requirements
 
-### 5.1 Technology Stack
+### 5.1 Sigil Process Requirements
+
+**FR-PROC-001**: Constitution Enforcement
+- Protected capabilities cannot be overridden by remote config
+- Violations logged with justification requirement
+- Audit trail for any override attempts
+
+**FR-PROC-002**: Lens Array Management
+- Lenses can be stacked (e.g., power_user + accessibility)
+- Conflict resolution by priority order
+- Immutable properties never vary between lenses
+
+**FR-PROC-003**: Decision Locking
+- Decisions locked with ID, scope, and duration
+- Unlock requires justification
+- /craft surfaces locked decisions for relevant files
+
+**FR-PROC-004**: Vibe Check Collection
+- Cooldown periods prevent survey fatigue
+- Max 1 survey per session
+- Pattern detection for research insights
+
+**FR-PROC-005**: Zone Configuration
+- Zones defined by path patterns in .sigilrc.yaml
+- Zone determines motion, timing, lens enforcement
+- Critical zones force strict lens
+
+### 5.2 Sigil Core Requirements
+
+(Retained from v2.0)
+
+**FR-CORE-001**: Critical Action Hook
+- State stream with time authorities
+- Optimistic, server-tick, hybrid modes
+
+**FR-CORE-002**: Layout Primitives
+- CriticalZone: 32px gap, max 3 actions
+- MachineryLayout: Keyboard navigation
+- GlassLayout: Hover physics
+
+**FR-CORE-003**: Lens System
+- Built-in lenses: Default, Strict, A11y
+- Ergonomic profiler validation
+- Zone-based enforcement
+
+### 5.3 Command Requirements
+
+| Command | Input | Output | Human Effort |
+|---------|-------|--------|--------------|
+| `/setup` | None | .sigilrc.yaml, sigil-mark/ | Low |
+| `/envision` | Interview | moodboard.md | Medium |
+| `/codify` | Interview | rules.md | Medium |
+| `/craft` | File path (optional) | Context restoration | Low |
+| `/consult` | Topic | Locked decision | Low |
+| `/garden` | None | Health report | Low |
+| `/inherit` | Codebase | Bootstrap rules | Medium |
+
+**Sources**: sigil-v2.6.zip/PROCESS.md, .claude/commands/*
+
+---
+
+## 6. Technical Requirements
+
+### 6.1 Technology Stack
 
 | Component | Technology |
 |-----------|------------|
-| Runtime | React 18+ |
-| Language | TypeScript |
+| Process Layer | YAML, Markdown |
+| Core Layer | React 18+, TypeScript |
 | Styling | Tailwind CSS |
-| State | React Context + useState |
 | Distribution | Mount script (sigil-mark/) |
+| Configuration | .sigilrc.yaml |
 
-**Sources**: package.json (from zip), User interview (Distribution: Mount script)
-
-### 5.2 Performance Requirements
-
-| Metric | Target |
-|--------|--------|
-| State stream latency | < 16ms (frame time) |
-| Lens registration | < 100ms |
-| Ergonomic validation | < 50ms per component |
-
-### 5.3 Accessibility Requirements
-
-| Requirement | Standard |
-|-------------|----------|
-| Touch targets | ≥ 44px (WCAG 2.5.5) |
-| Contrast | ≥ 4.5:1 AA, ≥ 7:1 AAA for critical |
-| Focus visibility | Required (WCAG 2.4.7) |
-| ARIA roles | Semantic layout primitives |
-
-**Sources**: .sigilrc.yaml:10-28, src/profiler/ergonomic.ts:17-33
-
----
-
-## 6. Scope & Prioritization
-
-### 6.1 MVP Scope (Full v2.0)
-
-Per user interview, MVP includes all v2.0 features:
-
-**Must Have (P0)**
-- Core Layer: `useCriticalAction` with all time authorities
-- Proprioception: Self predictions + world truth
-- Ergonomic Profiler: Hitbox, contrast, focus validation
-- Integrity Flags: Lens classification + zone enforcement
-- Layout Primitives: CriticalZone, MachineryLayout, GlassLayout
-- Built-in Lenses: Default, Strict, A11y
-
-**Sources**: User interview (MVP Scope: Full v2.0)
-
-### 6.2 Migration from v1.2.5
-
-Since this is additive evolution:
-- `SigilZone` continues to work (wrapped by new layouts)
-- `useSigilPhysics` continues to work
-- `Button` component enhanced with lens system
-- `useServerTick` → `useCriticalAction` with `timeAuthority: 'server-tick'`
-
-**Sources**: User interview (Evolution: Additive)
-
-### 6.3 Out of Scope
-
-- Multi-player sync engine (Figma-style CRDT)
-- Custom lens marketplace
-- Server-side rendering support
-- Native mobile (React Native)
-
----
-
-## 7. Success Metrics
-
-| Metric | Target | Source |
-|--------|--------|--------|
-| Lens rejections | > 0 (profiler working) | ARCHITECTURE.md:427 |
-| StrictLens in critical | 100% | ARCHITECTURE.md:428 |
-| Ergonomic compliance | 100% | ARCHITECTURE.md:429 |
-| Proprioception violations | 0 | ARCHITECTURE.md:430 |
-| Core → Lens decoupling | 100% | ARCHITECTURE.md:431 |
-
----
-
-## 8. Risks & Mitigations
-
-### 8.1 Technical Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Ergonomic profiler too strict | Medium | Medium | Allow zone-level overrides |
-| Proprioception drift causes jank | Medium | High | maxDrift timeout, snap fallback |
-| Lens registration perf | Low | Medium | Lazy validation, cache results |
-
-### 8.2 Adoption Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Learning curve for dual audience | High | Medium | CLAUDE.md as authoritative guide |
-| Breaking changes from v1.2.5 | Low | High | Additive evolution, not replacement |
-| Over-engineering for simple apps | Medium | Low | Layout primitives are optional wrappers |
-
----
-
-## 9. Architecture Overview
-
-### 9.1 Six-Layer Stack
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              SIGIL v2.0                                     │
-│                          REALITY ENGINE                                     │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                         CORE LAYER                                    │  │
-│  │                    (Truth + Physics)                                  │  │
-│  │                                                                       │  │
-│  │  State Stream: { status, timeAuthority, prediction, risk }            │  │
-│  │  Temporal Governor: optimistic | server-tick | hybrid                 │  │
-│  │  Proprioception: self (can lie) | world (truth only)                  │  │
-│  │                                                                       │  │
-│  │  Core is immutable. Lenses cannot change physics.                     │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-│                              ↓ State Stream                                 │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                    ERGONOMIC PROFILER                                 │  │
-│  │              (Validates Lenses)                                       │  │
-│  │                                                                       │  │
-│  │  Hitbox: ≥44px touch, ≤2px drift                                      │  │
-│  │  Contrast: ≥4.5:1 (AA), ≥7:1 (Critical)                               │  │
-│  │  Focus: Visible indicator required                                    │  │
-│  │                                                                       │  │
-│  │  Rejects lenses that break input physics.                             │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-│                              ↓                                              │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                    INTEGRITY FLAGS                                    │  │
-│  │              (Classifies Lenses)                                      │  │
-│  │                                                                       │  │
-│  │  Cosmetic: Colors, fonts, animations (Safe)                           │  │
-│  │  Utility: Overlays, highlights (Warning in critical)                  │  │
-│  │  Gameplay: Input hints (Blocked in critical/financial)                │  │
-│  │                                                                       │  │
-│  │  Forces StrictLens in sensitive zones.                                │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-│                              ↓                                              │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                      LENS REGISTRY                                    │  │
-│  │              (Approved Lenses)                                        │  │
-│  │                                                                       │  │
-│  │  DefaultLens (Cosmetic) — Standard UI                                 │  │
-│  │  A11yLens (Cosmetic) — High contrast, large targets                   │  │
-│  │  StrictLens (Cosmetic) — Forced in critical zones                     │  │
-│  │                                                                       │  │
-│  │  All lenses pass Ergonomic Profiler.                                  │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-│                              ↓                                              │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                   LAYOUT PRIMITIVES                                   │  │
-│  │              (Structural Physics)                                     │  │
-│  │                                                                       │  │
-│  │  CriticalZone — 32px gap, auto-ordering                               │  │
-│  │  MachineryLayout — Keyboard navigation                                │  │
-│  │  GlassLayout — Hover physics                                          │  │
-│  │                                                                       │  │
-│  │  Physics is DOM, not lint.                                            │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-**Sources**: ARCHITECTURE.md:35-97
-
-### 9.2 File Structure
+### 6.2 File Structure
 
 ```
 sigil-mark/
-├── core/                    # Physics engines
-│   ├── useCriticalAction.ts
-│   ├── useOptimisticAction.ts  # Convenience wrapper
-│   ├── useLocalAction.ts       # Local-first wrapper
-│   ├── proprioception.ts       # Self vs World
+├── constitution/                  # Protected capabilities
+│   └── protected-capabilities.yaml
+├── lens-array/                    # User personas
+│   └── lenses.yaml
+├── consultation-chamber/          # Locked decisions
+│   ├── config.yaml
+│   └── decisions/
+│       └── *.yaml
+├── surveys/                       # Vibe checks
+│   └── vibe-checks.yaml
+├── moodboard.md                   # Product feel
+├── rules.md                       # Design rules
+│
+├── core/                          # Physics engines (Core)
+│   ├── use-critical-action.ts
+│   ├── use-local-cache.ts
 │   └── types.ts
-│
-├── profiler/                # Ergonomic validation
-│   ├── ergonomic.ts
-│   ├── hitbox.ts
-│   ├── contrast.ts
-│   └── focus.ts
-│
-├── integrity/               # Lens classification
-│   ├── flags.ts
-│   ├── enforcement.ts
-│   └── index.ts
-│
-├── layouts/                 # Structural physics
-│   ├── CriticalZone.tsx
-│   ├── MachineryLayout.tsx
-│   ├── GlassLayout.tsx
-│   └── index.ts
-│
-├── lenses/                  # UI renderers
+├── layouts/                       # Layout primitives (Core)
+│   ├── critical-zone.tsx
+│   ├── machinery-layout.tsx
+│   └── glass-layout.tsx
+├── lenses/                        # UI renderers (Core)
 │   ├── default/
 │   ├── strict/
-│   ├── a11y/
-│   ├── registry.ts
-│   └── index.ts
-│
-├── types/                   # Shared types
-│   └── index.ts
-│
-└── index.ts                 # Public API
+│   └── a11y/
+└── index.ts                       # Public API
 ```
 
-**Sources**: ARCHITECTURE.md:226-264, src/ directory structure
+### 6.3 Integration Points
+
+| System | Integration |
+|--------|-------------|
+| Loa | After Loa builds, use /craft to refine interface |
+| Claude Code | Reads Constitution, Consultation before generating UI |
+| Remote Config | Marketing can control aliases, themes (not Constitution) |
+| Analytics | Vibe check responses → research dashboard |
 
 ---
 
-## 10. Evolution History
+## 7. Scope & Prioritization
 
-This architecture evolved through 10 rounds of Staff Engineer review:
+### 7.1 MVP Scope
 
-| Round | Problem | Fix |
-|-------|---------|-----|
-| 1 | Bureaucracy (Council, Codex) | → Workshop |
-| 2 | Museum rots (static docs) | → Live code tags |
-| 3 | Cargo cult (copies tech debt) | → Pure primitives |
-| 4 | Ban without alternative | → Ship engine hooks |
-| 5 | Hollow shell (no data binding) | → Archetypes |
-| 6 | Clone-and-Drift | → Composition |
-| 7 | Silver = sanctioned debt | → Atomic Graduation |
-| 8 | Data truth, no time truth | → Temporal Governor |
-| 9 | Static analysis bluff | → Layout Primitives |
-| **10** | Hitbox fallacy | → **Ergonomic Profiler** |
-| **10** | Cheat client risk | → **Integrity Flags** |
-| **10** | No proprioception | → **Legalize the Lie** |
+**Phase 1: Process Foundation**
+1. Constitution system (protected capabilities)
+2. Consultation Chamber (locked decisions)
+3. /craft command (context restoration)
+4. /consult command (decision locking)
+5. .sigilrc.yaml zone configuration
 
-**Sources**: ARCHITECTURE.md:196-223
+**Phase 2: Persona System**
+1. Lens Array (user personas)
+2. Lens stacking and conflict resolution
+3. Zone-based lens enforcement
+4. Validation rules per lens
+
+**Phase 3: Feedback Loop**
+1. Vibe Checks (micro-surveys)
+2. Pattern detection
+3. Research dashboard integration
+
+### 7.2 Out of Scope
+
+- Multi-player sync engine (Figma-style CRDT)
+- Server-side rendering support
+- Native mobile (React Native)
+- Custom lens marketplace
+- Real-time collaboration on decisions
+
+---
+
+## 8. Success Metrics
+
+| Metric | Target | Measurement |
+|--------|--------|-------------|
+| Context restoration time | < 30 seconds | Time from /craft to productive work |
+| Decision re-argument rate | 0 | Locked decisions that get reopened |
+| Constitution violations | 0 in production | Protected capabilities always work |
+| Vibe check response rate | > 30% | Survey completion rate |
+| Lens validation pass rate | 100% | All lenses pass ergonomic profiler |
+
+---
+
+## 9. Risks & Mitigations
+
+### 9.1 Process Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Constitution too restrictive | Medium | High | Allow justified overrides with audit |
+| Lock periods too long/short | Medium | Medium | Configurable per-decision |
+| Survey fatigue | Medium | Low | Cooldowns, max per session |
+
+### 9.2 Integration Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Process/Core coupling | Medium | High | Clear separation, typed interfaces |
+| AI misinterprets Constitution | Low | High | CLAUDE.md instructions, examples |
+| Remote config override abuse | Low | High | Engineering controls (not remote) |
+
+---
+
+## 10. Glossary
+
+| Term | Definition |
+|------|------------|
+| **Constitution** | Protected capabilities that always work |
+| **Lens** | User persona with physics and constraints |
+| **Consultation** | Process for locking deliberated decisions |
+| **Vibe Check** | Micro-survey capturing qualitative intent |
+| **Zone** | Area of product with specific motion/timing |
+| **Sigil Process** | Human interaction layer (YAML/markdown) |
+| **Sigil Core** | Implementation layer (React/TypeScript) |
 
 ---
 
@@ -470,7 +474,7 @@ This architecture evolved through 10 rounds of Staff Engineer review:
 
 1. `/architect` — Create Software Design Document
 2. `/sprint-plan` — Break down into implementation sprints
-3. `/implement sprint-1` — Begin implementation
+3. `/implement sprint-1` — Begin with Constitution system
 
 ---
 
@@ -478,27 +482,19 @@ This architecture evolved through 10 rounds of Staff Engineer review:
 
 | Section | Sources |
 |---------|---------|
-| Executive Summary | README.md:9, ARCHITECTURE.md:17-18, User interview |
-| Problem Statement | ARCHITECTURE.md:196-223, v1.2.5 codebase |
-| Vision | ARCHITECTURE.md:17-18, CLAUDE.md:9-14 |
-| Reference Products | ARCHITECTURE.md:436-446 |
-| Target Users | User interview, CLAUDE.md:1-302 |
-| Core Layer | src/core/useCriticalAction.ts:50-77, src/types/index.ts:56-65 |
-| Temporal Governor | ARCHITECTURE.md:124-132, .sigilrc.yaml:163-182 |
-| Proprioception | src/types/index.ts:23-36, ARCHITECTURE.md:134-158 |
-| Ergonomic Profiler | src/profiler/ergonomic.ts:17-33, ARCHITECTURE.md:162-170 |
-| Integrity Flags | src/integrity/index.ts:70-76, .sigilrc.yaml:30-77 |
-| Layout Primitives | src/layouts/CriticalZone.tsx:33-66, ARCHITECTURE.md:184-193 |
-| Lens System | src/lenses/index.ts:59-101, src/lenses/default/index.tsx:203-209 |
-| Tech Stack | package.json, User interview |
-| Accessibility | .sigilrc.yaml:10-28, src/profiler/ergonomic.ts:17-33 |
-| Scope | User interview (MVP: Full v2.0, Evolution: Additive) |
-| Success Metrics | ARCHITECTURE.md:427-431 |
-| Architecture Diagram | ARCHITECTURE.md:35-97 |
-| File Structure | ARCHITECTURE.md:226-264 |
-| Evolution History | ARCHITECTURE.md:196-223 |
+| Executive Summary | sigil-v2.6.zip/README.md, User clarification |
+| Problem Statement | sigil-v2.6.zip/README.md:67-74, CLAUDE.md |
+| Vision | sigil-v2.6.zip/README.md:9-27 |
+| Architecture | sigil-v2.6.zip structure, User clarification |
+| Constitution | sigil-v2.6.zip/sigil-mark/constitution/protected-capabilities.yaml |
+| Lens Array | sigil-v2.6.zip/sigil-mark/lens-array/lenses.yaml |
+| Consultation | sigil-v2.6.zip/.claude/commands/consult.md |
+| Vibe Checks | sigil-v2.6.zip/sigil-mark/surveys/vibe-checks.yaml |
+| Core Components | loa-grimoire/archive/prd-v2.0.md |
+| Commands | sigil-v2.6.zip/PROCESS.md, .claude/commands/* |
+| File Structure | sigil-v2.6.zip directory structure |
 
 ---
 
-*PRD generated from sigil-v2.0.zip context*
-*Context files: README.md, ARCHITECTURE.md, CLAUDE.md, .sigilrc.yaml, src/**
+*PRD generated from sigil-v2.6.zip context and v2.0 archive*
+*Architecture: Sigil Process (human) + Sigil Core (implementation)*

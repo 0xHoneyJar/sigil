@@ -86,13 +86,17 @@ export {
 // Zone resolution utilities (file path → zone)
 export {
   resolveZone,
+  resolveZoneWithPersona,
+  getPersonaForZone,
   isConstraintViolation,
   getRecipesPath,
+  DEFAULT_ZONE_PERSONA_MAP,
   type ZoneConfig,
   type RecipeSet,
   type SyncMode,
   type ZoneConstraints,
   type ConstraintLevel,
+  type PersonaId,
 } from './zone-resolver';
 
 // History utilities

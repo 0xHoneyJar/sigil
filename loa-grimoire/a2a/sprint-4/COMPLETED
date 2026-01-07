@@ -1,0 +1,9 @@
+Sprint 4: Zone-Persona Integration
+Completed: 2026-01-06
+Tests: 33/33 passing
+
+Deliverables:
+- sigil-mark/core/zone-resolver.ts (updated)
+- sigil-mark/process/process-context.tsx
+- sigil-mark/__tests__/zone-persona.test.ts
+- sigil-mark/__tests__/process/process-context.test.tsx

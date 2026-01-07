@@ -1,1067 +1,1172 @@
-# Software Design Document: Sigil v2.0
+# Software Design Document: Sigil v2.6
 
-> "Physics must be structural (DOM), not theoretical (AST). Multiple realities (Lenses) on a single truth (Physics)."
-
-**Version**: 2.0.0
-**Date**: 2026-01-05
-**Status**: Draft
-**PRD Reference**: loa-grimoire/prd.md
-
----
-
-## Executive Summary
-
-Sigil v2.0 is a **Reality Engine** that separates Truth (Core physics) from Experience (Lenses). This is an additive evolution from v1.2.5, but with a key architectural shift: **Layouts ARE Zones**. The previous `SigilZone` abstraction is deprecated in favor of Layout Primitives that provide both structural physics AND zone context in a single component.
-
-### Architecture Philosophy
-
-1. **Layouts ARE Zones** — `CriticalZone` provides zone context + layout physics in one component
-2. **Core emits state streams** — `useCriticalAction` provides status, time authority, predictions
-3. **Lenses consume streams** — Interchangeable UIs on the same physics
-4. **No Ergonomic Profiler** — Ship physics, skip bureaucracy (profiler is for lens ecosystems)
-
-### Key Technical Decisions
-
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| v1.2.5 APIs | Deprecated | Clean break, layouts ARE zones |
-| Ergonomic Profiler | Not shipped | No lens ecosystem yet, skip bureaucracy |
-| Layout composition | Layouts provide zone context | `CriticalZone` = `SigilZone` + layout |
-| Lens enforcement | Zone context | `useLens()` reads from nearest layout |
-| Distribution | Mount script | Continue existing pattern |
-
-### Migration Summary
-
-| v1.2.5 | v2.0 | Notes |
-|--------|------|-------|
-| `<SigilZone material="decisive">` | `<CriticalZone>` | Layout IS zone |
-| `<SigilZone material="machinery">` | `<MachineryLayout>` | Layout IS zone |
-| `<SigilZone material="glass">` | `<GlassLayout>` | Layout IS zone |
-| `useServerTick()` | `useCriticalAction()` | Adds time authority + proprioception |
-| `useSigilPhysics()` | `useLens()` | Returns lens for current zone |
-| `Button` | `Lens.CriticalButton` | Lens-based rendering |
+**Version:** 1.0
+**Date:** 2026-01-06
+**Author:** Architecture Designer Agent
+**Status:** Draft
+**PRD Reference:** loa-grimoire/prd.md
+**Codename:** Craftsman's Flow
 
 ---
 
-## 1. System Architecture
+## Table of Contents
 
-### 1.1 High-Level Architecture
+1. [Project Architecture](#1-project-architecture)
+2. [Software Stack](#2-software-stack)
+3. [Data Architecture](#3-data-architecture)
+4. [Component Design](#4-component-design)
+5. [API Specifications](#5-api-specifications)
+6. [Error Handling Strategy](#6-error-handling-strategy)
+7. [Testing Strategy](#7-testing-strategy)
+8. [Development Phases](#8-development-phases)
+9. [Known Risks and Mitigation](#9-known-risks-and-mitigation)
+10. [Open Questions](#10-open-questions)
+11. [Appendix](#11-appendix)
+
+---
+
+## 1. Project Architecture
+
+### 1.1 System Overview
+
+Sigil v2.6 is a **two-tier design framework** that separates human design decisions (Sigil Process) from implementation primitives (Sigil Core). This architecture enables:
+
+- **Craftsman Flow Protection**: Restore context after time away, lock settled decisions
+- **Design Decision Durability**: Constitution, Lens Array, Consultation Chamber stored as YAML
+- **AI Agent Integration**: Claude Code reads Process layer before generating UI code
+- **React Primitives**: Core hooks, layouts, and lenses for building interfaces
+
+### 1.2 Architectural Pattern
+
+**Pattern:** Layered Configuration + Component Library
+
+**Justification:**
+- Process Layer (YAML/Markdown) is human-readable and version-controlled
+- Core Layer (React/TypeScript) is strongly typed and testable
+- Separation allows humans to focus on "what" while code handles "how"
+- AI agents can parse YAML configuration easily
+
+### 1.3 Component Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              SIGIL v2.0                                     │
-│                          REALITY ENGINE                                     │
+│                              SIGIL v2.6                                      │
+│                         "Craftsman's Flow"                                   │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                         CORE LAYER                                    │  │
-│  │                    (Truth + Physics)                                  │  │
+│  │                      SIGIL PROCESS (Human Layer)                      │  │
+│  │                         YAML / Markdown                               │  │
 │  │                                                                       │  │
-│  │  useCriticalAction() → State Stream                                   │  │
-│  │  { status, timeAuthority, selfPrediction, worldTruth, risk }          │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌───────────┐ │  │
+│  │  │ Constitution │  │  Lens Array  │  │ Consultation │  │  Surveys  │ │  │
+│  │  │  (Protected) │  │  (Personas)  │  │   Chamber    │  │  (Vibe)   │ │  │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘  └───────────┘ │  │
 │  │                                                                       │  │
-│  │  Time Authority: optimistic | server-tick | hybrid                    │  │
-│  │  Proprioception: self (can lie) | world (truth only)                  │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐               │  │
+│  │  │   Moodboard  │  │    Rules     │  │   Zones      │               │  │
+│  │  │   (Vision)   │  │   (Taste)    │  │  (.sigilrc)  │               │  │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘               │  │
 │  └───────────────────────────────────────────────────────────────────────┘  │
-│                              ↓ State Stream                                 │
+│                              ↓                                              │
+│                    Process informs Core behavior                            │
+│                              ↓                                              │
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                    LAYOUT LAYER                                       │  │
-│  │              (Zones + Structural Physics)                             │  │
+│  │                      SIGIL CORE (Implementation Layer)                │  │
+│  │                         React / TypeScript                            │  │
 │  │                                                                       │  │
-│  │  CriticalZone — Zone context + 32px gaps + action ordering            │  │
-│  │  MachineryLayout — Zone context + keyboard navigation                 │  │
-│  │  GlassLayout — Zone context + hover physics                           │  │
-│  │                                                                       │  │
-│  │  Layouts ARE Zones. Physics is DOM, not lint.                         │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐               │  │
+│  │  │  Core Hooks  │  │   Layouts    │  │    Lenses    │               │  │
+│  │  │ useCritical  │  │ CriticalZone │  │  DefaultLens │               │  │
+│  │  │   Action     │  │ Machinery    │  │  StrictLens  │               │  │
+│  │  │ useLocalCache│  │ GlassLayout  │  │   A11yLens   │               │  │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘               │  │
 │  └───────────────────────────────────────────────────────────────────────┘  │
-│                              ↓ Zone Context                                 │
+│                                                                             │
 │  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │                      LENS LAYER                                       │  │
-│  │              (Experience)                                             │  │
+│  │                      CLAUDE CODE INTEGRATION                          │  │
 │  │                                                                       │  │
-│  │  useLens() — Returns appropriate lens for current zone                │  │
-│  │  DefaultLens — Standard UI, 44px targets                              │  │
-│  │  StrictLens — Forced in critical zones, no overlays                   │  │
-│  │  A11yLens — High contrast, 56px targets                               │  │
-│  │                                                                       │  │
-│  │  Lens.CriticalButton, Lens.GlassButton, Lens.MachineryItem            │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐               │  │
+│  │  │   /craft     │  │   /consult   │  │   /garden    │               │  │
+│  │  │  (Context)   │  │   (Lock)     │  │  (Health)    │               │  │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘               │  │
 │  └───────────────────────────────────────────────────────────────────────┘  │
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 1.2 Data Flow
+### 1.4 System Components
+
+#### 1.4.1 Sigil Process (Human Layer)
+
+**Purpose:** Capture human design decisions in durable, queryable format
+
+**Responsibilities:**
+- Store protected capabilities (Constitution)
+- Define user personas (Lens Array)
+- Lock deliberated decisions (Consultation Chamber)
+- Collect qualitative feedback (Vibe Checks)
+- Store product vision (Moodboard) and rules (Rules)
+
+**Interfaces:**
+- YAML files read by AI agents and validation tools
+- Markdown files for human documentation
+
+**Dependencies:** None (pure configuration)
+
+#### 1.4.2 Sigil Core (Implementation Layer)
+
+**Purpose:** Provide React primitives for building interfaces
+
+**Responsibilities:**
+- State management with time authorities (useCriticalAction)
+- Layout primitives enforcing physics (CriticalZone, etc.)
+- Interchangeable UI renderers (Lenses)
+
+**Interfaces:**
+- React hooks and components
+- TypeScript types for consumers
+
+**Dependencies:** React 18+, TypeScript
+
+#### 1.4.3 Claude Code Integration
+
+**Purpose:** Enable AI agents to respect Process decisions
+
+**Responsibilities:**
+- Read Constitution before generating UI code
+- Surface locked decisions when relevant files opened
+- Restore context after time away (/craft)
+- Lock decisions after deliberation (/consult)
+
+**Interfaces:**
+- `.claude/commands/` for slash commands
+- `.claude/skills/` for agent skills
+
+**Dependencies:** Claude Code CLI
+
+### 1.5 Data Flow
 
 ```
-User Action
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│ useCriticalAction({ mutation, timeAuthority, proprioception })  │
-└─────────────────────────────────────────────────────────────────┘
-    │
-    ├─── timeAuthority: 'optimistic' ────► Instant UI update
-    │                                      Silent rollback on error
-    │
-    ├─── timeAuthority: 'server-tick' ──► Wait for server
-    │                                      Show pending state
-    │
-    └─── timeAuthority: 'hybrid' ────────► Instant + sync indicator
-                                           Visible reconciliation
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│ State Stream                                                     │
-│ { status, timeAuthority, selfPrediction, worldTruth, risk }     │
-└─────────────────────────────────────────────────────────────────┘
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│ Layout (Zone Context)                                            │
-│ CriticalZone → type: 'critical', financial: true                │
-│ MachineryLayout → type: 'admin'                                 │
-│ GlassLayout → type: 'marketing'                                 │
-└─────────────────────────────────────────────────────────────────┘
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│ useLens() → Lens                                                 │
-│ Critical zone + financial? → StrictLens (forced)                 │
-│ Other zones → User preference (DefaultLens, A11yLens)           │
-└─────────────────────────────────────────────────────────────────┘
-    │
-    ▼
-┌─────────────────────────────────────────────────────────────────┐
-│ Lens.CriticalButton({ state, onAction })                        │
-│ Renders UI based on state stream                                │
-└─────────────────────────────────────────────────────────────────┘
+Human Decision
+      ↓
+  /consult "button color"
+      ↓
+  [Decision locked in YAML]
+      ↓
+  sigil-mark/consultation-chamber/decisions/DEC-2026-001.yaml
+      ↓
+Engineer opens file
+      ↓
+  /craft src/features/checkout/Button.tsx
+      ↓
+  [AI reads Constitution + Consultation]
+      ↓
+  "This zone has a locked decision: Primary CTA is Blue"
+      ↓
+  [AI generates code respecting decision]
 ```
+
+### 1.6 External Integrations
+
+| Service | Purpose | API Type | Documentation |
+|---------|---------|----------|---------------|
+| Claude Code | AI agent integration | CLI commands | CLAUDE.md |
+| Loa | Project workflow orchestration | Skill invocation | loa-grimoire/ |
+| Edge Config | Remote config (optional) | REST | Vercel docs |
+
+### 1.7 Deployment Architecture
+
+Sigil is a **client-side framework** distributed via:
+
+1. **Mount Script**: Copy `sigil-mark/` into target project
+2. **NPM Package** (future): `npm install sigil-mark`
+
+No server deployment required. All Process data stored in repository.
+
+### 1.8 Scalability Strategy
+
+Not applicable — client-side framework with file-based configuration.
+
+### 1.9 Security Architecture
+
+- **Constitution Override Audit**: All override attempts logged with justification
+- **No Secrets**: Process layer contains no sensitive data
+- **Git-Based Access Control**: Repository permissions govern who can modify decisions
 
 ---
 
-## 2. Component Design
+## 2. Software Stack
 
-### 2.1 Core Layer
+### 2.1 Process Layer Technologies
 
-#### 2.1.1 useCriticalAction
+| Category | Technology | Version | Justification |
+|----------|------------|---------|---------------|
+| Config Format | YAML | 1.2 | Human-readable, parseable by AI |
+| Documentation | Markdown | CommonMark | Standard, version-controllable |
+| Validation | JSON Schema | Draft-07 | Type safety for YAML |
 
-The primary physics engine hook. Replaces `useServerTick` with additional capabilities.
+### 2.2 Core Layer Technologies
 
-```typescript
-// sigil-mark/core/useCriticalAction.ts
+| Category | Technology | Version | Justification |
+|----------|------------|---------|---------------|
+| Runtime | React | 18+ | Hooks, Suspense, concurrent features |
+| Language | TypeScript | 5.0+ | Type safety, IDE support |
+| Styling | Tailwind CSS | 3.x | Utility-first, tree-shakeable |
+| Testing | Vitest | 1.x | Fast, ESM-native |
 
-export interface CriticalActionOptions<TData, TVariables = void> {
-  /** Async mutation function */
-  mutation: (variables: TVariables) => Promise<TData>;
+**Key Libraries:**
+- `yaml`: Parse YAML configuration files
+- `zod`: Runtime validation of Process data
+- `@testing-library/react`: Component testing
 
-  /** Who owns the clock */
-  timeAuthority: 'optimistic' | 'server-tick' | 'hybrid';
+### 2.3 Claude Code Integration
 
-  /** Self vs World prediction config */
-  proprioception?: ProprioceptiveConfig;
+| Category | Technology | Purpose |
+|----------|------------|---------|
+| Commands | `.claude/commands/*.md` | Slash command definitions |
+| Skills | `.claude/skills/*/SKILL.md` | Agent capabilities |
+| Config | `CLAUDE.md` | Agent instructions |
 
-  /** Optimistic cache update (for optimistic/hybrid) */
-  optimistic?: (cache: Cache, variables: TVariables) => void;
+---
 
-  /** Rollback on failure */
-  rollback?: (cache: Cache, variables: TVariables) => void;
+## 3. Data Architecture
 
-  /** Success callback */
-  onSuccess?: (data: TData) => void;
+### 3.1 Data Storage
 
-  /** Error callback */
-  onError?: (error: Error) => void;
-}
+**Storage Model:** File-based (Git repository)
 
-export interface CriticalActionState<TData = unknown> {
-  status: 'idle' | 'confirming' | 'pending' | 'confirmed' | 'failed';
-  timeAuthority: 'optimistic' | 'server-tick' | 'hybrid';
-  selfPrediction: SelfPredictionState;
-  worldTruth: WorldTruthState;
-  risk: 'low' | 'medium' | 'high';
-  progress: number | null;
-  error: Error | null;
-  data: TData | null;
-}
+**Justification:**
+- Version-controlled with full history
+- No external dependencies
+- Portable across projects
+- Human-editable
 
-export interface CriticalAction<TData, TVariables> {
-  state: CriticalActionState<TData>;
-  commit: (variables: TVariables) => Promise<void>;
-  cancel: () => void;
-  retry: () => void;
-}
+### 3.2 Schema Design
 
-export function useCriticalAction<TData, TVariables = void>(
-  options: CriticalActionOptions<TData, TVariables>
-): CriticalAction<TData, TVariables>;
+#### 3.2.1 Constitution Schema
+
+```yaml
+# sigil-mark/constitution/protected-capabilities.yaml
+version: "2.6.0"
+enforcement: block  # block | warn | log
+
+protected:
+  - id: string          # Unique identifier (e.g., "withdraw")
+    name: string        # Human-readable name
+    description: string # What this capability does
+    enforcement: block | warn | log
+    rationale: string   # Why this is protected
+
+override_audit:
+  enabled: boolean
+  path: string          # Where to log overrides
+  requires_justification: boolean
+  notify: string[]      # Stakeholders to notify
 ```
 
-**Implementation Notes:**
-- Uses `useRef` pattern to avoid stale closure issues (from v1.2.5 `useServerTick`)
-- Manages prediction confidence decay for proprioception
-- Handles rollback on failure for optimistic updates
-- Error visibility based on time authority (silent for optimistic)
-
-#### 2.1.2 Proprioception
-
-Configuration for self-predictions vs world-truth.
-
+**TypeScript Interface:**
 ```typescript
-// sigil-mark/core/proprioception.ts
-
-export interface ProprioceptiveConfig {
-  self: {
-    /** Face target immediately (legal lie) */
-    rotation?: { instant: boolean };
-
-    /** Start animation immediately (legal lie) */
-    animation?: { optimistic: boolean };
-
-    /** Show predicted position */
-    position?: {
-      enabled: boolean;
-      render: 'ghost' | 'solid' | 'hidden';
-      reconcile: 'snap' | 'lerp' | 'ignore';
-      maxDrift: number; // ms
-    };
-  };
-
-  world: {
-    /** HP changes — server only */
-    damage: 'server-only';
-
-    /** Money changes — server only */
-    balance: 'server-only';
-
-    /** Other players — server only */
-    otherEntities: 'server-only';
-  };
+interface Constitution {
+  version: string;
+  enforcement: 'block' | 'warn' | 'log';
+  protected: ProtectedCapability[];
+  override_audit: OverrideAuditConfig;
 }
 
-export interface SelfPredictionState {
-  position: { predicted: unknown; confidence: number; render: string } | null;
-  rotation: number | null;
-  animation: string | null;
-}
-
-export interface WorldTruthState {
-  confirmed: boolean;
-  position?: unknown;
-}
-```
-
-**Use Cases:**
-- OSRS-style games: Instant rotation, ghost position, server-tick damage
-- Banking: No predictions, full server-tick
-- Linear: Full optimistic with silent rollback
-
-#### 2.1.3 useLocalCache
-
-Simple cache for optimistic updates.
-
-```typescript
-// sigil-mark/core/useLocalCache.ts
-
-export interface Cache {
-  get<T>(key: string): T | undefined;
-  set<T>(key: string, value: T): void;
-  update<T>(key: string, updater: (value: T) => T): void;
-  append<T>(key: string, item: T): void;
-  remove<T>(key: string, predicate: (item: T) => boolean): void;
-  revert(key: string): void;
-}
-
-export function useLocalCache(): Cache;
-```
-
-### 2.2 Layout Layer
-
-#### 2.2.1 Zone Context
-
-All layouts provide zone context via React Context.
-
-```typescript
-// sigil-mark/layouts/context.ts
-
-export type ZoneType = 'critical' | 'admin' | 'marketing' | 'default';
-
-export interface ZoneContextValue {
-  type: ZoneType;
-  financial?: boolean;
-  competitive?: boolean;
-  timeAuthority: 'optimistic' | 'server-tick' | 'hybrid';
-}
-
-export const ZoneContext = createContext<ZoneContextValue | null>(null);
-
-export function useZoneContext(): ZoneContextValue {
-  const context = useContext(ZoneContext);
-  if (!context) {
-    return { type: 'default', timeAuthority: 'optimistic' };
-  }
-  return context;
-}
-```
-
-#### 2.2.2 CriticalZone
-
-Layout primitive for high-stakes UI.
-
-```typescript
-// sigil-mark/layouts/CriticalZone.tsx
-
-export interface CriticalZoneProps {
-  children: ReactNode;
-  financial?: boolean; // Default: true
-}
-
-/**
- * CriticalZone — Layout + Zone in one component
- *
- * Provides:
- * - Zone context: { type: 'critical', financial, timeAuthority: 'server-tick' }
- * - Structural physics: 32px gap, action ordering, max 3 actions
- *
- * @example
- * <CriticalZone financial>
- *   <CriticalZone.Content>
- *     <h2>Confirm Transfer</h2>
- *   </CriticalZone.Content>
- *   <CriticalZone.Actions>
- *     <Lens.GlassButton onAction={cancel}>Cancel</Lens.GlassButton>
- *     <Lens.CriticalButton state={state} onAction={commit}>
- *       Confirm
- *     </Lens.CriticalButton>
- *   </CriticalZone.Actions>
- * </CriticalZone>
- */
-export function CriticalZone({ children, financial = true }: CriticalZoneProps);
-
-// Subcomponents
-CriticalZone.Content: FC<{ children: ReactNode }>;
-CriticalZone.Actions: FC<{ children: ReactNode; maxActions?: number }>;
-```
-
-**Structural Physics:**
-- 32px gap between actions (`gap-8` in Tailwind)
-- Critical buttons auto-sorted to last position
-- Max 3 actions (warns if exceeded)
-
-#### 2.2.3 MachineryLayout
-
-Layout primitive for keyboard-driven UI.
-
-```typescript
-// sigil-mark/layouts/MachineryLayout.tsx
-
-export interface MachineryLayoutProps {
-  children: ReactNode;
-  stateKey?: string;
-  onAction?: (id: string) => void;
-  onDelete?: (id: string) => void;
-}
-
-/**
- * MachineryLayout — Keyboard-driven list UI
- *
- * Provides:
- * - Zone context: { type: 'admin', timeAuthority: 'optimistic' }
- * - Keyboard navigation: Arrow keys, Enter, Delete, Escape
- * - Vim bindings: j/k for navigation
- *
- * @example
- * <MachineryLayout stateKey="invoices" onAction={selectInvoice}>
- *   <MachineryLayout.Search placeholder="Filter..." />
- *   <MachineryLayout.List>
- *     {items.map(item => (
- *       <MachineryLayout.Item key={item.id} id={item.id}>
- *         {item.name}
- *       </MachineryLayout.Item>
- *     ))}
- *   </MachineryLayout.List>
- * </MachineryLayout>
- */
-export function MachineryLayout(props: MachineryLayoutProps);
-
-// Subcomponents
-MachineryLayout.List: FC<{ children: ReactNode }>;
-MachineryLayout.Item: FC<{ id: string; children: ReactNode }>;
-MachineryLayout.Search: FC<{ placeholder?: string; value?: string; onChange?: (v: string) => void }>;
-MachineryLayout.Empty: FC<{ children: ReactNode }>;
-```
-
-**Structural Physics:**
-- Arrow keys: Navigate items
-- j/k: Vim-style navigation
-- Enter/Space: Activate current item
-- Delete/Backspace: Delete current item
-- Escape: Deselect
-- Home/End: Jump to first/last
-
-#### 2.2.4 GlassLayout
-
-Layout primitive for exploratory/marketing UI.
-
-```typescript
-// sigil-mark/layouts/GlassLayout.tsx
-
-export interface GlassLayoutProps {
-  children: ReactNode;
-  variant?: 'card' | 'hero' | 'feature';
-}
-
-/**
- * GlassLayout — Hover-driven card UI
- *
- * Provides:
- * - Zone context: { type: 'marketing', timeAuthority: 'optimistic' }
- * - Hover physics: scale, lift, shadow
- * - Backdrop blur
- *
- * @example
- * <GlassLayout variant="card">
- *   <GlassLayout.Image src={product.image} />
- *   <GlassLayout.Content>
- *     <GlassLayout.Title>{product.name}</GlassLayout.Title>
- *     <GlassLayout.Description>{product.description}</GlassLayout.Description>
- *   </GlassLayout.Content>
- *   <GlassLayout.Actions>
- *     <Lens.GlassButton onAction={viewDetails}>View</Lens.GlassButton>
- *   </GlassLayout.Actions>
- * </GlassLayout>
- */
-export function GlassLayout(props: GlassLayoutProps);
-
-// Subcomponents
-GlassLayout.Image: FC<{ src: string; alt?: string }>;
-GlassLayout.Content: FC<{ children: ReactNode }>;
-GlassLayout.Title: FC<{ children: ReactNode }>;
-GlassLayout.Description: FC<{ children: ReactNode }>;
-GlassLayout.Actions: FC<{ children: ReactNode }>;
-```
-
-**Structural Physics:**
-- Hover: `scale(1.02)`, `translateY(-4px)`, shadow increase
-- Transition: 200ms ease-out
-- Backdrop blur: `backdrop-blur-lg`
-
-### 2.3 Lens Layer
-
-#### 2.3.1 useLens
-
-Hook to get the appropriate lens for the current zone.
-
-```typescript
-// sigil-mark/lenses/useLens.ts
-
-export interface Zone {
-  type: 'critical' | 'admin' | 'marketing' | 'default';
-  financial?: boolean;
-  competitive?: boolean;
-}
-
-export function useLens(overrideZone?: Zone): Lens {
-  const zoneContext = useZoneContext();
-  const zone = overrideZone ?? zoneContext;
-  const userLens = useUserLens(); // From LensProvider
-
-  // Critical zone + financial → Force StrictLens
-  if (zone.type === 'critical' && zone.financial) {
-    return StrictLens;
-  }
-
-  // Other zones → User preference
-  return userLens ?? DefaultLens;
-}
-```
-
-#### 2.3.2 Lens Interface
-
-All lenses implement this interface.
-
-```typescript
-// sigil-mark/lenses/types.ts
-
-export interface Lens {
+interface ProtectedCapability {
+  id: string;
   name: string;
-  classification: 'cosmetic' | 'utility' | 'gameplay';
-
-  // Components
-  CriticalButton: ComponentType<CriticalButtonProps>;
-  GlassButton: ComponentType<GlassButtonProps>;
-  MachineryItem: ComponentType<MachineryItemProps>;
-}
-
-export interface CriticalButtonProps {
-  state: CriticalActionState;
-  onAction: () => void;
-  children: ReactNode;
-  labels?: {
-    confirming?: string;
-    pending?: string;
-    confirmed?: string;
-    failed?: string;
-  };
-}
-
-export interface GlassButtonProps {
-  onAction: () => void;
-  children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'ghost';
-}
-
-export interface MachineryItemProps {
-  onAction: () => void;
-  onDelete?: () => void;
-  isActive?: boolean;
-  children: ReactNode;
+  description: string;
+  enforcement: 'block' | 'warn' | 'log';
+  rationale: string;
 }
 ```
 
-#### 2.3.3 Built-in Lenses
+#### 3.2.2 Lens Array Schema
 
-**DefaultLens** — Standard UI, 44px targets, animations
+```yaml
+# sigil-mark/lens-array/lenses.yaml
+version: "2.6.0"
 
+lenses:
+  power_user:
+    name: string
+    alias: string
+    description: string
+    priority: number        # Lower = higher priority
+    target_audience: string[]
+    mental_model: string
+    interaction_style: string
+    physics:
+      tap_targets: string   # e.g., "32px"
+      input_method: string  # e.g., "numeric"
+      shortcuts: string     # e.g., "full"
+      deposit: string       # e.g., "numeric_input + quick_amounts"
+      confirmation: string  # e.g., "cmd+enter"
+    constraints:
+      - id: string
+        description: string
+        required: boolean
+    validation: string[]
+
+immutable_properties:
+  description: string
+  properties:
+    - name: string
+      description: string
+
+stacking:
+  description: string
+  allowed_combinations: string[][]
+  conflict_resolution:
+    priority_order: string[]
+    rule: string
+```
+
+**TypeScript Interface:**
 ```typescript
-// sigil-mark/lenses/default/index.tsx
+interface LensArray {
+  version: string;
+  lenses: Record<string, UserPersona>;
+  immutable_properties: ImmutableProperties;
+  stacking: StackingConfig;
+}
 
-export const DefaultLens: Lens = {
-  name: 'DefaultLens',
-  classification: 'cosmetic',
-  CriticalButton, // 44px min-height, status styling, tap scale
-  GlassButton,    // 44px min-height, variant styling
-  MachineryItem,  // Hover highlighting, active state
+interface UserPersona {
+  name: string;
+  alias: string;
+  description: string;
+  priority: number;
+  target_audience: string[];
+  mental_model: string;
+  interaction_style: string;
+  physics: PersonaPhysics;
+  constraints: PersonaConstraint[];
+  validation: string[];
+}
+```
+
+#### 3.2.3 Consultation Chamber Schema
+
+```yaml
+# sigil-mark/consultation-chamber/decisions/DEC-2026-001.yaml
+id: "DEC-2026-001"
+topic: string           # What was decided
+decision: string        # The actual decision
+scope: strategic | direction | execution
+locked_at: ISO8601      # When locked
+locked_by: string       # Who locked it
+expires_at: ISO8601     # When lock expires
+context:
+  zone: string          # Relevant zone
+  moodboard_ref: string # Relevant moodboard section
+  options_considered:
+    - option: string
+      pros: string[]
+      cons: string[]
+rationale: string       # Why this decision
+status: locked | unlocked | expired
+unlock_history:
+  - unlocked_at: ISO8601
+    unlocked_by: string
+    justification: string
+```
+
+**TypeScript Interface:**
+```typescript
+interface Decision {
+  id: string;
+  topic: string;
+  decision: string;
+  scope: 'strategic' | 'direction' | 'execution';
+  locked_at: string;
+  locked_by: string;
+  expires_at: string;
+  context: DecisionContext;
+  rationale: string;
+  status: 'locked' | 'unlocked' | 'expired';
+  unlock_history: UnlockEvent[];
+}
+
+type LockPeriod = {
+  strategic: 180;  // days
+  direction: 90;
+  execution: 30;
 };
 ```
 
-**StrictLens** — Forced in critical zones, maximum clarity
+#### 3.2.4 Vibe Checks Schema
 
-```typescript
-// sigil-mark/lenses/strict/index.tsx
+```yaml
+# sigil-mark/surveys/vibe-checks.yaml
+version: "2.6.0"
 
-export const StrictLens: Lens = {
-  name: 'StrictLens',
-  classification: 'cosmetic',
-  CriticalButton, // 48px min-height, high contrast, no animations
-  GlassButton,    // 48px min-height, high contrast
-  MachineryItem,  // Clear active state, border indicator
-};
+triggers:
+  - id: string
+    trigger: string       # Event that triggers survey
+    question: string      # Question to ask
+    options: string[]     # Multiple choice options
+    cooldown_days: number # Days before asking again
+    priority: high | medium | low
+
+feedback:
+  enabled: boolean
+  destination: string     # Where to send responses
+  aggregate_patterns: boolean
+  patterns:
+    - name: string
+      description: string
+      condition: string   # Pattern detection rule
+      action: string      # Suggested action
+
+display:
+  position: string        # UI position
+  style: string
+  animation: string
+  dismiss_on_click_outside: boolean
+  skip_always_visible: boolean
 ```
 
-**A11yLens** — High contrast, 56px targets
-
-```typescript
-// sigil-mark/lenses/a11y/index.tsx
-
-export const A11yLens: Lens = {
-  name: 'A11yLens',
-  classification: 'cosmetic',
-  CriticalButton, // 56px min-height, extra high contrast
-  GlassButton,    // 56px min-height
-  MachineryItem,  // Large touch targets
-};
-```
-
----
-
-## 3. File Structure
+### 3.3 File Structure
 
 ```
 sigil-mark/
-├── core/                        # Physics engines (Truth)
-│   ├── index.ts                 # Public exports
-│   ├── useCriticalAction.ts     # Main physics hook
-│   ├── useLocalCache.ts         # Optimistic cache
-│   ├── proprioception.ts        # Self vs World types
-│   └── types.ts                 # Core types
+├── constitution/
+│   ├── protected-capabilities.yaml    # Core capabilities
+│   └── schemas/
+│       └── constitution.schema.json   # JSON Schema
 │
-├── layouts/                     # Layout Primitives (Zones + Structure)
-│   ├── index.ts                 # Public exports
-│   ├── context.ts               # Zone context
-│   ├── CriticalZone.tsx         # Critical + financial zone
-│   ├── MachineryLayout.tsx      # Admin zone + keyboard nav
-│   └── GlassLayout.tsx          # Marketing zone + hover
+├── lens-array/
+│   ├── lenses.yaml                    # User personas
+│   └── schemas/
+│       └── lens-array.schema.json
 │
-├── lenses/                      # UI Renderers (Experience)
-│   ├── index.ts                 # Public exports
-│   ├── types.ts                 # Lens interface
-│   ├── useLens.ts               # Get lens for zone
-│   ├── LensProvider.tsx         # User lens preference
+├── consultation-chamber/
+│   ├── config.yaml                    # Chamber config
+│   ├── decisions/
+│   │   ├── DEC-2026-001.yaml         # Individual decisions
+│   │   └── ...
+│   └── schemas/
+│       └── decision.schema.json
+│
+├── surveys/
+│   ├── vibe-checks.yaml              # Survey definitions
+│   └── schemas/
+│       └── vibe-checks.schema.json
+│
+├── moodboard.md                       # Product vision
+├── rules.md                           # Design rules
+│
+├── core/                              # React hooks (existing)
+│   ├── use-critical-action.ts
+│   ├── use-local-cache.ts
+│   └── types.ts
+│
+├── layouts/                           # Layout components (existing)
+│   ├── critical-zone.tsx
+│   ├── machinery-layout.tsx
+│   └── glass-layout.tsx
+│
+├── lenses/                            # UI renderers (existing)
 │   ├── default/
-│   │   └── index.tsx            # DefaultLens
 │   ├── strict/
-│   │   └── index.tsx            # StrictLens
 │   └── a11y/
-│       └── index.tsx            # A11yLens
 │
-├── types/                       # Shared types
+├── process/                           # NEW: Process utilities
+│   ├── constitution-reader.ts        # Read constitution
+│   ├── decision-reader.ts            # Read decisions
+│   ├── lens-array-reader.ts          # Read personas
+│   ├── vibe-check-trigger.ts         # Trigger surveys
 │   └── index.ts
 │
-├── __tests__/                   # Tests
-│   ├── useCriticalAction.test.ts
-│   ├── CriticalZone.test.tsx
-│   ├── MachineryLayout.test.tsx
-│   ├── GlassLayout.test.tsx
-│   └── useLens.test.tsx
-│
-└── index.ts                     # Package entry point
+└── index.ts                           # Public API
+```
+
+### 3.4 Data Access Patterns
+
+| Query | Frequency | Implementation |
+|-------|-----------|----------------|
+| Read Constitution | On file open | YAML parse |
+| Read decisions for zone | On file open | Glob + YAML parse |
+| Lock decision | On /consult | YAML write |
+| Check decision expiry | On /craft | Date comparison |
+| Trigger vibe check | On event | Event listener |
+
+---
+
+## 4. Component Design
+
+### 4.1 Process Reader Components
+
+#### 4.1.1 ConstitutionReader
+
+**Purpose:** Load and validate Constitution YAML
+
+```typescript
+// sigil-mark/process/constitution-reader.ts
+
+import { z } from 'zod';
+import yaml from 'yaml';
+
+const ProtectedCapabilitySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  enforcement: z.enum(['block', 'warn', 'log']),
+  rationale: z.string(),
+});
+
+const ConstitutionSchema = z.object({
+  version: z.string(),
+  enforcement: z.enum(['block', 'warn', 'log']),
+  protected: z.array(ProtectedCapabilitySchema),
+  override_audit: z.object({
+    enabled: z.boolean(),
+    path: z.string(),
+    requires_justification: z.boolean(),
+    notify: z.array(z.string()),
+  }),
+});
+
+export type Constitution = z.infer<typeof ConstitutionSchema>;
+
+export async function readConstitution(
+  path: string = 'sigil-mark/constitution/protected-capabilities.yaml'
+): Promise<Constitution> {
+  const content = await fs.readFile(path, 'utf-8');
+  const parsed = yaml.parse(content);
+  return ConstitutionSchema.parse(parsed);
+}
+
+export function isCapabilityProtected(
+  constitution: Constitution,
+  capabilityId: string
+): boolean {
+  return constitution.protected.some(c => c.id === capabilityId);
+}
+
+export function getCapabilityEnforcement(
+  constitution: Constitution,
+  capabilityId: string
+): 'block' | 'warn' | 'log' | null {
+  const capability = constitution.protected.find(c => c.id === capabilityId);
+  return capability?.enforcement ?? null;
+}
+```
+
+#### 4.1.2 DecisionReader
+
+**Purpose:** Load and manage locked decisions
+
+```typescript
+// sigil-mark/process/decision-reader.ts
+
+import { z } from 'zod';
+import yaml from 'yaml';
+import glob from 'fast-glob';
+
+const DecisionSchema = z.object({
+  id: z.string(),
+  topic: z.string(),
+  decision: z.string(),
+  scope: z.enum(['strategic', 'direction', 'execution']),
+  locked_at: z.string(),
+  locked_by: z.string(),
+  expires_at: z.string(),
+  context: z.object({
+    zone: z.string().optional(),
+    moodboard_ref: z.string().optional(),
+    options_considered: z.array(z.object({
+      option: z.string(),
+      pros: z.array(z.string()),
+      cons: z.array(z.string()),
+    })).optional(),
+  }),
+  rationale: z.string(),
+  status: z.enum(['locked', 'unlocked', 'expired']),
+  unlock_history: z.array(z.object({
+    unlocked_at: z.string(),
+    unlocked_by: z.string(),
+    justification: z.string(),
+  })).optional(),
+});
+
+export type Decision = z.infer<typeof DecisionSchema>;
+
+export const LOCK_PERIODS = {
+  strategic: 180,
+  direction: 90,
+  execution: 30,
+} as const;
+
+export async function readAllDecisions(
+  basePath: string = 'sigil-mark/consultation-chamber/decisions'
+): Promise<Decision[]> {
+  const files = await glob(`${basePath}/*.yaml`);
+  const decisions: Decision[] = [];
+
+  for (const file of files) {
+    const content = await fs.readFile(file, 'utf-8');
+    const parsed = yaml.parse(content);
+    decisions.push(DecisionSchema.parse(parsed));
+  }
+
+  return decisions;
+}
+
+export async function getDecisionsForZone(
+  zone: string,
+  basePath?: string
+): Promise<Decision[]> {
+  const all = await readAllDecisions(basePath);
+  return all.filter(d => d.context.zone === zone && d.status === 'locked');
+}
+
+export function isDecisionExpired(decision: Decision): boolean {
+  return new Date(decision.expires_at) < new Date();
+}
+
+export async function lockDecision(
+  topic: string,
+  decision: string,
+  scope: Decision['scope'],
+  context: Decision['context'],
+  rationale: string,
+  lockedBy: string
+): Promise<Decision> {
+  const id = generateDecisionId();
+  const lockedAt = new Date().toISOString();
+  const expiresAt = new Date(
+    Date.now() + LOCK_PERIODS[scope] * 24 * 60 * 60 * 1000
+  ).toISOString();
+
+  const newDecision: Decision = {
+    id,
+    topic,
+    decision,
+    scope,
+    locked_at: lockedAt,
+    locked_by: lockedBy,
+    expires_at: expiresAt,
+    context,
+    rationale,
+    status: 'locked',
+    unlock_history: [],
+  };
+
+  const path = `sigil-mark/consultation-chamber/decisions/${id}.yaml`;
+  await fs.writeFile(path, yaml.stringify(newDecision));
+
+  return newDecision;
+}
+
+function generateDecisionId(): string {
+  const year = new Date().getFullYear();
+  const seq = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+  return `DEC-${year}-${seq}`;
+}
+```
+
+#### 4.1.3 LensArrayReader
+
+**Purpose:** Load user personas and validate lens stacking
+
+```typescript
+// sigil-mark/process/lens-array-reader.ts
+
+import { z } from 'zod';
+import yaml from 'yaml';
+
+const PersonaConstraintSchema = z.object({
+  id: z.string(),
+  description: z.string(),
+  required: z.boolean(),
+});
+
+const PersonaPhysicsSchema = z.object({
+  tap_targets: z.string(),
+  input_method: z.string(),
+  shortcuts: z.string(),
+  deposit: z.string(),
+  confirmation: z.string(),
+});
+
+const UserPersonaSchema = z.object({
+  name: z.string(),
+  alias: z.string(),
+  description: z.string(),
+  priority: z.number(),
+  target_audience: z.array(z.string()),
+  mental_model: z.string(),
+  interaction_style: z.string(),
+  physics: PersonaPhysicsSchema,
+  constraints: z.array(PersonaConstraintSchema),
+  validation: z.array(z.string()),
+});
+
+const LensArraySchema = z.object({
+  version: z.string(),
+  lenses: z.record(UserPersonaSchema),
+  immutable_properties: z.object({
+    description: z.string(),
+    properties: z.array(z.object({
+      name: z.string(),
+      description: z.string(),
+    })),
+  }),
+  stacking: z.object({
+    description: z.string(),
+    allowed_combinations: z.array(z.array(z.string())),
+    conflict_resolution: z.object({
+      priority_order: z.array(z.string()),
+      rule: z.string(),
+    }),
+  }),
+});
+
+export type LensArray = z.infer<typeof LensArraySchema>;
+export type UserPersona = z.infer<typeof UserPersonaSchema>;
+
+export async function readLensArray(
+  path: string = 'sigil-mark/lens-array/lenses.yaml'
+): Promise<LensArray> {
+  const content = await fs.readFile(path, 'utf-8');
+  const parsed = yaml.parse(content);
+  return LensArraySchema.parse(parsed);
+}
+
+export function getPersona(
+  lensArray: LensArray,
+  personaId: string
+): UserPersona | undefined {
+  return lensArray.lenses[personaId];
+}
+
+export function validateLensStack(
+  lensArray: LensArray,
+  stack: string[]
+): { valid: boolean; error?: string } {
+  const allowed = lensArray.stacking.allowed_combinations;
+  const isAllowed = allowed.some(
+    combo => combo.length === stack.length &&
+      combo.every(lens => stack.includes(lens))
+  );
+
+  if (!isAllowed) {
+    return {
+      valid: false,
+      error: `Lens combination [${stack.join(', ')}] is not allowed`,
+    };
+  }
+
+  return { valid: true };
+}
+
+export function resolveStackConflict(
+  lensArray: LensArray,
+  stack: string[]
+): string {
+  const order = lensArray.stacking.conflict_resolution.priority_order;
+  for (const lens of order) {
+    if (stack.includes(lens)) {
+      return lens;
+    }
+  }
+  return stack[0];
+}
+```
+
+### 4.2 Claude Code Integration
+
+#### 4.2.1 /craft Command
+
+**Purpose:** Restore context after time away
+
+```markdown
+<!-- .claude/commands/craft.md -->
+---
+name: craft
+description: Restore context and support deep exploration
+skill: crafting-guidance
+skill_path: .claude/skills/crafting-guidance/SKILL.md
+preflight:
+  - sigil_mounted
+human_effort: low
+effort_type: conversation
+---
+
+# /craft — Return to Flow
+
+## Purpose
+
+`/craft` helps you:
+1. **Restore context** after time away
+2. **Get zone-specific guidance** during implementation
+3. **Deep dive** when the craft demands it
+
+## Usage
+
+# Restore context after time away
+/craft
+
+# Get guidance for a specific file
+/craft src/features/checkout/Button.tsx
+
+# Validate against a specific lens
+/craft --lens mobile
+```
+
+#### 4.2.2 /consult Command
+
+**Purpose:** Lock a deliberated decision
+
+```markdown
+<!-- .claude/commands/consult.md -->
+---
+name: consult
+description: Lock a decision you've already made through deliberation
+skill: consulting-decisions
+skill_path: .claude/skills/consulting-decisions/SKILL.md
+preflight:
+  - sigil_mounted
+human_effort: low
+effort_type: confirmation
+---
+
+# /consult — Lock a Deliberated Decision
+
+## Usage
+
+# Lock a decision you've made
+/consult "button color for primary CTA"
+
+# Unlock if new information emerges
+/consult --unlock DEC-2026-001
+
+## Agent Behavior
+
+1. Ask: "What have you decided about?"
+2. Ask: "What is your decision?"
+3. Ask: "What scope? (strategic/direction/execution)"
+4. Gather context (zone, moodboard references)
+5. Present options with trade-offs
+6. Confirm decision
+7. Generate decision YAML file
+8. Report lock status and expiry
+```
+
+### 4.3 Zone Resolution
+
+The zone resolver determines which zone a file belongs to:
+
+```typescript
+// sigil-mark/core/zone-resolver.ts (enhanced)
+
+export interface ZoneConfig {
+  paths: string[];
+  motion: string;
+  timing: string;
+  time_authority: string;
+  lens_enforcement: 'strict' | 'user';
+  patterns: {
+    prefer: string[];
+    warn: string[];
+  };
+}
+
+export async function resolveZoneForPath(
+  filePath: string,
+  sigilrcPath: string = '.sigilrc.yaml'
+): Promise<{ zone: string; config: ZoneConfig } | null> {
+  const sigilrc = await readSigilrc(sigilrcPath);
+
+  for (const [zoneName, config] of Object.entries(sigilrc.zones)) {
+    for (const pattern of config.paths) {
+      if (minimatch(filePath, pattern)) {
+        return { zone: zoneName, config };
+      }
+    }
+  }
+
+  return null;
+}
 ```
 
 ---
 
-## 4. API Design
+## 5. API Specifications
 
-### 4.1 Public API
+### 5.1 Process Reader API
 
 ```typescript
-// sigil-mark/index.ts
+// Public API for Process layer
 
-// Core
-export { useCriticalAction } from './core';
-export type {
-  CriticalActionOptions,
-  CriticalActionState,
-  CriticalAction,
-  ProprioceptiveConfig,
-  SelfPredictionState,
-  WorldTruthState,
-  Cache,
-} from './core';
+// Constitution
+export {
+  readConstitution,
+  isCapabilityProtected,
+  getCapabilityEnforcement,
+  type Constitution,
+  type ProtectedCapability,
+} from './process/constitution-reader';
+
+// Decisions
+export {
+  readAllDecisions,
+  getDecisionsForZone,
+  isDecisionExpired,
+  lockDecision,
+  unlockDecision,
+  LOCK_PERIODS,
+  type Decision,
+} from './process/decision-reader';
+
+// Lens Array
+export {
+  readLensArray,
+  getPersona,
+  validateLensStack,
+  resolveStackConflict,
+  type LensArray,
+  type UserPersona,
+} from './process/lens-array-reader';
+
+// Vibe Checks
+export {
+  readVibeChecks,
+  shouldTriggerSurvey,
+  recordSurveyResponse,
+  type VibeCheck,
+  type SurveyTrigger,
+} from './process/vibe-check-trigger';
+```
+
+### 5.2 Core API (Existing)
+
+```typescript
+// Core Layer API (already implemented)
+
+// Hooks
+export { useCriticalAction } from './core/use-critical-action';
+export { useLocalCache } from './core/use-local-cache';
 
 // Layouts
-export { CriticalZone, MachineryLayout, GlassLayout } from './layouts';
-export { useZoneContext } from './layouts';
-export type { ZoneContextValue, ZoneType } from './layouts';
+export { CriticalZone } from './layouts/critical-zone';
+export { MachineryLayout } from './layouts/machinery-layout';
+export { GlassLayout } from './layouts/glass-layout';
 
 // Lenses
-export { useLens, LensProvider, DefaultLens, StrictLens, A11yLens } from './lenses';
-export type {
-  Lens,
-  CriticalButtonProps,
-  GlassButtonProps,
-  MachineryItemProps,
-} from './lenses';
-```
+export { DefaultLens, StrictLens, A11yLens } from './lenses';
+export { useLens, LensProvider } from './lenses';
 
-### 4.2 Usage Examples
-
-#### Critical Zone (Payment)
-
-```tsx
-import { CriticalZone, useCriticalAction, useLens } from 'sigil-mark';
-
-function PaymentForm({ amount }: { amount: number }) {
-  const Lens = useLens(); // Returns StrictLens in CriticalZone
-
-  const payment = useCriticalAction({
-    mutation: () => api.pay(amount),
-    timeAuthority: 'server-tick', // Server owns clock
-  });
-
-  return (
-    <CriticalZone financial>
-      <CriticalZone.Content>
-        <h2>Confirm Payment</h2>
-        <p>Amount: ${amount}</p>
-      </CriticalZone.Content>
-
-      <CriticalZone.Actions>
-        <Lens.GlassButton onAction={cancel}>Cancel</Lens.GlassButton>
-        <Lens.CriticalButton state={payment.state} onAction={() => payment.commit()}>
-          Pay ${amount}
-        </Lens.CriticalButton>
-      </CriticalZone.Actions>
-    </CriticalZone>
-  );
-}
-```
-
-#### Machinery Layout (Admin)
-
-```tsx
-import { MachineryLayout, useCriticalAction, useLens } from 'sigil-mark';
-
-function InvoiceList({ invoices }: { invoices: Invoice[] }) {
-  const Lens = useLens(); // Returns user preference in MachineryLayout
-
-  return (
-    <MachineryLayout
-      stateKey="invoices"
-      onAction={(id) => router.push(`/invoices/${id}`)}
-      onDelete={(id) => deleteInvoice(id)}
-    >
-      <MachineryLayout.Search placeholder="Filter invoices..." />
-      <MachineryLayout.List>
-        {invoices.map((inv) => (
-          <MachineryLayout.Item key={inv.id} id={inv.id}>
-            <Lens.MachineryItem>
-              <span>{inv.number}</span>
-              <span>${inv.amount}</span>
-            </Lens.MachineryItem>
-          </MachineryLayout.Item>
-        ))}
-      </MachineryLayout.List>
-    </MachineryLayout>
-  );
-}
-```
-
-#### Glass Layout (Marketing)
-
-```tsx
-import { GlassLayout, useLens } from 'sigil-mark';
-
-function ProductCard({ product }: { product: Product }) {
-  const Lens = useLens(); // Returns user preference in GlassLayout
-
-  return (
-    <GlassLayout variant="card">
-      <GlassLayout.Image src={product.image} alt={product.name} />
-      <GlassLayout.Content>
-        <GlassLayout.Title>{product.name}</GlassLayout.Title>
-        <GlassLayout.Description>{product.description}</GlassLayout.Description>
-      </GlassLayout.Content>
-      <GlassLayout.Actions>
-        <Lens.GlassButton onAction={() => addToCart(product.id)}>
-          Add to Cart
-        </Lens.GlassButton>
-      </GlassLayout.Actions>
-    </GlassLayout>
-  );
-}
-```
-
-#### Optimistic Action (Linear-style)
-
-```tsx
-import { useCriticalAction, useLocalCache } from 'sigil-mark';
-
-function CreateIssue() {
-  const cache = useLocalCache();
-
-  const create = useCriticalAction({
-    mutation: (data) => api.issues.create(data),
-    timeAuthority: 'optimistic', // Client owns clock
-    optimistic: (cache, data) => {
-      cache.append('issues', { ...data, id: 'temp', status: 'pending' });
-    },
-    rollback: (cache) => {
-      cache.remove('issues', (i) => i.id === 'temp');
-    },
-  });
-
-  // UI updates instantly, silent rollback on failure
-}
-```
-
-#### Proprioception (Game-style)
-
-```tsx
-import { useCriticalAction } from 'sigil-mark';
-
-function PlayerMovement() {
-  const movement = useCriticalAction({
-    mutation: (target) => api.game.move(target),
-    timeAuthority: 'server-tick', // Server is truth
-
-    proprioception: {
-      self: {
-        rotation: { instant: true },     // Face target NOW (legal lie)
-        animation: { optimistic: true }, // Start walking NOW
-        position: {
-          enabled: true,
-          render: 'ghost',
-          reconcile: 'lerp',
-          maxDrift: 600, // 600ms prediction window
-        },
-      },
-      world: {
-        damage: 'server-only', // HP waits for server
-        balance: 'server-only',
-        otherEntities: 'server-only',
-      },
-    },
-  });
-
-  // Rotation instant, position ghost, damage waits
-}
+// Zone Resolution
+export { resolveZone, resolveZoneForPath } from './core/zone-resolver';
 ```
 
 ---
 
-## 5. Configuration
+## 6. Error Handling Strategy
 
-### 5.1 .sigilrc.yaml
+### 6.1 Error Categories
 
-Zone configuration for file path resolution.
+| Category | Example | Handling |
+|----------|---------|----------|
+| Parse Error | Invalid YAML syntax | Log error, use defaults |
+| Validation Error | Missing required field | Log warning, skip entry |
+| File Not Found | Constitution missing | Return empty/defaults |
+| Lock Conflict | Decision already locked | Return existing decision |
 
-```yaml
-sigil: "2.0.0"
-
-# Zone definitions (for file path → zone mapping)
-zones:
-  critical:
-    paths:
-      - "src/features/checkout/**"
-      - "src/features/payment/**"
-      - "src/features/transfer/**"
-    financial: true
-    timeAuthority: server-tick
-
-  admin:
-    paths:
-      - "src/features/admin/**"
-      - "src/features/settings/**"
-    timeAuthority: optimistic
-
-  marketing:
-    paths:
-      - "src/features/landing/**"
-      - "src/features/marketing/**"
-      - "app/(marketing)/**"
-    timeAuthority: optimistic
-
-# Proprioception defaults
-proprioception:
-  self:
-    rotation: { instant: true }
-    animation: { optimistic: true }
-    position: { render: ghost, reconcile: lerp, maxDrift: 600 }
-  world:
-    damage: server-only
-    balance: server-only
-    otherEntities: server-only
-
-# Registered lenses
-lenses:
-  DefaultLens:
-    classification: cosmetic
-    path: "@/lenses/default"
-  StrictLens:
-    classification: cosmetic
-    path: "@/lenses/strict"
-  A11yLens:
-    classification: cosmetic
-    path: "@/lenses/a11y"
-```
-
-### 5.2 Zone Resolution (for Claude/AI)
+### 6.2 Error Response Format
 
 ```typescript
-// sigil-mark/core/zone-resolver.ts
-
-import { ZoneType } from '../layouts/context';
-
-interface ZoneConfig {
-  type: ZoneType;
-  financial?: boolean;
-  timeAuthority: 'optimistic' | 'server-tick' | 'hybrid';
+interface ProcessError {
+  code: string;
+  message: string;
+  path?: string;
+  details?: unknown;
 }
 
-/**
- * Resolve zone from file path.
- * Used by Claude to determine which layout to suggest.
- */
-export function resolveZone(filePath: string): ZoneConfig {
-  // Parse .sigilrc.yaml zones
-  // Match file path against glob patterns
-  // Return zone config or default
-}
+// Example errors
+const ERRORS = {
+  CONSTITUTION_PARSE_ERROR: 'Failed to parse constitution YAML',
+  DECISION_NOT_FOUND: 'Decision not found',
+  INVALID_LOCK_SCOPE: 'Invalid lock scope',
+  DECISION_ALREADY_LOCKED: 'Decision is already locked',
+  LENS_STACK_INVALID: 'Lens combination not allowed',
+};
 ```
+
+### 6.3 Graceful Degradation
+
+If Process layer files are missing or invalid:
+- Constitution: Assume no protected capabilities (warn)
+- Decisions: Return empty array
+- Lens Array: Use default persona only
+- Vibe Checks: Skip surveys
 
 ---
 
-## 6. Testing Strategy
+## 7. Testing Strategy
 
-### 6.1 Unit Tests
+### 7.1 Testing Pyramid
 
-**Core Layer:**
+| Level | Coverage Target | Tools |
+|-------|-----------------|-------|
+| Unit | 80% | Vitest |
+| Integration | Key flows | Vitest |
+| E2E | Critical paths | Playwright |
+
+### 7.2 Process Layer Tests
+
 ```typescript
-// __tests__/useCriticalAction.test.ts
+// __tests__/process/constitution-reader.test.ts
 
-describe('useCriticalAction', () => {
-  describe('server-tick authority', () => {
-    it('shows pending state until server responds');
-    it('does not allow double execution');
-    it('calls onError on failure');
-    it('calls onSuccess on success');
+describe('ConstitutionReader', () => {
+  it('parses valid constitution YAML', async () => {
+    const constitution = await readConstitution('fixtures/valid-constitution.yaml');
+    expect(constitution.protected).toHaveLength(8);
   });
 
-  describe('optimistic authority', () => {
-    it('updates cache immediately');
-    it('rolls back on failure');
-    it('hides error (silent rollback)');
+  it('identifies protected capabilities', async () => {
+    const constitution = await readConstitution('fixtures/valid-constitution.yaml');
+    expect(isCapabilityProtected(constitution, 'withdraw')).toBe(true);
+    expect(isCapabilityProtected(constitution, 'nonexistent')).toBe(false);
   });
 
-  describe('proprioception', () => {
-    it('applies self predictions immediately');
-    it('decays confidence over maxDrift');
-    it('reconciles with lerp on server response');
+  it('handles missing file gracefully', async () => {
+    const constitution = await readConstitution('nonexistent.yaml');
+    expect(constitution.protected).toEqual([]);
   });
 });
 ```
 
-**Layout Layer:**
-```typescript
-// __tests__/CriticalZone.test.tsx
-
-describe('CriticalZone', () => {
-  it('provides critical zone context');
-  it('sorts critical buttons to last');
-  it('warns when exceeding max actions');
-  it('enforces 32px gap between actions');
-});
-```
-
-**Lens Layer:**
-```typescript
-// __tests__/useLens.test.tsx
-
-describe('useLens', () => {
-  it('returns StrictLens in critical+financial zone');
-  it('returns user preference in admin zone');
-  it('returns DefaultLens when no preference set');
-});
-```
-
-### 6.2 Integration Tests
+### 7.3 Decision Lock Tests
 
 ```typescript
-// __tests__/integration.test.tsx
+// __tests__/process/decision-reader.test.ts
 
-describe('Payment Flow', () => {
-  it('forces StrictLens in CriticalZone');
-  it('shows pending state during payment');
-  it('shows confirmed state on success');
-  it('shows error state on failure');
-});
+describe('DecisionReader', () => {
+  it('locks a decision with correct expiry', async () => {
+    const decision = await lockDecision(
+      'button color',
+      'Blue',
+      'direction',
+      { zone: 'critical' },
+      'Industry standard',
+      'engineer@example.com'
+    );
 
-describe('Admin List', () => {
-  it('supports keyboard navigation');
-  it('fires onAction on Enter');
-  it('fires onDelete on Delete key');
+    const expiryDays = (new Date(decision.expires_at).getTime() - Date.now())
+      / (24 * 60 * 60 * 1000);
+    expect(expiryDays).toBeCloseTo(90, 0);
+  });
+
+  it('detects expired decisions', () => {
+    const expiredDecision = {
+      expires_at: '2020-01-01T00:00:00Z',
+      status: 'locked',
+    } as Decision;
+
+    expect(isDecisionExpired(expiredDecision)).toBe(true);
+  });
 });
 ```
 
 ---
 
-## 7. Migration Guide
+## 8. Development Phases
 
-### 7.1 From v1.2.5
+### Phase 1: Process Foundation (Sprint 1-2)
 
-**Before (v1.2.5):**
-```tsx
-import { SigilZone, useSigilPhysics, Button, useServerTick } from 'sigil-mark';
+- [ ] Constitution system
+  - [ ] YAML schema and validation
+  - [ ] ConstitutionReader implementation
+  - [ ] JSON Schema for validation
+- [ ] Consultation Chamber
+  - [ ] Decision schema and validation
+  - [ ] DecisionReader implementation
+  - [ ] Lock/unlock functionality
+- [ ] /craft command (basic)
+- [ ] /consult command
 
-function Checkout() {
-  const { physics } = useSigilPhysics();
-  const { execute, isPending } = useServerTick(pay);
+### Phase 2: Persona System (Sprint 3-4)
 
-  return (
-    <SigilZone material="decisive" serverAuthoritative>
-      <Button onClick={execute} disabled={isPending}>
-        {isPending ? 'Processing...' : 'Confirm'}
-      </Button>
-    </SigilZone>
-  );
-}
-```
+- [ ] Lens Array
+  - [ ] UserPersona schema
+  - [ ] LensArrayReader implementation
+  - [ ] Stacking validation
+- [ ] Zone-persona integration
+  - [ ] Zone → persona mapping
+  - [ ] Persona physics surfacing
+- [ ] /craft command (persona-aware)
 
-**After (v2.0):**
-```tsx
-import { CriticalZone, useCriticalAction, useLens } from 'sigil-mark';
+### Phase 3: Feedback Loop (Sprint 5-6)
 
-function Checkout() {
-  const Lens = useLens();
-  const payment = useCriticalAction({
-    mutation: pay,
-    timeAuthority: 'server-tick',
-  });
+- [ ] Vibe Checks
+  - [ ] Survey trigger system
+  - [ ] Cooldown management
+  - [ ] Response recording
+- [ ] Pattern detection
+- [ ] Research dashboard integration (optional)
 
-  return (
-    <CriticalZone financial>
-      <CriticalZone.Content>
-        {/* Content */}
-      </CriticalZone.Content>
-      <CriticalZone.Actions>
-        <Lens.CriticalButton state={payment.state} onAction={() => payment.commit()}>
-          Confirm
-        </Lens.CriticalButton>
-      </CriticalZone.Actions>
-    </CriticalZone>
-  );
-}
-```
+### Phase 4: Polish & Documentation (Sprint 7)
 
-### 7.2 Key Changes
-
-| v1.2.5 Pattern | v2.0 Pattern |
-|----------------|--------------|
-| `<SigilZone material="decisive">` | `<CriticalZone>` |
-| `useSigilPhysics().physics` | `useLens()` → Lens components |
-| `useServerTick(action)` | `useCriticalAction({ mutation, timeAuthority })` |
-| `isPending` state | `state.status === 'pending'` |
-| Manual button styling | `Lens.CriticalButton` with state |
+- [ ] CLAUDE.md updates
+- [ ] Command documentation
+- [ ] Migration guide from v2.0
+- [ ] Example project
 
 ---
 
-## 8. Risks & Mitigations
+## 9. Known Risks and Mitigation
 
-### 8.1 Technical Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Proprioception drift causes jank | Medium | High | `maxDrift` timeout, snap fallback |
-| Layout context not provided | Medium | Medium | Fallback to default zone |
-| Lens not found | Low | Low | Fallback to DefaultLens |
-
-### 8.2 Migration Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| v1.2.5 API usage in codebase | High | Medium | Deprecation warnings in v1.2.5 |
-| Missing layout wrappers | Medium | Medium | ESLint rule: no bare Lens components |
+| Risk | Probability | Impact | Mitigation |
+|------|-------------|--------|------------|
+| YAML parsing errors break workflow | Medium | High | Graceful degradation, defaults |
+| Lock periods too restrictive | Medium | Medium | Configurable per-project |
+| AI misinterprets Constitution | Low | High | Explicit CLAUDE.md instructions |
+| Persona explosion (too many) | Medium | Low | Limit to 4-6 core personas |
+| Decision bikeshedding on scope | Medium | Low | Clear guidelines in /consult |
 
 ---
 
-## 9. Future Considerations
+## 10. Open Questions
 
-### 9.1 Not In Scope (v2.0)
-
-- **Ergonomic Profiler**: Deferred until lens ecosystem exists
-- **Custom Lens Registration**: Built-in lenses only for now
-- **Server-Side Rendering**: Client-only for v2.0
-- **Multi-player Sync Engine**: Hybrid authority only
-
-### 9.2 Potential v2.1 Features
-
-- Zone-based ESLint rules (`sigil/require-layout-wrapper`)
-- DevTools extension for zone visualization
-- Storybook integration for lens preview
-- Performance profiler for prediction accuracy
+| Question | Owner | Due Date | Status |
+|----------|-------|----------|--------|
+| Should decisions support team voting? | Product | TBD | Open |
+| Remote config for Constitution? | Engineering | TBD | Open |
+| Vibe check analytics destination? | Product | TBD | Open |
 
 ---
 
-## 10. Appendix
+## 11. Appendix
 
-### 10.1 Reference Products
+### A. Glossary
 
-| Product | Concept | How Sigil Uses It |
-|---------|---------|-------------------|
-| OSRS | Client prediction | Proprioception (self vs world) |
-| Linear | Optimistic updates | `timeAuthority: 'optimistic'` |
-| Figma | Multiplayer reconciliation | `timeAuthority: 'hybrid'` |
-| Phantom | Server-tick truth | `timeAuthority: 'server-tick'` |
+| Term | Definition |
+|------|------------|
+| **Constitution** | YAML file defining capabilities that always work |
+| **User Persona** | Definition of a user type with physics and constraints |
+| **Visual Lens** | React component that renders UI (DefaultLens, etc.) |
+| **Decision Lock** | Time-limited protection against reopening a decision |
+| **Vibe Check** | Micro-survey triggered by user action |
+| **Zone** | File path pattern with associated motion/timing |
 
-### 10.2 Decision Log
+### B. References
 
-| Decision | Choice | Date | Rationale |
-|----------|--------|------|-----------|
-| v1.2.5 deprecation | Deprecated | 2026-01-05 | Clean break, layouts ARE zones |
-| Ergonomic Profiler | Not shipped | 2026-01-05 | No lens ecosystem, skip bureaucracy |
-| Layout composition | Layouts provide zone | 2026-01-05 | "Physics is structural" |
+- PRD: `loa-grimoire/prd.md`
+- Sigil v2.0 PRD (archived): `loa-grimoire/archive/prd-v2.0.md`
+- Sigil Core implementation: `sigil-mark/`
+- Claude Code documentation: CLAUDE.md
+
+### C. Change Log
+
+| Version | Date | Changes | Author |
+|---------|------|---------|--------|
+| 1.0 | 2026-01-06 | Initial version | Architecture Designer Agent |
 
 ---
 
-*SDD generated from PRD v2.0.0*
-*Source: loa-grimoire/prd.md, sigil-v2.0.zip context*
+*Generated by Architecture Designer Agent*

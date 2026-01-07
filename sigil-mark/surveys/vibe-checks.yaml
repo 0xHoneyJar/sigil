@@ -1,0 +1,183 @@
+# Sigil v2.6 — Vibe Checks
+# Micro-surveys for qualitative feedback
+#
+# Philosophy: "Ask at the moment of emotion, not after it's gone."
+#
+# These are lightweight surveys triggered by specific events.
+# Keep them short (1 question), non-intrusive, and respectful of cooldowns.
+
+version: "2.6.0"
+
+triggers:
+  # ==========================================================================
+  # CRITICAL ZONE TRIGGERS
+  # ==========================================================================
+
+  - id: strategy_change
+    name: Strategy Change Feedback
+    trigger: action_completed
+    trigger_event: strategy_updated
+    question: "How confident do you feel about this strategy change?"
+    type: scale
+    options:
+      - value: 1
+        label: "Very uncertain"
+      - value: 2
+        label: "Somewhat uncertain"
+      - value: 3
+        label: "Neutral"
+      - value: 4
+        label: "Somewhat confident"
+      - value: 5
+        label: "Very confident"
+    cooldown_days: 3
+    zones: ["critical", "checkout"]
+    priority: 10
+
+  - id: first_deposit
+    name: First Deposit Experience
+    trigger: first_time
+    trigger_event: deposit_completed
+    question: "How was your first deposit experience?"
+    type: emoji
+    options:
+      - value: 1
+        label: "Frustrating"
+        emoji: "😤"
+      - value: 2
+        label: "Confusing"
+        emoji: "😕"
+      - value: 3
+        label: "Okay"
+        emoji: "😐"
+      - value: 4
+        label: "Good"
+        emoji: "🙂"
+      - value: 5
+        label: "Great"
+        emoji: "😊"
+    cooldown_days: 30
+    zones: ["critical"]
+    priority: 20
+
+  - id: first_withdraw
+    name: First Withdrawal Experience
+    trigger: first_time
+    trigger_event: withdraw_completed
+    question: "How was your first withdrawal experience?"
+    type: emoji
+    options:
+      - value: 1
+        label: "Frustrating"
+        emoji: "😤"
+      - value: 2
+        label: "Confusing"
+        emoji: "😕"
+      - value: 3
+        label: "Okay"
+        emoji: "😐"
+      - value: 4
+        label: "Good"
+        emoji: "🙂"
+      - value: 5
+        label: "Great"
+        emoji: "😊"
+    cooldown_days: 30
+    zones: ["critical"]
+    priority: 20
+
+  # ==========================================================================
+  # ERROR RECOVERY TRIGGERS
+  # ==========================================================================
+
+  - id: transaction_failed
+    name: Transaction Failed Recovery
+    trigger: error_occurred
+    trigger_event: transaction_error
+    question: "Did you understand what went wrong?"
+    type: choice
+    options:
+      - value: "yes"
+        label: "Yes, it was clear"
+      - value: "somewhat"
+        label: "Somewhat, but confused"
+      - value: "no"
+        label: "No, I have no idea"
+    cooldown_days: 7
+    zones: ["critical"]
+    priority: 15
+
+  # ==========================================================================
+  # DISCOVERY TRIGGERS
+  # ==========================================================================
+
+  - id: card_expanded
+    name: Card Discovery Feedback
+    trigger: action_completed
+    trigger_event: card_expanded
+    question: "Was this information helpful?"
+    type: choice
+    options:
+      - value: "very"
+        label: "Very helpful"
+      - value: "somewhat"
+        label: "Somewhat helpful"
+      - value: "not"
+        label: "Not helpful"
+    cooldown_days: 14
+    zones: ["marketing", "landing"]
+    priority: 5
+
+  # ==========================================================================
+  # ONBOARDING TRIGGERS
+  # ==========================================================================
+
+  - id: onboarding_completed
+    name: Onboarding Completion
+    trigger: action_completed
+    trigger_event: onboarding_done
+    question: "How prepared do you feel to use the platform?"
+    type: scale
+    options:
+      - value: 1
+        label: "Not at all"
+      - value: 2
+        label: "A little"
+      - value: 3
+        label: "Moderately"
+      - value: 4
+        label: "Quite prepared"
+      - value: 5
+        label: "Very prepared"
+    cooldown_days: 90
+    zones: ["onboarding", "welcome"]
+    priority: 25
+
+# ==========================================================================
+# FEEDBACK CONFIGURATION
+# ==========================================================================
+
+feedback:
+  destination: console
+  include_context: true
+  anonymize: true
+
+# ==========================================================================
+# DISPLAY CONFIGURATION
+# ==========================================================================
+
+display:
+  position: bottom-right
+  delay_ms: 2000
+  auto_dismiss_ms: 0
+  show_dismiss: true
+  theme: system
+
+# ==========================================================================
+# RATE LIMITS
+# ==========================================================================
+
+limits:
+  max_per_session: 2
+  max_per_day: 3
+  min_interval_minutes: 30

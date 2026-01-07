@@ -12,11 +12,17 @@ zones:
     permission: read
 ---
 
-# Consulting Decisions
+# Consulting Decisions (v2.6)
 
 ## Purpose
 
 Guide the user through a consultation process for design decisions. Determines the appropriate decision tier (strategic/direction/execution) and facilitates the consultation process.
+
+**NEW in v2.6:**
+- Early unlock support (`--unlock` flag)
+- Decision status checking (`--status` flag)
+- Integration with ProcessContext for /craft surfacing
+- LOCK_PERIODS constant: `{ strategic: 180, direction: 90, execution: 30 }`
 
 ## Philosophy
 
@@ -335,6 +341,115 @@ lock_durations:
   execution: 30   # 1 month
 ```
 
+## Early Unlock Flow (NEW in v2.6)
+
+When called with `--unlock`:
+
+### Step 1: Load Decision
+
+```bash
+decision_file="sigil-mark/consultation-chamber/decisions/${decision_id}.yaml"
+```
+
+### Step 2: Verify Locked Status
+
+If not locked:
+
+```
+⚠️ Decision {id} is not currently locked.
+
+Current status: {status}
+```
+
+### Step 3: Show Decision Context
+
+```
+🔓 EARLY UNLOCK REQUEST
+
+Decision: {id}
+Topic: {topic}
+Scope: {scope}
+Locked at: {locked_at}
+Expires: {expires_at} ({days_remaining} days remaining)
+
+Original rationale:
+  {decision.outcome.reasoning}
+  Decided by: {decision.outcome.decided_by}
+  Scope: {decision.scope}
+
+⚠️ WARNING: Early unlocks should be rare and justified.
+```
+
+### Step 4: Request Justification
+
+```
+question: "Why do you need to unlock this decision early?"
+header: "Justification"
+```
+
+User must provide a justification. This is recorded in unlock_history.
+
+### Step 5: Update Decision Record
+
+```yaml
+lock:
+  locked: false
+  locked_at: "{original_locked_at}"  # Keep for history
+  unlock_date: null
+
+unlock_history:
+  - unlocked_at: "{current ISO-8601 timestamp}"
+    unlocked_by: "{user or agent}"
+    justification: "{user's justification}"
+    remaining_days: {days_that_were_remaining}
+```
+
+### Step 6: Confirm Unlock
+
+```
+🔓 DECISION UNLOCKED
+
+Decision: {id}
+Unlocked at: {now}
+Justification: {justification}
+Previous lock: {scope_duration} days ({remaining_days} days remaining)
+
+Note: This unlock has been recorded in the decision history.
+/garden will flag this decision as manually unlocked.
+
+The decision can now be modified or re-consulted.
+```
+
+## Decision Status Flow (NEW in v2.6)
+
+When called with `--status`:
+
+### Output Format
+
+```
+📋 DECISION STATUS
+
+ID: {id}
+Topic: {title}
+Scope: {scope}
+Status: {locked | unlocked | pending}
+
+Decision: {outcome.decision}
+Decided by: {outcome.decided_by}
+Decided at: {outcome.decided_at}
+
+Lock:
+  Locked at: {lock.locked_at}
+  Expires: {lock.unlock_date}
+  Days remaining: {calculated}
+
+Unlock history:
+  {List of previous unlocks, or "(none)"}
+
+Related decisions:
+  {List of decisions in same zone, or "(none)"}
+```
+
 ## Strictness Behavior
 
 Consultation is always allowed regardless of strictness level.
@@ -348,6 +463,9 @@ Lock enforcement is strictness-aware (see `/craft` SKILL.md).
 | No config | Create default consultation config |
 | Decision exists | "Decision {id} already exists. View or update it?" |
 | Invalid layer | Default to Direction, ask for confirmation |
+| Decision not found | "Decision {id} not found." |
+| Already unlocked | "Decision {id} is not currently locked." |
+| No justification | "Justification required for early unlock." |
 
 ## Philosophy
 
@@ -360,8 +478,11 @@ Do NOT:
 - Skip layer detection
 - Create decisions without proper classification
 - Allow execution decisions to trigger community polls
+- Unlock without justification
 
 DO:
 - Help users understand the difference between layers
 - Generate appropriate output for each layer
 - Lock decisions promptly after outcomes are recorded
+- Record all unlocks with justification
+- Warn about unlock implications (/garden will flag)

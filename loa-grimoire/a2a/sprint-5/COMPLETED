@@ -1,0 +1,9 @@
+Sprint 5: Vibe Checks
+Completed: 2026-01-06
+Tests: 36/36 passing
+
+Deliverables:
+- sigil-mark/surveys/vibe-checks.yaml
+- sigil-mark/surveys/schemas/vibe-checks.schema.json
+- sigil-mark/process/vibe-check-reader.ts
+- sigil-mark/__tests__/process/vibe-check-reader.test.ts

@@ -1,14 +1,17 @@
 /**
- * Sigil v1.2.4 - Zone Resolution
+ * Sigil v2.6 - Zone Resolution
  *
  * Resolves zone configuration from file path by walking up
  * directory tree and merging .sigilrc.yaml files.
+ *
+ * v2.6 additions: Zone-persona mapping for contextual guidance.
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 
 export type RecipeSet = 'decisive' | 'machinery' | 'glass';
+export type PersonaId = 'power_user' | 'newcomer' | 'mobile' | 'accessibility' | string;
 export type SyncMode = 'server_authoritative' | 'client_authoritative';
 export type ConstraintLevel = 'forbidden' | 'warn';
 
@@ -34,7 +37,45 @@ export interface ZoneConfig {
   configChain: string[];
   /** Original file path that was resolved */
   resolvedFrom: string;
+  /** Default persona for this zone (v2.6) */
+  defaultPersona?: PersonaId;
 }
+
+// =============================================================================
+// ZONE-PERSONA MAPPING (v2.6)
+// =============================================================================
+
+/**
+ * Default mapping of zones to personas.
+ * Can be overridden by .sigilrc.yaml configuration.
+ */
+export const DEFAULT_ZONE_PERSONA_MAP: Record<string, PersonaId> = {
+  // Critical zones (transactions, high-stakes) → power users who know what they're doing
+  critical: 'power_user',
+  checkout: 'power_user',
+  claim: 'power_user',
+  withdraw: 'power_user',
+  deposit: 'power_user',
+
+  // Marketing zones → newcomers who need guidance
+  marketing: 'newcomer',
+  landing: 'newcomer',
+  onboarding: 'newcomer',
+  welcome: 'newcomer',
+
+  // Admin zones → power users with keyboard navigation
+  admin: 'power_user',
+  dashboard: 'power_user',
+  settings: 'power_user',
+
+  // Mobile-specific zones
+  mobile: 'mobile',
+  app: 'mobile',
+
+  // Accessibility-first zones
+  a11y: 'accessibility',
+  accessible: 'accessibility',
+};
 
 interface RawConfig {
   sigil?: string;
@@ -254,6 +295,70 @@ export function isConstraintViolation(
  */
 export function getRecipesPath(config: ZoneConfig): string {
   return `sigil-mark/recipes/${config.recipes}`;
+}
+
+// =============================================================================
+// ZONE-PERSONA INTEGRATION (v2.6)
+// =============================================================================
+
+/**
+ * Get the default persona for a zone.
+ *
+ * @param zone - Zone name or path segment
+ * @param customMapping - Optional custom zone-persona mapping
+ * @returns Persona ID, or 'newcomer' as default
+ *
+ * @example
+ * ```ts
+ * getPersonaForZone('critical'); // 'power_user'
+ * getPersonaForZone('marketing'); // 'newcomer'
+ * getPersonaForZone('unknown'); // 'newcomer' (default)
+ * ```
+ */
+export function getPersonaForZone(
+  zone: string,
+  customMapping?: Record<string, PersonaId>
+): PersonaId {
+  // Use custom mapping if provided, fall back to defaults
+  const mapping = { ...DEFAULT_ZONE_PERSONA_MAP, ...customMapping };
+
+  // Try exact match first
+  if (mapping[zone]) {
+    return mapping[zone];
+  }
+
+  // Try matching against zone path parts
+  const zoneParts = zone.toLowerCase().split('/');
+  for (const part of zoneParts) {
+    if (mapping[part]) {
+      return mapping[part];
+    }
+  }
+
+  // Default to newcomer (safest for unknown zones)
+  return 'newcomer';
+}
+
+/**
+ * Get the zone config with persona information.
+ *
+ * @param filePath - Path to resolve
+ * @param customMapping - Optional custom zone-persona mapping
+ * @returns Zone config with defaultPersona set
+ *
+ * @example
+ * ```ts
+ * const config = resolveZoneWithPersona('src/checkout/Button.tsx');
+ * console.log(config.defaultPersona); // 'power_user'
+ * ```
+ */
+export function resolveZoneWithPersona(
+  filePath: string,
+  customMapping?: Record<string, PersonaId>
+): ZoneConfig {
+  const config = resolveZone(filePath);
+  config.defaultPersona = getPersonaForZone(config.zone, customMapping);
+  return config;
 }
 
 export default resolveZone;
