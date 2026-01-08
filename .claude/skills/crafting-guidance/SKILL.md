@@ -515,3 +515,34 @@ DO:
 - Present options with tradeoffs when multiple approaches exist
 - Surface gaps at END with actionable /refine commands
 - Proceed with implementation after warnings
+
+---
+
+## Next Steps
+
+After providing `/craft` guidance, always show this section:
+
+```
+═══════════════════════════════════════════════════════════
+                     NEXT STEPS
+═══════════════════════════════════════════════════════════
+
+Implementation guidance provided. Here's what to do next:
+
+AFTER BUILDING:
+  /observe    — Capture screenshot and compare against rules
+               (Validates your implementation matches intent)
+
+IF CONTEXT GAPS WERE SHOWN:
+  /refine     — Fill in missing personas, zones, or vocabulary
+               (Improves future guidance)
+
+IF MAKING A DESIGN DECISION:
+  /consult    — Lock the decision to prevent bikeshedding
+               (30-day default lock)
+
+PERIODICALLY:
+  /garden     — Check context health
+
+═══════════════════════════════════════════════════════════
+```

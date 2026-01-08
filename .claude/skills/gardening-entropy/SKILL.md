@@ -441,3 +441,41 @@ else:
 3. **Evidence-first** — Health tied to evidence quality
 4. **CI-friendly** — --validate mode for automation
 5. **Progressive** — L1 summary, L2 details, L3 automation
+
+---
+
+## Next Steps
+
+After completing `/garden`, always show this section:
+
+```
+═══════════════════════════════════════════════════════════
+                     NEXT STEPS
+═══════════════════════════════════════════════════════════
+
+Health report complete. Here's what to do based on findings:
+
+IF PERSONAS LACK EVIDENCE:
+  /refine --persona <name> --evidence <file>
+               (Grounds personas in data)
+
+IF FEEDBACK IS UNAPPLIED:
+  /refine     — Review and apply pending feedback
+               (Keeps rules in sync with observations)
+
+IF ZONES LACK JOURNEY CONTEXT:
+  /refine --zone <name>
+               (Adds journey_stage, persona_likely, trust_state)
+
+IF DECISIONS EXPIRED:
+  /consult DEC-XXXX-XXX --unlock "expired, needs review"
+               (Re-evaluate or remove stale decisions)
+
+CONTINUE BUILDING:
+  /craft      — Get guidance (health issues don't block work)
+
+RE-CHECK AFTER FIXES:
+  /garden     — Verify health improved
+
+═══════════════════════════════════════════════════════════
+```

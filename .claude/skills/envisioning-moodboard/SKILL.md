@@ -675,3 +675,31 @@ DO:
 - Capture specific numbers when available
 - Map users to journey stages
 - Save progress incrementally
+
+---
+
+## Next Steps
+
+After completing `/envision`, always show this section:
+
+```
+═══════════════════════════════════════════════════════════
+                     NEXT STEPS
+═══════════════════════════════════════════════════════════
+
+Your product soul has been captured. Here's what to do next:
+
+RECOMMENDED:
+  /codify     — Define design rules, zones, and motion recipes
+               (Best done immediately after /envision)
+
+LATER:
+  /craft      — Get design guidance during implementation
+  /garden     — Check context health and completeness
+
+ANYTIME:
+  /refine     — Update personas or add evidence incrementally
+  /consult    — Record design decisions with time locks
+
+═══════════════════════════════════════════════════════════
+```

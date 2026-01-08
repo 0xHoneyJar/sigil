@@ -564,3 +564,36 @@ DO:
 - Show current state before changes
 - Track all refinements
 - Batch feedback application
+
+---
+
+## Next Steps
+
+After completing `/refine`, always show this section:
+
+```
+═══════════════════════════════════════════════════════════
+                     NEXT STEPS
+═══════════════════════════════════════════════════════════
+
+Context refined. Here's what to do next:
+
+CONTINUE BUILDING:
+  /craft      — Get guidance with your updated context
+               (New personas/zones/vocab now inform suggestions)
+
+VALIDATE CHANGES:
+  /observe    — Capture screenshot to verify alignment
+  /garden     — Check overall context health
+
+IF YOU MADE A SIGNIFICANT DECISION:
+  /consult    — Lock it to prevent bikeshedding
+               (Prevents re-debating the same topic)
+
+MORE REFINEMENT:
+  /refine --persona <name>   — Update another persona
+  /refine --zone <name>      — Update a zone
+  /refine --vocab <term>     — Update vocabulary
+
+═══════════════════════════════════════════════════════════
+```

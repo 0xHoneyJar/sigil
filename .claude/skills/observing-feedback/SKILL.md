@@ -391,3 +391,37 @@ DO:
 - Generate questions for human judgment
 - Link to actionable /refine commands
 - Store observations for reference
+
+---
+
+## Next Steps
+
+After completing `/observe`, always show this section:
+
+```
+═══════════════════════════════════════════════════════════
+                     NEXT STEPS
+═══════════════════════════════════════════════════════════
+
+Observation complete. Here's what to do next:
+
+IF STRUCTURAL ISSUES FOUND:
+  Fix the component directly
+  Then re-run: /observe
+
+IF RULES SHOULD CHANGE:
+  /refine     — Apply feedback to update rules.md
+               (Changes rules to match observed reality)
+
+IF A DESIGN DECISION WAS MADE:
+  /consult    — Lock the decision to prevent re-litigation
+               ("border-radius is 4px" → 30-day lock)
+
+CONTINUE BUILDING:
+  /craft      — Get guidance for next component
+
+PERIODICALLY:
+  /garden     — Shows unapplied feedback count
+
+═══════════════════════════════════════════════════════════
+```

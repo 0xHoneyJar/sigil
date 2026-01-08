@@ -702,3 +702,31 @@ DO:
 - Link zones to likely personas
 - Capture evidence for zone decisions
 - Define constraints by trust level
+
+---
+
+## Next Steps
+
+After completing `/codify`, always show this section:
+
+```
+═══════════════════════════════════════════════════════════
+                     NEXT STEPS
+═══════════════════════════════════════════════════════════
+
+Design rules are now codified. Here's what to do next:
+
+RECOMMENDED:
+  /craft      — Start building! Get design guidance during implementation
+               (Your zones and rules will inform all suggestions)
+
+DURING IMPLEMENTATION:
+  /observe    — Capture screenshots and compare against rules
+  /consult    — Record design decisions with time locks
+
+MAINTENANCE:
+  /garden     — Check context health periodically
+  /refine     — Update zones or rules incrementally
+
+═══════════════════════════════════════════════════════════
+```

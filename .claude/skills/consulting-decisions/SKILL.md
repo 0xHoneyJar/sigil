@@ -322,3 +322,35 @@ Note: /garden will show this as manually unlocked.
 3. **Locks prevent bikeshedding** — Not reconsideration
 4. **Unlocks are valid** — With justification
 5. **Protection is strategic** — For behaviors that must always work
+
+---
+
+## Next Steps
+
+After completing `/consult`, always show this section:
+
+```
+═══════════════════════════════════════════════════════════
+                     NEXT STEPS
+═══════════════════════════════════════════════════════════
+
+Decision recorded. Here's what to do next:
+
+CONTINUE BUILDING:
+  /craft      — Get guidance (your locked decisions are now respected)
+               (Agent will warn if implementation conflicts)
+
+IF YOU WANT TO UNLOCK LATER:
+  /consult DEC-XXXX-XXX --unlock "reason"
+               (Requires justification)
+
+CHECK DECISION HEALTH:
+  /garden --decisions   — See all active locks and expirations
+  /garden               — Overall health including decisions
+
+OTHER TOOLS:
+  /observe    — Validate implementations match decisions
+  /refine     — Update context (won't override locked decisions)
+
+═══════════════════════════════════════════════════════════
+```
