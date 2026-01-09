@@ -666,3 +666,26 @@ export {
   queryPhysics,
   queryZone,
 } from './workshop-builder';
+
+// =============================================================================
+// STARTUP SENTINEL (v6.0 - Sprint 2)
+// =============================================================================
+
+export {
+  // Lock file handling
+  acquireLock,
+  releaseLock,
+  isLocked,
+  // Quick rebuild
+  quickRebuild,
+  // Sentinel
+  runSentinel,
+  // Integration with /craft
+  ensureWorkshopReady,
+  logSentinelDecision,
+  // Types
+  type SentinelResult,
+  type SentinelOptions,
+  type QuickRebuildOptions,
+  type QuickRebuildResult,
+} from './startup-sentinel';

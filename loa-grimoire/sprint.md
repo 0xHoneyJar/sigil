@@ -186,11 +186,11 @@ The MVP delivers:
 **Description:** Implement startup check that runs before /craft.
 
 **Acceptance Criteria:**
-- [ ] Check package.json hash on startup
-- [ ] Check imports.yaml hash on startup
-- [ ] If either stale, trigger rebuild
-- [ ] If both fresh, skip rebuild
-- [ ] Log rebuild decision
+- [x] Check package.json hash on startup
+- [x] Check imports.yaml hash on startup
+- [x] If either stale, trigger rebuild
+- [x] If both fresh, skip rebuild
+- [x] Log rebuild decision
 
 **Dependencies:** Sprint 1
 **Effort:** Medium
@@ -201,11 +201,11 @@ The MVP delivers:
 **Description:** Implement fast incremental rebuild.
 
 **Acceptance Criteria:**
-- [ ] `quickRebuild()` updates only stale sections
-- [ ] If package_hash changed: rebuild materials only
-- [ ] If imports_hash changed: rebuild materials only
-- [ ] If Sanctuary changed: rebuild components only
-- [ ] Total rebuild time <2s
+- [x] `quickRebuild()` updates only stale sections
+- [x] If package_hash changed: rebuild materials only
+- [x] If imports_hash changed: rebuild materials only
+- [x] If Sanctuary changed: rebuild components only
+- [x] Total rebuild time <2s
 
 **Dependencies:** S2-T1
 **Effort:** Medium
@@ -216,11 +216,11 @@ The MVP delivers:
 **Description:** Prevent concurrent rebuilds.
 
 **Acceptance Criteria:**
-- [ ] Lock file at .sigil/workshop.lock
-- [ ] Acquire lock before rebuild
-- [ ] Release lock after rebuild
-- [ ] Timeout after 30s
-- [ ] Handle stale locks
+- [x] Lock file at .sigil/workshop.lock
+- [x] Acquire lock before rebuild
+- [x] Release lock after rebuild
+- [x] Timeout after 30s
+- [x] Handle stale locks
 
 **Dependencies:** S2-T1
 **Effort:** Small
@@ -231,10 +231,10 @@ The MVP delivers:
 **Description:** Run Startup Sentinel before every /craft.
 
 **Acceptance Criteria:**
-- [ ] /craft checks workshop freshness first
-- [ ] If stale, rebuild silently (no interruption)
-- [ ] If rebuild fails, fallback to JIT grep
-- [ ] Log fallback decision
+- [x] /craft checks workshop freshness first
+- [x] If stale, rebuild silently (no interruption)
+- [x] If rebuild fails, fallback to JIT grep
+- [x] Log fallback decision
 
 **Dependencies:** S2-T1, S2-T2
 **Effort:** Medium
@@ -245,11 +245,11 @@ The MVP delivers:
 **Description:** Integration tests for startup flow.
 
 **Acceptance Criteria:**
-- [ ] Test fresh workshop skips rebuild
-- [ ] Test stale package triggers rebuild
-- [ ] Test stale imports triggers rebuild
-- [ ] Test concurrent rebuild handling
-- [ ] Test fallback on failure
+- [x] Test fresh workshop skips rebuild
+- [x] Test stale package triggers rebuild
+- [x] Test stale imports triggers rebuild
+- [x] Test concurrent rebuild handling
+- [x] Test fallback on failure
 
 **Dependencies:** S2-T1 through S2-T4
 **Effort:** Medium
