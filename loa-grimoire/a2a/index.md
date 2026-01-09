@@ -594,7 +594,7 @@ This document tracks all sprint artifacts and their approval status.
 | 1 | Workshop Schema & Builder | COMPLETED | ✅ Approved | ✅ Approved |
 | 2 | Startup Sentinel | COMPLETED | ✅ Approved | ✅ Approved |
 | 3 | Discovery Skills | COMPLETED | ✅ Approved | ✅ Approved |
-| 4 | Querying Workshop | PENDING | — | — |
+| 4 | Querying Workshop | COMPLETED | ✅ Approved | ✅ Approved |
 | 5 | Validating Physics | PENDING | — | — |
 | 6 | Virtual Sanctuary | PENDING | — | — |
 | 7 | Ephemeral Inspiration | PENDING | — | — |

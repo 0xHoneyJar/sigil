@@ -399,11 +399,11 @@ The MVP delivers:
 **Description:** Create skill definition for workshop queries.
 
 **Acceptance Criteria:**
-- [ ] SKILL.md in `.claude/skills/querying-workshop/`
-- [ ] Purpose: Fast lookups from pre-computed index
-- [ ] Trigger: /craft command
-- [ ] Query types: material, component, physics, zone
-- [ ] Performance target: <5ms
+- [x] SKILL.md in `.claude/skills/querying-workshop/`
+- [x] Purpose: Fast lookups from pre-computed index
+- [x] Trigger: /craft command
+- [x] Query types: material, component, physics, zone
+- [x] Performance target: <5ms
 
 **Dependencies:** Sprint 1
 **Effort:** Small
@@ -414,10 +414,10 @@ The MVP delivers:
 **Description:** Create schema documentation for workshop.json.
 
 **Acceptance Criteria:**
-- [ ] WORKSHOP_SCHEMA.md in querying-workshop skill
-- [ ] Full JSON schema documented
-- [ ] Example queries documented
-- [ ] Performance characteristics explained
+- [x] WORKSHOP_SCHEMA.md in querying-workshop skill
+- [x] Full JSON schema documented
+- [x] Example queries documented
+- [x] Performance characteristics explained
 
 **Dependencies:** S4-T1
 **Effort:** Small
@@ -428,11 +428,11 @@ The MVP delivers:
 **Description:** Implement query functions for workshop.
 
 **Acceptance Criteria:**
-- [ ] `queryMaterial(name)` returns MaterialEntry
-- [ ] `queryComponent(name)` returns ComponentEntry
-- [ ] `queryPhysics(name)` returns PhysicsDefinition
-- [ ] `queryZone(name)` returns ZoneDefinition
-- [ ] All queries <5ms
+- [x] `queryMaterial(name)` returns MaterialEntry
+- [x] `queryComponent(name)` returns ComponentEntry
+- [x] `queryPhysics(name)` returns PhysicsDefinition
+- [x] `queryZone(name)` returns ZoneDefinition
+- [x] All queries <5ms
 
 **Dependencies:** S4-T1, Sprint 1
 **Effort:** Medium
@@ -443,10 +443,10 @@ The MVP delivers:
 **Description:** Fallback to direct type reading when signature missing.
 
 **Acceptance Criteria:**
-- [ ] If workshop lacks signature, read from node_modules/*.d.ts
-- [ ] Targeted file read (not full parse)
-- [ ] Cache result in memory for session
-- [ ] Fallback time <50ms
+- [x] If workshop lacks signature, read from node_modules/*.d.ts
+- [x] Targeted file read (not full parse)
+- [x] Cache result in memory for session
+- [x] Fallback time <50ms
 
 **Dependencies:** S4-T3
 **Effort:** Medium
@@ -457,9 +457,9 @@ The MVP delivers:
 **Description:** Track where query results come from.
 
 **Acceptance Criteria:**
-- [ ] QueryResult includes `source: 'workshop' | 'seed' | 'fallback'`
-- [ ] Log when using fallback
-- [ ] Prefer workshop > seed > fallback
+- [x] QueryResult includes `source: 'workshop' | 'seed' | 'fallback'`
+- [x] Log when using fallback
+- [x] Prefer workshop > seed > fallback
 
 **Dependencies:** S4-T3
 **Effort:** Small
@@ -470,11 +470,11 @@ The MVP delivers:
 **Description:** Unit tests for query performance.
 
 **Acceptance Criteria:**
-- [ ] Test material query <5ms
-- [ ] Test component query <5ms
-- [ ] Test fallback behavior
-- [ ] Benchmark 100 queries in <500ms
-- [ ] All tests pass
+- [x] Test material query <5ms
+- [x] Test component query <5ms
+- [x] Test fallback behavior
+- [x] Benchmark 100 queries in <500ms
+- [x] All tests pass
 
 **Dependencies:** S4-T3 through S4-T5
 **Effort:** Medium

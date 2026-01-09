@@ -713,3 +713,29 @@ export {
   type ScanResult,
   type ScanOptions,
 } from './sanctuary-scanner';
+
+// =============================================================================
+// WORKSHOP QUERY (v6.0 - Sprint 4)
+// =============================================================================
+
+export {
+  // Material query with fallback
+  queryMaterialWithFallback,
+  // Component query
+  queryComponentWithSource,
+  // Physics query
+  queryPhysicsWithSource,
+  // Zone query
+  queryZoneWithSource,
+  // Batch queries
+  queryMaterials,
+  queryComponents,
+  // Query API factory
+  createQueryAPI,
+  loadWorkshopWithQueryAPI,
+  // Cache management
+  clearQueryCache,
+  // Types
+  type QueryOptions,
+  type WorkshopQueryAPI,
+} from './workshop-query';
