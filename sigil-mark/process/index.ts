@@ -854,3 +854,49 @@ export {
   type SanctifyResult,
   type EphemeralFlow,
 } from './ephemeral-inspiration';
+
+// =============================================================================
+// FORGE MODE (v6.0 - Sprint 8)
+// =============================================================================
+
+export {
+  // Trigger detection
+  detectForgeTrigger,
+  isForgeModeRequested,
+  // Context management
+  createForgeContext,
+  getDefaultContext,
+  isForgeMode,
+  // Survival bypass
+  shouldCheckPattern,
+  shouldLoadSurvival,
+  shouldWarnRejected,
+  shouldPreferCanonical,
+  // Generation management
+  storeForgeGeneration,
+  getForgeGeneration,
+  getPendingForgeGenerations,
+  hasPendingForgeDecisions,
+  // Decision handling
+  recordForgeDecision,
+  keepForgeGeneration,
+  discardForgeGeneration,
+  getForgeDecisionLog,
+  getForgeDecision,
+  // Utilities
+  formatForgeActivation,
+  formatForgeDecisionPrompt,
+  formatForgeDecisionResult,
+  // Integration
+  prepareCraftContext,
+  createForgeFlow,
+  // Cleanup
+  clearForgeSessions,
+  // Types
+  type ForgeContext,
+  type ForgeTrigger,
+  type ForgeGeneration,
+  type ForgeDecisionLog,
+  type PatternCheckOptions,
+  type ForgeFlow,
+} from './forge-mode';

@@ -878,11 +878,11 @@ The MVP delivers:
 **Description:** Create skill definition for forge mode.
 
 **Acceptance Criteria:**
-- [ ] SKILL.md in `.claude/skills/forging-patterns/`
-- [ ] Purpose: Explicit precedent-breaking mode
-- [ ] Trigger: `/craft --forge` or `/forge` command
-- [ ] Respects: Physics constraints only
-- [ ] Ignores: Survival patterns, rejected patterns
+- [x] SKILL.md in `.claude/skills/forging-patterns/`
+- [x] Purpose: Explicit precedent-breaking mode
+- [x] Trigger: `/craft --forge` or `/forge` command
+- [x] Respects: Physics constraints only
+- [x] Ignores: Survival patterns, rejected patterns
 
 **Dependencies:** None
 **Effort:** Small
@@ -893,10 +893,10 @@ The MVP delivers:
 **Description:** Detect forge mode trigger.
 
 **Acceptance Criteria:**
-- [ ] Detect `--forge` flag in /craft
-- [ ] Detect standalone `/forge` command
-- [ ] Set forge mode in context
-- [ ] Log forge mode activation
+- [x] Detect `--forge` flag in /craft
+- [x] Detect standalone `/forge` command
+- [x] Set forge mode in context
+- [x] Log forge mode activation
 
 **Dependencies:** S8-T1
 **Effort:** Small
@@ -907,10 +907,10 @@ The MVP delivers:
 **Description:** Skip survival checks in forge mode.
 
 **Acceptance Criteria:**
-- [ ] Don't load survival.json in forge mode
-- [ ] Don't warn about rejected patterns
-- [ ] Don't prefer canonical patterns
-- [ ] Treat all patterns as equal
+- [x] Don't load survival.json in forge mode
+- [x] Don't warn about rejected patterns
+- [x] Don't prefer canonical patterns
+- [x] Treat all patterns as equal
 
 **Dependencies:** S8-T2
 **Effort:** Medium
@@ -921,11 +921,11 @@ The MVP delivers:
 **Description:** Enforce only physics in forge mode.
 
 **Acceptance Criteria:**
-- [ ] Zone constraints still enforced
-- [ ] Material constraints still enforced
-- [ ] API correctness still enforced
-- [ ] Pattern precedent NOT enforced
-- [ ] Style novelty NOT blocked
+- [x] Zone constraints still enforced
+- [x] Material constraints still enforced
+- [x] API correctness still enforced
+- [x] Pattern precedent NOT enforced
+- [x] Style novelty NOT blocked
 
 **Dependencies:** S8-T2, Sprint 5
 **Effort:** Medium
@@ -936,10 +936,10 @@ The MVP delivers:
 **Description:** Let user decide to keep or discard forge output.
 
 **Acceptance Criteria:**
-- [ ] After forge generation, prompt "Keep this exploration?"
-- [ ] If keep: Normal /craft flow applies
-- [ ] If discard: Generated code removed
-- [ ] Log decision
+- [x] After forge generation, prompt "Keep this exploration?"
+- [x] If keep: Normal /craft flow applies
+- [x] If discard: Generated code removed
+- [x] Log decision
 
 **Dependencies:** S8-T3, S8-T4
 **Effort:** Small
@@ -950,10 +950,10 @@ The MVP delivers:
 **Description:** Test forge mode behavior.
 
 **Acceptance Criteria:**
-- [ ] Test survival bypass
-- [ ] Test physics still enforced
-- [ ] Test keep/discard flow
-- [ ] Test integration with /craft
+- [x] Test survival bypass
+- [x] Test physics still enforced
+- [x] Test keep/discard flow
+- [x] Test integration with /craft
 
 **Dependencies:** S8-T1 through S8-T5
 **Effort:** Medium

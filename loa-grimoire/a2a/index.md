@@ -598,7 +598,7 @@ This document tracks all sprint artifacts and their approval status.
 | 5 | Validating Physics | COMPLETED | ✅ Approved | ✅ Approved |
 | 6 | Virtual Sanctuary | COMPLETED | ✅ Approved | ✅ Approved |
 | 7 | Ephemeral Inspiration | COMPLETED | ✅ Approved | ✅ Approved |
-| 8 | Forge Mode | PENDING | — | — |
+| 8 | Forge Mode | COMPLETED | ✅ Approved | ✅ Approved |
 | 9 | Era Management | PENDING | — | — |
 | 10 | Survival Observation | PENDING | — | — |
 | 11 | Chronicling & Auditing | PENDING | — | — |
@@ -608,4 +608,4 @@ This document tracks all sprint artifacts and their approval status.
 ---
 
 *Last Updated: 2026-01-09*
-*Current Version: Sigil v6.0.0 "Native Muse" — Sprint 7 Complete*
+*Current Version: Sigil v6.0.0 "Native Muse" — Sprint 8 Complete*
