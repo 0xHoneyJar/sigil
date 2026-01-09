@@ -739,3 +739,44 @@ export {
   type QueryOptions,
   type WorkshopQueryAPI,
 } from './workshop-query';
+
+// =============================================================================
+// PHYSICS VALIDATOR (v6.0 - Sprint 5)
+// =============================================================================
+
+export {
+  // Zone constraints
+  getZoneConstraint,
+  isPhysicsAllowedInZone,
+  validateZoneConstraint,
+  // Material constraints
+  getMaterialConstraint,
+  parseTimingMs,
+  isTimingValidForMaterial,
+  validateMaterialConstraint,
+  // API correctness
+  validateApiExport,
+  // Fidelity constraints
+  getFidelityConstraint,
+  compareFidelity,
+  isFidelityValid,
+  isEffectAllowed,
+  validateFidelityConstraint,
+  // Code extraction
+  extractZoneFromCode,
+  extractPhysicsFromCode,
+  extractTimingFromCode,
+  extractMaterialFromCode,
+  extractImportsFromCode,
+  // Main validator
+  validatePhysics,
+  formatValidationResponse,
+  validateForHook,
+  // Types
+  type ZoneConstraint,
+  type MaterialConstraint,
+  type FidelityConstraint,
+  type ValidationResult,
+  type ValidationViolation,
+  type ValidationOptions,
+} from './physics-validator';

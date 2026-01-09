@@ -502,11 +502,11 @@ The MVP delivers:
 **Description:** Create skill definition for physics validation.
 
 **Acceptance Criteria:**
-- [ ] SKILL.md in `.claude/skills/validating-physics/`
-- [ ] Purpose: Block physics violations, not novelty
-- [ ] Trigger: PreToolUse hook on Write|Edit
-- [ ] Checks: zone, material, API, fidelity
-- [ ] Non-checks: pattern existence, style novelty
+- [x] SKILL.md in `.claude/skills/validating-physics/`
+- [x] Purpose: Block physics violations, not novelty
+- [x] Trigger: PreToolUse hook on Write|Edit
+- [x] Checks: zone, material, API, fidelity
+- [x] Non-checks: pattern existence, style novelty
 
 **Dependencies:** None
 **Effort:** Small
@@ -517,10 +517,10 @@ The MVP delivers:
 **Description:** Configure hook in settings.json.
 
 **Acceptance Criteria:**
-- [ ] Hook registered for Write|Edit tools
-- [ ] Calls validate_physics function
-- [ ] Can block generation if violation found
-- [ ] Returns clear error message
+- [x] Hook registered for Write|Edit tools
+- [x] Calls validate_physics function
+- [x] Can block generation if violation found
+- [x] Returns clear error message
 
 **Dependencies:** S5-T1
 **Effort:** Medium
@@ -531,10 +531,10 @@ The MVP delivers:
 **Description:** Validate zone-physics compatibility.
 
 **Acceptance Criteria:**
-- [ ] Critical zone + playful physics → BLOCK
-- [ ] Critical zone + deliberate physics → ALLOW
-- [ ] Standard zone + any physics → ALLOW
-- [ ] Clear error message with suggestion
+- [x] Critical zone + playful physics → BLOCK
+- [x] Critical zone + deliberate physics → ALLOW
+- [x] Standard zone + any physics → ALLOW
+- [x] Clear error message with suggestion
 
 **Dependencies:** S5-T1
 **Effort:** Medium
@@ -545,10 +545,10 @@ The MVP delivers:
 **Description:** Validate material-timing compatibility.
 
 **Acceptance Criteria:**
-- [ ] Clay material + 0ms timing → BLOCK
-- [ ] Glass material + heavy spring → BLOCK
-- [ ] Valid combinations → ALLOW
-- [ ] Clear error message with suggestion
+- [x] Clay material + 0ms timing → BLOCK
+- [x] Glass material + heavy spring → BLOCK
+- [x] Valid combinations → ALLOW
+- [x] Clear error message with suggestion
 
 **Dependencies:** S5-T1
 **Effort:** Medium
@@ -559,10 +559,10 @@ The MVP delivers:
 **Description:** Validate framework API usage.
 
 **Acceptance Criteria:**
-- [ ] Query workshop for valid exports
-- [ ] motion.animate (invalid) → BLOCK with suggestion
-- [ ] motion.div (valid) → ALLOW
-- [ ] Include correct API in error message
+- [x] Query workshop for valid exports
+- [x] motion.animate (invalid) → BLOCK with suggestion
+- [x] motion.div (valid) → ALLOW
+- [x] Include correct API in error message
 
 **Dependencies:** Sprint 4 (workshop)
 **Effort:** Medium
@@ -573,10 +573,10 @@ The MVP delivers:
 **Description:** Validate fidelity level constraints.
 
 **Acceptance Criteria:**
-- [ ] 3D effects in standard zone → BLOCK
-- [ ] Heavy effects in critical zone → BLOCK
-- [ ] Check against fidelity.yaml limits
-- [ ] Clear error with constraint source
+- [x] 3D effects in standard zone → BLOCK
+- [x] Heavy effects in critical zone → BLOCK
+- [x] Check against fidelity.yaml limits
+- [x] Clear error with constraint source
 
 **Dependencies:** S5-T1
 **Effort:** Medium
@@ -587,12 +587,12 @@ The MVP delivers:
 **Description:** Test suite for validation logic.
 
 **Acceptance Criteria:**
-- [ ] Test all zone constraint combinations
-- [ ] Test material constraint combinations
-- [ ] Test API correctness checks
-- [ ] Test fidelity ceiling enforcement
-- [ ] 100% coverage on validation logic
-- [ ] All tests pass
+- [x] Test all zone constraint combinations
+- [x] Test material constraint combinations
+- [x] Test API correctness checks
+- [x] Test fidelity ceiling enforcement
+- [x] 100% coverage on validation logic
+- [x] All tests pass
 
 **Dependencies:** S5-T3 through S5-T6
 **Effort:** Large
