@@ -1098,11 +1098,11 @@ The MVP delivers:
 **Description:** Create skill definition for survival observation.
 
 **Acceptance Criteria:**
-- [ ] SKILL.md in `.claude/skills/observing-survival/`
-- [ ] Purpose: Silent pattern tracking via PostToolUse hook
-- [ ] Trigger: After Write|Edit tool
-- [ ] Output: Updated survival.json
-- [ ] Behavior: No interruption, no approval dialog
+- [x] SKILL.md in `.claude/skills/observing-survival/`
+- [x] Purpose: Silent pattern tracking via PostToolUse hook
+- [x] Trigger: After Write|Edit tool
+- [x] Output: Updated survival.json
+- [x] Behavior: No interruption, no approval dialog
 
 **Dependencies:** None
 **Effort:** Small
@@ -1113,10 +1113,10 @@ The MVP delivers:
 **Description:** Configure hook in settings.json.
 
 **Acceptance Criteria:**
-- [ ] Hook registered for Write|Edit tools
-- [ ] Calls observe_patterns function
-- [ ] Non-blocking (never blocks generation)
-- [ ] Runs silently in background
+- [x] Hook registered for Write|Edit tools
+- [x] Calls observe_patterns function
+- [x] Non-blocking (never blocks generation)
+- [x] Runs silently in background
 
 **Dependencies:** S10-T1
 **Effort:** Medium
@@ -1127,10 +1127,10 @@ The MVP delivers:
 **Description:** Detect new patterns in generated code.
 
 **Acceptance Criteria:**
-- [ ] Detect new animation patterns
-- [ ] Detect new component structures
-- [ ] Detect new hook usages
-- [ ] Return list of patterns with names
+- [x] Detect new animation patterns
+- [x] Detect new component structures
+- [x] Detect new hook usages
+- [x] Return list of patterns with names
 
 **Dependencies:** S10-T2
 **Effort:** Medium
@@ -1141,10 +1141,10 @@ The MVP delivers:
 **Description:** Add @sigil-pattern tags to new patterns.
 
 **Acceptance Criteria:**
-- [ ] Format: `// @sigil-pattern: patternName (2026-01-08)`
-- [ ] Tag added after relevant code block
-- [ ] Non-intrusive placement
-- [ ] Parseable for gardener
+- [x] Format: `// @sigil-pattern: patternName (2026-01-08)`
+- [x] Tag added after relevant code block
+- [x] Non-intrusive placement
+- [x] Parseable for gardener
 
 **Dependencies:** S10-T3
 **Effort:** Medium
@@ -1155,11 +1155,11 @@ The MVP delivers:
 **Description:** Incrementally update survival.json.
 
 **Acceptance Criteria:**
-- [ ] Add new patterns with first_seen date
-- [ ] Increment occurrences for existing patterns
-- [ ] Set initial status: experimental
-- [ ] Add file path to files array
-- [ ] Update last_scan timestamp
+- [x] Add new patterns with first_seen date
+- [x] Increment occurrences for existing patterns
+- [x] Set initial status: experimental
+- [x] Add file path to files array
+- [x] Update last_scan timestamp
 
 **Dependencies:** S10-T4
 **Effort:** Medium
@@ -1170,12 +1170,12 @@ The MVP delivers:
 **Description:** Create weekly survival scan script.
 
 **Acceptance Criteria:**
-- [ ] Script at `.claude/skills/observing-survival/scripts/gardener.sh`
-- [ ] Scan for @sigil-pattern tags via ripgrep
-- [ ] Count occurrences per pattern
-- [ ] Apply promotion rules (3+ → canonical)
-- [ ] Detect deletions (0 occurrences → rejected)
-- [ ] Update survival.json
+- [x] Script at `.claude/skills/observing-survival/scripts/gardener.sh`
+- [x] Scan for @sigil-pattern tags via ripgrep
+- [x] Count occurrences per pattern
+- [x] Apply promotion rules (3+ → canonical)
+- [x] Detect deletions (0 occurrences → rejected)
+- [x] Update survival.json
 
 **Dependencies:** S10-T5
 **Effort:** Medium
@@ -1186,10 +1186,10 @@ The MVP delivers:
 **Description:** Implement manual garden command.
 
 **Acceptance Criteria:**
-- [ ] `/garden` runs gardener script
-- [ ] Reports pattern status changes
-- [ ] Shows canonical/rejected transitions
-- [ ] Returns summary
+- [x] `/garden` runs gardener script
+- [x] Reports pattern status changes
+- [x] Shows canonical/rejected transitions
+- [x] Returns summary
 
 **Dependencies:** S10-T6
 **Effort:** Small
@@ -1200,11 +1200,11 @@ The MVP delivers:
 **Description:** Test pattern tracking flow.
 
 **Acceptance Criteria:**
-- [ ] Test pattern detection
-- [ ] Test JSDoc tagging
-- [ ] Test survival update
-- [ ] Test gardener promotion logic
-- [ ] Test rejection detection
+- [x] Test pattern detection
+- [x] Test JSDoc tagging
+- [x] Test survival update
+- [x] Test gardener promotion logic
+- [x] Test rejection detection
 
 **Dependencies:** S10-T1 through S10-T7
 **Effort:** Medium

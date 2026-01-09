@@ -941,3 +941,44 @@ export {
   type SurvivalEraInfo,
   type EraLogEntry,
 } from './era-manager';
+
+// =============================================================================
+// SURVIVAL OBSERVER (v6.0 - Sprint 10)
+// =============================================================================
+
+export {
+  // Constants
+  SURVIVAL_PATH as OBSERVER_SURVIVAL_PATH,
+  PATTERN_TAG_PREFIX,
+  PROMOTION_THRESHOLDS,
+  // Pattern detection
+  detectPatterns,
+  hasPatternTag,
+  getPatternTags,
+  // Pattern tagging
+  addPatternTag,
+  addPatternTags,
+  // Survival index
+  loadSurvivalIndex,
+  saveSurvivalIndex,
+  determineStatus,
+  updatePattern,
+  rejectPattern,
+  // Observation
+  observePatterns,
+  observeAndTag,
+  // Gardener
+  countPatternOccurrences,
+  applyPromotionRules,
+  runGardener,
+  // Formatting
+  formatObservationResult,
+  formatGardenerResult,
+  // Types
+  type PatternStatus,
+  type PatternEntry,
+  type SurvivalIndex,
+  type DetectedPattern,
+  type PatternTag,
+  type ObservationResult,
+} from './survival-observer';
