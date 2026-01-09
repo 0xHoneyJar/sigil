@@ -1380,10 +1380,10 @@ The MVP delivers:
 **Description:** Create agent definition for /craft flow.
 
 **Acceptance Criteria:**
-- [ ] Agent YAML at `.claude/agents/sigil-craft.yaml`
-- [ ] Orchestrates all 10 skills
-- [ ] Defines skill execution order
-- [ ] Handles errors gracefully
+- [x] Agent YAML at `.claude/agents/sigil-craft.yaml`
+- [x] Orchestrates all 10 skills
+- [x] Defines skill execution order
+- [x] Handles errors gracefully
 
 **Dependencies:** Sprints 3-11
 **Effort:** Medium
@@ -1394,12 +1394,12 @@ The MVP delivers:
 **Description:** Define skill execution flow for /craft.
 
 **Acceptance Criteria:**
-- [ ] Startup: Check workshop freshness
-- [ ] Discovery: Scan Sanctuary, query workshop
-- [ ] Validation: PreToolUse physics check
-- [ ] Generation: Code generation
-- [ ] Observation: PostToolUse pattern tracking
-- [ ] Chronicling: Stop hook craft log
+- [x] Startup: Check workshop freshness
+- [x] Discovery: Scan Sanctuary, query workshop
+- [x] Validation: PreToolUse physics check
+- [x] Generation: Code generation
+- [x] Observation: PostToolUse pattern tracking
+- [x] Chronicling: Stop hook craft log
 
 **Dependencies:** S12-T1
 **Effort:** Medium
@@ -1410,10 +1410,10 @@ The MVP delivers:
 **Description:** Resolve zone, physics, vocabulary from prompt.
 
 **Acceptance Criteria:**
-- [ ] Extract vocabulary terms from prompt
-- [ ] Map to zone via vocabulary.yaml
-- [ ] Resolve physics from zone
-- [ ] Log resolution chain
+- [x] Extract vocabulary terms from prompt
+- [x] Map to zone via vocabulary.yaml
+- [x] Resolve physics from zone
+- [x] Log resolution chain
 
 **Dependencies:** S12-T2
 **Effort:** Medium
@@ -1424,10 +1424,10 @@ The MVP delivers:
 **Description:** Select canonical patterns when available.
 
 **Acceptance Criteria:**
-- [ ] Query survival.json for canonical patterns
-- [ ] Prefer canonical over experimental
-- [ ] Prefer experimental over new
-- [ ] Log pattern selection
+- [x] Query survival.json for canonical patterns
+- [x] Prefer canonical over experimental
+- [x] Prefer experimental over new
+- [x] Log pattern selection
 
 **Dependencies:** Sprint 10
 **Effort:** Medium
@@ -1438,12 +1438,12 @@ The MVP delivers:
 **Description:** Complete /craft flow implementation.
 
 **Acceptance Criteria:**
-- [ ] `/craft "trustworthy claim button"` works end-to-end
-- [ ] Zone resolved correctly (critical)
-- [ ] Physics applied correctly (deliberate)
-- [ ] Code generated with correct timing
-- [ ] Craft log created
-- [ ] Pattern observed
+- [x] `/craft "trustworthy claim button"` works end-to-end
+- [x] Zone resolved correctly (critical)
+- [x] Physics applied correctly (deliberate)
+- [x] Code generated with correct timing
+- [x] Craft log created
+- [x] Pattern observed
 
 **Dependencies:** S12-T1 through S12-T4
 **Effort:** Large
@@ -1454,10 +1454,10 @@ The MVP delivers:
 **Description:** Verify performance targets.
 
 **Acceptance Criteria:**
-- [ ] Workshop query <5ms (benchmark)
-- [ ] Sanctuary scan <50ms (benchmark)
-- [ ] Full /craft flow <2s (benchmark)
-- [ ] Document benchmark results
+- [x] Workshop query <5ms (benchmark)
+- [x] Sanctuary scan <50ms (benchmark)
+- [x] Full /craft flow <2s (benchmark)
+- [x] Document benchmark results
 
 **Dependencies:** S12-T5
 **Effort:** Medium
@@ -1468,12 +1468,12 @@ The MVP delivers:
 **Description:** End-to-end integration tests.
 
 **Acceptance Criteria:**
-- [ ] Test /craft with empty Sanctuary (seed)
-- [ ] Test /craft with populated Sanctuary
-- [ ] Test /craft --forge mode
-- [ ] Test /inspire flow
-- [ ] Test /audit flow
-- [ ] All tests pass
+- [x] Test /craft with empty Sanctuary (seed)
+- [x] Test /craft with populated Sanctuary
+- [x] Test /craft --forge mode
+- [x] Test /inspire flow
+- [x] Test /audit flow
+- [x] All tests pass
 
 **Dependencies:** S12-T5
 **Effort:** Large

@@ -1061,3 +1061,33 @@ export {
   type AuditResult,
   type TierBaseline,
 } from './auditing-cohesion';
+
+// =============================================================================
+// AGENT ORCHESTRATION (v6.0 - Sprint 12)
+// =============================================================================
+
+export {
+  // Vocabulary resolution
+  extractVocabularyTerms,
+  resolveZoneFromVocabulary,
+  resolvePhysicsFromZone,
+  resolveContext,
+  // Pattern selection
+  selectPatterns,
+  // Craft flow
+  runCraftFlow,
+  // Benchmarking
+  runBenchmarks,
+  // Formatting
+  formatSkillsSummary,
+  formatCraftFlowResult,
+  formatBenchmarkResults,
+  // Types
+  type CraftPhase,
+  type SkillResult,
+  type ResolvedContext,
+  type PatternSelection,
+  type CraftFlowResult,
+  type OrchestrationOptions,
+  type BenchmarkResult,
+} from './agent-orchestration';

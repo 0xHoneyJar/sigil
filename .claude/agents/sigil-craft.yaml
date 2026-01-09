@@ -1,0 +1,148 @@
+# Sigil v6.0 — Craft Agent
+#
+# Orchestrates all 10 skills for the /craft flow.
+#
+# Philosophy: "Code is precedent. Survival is the vote. Never interrupt flow."
+
+name: sigil-craft
+version: 6.0.0
+description: Design context agent for component generation
+
+# Trigger patterns
+triggers:
+  - "/craft"
+  - "/craft --forge"
+  - pattern: "craft a|craft the|create a|create the"
+    context: component
+
+# Skill orchestration
+skills:
+  # Phase 1: Startup
+  startup:
+    - name: querying-workshop
+      description: Check workshop freshness and query materials
+      when: always
+      fallback: sanctuary-scanner
+
+    - name: startup-sentinel
+      description: Rebuild workshop if stale
+      when: workshop_stale
+      blocking: false
+
+  # Phase 2: Discovery
+  discovery:
+    - name: scanning-sanctuary
+      description: Find relevant components
+      when: always
+
+    - name: seeding-sanctuary
+      description: Provide virtual taste for cold starts
+      when: sanctuary_empty
+
+  # Phase 3: Context Resolution
+  context:
+    - name: vocabulary-resolution
+      description: Extract terms and resolve zone
+      when: always
+
+    - name: physics-resolution
+      description: Determine appropriate physics
+      when: zone_resolved
+
+  # Phase 4: Validation (PreToolUse)
+  validation:
+    - name: validating-physics
+      description: Block physics violations
+      when: pre_write
+      blocking: true
+
+  # Phase 5: Generation
+  generation:
+    - name: pattern-selection
+      description: Prefer canonical patterns
+      when: always
+
+    - name: inspiring-ephemerally
+      description: Context fork for external reference
+      when: inspiration_trigger
+
+    - name: forging-patterns
+      description: Precedent-breaking exploration
+      when: forge_mode
+
+  # Phase 6: Observation (PostToolUse)
+  observation:
+    - name: observing-survival
+      description: Track patterns silently
+      when: post_write
+      blocking: false
+
+  # Phase 7: Chronicling (Stop)
+  chronicling:
+    - name: chronicling-rationale
+      description: Write craft log
+      when: session_end
+      blocking: false
+
+# Error handling
+error_handling:
+  workshop_unavailable:
+    action: fallback_to_grep
+    message: "Workshop unavailable, using live grep discovery"
+
+  physics_violation:
+    action: block_with_suggestion
+    message: "Physics violation detected. Suggestion: {suggestion}"
+
+  empty_sanctuary:
+    action: use_seed
+    message: "Sanctuary empty, using {seed_name} seed"
+
+# Context flow
+context_flow:
+  # Input extraction
+  input:
+    - vocabulary_terms: "Extract from prompt"
+    - zone_hints: "Match vocabulary to zones"
+    - physics_requirements: "Derive from zone"
+    - inspiration_url: "Detect 'like [url]' pattern"
+    - forge_flag: "Detect '--forge' or '/forge'"
+
+  # Resolution chain
+  resolution:
+    1: vocabulary → zone
+    2: zone → physics
+    3: physics → patterns
+    4: patterns → code
+
+  # Output annotation
+  output:
+    - tier_pragma: "@sigil-tier {tier}"
+    - zone_pragma: "@sigil-zone {zone}"
+    - physics_pragma: "@sigil-physics {physics}"
+    - pattern_tag: "// @sigil-pattern: {pattern} ({date})"
+
+# Performance targets
+performance:
+  workshop_query: "<5ms"
+  sanctuary_scan: "<50ms"
+  physics_validation: "<10ms"
+  pattern_observation: "<10ms"
+  craft_log: "<100ms"
+  total_flow: "<2s"
+
+# Integration points
+integrations:
+  # PreToolUse hook for physics validation
+  PreToolUse:
+    matcher: "Write|Edit"
+    script: ".claude/skills/validating-physics/scripts/validate.sh"
+
+  # PostToolUse hook for pattern observation
+  PostToolUse:
+    matcher: "Write|Edit"
+    script: ".claude/skills/observing-survival/scripts/observe.sh"
+
+  # Stop hook for craft logging
+  Stop:
+    script: ".claude/skills/chronicling-rationale/scripts/ensure-log.sh"

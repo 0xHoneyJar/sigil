@@ -602,10 +602,10 @@ This document tracks all sprint artifacts and their approval status.
 | 9 | Era Management | COMPLETED | ✅ Approved | ✅ Approved |
 | 10 | Survival Observation | COMPLETED | ✅ Approved | ✅ Approved |
 | 11 | Chronicling & Auditing | COMPLETED | ✅ Approved | ✅ Approved |
-| 12 | Agent Integration | PENDING | — | — |
+| 12 | Agent Integration | COMPLETED | ✅ Approved | ✅ Approved |
 | 13 | Polish & Documentation | PENDING | — | — |
 
 ---
 
 *Last Updated: 2026-01-08*
-*Current Version: Sigil v6.0.0 "Native Muse" — Sprint 11 Complete*
+*Current Version: Sigil v6.0.0 "Native Muse" — Sprint 12 Complete*
