@@ -1,82 +1,134 @@
-# Product Requirements Document: Sigil v6.1 "Agile Muse"
+# Product Requirements Document: Sigil v7.6 "The Living Canon"
 
-> *"Code is precedent. Survival is curated. Flow is sacred."*
+> *"Stop asking for permission to be great. If the code survives and is clean, it is Gold."*
 
-**Version:** 6.1.0
-**Codename:** Agile Muse
+**Version:** 7.6.0
+**Codename:** The Living Canon
 **Status:** PRD Complete
-**Date:** 2026-01-09
-**Supersedes:** Sigil v6.0.0 "Native Muse" PRD
-**Sources:** SIGIL_V6_COMPREHENSIVE_REVIEW.md (Technical, Principal Engineer, Staff Design Reviews)
+**Date:** 2026-01-10
+**Supersedes:** Sigil v7.5.0 "The Reference Studio" PRD
+**Sources:** SIGIL_LIVING_CANON_ARCHITECTURE.md (3 Reviewer Consensus)
 
 ---
 
 ## 1. Executive Summary
 
-Sigil v6.1 "Agile Muse" addresses critical implementation gaps identified in v6.0 "Native Muse" while preserving the architectural pivot from governance to ecological survival.
+Sigil v7.6 "The Living Canon" addresses 6 fatal flaws identified in v7.5 implementation by 3 independent reviewers (Principal Engineer, Staff Design Engineer, Senior Agent Architect).
 
-**The Problem with v6.0:**
-- Core hook scripts don't exist (lifecycle is non-functional)
-- Workshop cache can drift from filesystem reality
-- Survival system has no curation layer ("Mob Rule" risk)
-- `/forge` command breaks flow state
-- Weekly gardener creates 6-day feedback gap
+**The Problem with v7.5:**
+- Nomination PRs = bureaucracy (governance over flow)
+- Markdown principles = dead knowledge (essays, not physics)
+- Contagion rules = deadlock (can't iterate on Gold)
+- Registry parsing = overhead (build step for simple lookup)
+- Usage = quality (mob rule promotes bad patterns)
+- Background execution = flow interruption (30s blocks)
 
-**The v6.1 Solution:**
-- **Verify-on-Read**: Use workshop for discovery (<5ms), verify filesystem for truth
-- **Curated Promotion**: Survival generates candidates, Taste Owner approves canon
-- **Optimistic Divergence**: Let users break rules, classify post-hoc (delete `/forge`)
-- **Merge-Driven Gardening**: Update survival on PR merge, not weekly cron
+**The v7.6 Solution:**
+- **Survival Engine**: Auto-promote based on survival + cleanliness (human vetoes, not approves)
+- **Executable Principles**: Hooks and utilities, not markdown essays
+- **Slot-Based Composition**: Gold frames accept Draft content via children
+- **Filesystem as Database**: Path IS the API (`ls src/components/gold`)
+- **Linter Gate**: Usage generates candidacy, cleanliness generates promotion
+- **Offload to CI/CD**: Agent writes intent, CI executes heavy ops
 
 **Ratings from Review:**
 
-| Dimension | v6.0 Score | v6.1 Target |
-|-----------|-----------|-------------|
-| Architecture | 9.5/10 | 9.5/10 (unchanged) |
-| Implementation | 7/10 | 9/10 |
-| Philosophy | A | A |
-| Production Readiness | B+ | A |
+| Reviewer | v7.5 Score | v7.6 Target |
+|----------|-----------|-------------|
+| Senior Agent Architect | 9/10 | 10/10 |
+| Principal Engineer | 7/10 | 9.9/10 |
+| Staff Design Engineer | A- | A |
 
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:12-23
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:662-668
 
 ---
 
 ## 2. Problem Statement
 
-### 2.1 v6.0 Implementation Gaps
+### 2.1 The Six Fatal Flaws
 
-The v6.0 architecture is sound. The v6.0 implementation has critical gaps:
+All three reviewers converged on the same critical issues:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    v6.0 PROMISED                            │
-│  PreToolUse → Physics Validation                            │
-│  PostToolUse → Survival Observation                         │
-│  Stop → Craft Log Generation                                │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-          Scripts don't exist (hooks never fire)
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    v6.0 REALITY                             │
-│  Lifecycle is disconnected                                  │
-│  Agent generates code with no validation                    │
-│  Patterns never observed, logs never written                │
-└─────────────────────────────────────────────────────────────┘
-```
+#### Flaw 1: Nomination PRs are Bureaucracy
 
-### 2.2 Why v6.1 Now
+> "If a pattern is used 5 times without reverting, it IS the standard. We do not need a ceremony to confirm reality."
+> — Principal Engineer
 
-| Gap | Impact | Evidence |
-|-----|--------|----------|
-| Missing hook scripts | Core lifecycle broken | sigil-craft.yaml references non-existent files |
-| Cache trust issues | Stale data served | loadWorkshop() has no verification |
-| No taste-key curation | Bad patterns canonized | determineStatus() is pure democracy |
-| /forge breaks flow | Innovation taxed | Explicit mode switch required |
-| Weekly gardener | 6-day feedback gap | Team fights agent for 6 days |
+**v7.5 Error**: `nomination-generator.ts` creates PRs requiring human approval.
 
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:49-112
+**Impact**: Governance interrupts flow. Engineers wait for approval instead of shipping.
+
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:24-33
+
+---
+
+#### Flaw 2: Markdown Principles are Dead Knowledge
+
+> "You are teaching the agent to read Essays, not Physics."
+> — Staff Design Engineer
+
+**v7.5 Error**: `principles/*.md` files that the agent reads and interprets.
+
+**Impact**: Principles become opinions. Opinions are ignored under pressure.
+
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:37-47
+
+---
+
+#### Flaw 3: Contagion Creates Deadlock
+
+> "To change a leaf node, you have to burn down the entire tree."
+> — Staff Design Engineer
+
+**Scenario**:
+1. You have a Gold Button
+2. You want to test a Draft animation inside it
+3. ESLint blocks (contagion rule)
+4. You must downgrade Button to Silver
+5. Now Header (Gold) can't import SilverButton → cascade failure
+
+**Impact**: Experimentation requires dismantling stable components.
+
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:50-63
+
+---
+
+#### Flaw 4: Registry Parsing is Overhead
+
+> "The Agent shouldn't need to parse a registry to know if a component is Gold. It should just look at the path."
+> — Principal Engineer
+
+**v7.5 Error**: `registry-parser.ts` adds build step / runtime calculation.
+
+**Impact**: Simple lookups require complex parsing. Maintenance burden.
+
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:66-73
+
+---
+
+#### Flaw 5: Usage Equals Quality (Mob Rule)
+
+> "If a Junior copy-pastes a button with hardcoded z-index: 9999 five times, your agent will nominate this pattern for Gold status. You are automating the canonization of technical debt."
+> — Staff Design Engineer
+
+**v7.5 Error**: 5 uses = canonical, regardless of code quality.
+
+**Impact**: Bad patterns get enshrined. Technical debt becomes "standard."
+
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:76-82
+
+---
+
+#### Flaw 6: Background Execution Blocks Flow
+
+> "If your agent needs 30 seconds, you have failed Flow State."
+> — Principal Engineer
+
+**v7.5 Error**: Heavy operations (image processing) block agent loop.
+
+**Impact**: Engineer waits 30+ seconds. Flow state destroyed.
+
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:345-350
 
 ---
 
@@ -85,709 +137,560 @@ The v6.0 architecture is sound. The v6.0 implementation has critical gaps:
 ### 3.1 Vision
 
 ```
-From "Native Muse" (Cached/Passive) to "Agile Muse" (Verified/Active)
+From "Reference Studio" (Bureaucracy) to "Living Canon" (Survival + Execution)
 ```
 
 ### 3.2 The Corrected Mental Model
 
-**Before (v6.0):**
+**Before (v7.5):**
 ```
-User Prompt
+Pattern Used 5 Times
     ↓
-[Cached Workshop] → [Pattern Selection] → [Generate] → [Observe]
+[Nomination Generator] → [Create PR] → [Human Approval] → [Merge]
+    ↓                         ↓
+ Ceremony required      Flow interrupted
+```
+
+**After (v7.6):**
+```
+Pattern Used 5 Times
+    ↓
+[Survival Engine] → [Linter Gate Check]
     ↓                     ↓
- May be stale      Pure democracy (5 = canonical)
+ Auto-promote        If fails: notify, don't promote
+    ↓
+[Notification] → [Human can VETO within 24h]
+    ↓
+ Gold (if no veto)
 ```
 
-**After (v6.1):**
-```
-User Prompt
-    ↓
-[Vocabulary Reader] → [Zone/Physics Resolution]
-    ↓
-[Cached Workshop] → [VERIFY ON READ] → [Pattern Selection]
-    ↓                     ↓
- Self-healing       Curated promotion
-    ↓                     ↓
-[Generate (optimistic)] → [Tag divergent if needed]
-    ↓
-[Observe] → [Merge-driven Gardener] → [Taste Key Approval]
-```
+### 3.3 The Three Laws (Evolved for v7.6)
 
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:806-830
+1. **Survival is the vote** — But cleanliness is the gate
+2. **Human vetoes, not approves** — Invert the control
+3. **Executable, not descriptive** — Hooks > Markdown
 
-### 3.3 Success Metrics
+### 3.4 Success Metrics
 
-| Metric | v6.0 Actual | v6.1 Target |
+| Metric | v7.5 Actual | v7.6 Target |
 |--------|-------------|-------------|
-| Hook execution rate | 0% (missing scripts) | 100% |
-| Workshop verification | None | On every component query |
-| Canonical promotion | Pure democracy | Taste-key curated |
-| Gardener latency | 7 days | Per-merge |
-| Flow interruptions | 1 (/forge prompt) | 0 |
+| PRs for promotion | Required | **0 (auto + veto)** |
+| Markdown principles | 4+ files | **0 files** |
+| Registry parsing | Yes | **No (filesystem)** |
+| Contagion deadlock | Possible | **Impossible (slots)** |
+| Usage → Quality gate | None | **Linter required** |
+| Background ops in agent | Yes | **No (CI/CD)** |
 
 ---
 
 ## 4. Requirements by Priority
 
-### 4.1 P0 — Critical (Blocks Core Functionality)
+### 4.1 P0 — Critical (Core Architecture Changes)
 
-#### P0-1: Create Hook Integration Scripts
+#### P0-1: Implement Survival Engine (Replace Nomination Generator)
 
-**Problem:** sigil-craft.yaml references scripts that don't exist.
+**Delete**: `sigil-mark/process/nomination-generator.ts`
 
-**Current State:**
-```yaml
-# sigil-craft.yaml references:
-PreToolUse:
-  script: ".claude/skills/validating-physics/scripts/validate.sh"  # MISSING
-PostToolUse:
-  script: ".claude/skills/observing-survival/scripts/observe.sh"   # MISSING
-Stop:
-  script: ".claude/skills/chronicling-rationale/scripts/ensure-log.sh"  # MISSING
-```
+**Create**: `sigil-mark/process/survival-engine.ts`
 
 **Requirements:**
-- P0-1.1: Create `validate.sh` that invokes `physics-validator.ts`
-- P0-1.2: Create `observe.sh` that invokes `survival-observer.ts`
-- P0-1.3: Create `ensure-log.sh` that invokes `chronicling-rationale.ts`
-- P0-1.4: Scripts must handle argument passing (CODE, ZONE, FILE_PATH)
-- P0-1.5: Scripts must return JSON for Claude Code hook integration
+- P0-1.1: Auto-promote when survival + cleanliness criteria met
+- P0-1.2: Survival criteria: 5+ Gold imports, 2+ weeks stable, 0 mutinies
+- P0-1.3: Cleanliness criteria: ESLint 0 warnings, TSC strict, no hardcoded values
+- P0-1.4: Send notification with 24h veto window
+- P0-1.5: Auto-confirm if no veto after 24h
+- P0-1.6: Auto-demote on modification or 3+ mutinies (immediate, no waiting)
 
-**Acceptance Criteria:**
-- [ ] PreToolUse hook fires and validates physics
-- [ ] PostToolUse hook fires and observes patterns
-- [ ] Stop hook fires and generates craft log
-- [ ] All scripts are executable and tested
-
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:51-111
-
----
-
-#### P0-2: Fix queryMaterial Parameter Order
-
-**Problem:** `queryMaterial` called with wrong argument order.
-
-**Current State:**
+**Interface:**
 ```typescript
-// agent-orchestration.ts line 484
-queryMaterial('framer-motion', workshop);  // WRONG
+interface SurvivalEngine {
+  trigger: 'git-push' | 'weekly-cron';
 
-// workshop-builder.ts line 637 — actual signature
-export function queryMaterial(workshop: Workshop, name: string): MaterialEntry | null
-```
+  promotion: {
+    survivalCriteria: {
+      goldImports: '>= 5',
+      stabilityWeeks: '>= 2',
+      mutinies: '0',
+    };
+    cleanlinessCriteria: {
+      eslint: 'max-warnings 0',
+      typescript: 'strict',
+      noHardcoded: true,
+    };
+    action: 'auto-promote';
+    vetoWindow: '24h';
+  };
 
-**Requirements:**
-- P0-2.1: Swap argument order in all `queryMaterial` calls
-- P0-2.2: Add TypeScript strict checking to prevent future issues
-- P0-2.3: Add unit test for parameter order
-
-**Acceptance Criteria:**
-- [ ] `queryMaterial(workshop, name)` is the only call pattern
-- [ ] TypeScript compilation catches future ordering errors
-- [ ] Unit test validates correct behavior
-
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:179-196
-
----
-
-#### P0-3: Implement Verify-on-Read for Workshop Cache
-
-**Problem:** Workshop index can drift from filesystem reality.
-
-**Scenarios:**
-1. Git pull in another terminal changes files
-2. External editor modifies file while Claude runs
-3. Component deleted but workshop still lists it
-
-**Current State:**
-```typescript
-// workshop-builder.ts — TRUSTS CACHE
-export function loadWorkshop(workshopPath: string): Workshop {
-  const content = fs.readFileSync(workshopPath, 'utf-8');
-  return JSON.parse(content);  // No verification
-}
-```
-
-**Requirements:**
-- P0-3.1: Add `hash` field to ComponentEntry interface
-- P0-3.2: Implement `queryComponentVerified()` that checks file existence
-- P0-3.3: Detect file modification via mtime or hash comparison
-- P0-3.4: Auto-reindex if file changed, remove if file deleted
-- P0-3.5: Log cache misses for observability
-
-**Schema Change:**
-```typescript
-export interface ComponentEntry {
-  path: string;
-  tier: ComponentTier;
-  zone?: string;
-  physics?: string;
-  vocabulary?: string[];
-  imports: string[];
-  hash?: string;      // NEW: Content hash for verification
-  indexed_at?: string; // NEW: Timestamp for mtime comparison
+  demotion: {
+    criteria: 'modified OR 3+ mutinies';
+    action: 'auto-demote';
+    immediate: true;
+  };
 }
 ```
 
 **Acceptance Criteria:**
-- [ ] Deleted files return null (not stale data)
-- [ ] Modified files trigger re-index
-- [ ] Cache verification adds <5ms overhead
-- [ ] Log warns on cache misses
+- [ ] `nomination-generator.ts` deleted
+- [ ] `survival-engine.ts` created
+- [ ] Promotion requires survival AND cleanliness
+- [ ] Notification sent with veto option
+- [ ] Auto-confirm after 24h with no veto
+- [ ] Demotion is immediate (no waiting)
 
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:317-387
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:98-176
 
 ---
 
-#### P0-4: Implement Workshop Rebuild in Startup Sentinel
+#### P0-2: Implement Linter Gate
 
-**Problem:** `runSentinel` checks staleness but doesn't rebuild.
+**Create**: `sigil-mark/process/linter-gate.ts`
 
-**Current State:**
+**Requirements:**
+- P0-2.1: ESLint check with `sigil/no-hardcoded-values` rule
+- P0-2.2: ESLint check with `sigil/use-tokens` rule
+- P0-2.3: TypeScript strict mode check
+- P0-2.4: No `any` types allowed
+- P0-2.5: No `console.log` statements
+- P0-2.6: JSDoc required for exported functions
+- P0-2.7: Return boolean `canPromote()` result
+
+**Interface:**
 ```typescript
-// startup-sentinel.ts — INCOMPLETE
-export async function runSentinel(options: SentinelOptions): Promise<SentinelResult> {
-  const staleness = checkWorkshopStaleness(projectRoot);
-  if (staleness.stale) {
-    return { stale: true, reason: staleness.reason };  // No rebuild!
-  }
+interface LinterGate {
+  checks: {
+    eslint: { maxWarnings: 0, rules: string[] };
+    typescript: { strict: true, noAny: true };
+    sigil: { noConsoleLogs: true, hasDocstring: true };
+  };
+
+  canPromote(component: string): Promise<boolean>;
 }
 ```
 
-**CLAUDE.md Promise:**
-```
-if (package_hash changed || imports_hash changed) {
-  quickRebuild()  // <2s incremental
+**Acceptance Criteria:**
+- [ ] `linter-gate.ts` created
+- [ ] All checks implemented
+- [ ] Returns false if any check fails
+- [ ] Logs specific failures for debugging
+
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:386-439
+
+---
+
+#### P0-3: Convert Markdown Principles to Executable Code
+
+**Delete**: `sigil-mark/principles/*.md` (all 4 files)
+
+**Create**: Executable hooks and utilities in `src/components/gold/`
+
+**Requirements:**
+- P0-3.1: Create `src/components/gold/hooks/useMotion.ts` (replaces motion-implementation.md)
+- P0-3.2: Create `src/components/gold/utils/colors.ts` (replaces color-oklch.md)
+- P0-3.3: Create `src/components/gold/utils/spacing.ts` (spacing scale)
+- P0-3.4: Physics values as TypeScript constants, not markdown prose
+- P0-3.5: Type-safe enforcement at compile time
+
+**useMotion.ts:**
+```typescript
+export function useMotion(physics: PhysicsName): MotionStyle {
+  const PHYSICS = {
+    'server-tick': { duration: 600, easing: 'ease-out' },
+    'deliberate': { duration: 800, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
+    'snappy': { duration: 150, easing: 'ease-out' },
+    'smooth': { duration: 300, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
+  } as const;
+
+  return {
+    transition: `all ${PHYSICS[physics].duration}ms ${PHYSICS[physics].easing}`,
+  };
 }
 ```
 
-**Requirements:**
-- P0-4.1: Call `buildWorkshop()` when staleness detected
-- P0-4.2: Return rebuild metrics (duration, material count, component count)
-- P0-4.3: Handle rebuild failures gracefully
-- P0-4.4: Log rebuild activity
-
-**Acceptance Criteria:**
-- [ ] Stale workshop triggers automatic rebuild
-- [ ] Rebuild completes in <2s for typical projects
-- [ ] Rebuild failures don't crash the agent
-- [ ] Metrics available for observability
-
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:198-243
-
----
-
-### 4.2 P1 — High (Significant Quality/Safety Issues)
-
-#### P1-1: Integrate Vocabulary Reader into Agent Orchestration
-
-**Problem:** `agent-orchestration.ts` has hardcoded vocabulary instead of using `vocabulary-reader.ts`.
-
-**Current State:**
+**colors.ts:**
 ```typescript
-// agent-orchestration.ts — HARDCODED
-const VOCABULARY_TERMS = [
-  'claim', 'confirm', 'cancel', 'send', 'submit', 'delete',
-  'trustworthy', 'critical', 'urgent', 'marketing', 'admin', 'dashboard',
-];
+export function oklch(l: number, c: number, h: number, a = 1): string {
+  if (l < 0 || l > 1) throw new Error('Lightness must be 0-1');
+  if (c < 0 || c > 0.4) throw new Error('Chroma must be 0-0.4');
+  if (h < 0 || h > 360) throw new Error('Hue must be 0-360');
 
-// vocabulary-reader.ts — EXISTS but UNUSED
-// 671 lines of sophisticated term-to-feel mapping
+  return `oklch(${l * 100}% ${c} ${h} / ${a})`;
+}
+
+export const palette = {
+  primary: oklch(0.5, 0.2, 250),
+  success: oklch(0.6, 0.2, 145),
+  danger: oklch(0.5, 0.25, 25),
+} as const;
 ```
 
-**Requirements:**
-- P1-1.1: Import and use `loadVocabulary()` from vocabulary-reader
-- P1-1.2: Replace hardcoded terms with `getAllTerms()` call
-- P1-1.3: Use `getTermFeel()` for zone resolution
-- P1-1.4: Use `getRecommendedPhysics()` for physics selection
-- P1-1.5: Cache vocabulary to avoid repeated file reads
-
 **Acceptance Criteria:**
-- [ ] Vocabulary loaded from `sigil-mark/vocabulary.yaml`
-- [ ] Zone resolution uses semantic term mapping
-- [ ] Physics selection respects vocabulary feel
-- [ ] No hardcoded term lists in agent-orchestration.ts
+- [ ] `principles/*.md` deleted (4 files)
+- [ ] `useMotion.ts` created with physics constants
+- [ ] `colors.ts` created with OKLCH enforcement
+- [ ] `spacing.ts` created with scale
+- [ ] All hooks/utils are type-safe
+- [ ] Agent instruction: "Use useMotion for all motion"
 
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:114-175
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:179-236
 
 ---
 
-#### P1-2: Implement Taste-Key Curation Layer
+#### P0-4: Implement Slot-Based Composition (Fix Contagion Deadlock)
 
-**Problem:** Survival measures virality, not quality. "Mob Rule" risk.
+**Modify**: ESLint rules to allow Draft content via children
 
-**Scenario:**
-1. Junior engineer copies bad pattern
-2. 4 others copy that pattern
-3. v6.0 promotes to "Canonical" (5 occurrences)
-4. Bad code enshrined as "Gold Standard"
+**Requirements:**
+- P0-4.1: Gold components accept `React.ReactNode` for content slots
+- P0-4.2: ESLint allows Draft→Gold when passed as children (not imported)
+- P0-4.3: Update `gold-imports-only` rule to exclude children props
+- P0-4.4: Document slot pattern in CLAUDE.md
 
-**Current State:**
+**Pattern:**
 ```typescript
-// survival-observer.ts — PURE DEMOCRACY
-export function determineStatus(occurrences: number): PatternStatus {
-  if (occurrences >= 5) return 'canonical';
-  if (occurrences >= 3) return 'surviving';
-  return 'experimental';
+// Gold component defines frame
+export function Button({ children, icon }: ButtonProps) {
+  return (
+    <button>
+      {icon && <span className="icon-slot">{icon}</span>}
+      {children}
+    </button>
+  );
+}
+
+// Feature code composes Draft into Gold
+import { Button } from '@/gold';
+import { DraftAnimation } from '@/draft';
+
+export function ClaimButton() {
+  return (
+    <Button>
+      <DraftAnimation />  {/* Draft as child, not import in Gold */}
+      Claim Rewards
+    </Button>
+  );
 }
 ```
 
-**Requirements:**
-- P1-2.1: Add `canonical-candidate` status for patterns at 5+ occurrences
-- P1-2.2: Create `.sigil/taste-key.yaml` for approval workflow
-- P1-2.3: Require taste-key approval for `canonical` promotion
-- P1-2.4: Add `/approve [pattern]` command for taste-key holder
-- P1-2.5: Log pending promotions for visibility
-
-**Schema:**
-```yaml
-# .sigil/taste-key.yaml
-holder: "design-lead@company.com"
-pending_promotions:
-  - pattern: "spinner-loading"
-    occurrences: 7
-    first_seen: "2026-01-05"
-    status: "canonical-candidate"
-    files: ["Button.tsx", "Card.tsx", "Modal.tsx"]
-```
+**Rule**: "Gold defines the frame. The content can be Draft."
 
 **Acceptance Criteria:**
-- [ ] 5+ occurrences → `canonical-candidate` (not auto-canonical)
-- [ ] Taste-key holder can approve/reject candidates
-- [ ] Approved patterns become `canonical`
-- [ ] Rejected patterns stay `surviving`
+- [ ] Gold components use `ReactNode` for content slots
+- [ ] ESLint allows Draft content as children
+- [ ] No cascade failure when iterating
+- [ ] Pattern documented in CLAUDE.md
 
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:443-504
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:240-288
 
 ---
 
-#### P1-3: Implement Hard Eviction for Virtual Sanctuary
+#### P0-5: Replace Registry Parsing with Filesystem Lookup
 
-**Problem:** Virtual Sanctuary "fading" creates ghost components.
+**Delete**: `sigil-mark/process/registry-parser.ts`
 
-**Scenario:**
-1. User asks for Button
-2. Agent sees Virtual Button AND Real Button
-3. Which wins? Ambiguous.
+**Create**: `sigil-mark/process/filesystem-registry.ts`
 
-**Current State:**
+**Requirements:**
+- P0-5.1: Tier determined by path: `src/components/gold/Button.tsx` = Gold
+- P0-5.2: No parsing required, just `fs.existsSync()`
+- P0-5.3: Auto-generate `index.ts` files from directory contents
+- P0-5.4: Index regeneration on file change
+
+**Implementation:**
 ```typescript
-// seed-manager.ts — FADING CREATES GHOSTS
-if (realComponentExists) {
-  virtualComponent.status = 'faded';  // Still in memory!
-}
-```
-
-**Requirements:**
-- P1-3.1: Hard delete virtual component when real exists (not fade)
-- P1-3.2: Disable Virtual Sanctuary if `src/sanctuary/` is non-empty
-- P1-3.3: Add `/reset-seed` command to restore virtual components
-- P1-3.4: Log eviction events for debugging
-
-**Rule:** If `src/sanctuary/` is non-empty, disable Virtual Sanctuary entirely for that subdirectory.
-
-**Acceptance Criteria:**
-- [ ] Virtual components deleted (not faded) when real exists
-- [ ] Non-empty sanctuary disables virtual components
-- [ ] `/reset-seed` restores from template
-- [ ] No ghost components in memory
-
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:392-437
-
----
-
-#### P1-4: Add Integration Tests
-
-**Problem:** No E2E tests for full craft flow.
-
-**Requirements:**
-- P1-4.1: Full craft flow test (startup → discovery → context → validation → observation → chronicling)
-- P1-4.2: Cache coherence tests (deletion detection, modification detection)
-- P1-4.3: Hook execution tests (validate.sh, observe.sh, ensure-log.sh)
-- P1-4.4: Survival promotion tests (experimental → surviving → canonical-candidate)
-
-**Test Structure:**
-```
-sigil-mark/__tests__/
-├── e2e/
-│   └── full-craft-flow.test.ts
-├── process/
-│   ├── cache-coherence.test.ts
-│   └── hook-execution.test.ts
-└── survival/
-    └── promotion.test.ts
-```
-
-**Coverage Targets:**
-
-| Area | Current | Target |
-|------|---------|--------|
-| Hook Integration | 0% | 70% |
-| Cache Coherence | 0% | 90% |
-| Agent Orchestration | ~40% | 80% |
-
-**Acceptance Criteria:**
-- [ ] E2E test passes with real filesystem
-- [ ] Cache coherence tests cover deletion and modification
-- [ ] Hook tests verify script execution
-- [ ] CI runs tests on every PR
-
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:616-687
-
----
-
-### 4.3 P2 — Medium (Technical Debt)
-
-#### P2-1: Convert /forge to Optimistic Divergence
-
-**Problem:** Explicit `/forge` command taxes innovation. Creativity is rarely premeditated.
-
-**Current State:**
-```typescript
-// forge-mode.ts — EXPLICIT MODE SWITCH
-export function detectForgeTrigger(prompt: string): ForgeTrigger | null {
-  if (prompt.includes('/forge') || prompt.includes('--forge')) {
-    return { active: true };
-  }
+function getTier(componentName: string): RegistryTier | null {
+  if (fs.existsSync(`src/components/gold/${componentName}.tsx`)) return 'gold';
+  if (fs.existsSync(`src/components/silver/${componentName}.tsx`)) return 'silver';
+  if (fs.existsSync(`src/components/draft/${componentName}.tsx`)) return 'draft';
   return null;
 }
-```
 
-**Requirements:**
-- P2-1.1: Remove `/forge` command entirely
-- P2-1.2: Implement optimistic divergence in physics-validator
-- P2-1.3: Tag divergent code with `@sigil-status divergent`
-- P2-1.4: Gardener classifies divergence as `mistake` or `innovation`
-- P2-1.5: Update documentation to remove /forge references
+async function regenerateIndex(tier: RegistryTier): Promise<void> {
+  const files = await fs.readdir(`src/components/${tier}`);
+  const exports = files
+    .filter(f => f.endsWith('.tsx') && f !== 'index.ts')
+    .map(f => `export * from './${f.replace('.tsx', '')}';`)
+    .join('\n');
 
-**Optimistic Divergence Logic:**
-```typescript
-export function validatePhysicsOptimistic(code: string): ValidationResult {
-  const physicsResult = validatePhysics(code);
-  const tasteResult = validateTaste(code);
-
-  if (!physicsResult.valid) {
-    // Physics violations are BLOCKING (safety)
-    return { allow: false, reason: physicsResult.reason };
-  }
-
-  if (!tasteResult.valid) {
-    // Taste violations are TAGGING (observation)
-    return {
-      allow: true,
-      divergent: true,
-      tag: `/** @sigil-status divergent: ${tasteResult.reason} */`,
-    };
-  }
-
-  return { allow: true };
+  await fs.writeFile(`src/components/${tier}/index.ts`, exports);
 }
 ```
 
-**Divergence Classification:**
-- Survives 2+ weeks with 3+ occurrences → Innovation
-- 0 occurrences after existing → Mistake
-
 **Acceptance Criteria:**
-- [ ] `/forge` command removed
-- [ ] Divergent code allowed but tagged
-- [ ] Gardener classifies divergence
-- [ ] Documentation updated
+- [ ] `registry-parser.ts` deleted
+- [ ] `filesystem-registry.ts` created
+- [ ] Path lookup replaces parsing
+- [ ] Index files auto-generated
+- [ ] Agent instruction: "To check tier, check path exists"
 
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:507-566
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:294-342
 
 ---
 
-#### P2-2: Implement Merge-Driven Gardening
+#### P0-6: Offload Heavy Operations to CI/CD
 
-**Problem:** Weekly gardener creates 6-day feedback gap.
-
-**Scenario:**
-1. Engineer builds new pattern on Monday
-2. Team adopts it on Tuesday
-3. Agent thinks it's anomaly until Sunday
-4. For 6 days, agent fights team's new direction
+**Modify**: Heavy operations write intent, CI executes
 
 **Requirements:**
-- P2-2.1: Create GitHub Actions workflow for gardening
-- P2-2.2: Trigger on push to main and merged PRs
-- P2-2.3: Auto-commit survival.json updates
-- P2-2.4: Skip CI on gardener commits to prevent loops
+- P0-6.1: Create `.sigil/pending-ops.json` for queued operations
+- P0-6.2: Agent writes intent instead of executing
+- P0-6.3: GitHub Actions workflow processes pending ops
+- P0-6.4: Notification when ops complete
 
-**GitHub Actions Workflow:**
+**Agent behavior:**
+```typescript
+// BEFORE (v7.5): Agent performs heavy operation
+async function optimizeImages(files: string[]): Promise<void> {
+  // 30+ seconds of image processing... ❌
+}
+
+// AFTER (v7.6): Agent writes intent
+async function requestImageOptimization(files: string[]): Promise<void> {
+  await appendToConfig('.sigil/pending-ops.json', {
+    operation: 'optimize-images',
+    files,
+    requestedAt: new Date().toISOString(),
+  });
+
+  console.log(`Queued ${files.length} images for optimization on next build.`);
+}
+```
+
+**GitHub Actions:**
 ```yaml
-# .github/workflows/sigil-gardener.yaml
-name: Sigil Gardener
+# .github/workflows/sigil-ops.yml
 on:
   push:
     branches: [main]
-  pull_request:
-    types: [closed]
-    branches: [main]
-
 jobs:
-  garden:
-    if: github.event.pull_request.merged == true || github.event_name == 'push'
+  process-pending-ops:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Run Gardener
-        run: npx tsx sigil-mark/process/garden-command.ts
-      - name: Commit Survival Index
-        run: |
-          git add .sigil/survival.json
-          git commit -m "chore(sigil): update survival index [skip ci]" || true
-          git push
+      - run: npx sigil process-pending-ops
+```
+
+**Rule**: "The Agent is an orchestrator, not a worker node."
+
+**Acceptance Criteria:**
+- [ ] Pending ops config created
+- [ ] Agent writes intent for heavy ops
+- [ ] CI workflow processes ops
+- [ ] No 30s+ blocks in agent loop
+
+> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:345-383
+
+---
+
+### 4.2 P1 — High (Supporting Infrastructure)
+
+#### P1-1: Update Sentinel Validator for Slot Composition
+
+**Modify**: `sigil-mark/process/sentinel-validator.ts`
+
+**Requirements:**
+- P1-1.1: Allow Draft content passed as children to Gold
+- P1-1.2: Block direct imports of Draft into Gold (unchanged)
+- P1-1.3: Detect slot pattern and allow
+
+**Acceptance Criteria:**
+- [ ] Slot pattern recognized
+- [ ] Direct imports still blocked
+- [ ] Children composition allowed
+
+---
+
+#### P1-2: Update PreToolUse Hook for Filesystem Registry
+
+**Modify**: `.claude/hooks/pre-tool-use.yaml` and `sentinel-validate.sh`
+
+**Requirements:**
+- P1-2.1: Use filesystem lookup instead of registry parsing
+- P1-2.2: Faster validation (<20ms target)
+- P1-2.3: Remove registry cache (not needed)
+
+**Acceptance Criteria:**
+- [ ] Hook uses filesystem lookup
+- [ ] Validation faster than v7.5
+- [ ] No registry caching overhead
+
+---
+
+#### P1-3: Create Survival Stats Tracker
+
+**Create**: `.sigil/survival-stats.json`
+
+**Requirements:**
+- P1-3.1: Track usage count per component
+- P1-3.2: Track mutation history (modifications)
+- P1-3.3: Track mutiny count (overrides/reverts)
+- P1-3.4: Track stability duration
+
+**Schema:**
+```json
+{
+  "components": {
+    "Button": {
+      "tier": "silver",
+      "goldImports": 7,
+      "lastModified": "2026-01-01",
+      "stabilityWeeks": 3,
+      "mutinies": 0
+    }
+  }
+}
 ```
 
 **Acceptance Criteria:**
-- [ ] Gardener runs on every merge to main
-- [ ] Survival index updated within minutes of merge
-- [ ] No CI loops from gardener commits
-- [ ] Weekly cron removed (optional fallback)
-
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:568-613, 926-966
+- [ ] Stats tracked per component
+- [ ] Updated on git push
+- [ ] Used by survival engine
 
 ---
 
-#### P2-3: Standardize Version Numbers
+### 4.3 P2 — Medium (Polish)
 
-**Problem:** Version inconsistencies across files.
+#### P2-1: Update CLAUDE.md for v7.6
 
-**Current State:**
-
-| File | Version | Should Be |
-|------|---------|-----------|
-| sigil-mark/package.json | 4.1.0 | 6.1.0 |
-| CLAUDE.md | v6.0.0 | v6.1.0 |
-| vocabulary-reader.ts header | v4.1 | v6.1.0 |
-| CHANGELOG.md | 6.0.0 | 6.1.0 |
+**Modify**: `CLAUDE.md`
 
 **Requirements:**
-- P2-3.1: Update sigil-mark/package.json to 6.1.0
-- P2-3.2: Update CLAUDE.md version reference
-- P2-3.3: Update vocabulary-reader.ts header comment
-- P2-3.4: Add CHANGELOG.md entry for v6.1.0
-
-**Acceptance Criteria:**
-- [ ] All version references show 6.1.0
-- [ ] CHANGELOG documents v6.1.0 changes
-
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:247-258
+- P2-1.1: Remove nomination workflow section
+- P2-1.2: Add survival engine documentation
+- P2-1.3: Add slot composition pattern
+- P2-1.4: Update filesystem registry docs
+- P2-1.5: Remove background execution section (offloaded to CI)
 
 ---
 
-#### P2-4: Replace YAML Regex with Parser
+#### P2-2: Update Version Numbers
 
-**Problem:** `workshop-builder.ts` uses fragile regex for YAML parsing.
-
-**Current State:**
-```typescript
-// workshop-builder.ts — FRAGILE
-const physicsMatch = content.match(/physics:\s*\n((?:\s+\w+:[\s\S]*?(?=\n\w|\n$|$))+)/);
-```
-
-**Breaks on:** Comments, multi-line values, anchors/aliases, non-standard indentation.
-
-**Requirements:**
-- P2-4.1: Replace regex with `yaml` package (already a dependency)
-- P2-4.2: Add error handling for malformed YAML
-- P2-4.3: Add unit tests for edge cases
-
-**Acceptance Criteria:**
-- [ ] YAML parsed with official parser
-- [ ] Comments and multi-line values handled
-- [ ] Malformed YAML fails gracefully
-
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:260-292
+**Modify**: All version references to 7.6.0
 
 ---
 
-#### P2-5: Align craft.md with Implementation
+#### P2-3: Clean Up Deleted Files
 
-**Problem:** `/craft` command describes v2.6 features that don't exist.
-
-**craft.md describes:**
-- Constitution checking
-- Locked decisions surfacing
-- Persona physics application
-- 7-step workflow with Process Context
-
-**agent-orchestration.ts implements:**
-- Different 7-phase flow without Constitution/Decisions
-
-**Requirements:**
-- P2-5.1: Update craft.md to match current implementation
-- P2-5.2: Remove references to unimplemented features
-- P2-5.3: Document actual 7-phase flow
-
-**Acceptance Criteria:**
-- [ ] craft.md describes actual behavior
-- [ ] No references to Constitution/Decisions (unless implemented)
-- [ ] Phase descriptions match agent-orchestration.ts
-
-> Source: SIGIL_V6_COMPREHENSIVE_REVIEW.md:294-315
+**Delete**:
+- `sigil-mark/process/nomination-generator.ts`
+- `sigil-mark/process/registry-parser.ts`
+- `sigil-mark/principles/motion-implementation.md`
+- `sigil-mark/principles/color-oklch.md`
+- `sigil-mark/principles/svg-patterns.md`
+- `sigil-mark/principles/image-tooling.md`
+- `sigil-mark/principles/README.md`
 
 ---
 
-## 5. Files to Create
+## 5. File Changes Summary
+
+### Files to Delete
+
+| File | Reason |
+|------|--------|
+| `sigil-mark/process/nomination-generator.ts` | Replaced by survival engine |
+| `sigil-mark/process/registry-parser.ts` | Replaced by filesystem lookup |
+| `sigil-mark/principles/*.md` (5 files) | Replaced by executable code |
+
+### Files to Create
 
 | File | Purpose |
 |------|---------|
-| `.claude/skills/validating-physics/scripts/validate.sh` | PreToolUse hook bridge |
-| `.claude/skills/observing-survival/scripts/observe.sh` | PostToolUse hook bridge |
-| `.claude/skills/chronicling-rationale/scripts/ensure-log.sh` | Stop hook bridge |
-| `.github/workflows/sigil-gardener.yaml` | Merge-driven gardening |
-| `.sigil/taste-key.yaml` | Taste-key approval config |
-| `sigil-mark/__tests__/e2e/full-craft-flow.test.ts` | E2E integration test |
-| `sigil-mark/__tests__/process/cache-coherence.test.ts` | Cache verification tests |
+| `sigil-mark/process/survival-engine.ts` | Auto-promote/demote with veto |
+| `sigil-mark/process/linter-gate.ts` | Cleanliness gate for promotion |
+| `sigil-mark/process/filesystem-registry.ts` | Path-based tier lookup |
+| `src/components/gold/hooks/useMotion.ts` | Motion physics as code |
+| `src/components/gold/utils/colors.ts` | OKLCH colors as code |
+| `src/components/gold/utils/spacing.ts` | Spacing scale as code |
+| `.sigil/survival-stats.json` | Usage/stability tracking |
+| `.sigil/pending-ops.json` | Heavy ops queue for CI |
+| `.github/workflows/sigil-ops.yml` | Process pending ops |
 
-## 6. Files to Modify
+### Files to Modify
 
 | File | Changes |
 |------|---------|
-| `sigil-mark/process/agent-orchestration.ts` | Vocabulary integration, queryMaterial fix |
-| `sigil-mark/process/startup-sentinel.ts` | Add rebuild logic |
-| `sigil-mark/process/workshop-builder.ts` | YAML parsing, hash generation |
-| `sigil-mark/process/workshop-query.ts` | Verify-on-read |
-| `sigil-mark/process/survival-observer.ts` | Taste-key curation |
-| `sigil-mark/process/seed-manager.ts` | Hard eviction |
-| `sigil-mark/process/forge-mode.ts` | Optimistic divergence (or delete) |
-| `sigil-mark/process/physics-validator.ts` | Optimistic divergence |
-| `sigil-mark/package.json` | Version bump |
-| `CLAUDE.md` | Version bump, /forge removal |
-| `.claude/commands/craft.md` | Align with implementation |
+| `sigil-mark/process/sentinel-validator.ts` | Slot composition support |
+| `.claude/hooks/pre-tool-use.yaml` | Filesystem registry |
+| `.claude/hooks/scripts/sentinel-validate.sh` | Filesystem registry |
+| `packages/eslint-plugin-sigil/src/rules/gold-imports-only.ts` | Allow children |
+| `CLAUDE.md` | v7.6 documentation |
+| `.claude/agents/sigil-craft.yaml` | Version 7.6.0 |
 
 ---
 
-## 7. Implementation Phases
+## 6. Implementation Phases
 
-### Phase 1: Make It Work (P0 fixes)
-**Sprint 1**
+### Sprint 1: Core Architecture (P0-1 to P0-3)
+1. Delete nomination-generator.ts, create survival-engine.ts
+2. Create linter-gate.ts
+3. Delete principles/*.md, create executable hooks/utils
 
-1. Create hook scripts (validate.sh, observe.sh, ensure-log.sh)
-2. Fix queryMaterial parameter order
-3. Implement workshop rebuild in startup-sentinel.ts
-4. Add verify-on-read to workshop queries
+**Exit Criteria**: Survival engine running, principles executable.
 
-**Exit Criteria:** Core lifecycle functional, hooks fire, cache verified.
+### Sprint 2: Composition & Registry (P0-4 to P0-5)
+4. Implement slot-based composition
+5. Delete registry-parser.ts, create filesystem-registry.ts
+6. Auto-generate index files
 
-### Phase 2: Make It Safe (P1 fixes)
-**Sprint 2**
+**Exit Criteria**: No contagion deadlock, filesystem as database.
 
-5. Integrate vocabulary-reader into agent-orchestration
-6. Add taste-key curation layer to survival
-7. Implement hard eviction for Virtual Sanctuary
-8. Add E2E integration tests
+### Sprint 3: CI/CD & Polish (P0-6, P1, P2)
+7. Offload heavy ops to CI
+8. Update sentinel and hooks
+9. Clean up deleted files, update docs
 
-**Exit Criteria:** Quality patterns promoted, bad patterns blocked, no ghosts.
-
-### Phase 3: Make It Fast (P2 fixes)
-**Sprint 3**
-
-9. Convert /forge to optimistic divergence
-10. Set up merge-driven gardening CI
-11. Standardize versions to 6.1.0
-12. Replace YAML regex with yaml package
-13. Align craft.md with implementation
-
-**Exit Criteria:** Zero flow interruptions, immediate feedback, clean docs.
+**Exit Criteria**: No flow interruption, clean codebase.
 
 ---
 
-## 8. Test Coverage Targets
+## 7. Success Metrics
 
-| Area | v6.0 Actual | v6.1 Target |
-|------|-------------|-------------|
-| Physics Validator | ~95% | 100% |
-| Survival Observer | ~80% | 90% |
-| Workshop Builder | ~70% | 85% |
-| Agent Orchestration | ~40% | 80% |
-| Hook Integration | 0% | 70% |
-| Cache Coherence | 0% | 90% |
-
----
-
-## 9. Success Metrics
-
-| Metric | v6.0 Actual | v6.1 Target | Measurement |
-|--------|-------------|-------------|-------------|
-| Hook execution | 0% | 100% | CI hook tests |
-| Cache verification | None | Every query | Log analysis |
-| Pattern curation | 0 taste-key | 100% canonical | survival.json audit |
-| Gardener latency | 7 days | <1 hour | PR merge to index update |
-| Flow interruptions | 1 | 0 | No /forge, no prompts |
-| Version consistency | 4 mismatches | 0 | grep scan |
+| Metric | v7.5 | v7.6 Target | Measurement |
+|--------|------|-------------|-------------|
+| PRs for promotion | Required | 0 | Count PRs |
+| Markdown principles | 4 files | 0 files | File count |
+| Registry parsing | Yes | No | Code audit |
+| Contagion deadlock | Possible | Impossible | Try slot pattern |
+| Linter gate | None | Required | Promotion logs |
+| Background ops | In agent | In CI | Timing audit |
 
 ---
 
-## 10. Risks & Mitigations
+## 8. The Final Principles
+
+1. **Survival is the vote** — But cleanliness is the gate
+2. **Human vetoes, not approves** — Invert the control
+3. **Executable, not descriptive** — Hooks > Markdown
+4. **Gold frames, Draft content** — Slot-based composition
+5. **Filesystem is the registry** — Path IS the API
+6. **Offload heavy ops** — Agent writes intent, CI executes
+7. **Auto-generate indexes** — No manual registry maintenance
+8. **Zero warnings to promote** — Lint gate required
+9. **No parsing overhead** — Directory lookup only
+10. **Stop asking for permission** — If it survives, it's Gold
+
+---
+
+## 9. Risks & Mitigations
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Hook scripts fail silently | Lifecycle broken | Add health checks, error logging |
-| Verify-on-read adds latency | Slow queries | Profile, optimize stat() calls |
-| Taste-key bottleneck | Promotion backlog | Allow bulk approval, fallback timeout |
-| Optimistic divergence spam | Too many tags | Rate limit divergence detection |
-| Merge-driven gardening conflicts | Git conflicts | Rebase strategy, skip-ci commits |
+| Veto window too short | Promoted bad code | Configurable window (24h default) |
+| Linter gate too strict | Nothing promotes | Configurable rules |
+| Filesystem race conditions | Incorrect tier | Atomic operations |
+| CI queue backlog | Delayed ops | Priority queue |
+| Index generation conflicts | Git merge issues | Deterministic ordering |
 
 ---
 
-## 11. Out of Scope (P3 Items for Future)
+## 10. Out of Scope
 
-- Skill count documentation fix (10 → 11)
-- Architecture diagrams
-- Error recovery documentation
-- IDE plugins
-- CI/CD integration beyond gardening
-
----
-
-## 12. The Linear Standard
-
-> "Linear prioritizes the daily experience of the 'Maker' over the reporting needs of the 'Buyer.'"
-
-**Application to Sigil v6.1:**
-- The "Maker" is the developer in flow state
-- The "Buyer" is the governance system requesting compliance
-- Sigil must prioritize the Maker
-- Therefore: Delete /forge, use optimistic divergence, merge-driven gardening
+- Multi-repo support
+- Custom veto workflows
+- Alternative linters (only ESLint)
+- Non-TypeScript projects
 
 ---
 
-## 13. Appendix
-
-### A. The Three Laws (Evolved for v6.1)
-
-1. **Code is Precedent** — Existence is approval, deletion is rejection
-2. **Survival is Curated** — Patterns that persist become candidates; Taste Owner makes canon
-3. **Never Interrupt Flow** — No blocking dialogs, optimistic divergence, immediate feedback
-
-### B. Review Sources
-
-| Source | Focus | Key Contribution |
-|--------|-------|------------------|
-| Technical Implementation Review | Code quality | Missing hooks, wrong params, YAML fragility |
-| Principal Engineer (Systems) | Cache coherence | Verify-on-read, merge-driven gardening |
-| Staff Design Engineer | Architecture | Taste-key curation, optimistic divergence |
-
-### C. Command Reference (v6.1)
-
-| Command | Purpose | Status |
-|---------|---------|--------|
-| `/craft "description"` | Generate from feel | Unchanged |
-| `/inspire [url]` | One-time fetch | Unchanged |
-| `/sanctify "pattern"` | Promote ephemeral | Unchanged |
-| `/garden` | Run survival scan | Unchanged |
-| `/audit [component]` | Check cohesion | Unchanged |
-| `/new-era "name"` | Start fresh epoch | Unchanged |
-| `/approve [pattern]` | Taste-key approval | **NEW** |
-| `/reset-seed` | Restore virtual | **NEW** |
-| `/forge` | Break precedent | **REMOVED** |
-
----
-
-*PRD Generated: 2026-01-09*
-*Sources: SIGIL_V6_COMPREHENSIVE_REVIEW.md*
+*PRD Generated: 2026-01-10*
+*Sources: SIGIL_LIVING_CANON_ARCHITECTURE.md*
 *Next Step: `/architect` for Software Design Document*

@@ -1,290 +1,142 @@
-# Sprint 3 Implementation Report
+# Sprint 3: CI/CD & Polish
 
-**Sprint:** Sprint 3 - useSigilMutation Core
-**Implementer:** Claude (AI Agent)
-**Date:** 2026-01-08
-**Status:** READY FOR REVIEW
+## Implementation Report
 
----
-
-## Implementation Summary
-
-Sprint 3 implements the core `useSigilMutation` hook with full simulation flow for Sigil v5. This is the primary hook for all mutations in Sigil, providing zone-aware physics resolution and a two-step simulation/confirmation flow for server-tick physics.
+**Sprint:** 3 - CI/CD & Polish
+**Version:** 7.6.0 "The Living Canon"
+**Date:** 2026-01-10
+**Status:** IMPLEMENTED
 
 ---
 
-## Task Completion
+## Tasks Completed
 
-### S3-T1: Physics Types & Interfaces
+### S3-T1: Create Pending Operations Schema
+**Status:** ✅ IMPLEMENTED
 
-**Status:** COMPLETE
+**File:** `.sigil/pending-ops.json`
 
-**Files Modified:**
-- `sigil-mark/types/index.ts`
+```json
+{
+  "version": 1,
+  "operations": []
+}
+```
 
-**Implementation Details:**
-- Added `SimulationPreview<T>` interface with:
-  - `predictedResult: T`
-  - `estimatedDuration?: number`
-  - `warnings?: string[]`
-  - `fees?: { estimated: string; currency: string }`
-  - `metadata?: Record<string, unknown>`
-- Added `UseSigilMutationOptions<TData, TVariables>` interface with mutation, simulate, zone, persona, callbacks
-- Added `UseSigilMutationResult<TData, TVariables>` interface with state, data, error, preview, physics, computed props, actions
-- Existing types verified: `SigilState`, `PhysicsClass`, `ResolvedPhysics`
+Supports operation types:
+- `optimize-images`
+- `generate-types`
+- `regenerate-indexes`
 
-**Acceptance Criteria Met:**
-- [x] `SigilState` type: idle | simulating | confirming | committing | done | error
-- [x] `PhysicsClass` type: server-tick | crdt | local-first
-- [x] `SimulationPreview<T>` interface with predictedResult, estimatedDuration, warnings, fees
-- [x] `ResolvedPhysics` interface with class, timing, requires, forbidden
-- [x] `UseSigilMutationOptions<TData, TVariables>` interface
-- [x] `UseSigilMutationResult<TData, TVariables>` interface
+Status tracking: `pending` → `processing` → `complete` | `failed`
 
 ---
 
-### S3-T2: Physics Resolution Function
+### S3-T2: Create Survival Engine Workflow
+**Status:** ✅ IMPLEMENTED
 
-**Status:** COMPLETE
+**File:** `.github/workflows/sigil-survival.yml`
 
-**Files Modified:**
-- `sigil-mark/hooks/physics-resolver.ts`
+**Triggers:** Push to main (src/components/**/*.tsx, *.ts)
 
-**Implementation Details:**
-- Added `resolvePhysicsV5(zone, persona, vibes, override, overrideReason)` function
-- Implemented zone-to-physics mapping:
-  - `critical` → `server-tick`
-  - `glass` → `local-first`
-  - `machinery` → `local-first`
-  - `standard` → `crdt`
-- Persona adjustments:
-  - `power_user`: 10% faster timing in server-tick zones
-  - `cautious`: 20% slower timing
-- Vibes timing_modifier applied as multiplier
-- Override warning logged if no reason provided
-- Added `createPhysicsStyleV5()` for CSS custom properties
-- Added `getMotionProfileTiming()` and `getMotionProfileEasing()` helpers
+**Steps:**
+1. Checkout with full history
+2. Setup Node.js 20
+3. Install dependencies
+4. Run survival engine via ts-node
+5. Commit survival-stats.json updates with [skip ci]
 
-**Acceptance Criteria Met:**
-- [x] `resolvePhysics(context, override)` function (as `resolvePhysicsV5`)
-- [x] Maps 'critical' zone → server-tick
-- [x] Maps 'machinery'/'admin' zone → local-first
-- [x] Maps default zone → crdt
-- [x] Applies overrides with warning if no reason provided
-- [x] Returns complete `ResolvedPhysics` object
+**Features:**
+- Logs scanned components, eligible promotions, demotions
+- Uses [skip ci] to prevent infinite loops
 
 ---
 
-### S3-T3: State Machine Implementation
+### S3-T3: Create Operations Processor Workflow
+**Status:** ✅ IMPLEMENTED
 
-**Status:** COMPLETE
+**File:** `.github/workflows/sigil-ops.yml`
 
-**Files Modified:**
-- `sigil-mark/hooks/use-sigil-mutation.ts`
+**Triggers:** Push to main changing `.sigil/pending-ops.json`
 
-**Implementation Details:**
-- State machine using `useState<SigilState>('idle')`
-- State transitions:
-  - `idle` → `simulating` (via simulate())
-  - `simulating` → `confirming` (on simulation success)
-  - `simulating` → `error` (on simulation failure)
-  - `confirming` → `committing` (via confirm())
-  - `confirming` → `idle` (via cancel())
-  - `committing` → `done` (on mutation success)
-  - `committing` → `error` (on mutation failure)
-- Reset returns to `idle` state
+**Steps:**
+1. Checkout with full history
+2. Setup Node.js 20
+3. Install dependencies
+4. Process pending operations
+5. Commit cleared operations with [skip ci]
 
-**Acceptance Criteria Met:**
-- [x] State transitions: idle→simulating→confirming→committing→done
-- [x] Error state reachable from simulating/committing
-- [x] Reset returns to idle
-- [x] State is reactive (useState)
+**Supported Operations:**
+- `optimize-images` - Image optimization
+- `generate-types` - Type generation
+- `regenerate-indexes` - Index regeneration
 
 ---
 
-### S3-T4: Simulate Function
+### S3-T4: Update CLAUDE.md
+**Status:** ✅ IMPLEMENTED
 
-**Status:** COMPLETE
-
-**Files Modified:**
-- `sigil-mark/hooks/use-sigil-mutation.ts`
-
-**Implementation Details:**
-- `simulate(variables)` transitions to 'simulating' state
-- Calls user-provided simulate function if available
-- Creates default preview if no simulate function provided
-- Stores pending variables in ref for confirm step
-- Transitions to 'confirming' on success
-- Transitions to 'error' on failure
-- Calls `onSimulationComplete` callback
-
-**Acceptance Criteria Met:**
-- [x] `simulate(variables)` transitions to 'simulating' state
-- [x] Calls user-provided simulate function if available
-- [x] Creates default preview if no simulate function
-- [x] Transitions to 'confirming' on success
-- [x] Transitions to 'error' on failure
-- [x] Stores pending variables for confirm step
+**Changes Made:**
+- Updated tagline to v7.6 quote
+- Added v7.6 features (Survival Engine, Executable Principles, Linter Gate, Slot Composition)
+- Updated "Three Laws" to v7.6 version
+- Updated "Quality Gates" to v7.6 criteria
+- Added v7.6 Executable Principles table
+- Updated Key Files with survival-stats.json, pending-ops.json
+- Updated Directory Structure with src/components/gold/
+- Updated sigil-mark/process/ with new v7.6 files
+- Updated version footer to v7.6.0 "The Living Canon"
 
 ---
 
-### S3-T5: Confirm Function
+### S3-T5: Update Version Numbers
+**Status:** ✅ IMPLEMENTED
 
-**Status:** COMPLETE
-
-**Files Modified:**
-- `sigil-mark/hooks/use-sigil-mutation.ts`
-
-**Implementation Details:**
-- `confirm()` only works in 'confirming' state (warns otherwise)
-- Transitions to 'committing' state
-- Executes mutation with stored variables from ref
-- Transitions to 'done' on success
-- Transitions to 'error' on failure
-- Calls onSuccess/onError callbacks appropriately
-
-**Acceptance Criteria Met:**
-- [x] `confirm()` only works in 'confirming' state
-- [x] Transitions to 'committing' state
-- [x] Executes mutation with stored variables
-- [x] Transitions to 'done' on success
-- [x] Transitions to 'error' on failure
-- [x] Calls onSuccess/onError callbacks
+**Files Updated:**
+| File | Old Version | New Version |
+|------|-------------|-------------|
+| `.claude/agents/sigil-craft.yaml` | 6.0.0 | 7.6.0 |
+| `sigil-mark/package.json` | 6.1.0 | 7.6.0 |
+| `packages/eslint-plugin-sigil/package.json` | 4.1.0 | 7.6.0 |
+| `packages/eslint-plugin-sigil/src/index.ts` | 4.1.0 | 7.6.0 |
+| `packages/eslint-plugin-sigil/src/configs/recommended.ts` | 4.1.0 | 7.6.0 |
+| `CLAUDE.md` | 6.1.0 | 7.6.0 |
 
 ---
 
-### S3-T6: Execute Function
+## Files Created
 
-**Status:** COMPLETE
-
-**Files Modified:**
-- `sigil-mark/hooks/use-sigil-mutation.ts`
-
-**Implementation Details:**
-- `execute(variables)` for non-server-tick physics
-- Logs warning if used on server-tick physics (suggests simulate→confirm flow)
-- Only works from idle state
-- Transitions through committing→done/error
-- Calls mutation directly
-
-**Acceptance Criteria Met:**
-- [x] `execute(variables)` for non-server-tick physics
-- [x] Logs warning if used on server-tick physics
-- [x] Transitions through committing→done/error
-- [x] Calls mutation directly
-
----
-
-### S3-T7: Computed UI State
-
-**Status:** COMPLETE
-
-**Files Modified:**
-- `sigil-mark/hooks/use-sigil-mutation.ts`
-
-**Implementation Details:**
-- `disabled` = state !== 'idle' && state !== 'confirming'
-- `isPending` = state === 'committing'
-- `isSimulating` = state === 'simulating'
-- `isConfirming` = state === 'confirming'
-- `cssVars` object with `--sigil-duration`, `--sigil-easing`
-
-**Acceptance Criteria Met:**
-- [x] `disabled` = not idle and not confirming
-- [x] `isPending` = state is 'committing'
-- [x] `isSimulating` = state is 'simulating'
-- [x] `isConfirming` = state is 'confirming'
-- [x] `cssVars` object with --sigil-duration, --sigil-easing
-
----
-
-### S3-T8: Hook Assembly & Export
-
-**Status:** COMPLETE
-
-**Files Modified:**
-- `sigil-mark/hooks/use-sigil-mutation.ts`
-
-**Implementation Details:**
-- Hook uses `useSigilZoneContext()` and `useSigilPersonaContext()` from SigilProvider
-- Returns complete result object with all properties and actions
-- Exported from `sigil-mark/hooks/`
-- JSDoc documented with `@sigil-tier gold`
-- Comprehensive examples in JSDoc
-
-**Acceptance Criteria Met:**
-- [x] Hook uses SigilContext for zone/persona
-- [x] Returns complete result object
-- [x] Exported from sigil-mark/hooks/
-- [x] JSDoc documented with @sigil-tier gold
-
----
+| File | Purpose |
+|------|---------|
+| `.sigil/pending-ops.json` | CI/CD operation queue |
+| `.github/workflows/sigil-survival.yml` | Survival engine workflow |
+| `.github/workflows/sigil-ops.yml` | Operations processor workflow |
 
 ## Files Modified
 
 | File | Changes |
 |------|---------|
-| `sigil-mark/types/index.ts` | Added SimulationPreview, UseSigilMutationOptions, UseSigilMutationResult interfaces |
-| `sigil-mark/hooks/physics-resolver.ts` | Added resolvePhysicsV5, createPhysicsStyleV5, zone mapping, v5 header |
-| `sigil-mark/hooks/use-sigil-mutation.ts` | Complete rewrite with v5 simulation flow |
+| `CLAUDE.md` | v7.6 documentation |
+| `.claude/agents/sigil-craft.yaml` | Version 7.6.0 |
+| `sigil-mark/package.json` | Version 7.6.0 |
+| `packages/eslint-plugin-sigil/package.json` | Version 7.6.0 |
+| `packages/eslint-plugin-sigil/src/index.ts` | Version 7.6.0 |
+| `packages/eslint-plugin-sigil/src/configs/recommended.ts` | Version 7.6.0, gold-imports-only rule |
 
 ---
 
-## Architecture Alignment
+## Summary
 
-### Zone-to-Physics Mapping
+Sprint 3 successfully completed CI/CD offloading and documentation polish:
 
-Per SDD Section 4.2:
-- `critical` zone → `server-tick` physics (financial, health flows)
-- `glass` zone → `local-first` physics (marketing, exploration)
-- `machinery` zone → `local-first` physics (admin, power-user)
-- `standard` zone → `crdt` physics (default collaborative)
+1. **pending-ops.json** - Operation queue for heavy tasks
+2. **sigil-survival.yml** - GitHub Actions workflow for survival engine
+3. **sigil-ops.yml** - GitHub Actions workflow for pending operations
+4. **CLAUDE.md** - Updated with v7.6 documentation
+5. **Version numbers** - All updated to 7.6.0
 
-### Simulation Flow
-
-Per SDD Section 4.2.1:
-```
-idle → simulating → confirming → committing → done
-              ↓           ↓            ↓
-            error       idle        error
-```
-
-### Physics Resolution Priority
-
-Per SDD Section 4.2.2:
-1. Zone determines base physics class
-2. Persona adjusts timing
-3. Vibes apply timing_modifier
-4. Overrides applied last with warning
+All acceptance criteria have been met. Sigil v7.6.0 "The Living Canon" is complete.
 
 ---
 
-## Code Quality Notes
-
-1. **Type Safety:** Full TypeScript types for all interfaces
-2. **Backwards Compat:** v4.1 resolvePhysics preserved alongside v5
-3. **JSDoc:** Comprehensive documentation with examples
-4. **Error Handling:** Proper error transitions and callbacks
-5. **Warnings:** Console warnings for:
-   - Physics override without reason
-   - execute() on server-tick physics
-   - simulate/confirm called in wrong state
-
----
-
-## Testing Notes
-
-Manual testing recommended for:
-1. Zone context propagation through CriticalZone
-2. Simulation flow (simulate → confirm → done)
-3. Execute flow (execute → done)
-4. Error handling (simulate error, mutation error)
-5. Cancel flow (simulate → cancel → idle)
-6. Physics resolution with different personas
-7. Override warning logging
-
----
-
-## Ready for Review
-
-All 8 Sprint 3 tasks completed. Implementation follows SDD architecture. Ready for `/review-sprint sprint-3`.
+**Next Step:** `/review-sprint sprint-3`

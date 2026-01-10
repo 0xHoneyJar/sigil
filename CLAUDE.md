@@ -1,6 +1,6 @@
 # Sigil: Design Context Framework
 
-> "Code is precedent. Survival is the vote. Never interrupt flow."
+> "Stop asking for permission to be great. If the code survives and is clean, it is Gold."
 
 ## What is Sigil?
 
@@ -12,25 +12,27 @@ Sigil is a design context framework that helps AI agents make consistent design 
 4. **Survival-Based Precedent** — Patterns earn status through usage, not approval dialogs
 5. **Context Forking** — Ephemeral inspiration without polluting taste
 6. **10 Claude Code Skills** — Complete lifecycle with hooks
-7. **v6.1: Optimistic Divergence** — Taste violations tagged, not blocked
-8. **v6.1: Merge-Driven Gardening** — <5 min pattern promotion latency
+7. **v7.6: Survival Engine** — Auto-promote with 24h veto window, no nomination PRs
+8. **v7.6: Executable Principles** — TypeScript hooks/utils instead of markdown docs
+9. **v7.6: Linter Gate** — Quality gate (ESLint + TSC + Sigil checks) before promotion
+10. **v7.6: Slot-Based Composition** — Gold frames accept Draft children
 
 ---
 
-## The Three Laws of v6.0
+## The Three Laws of v7.6 "The Living Canon"
 
 1. **Code is Precedent** — Patterns that survive become canonical. No governance dialogs.
-2. **Survival is the Vote** — Usage frequency determines pattern status, not approvals.
-3. **Never Interrupt Flow** — No blocking, no dialogs, observe silently.
+2. **Survival + Cleanliness = Gold** — Usage is necessary, linter gate is sufficient.
+3. **Never Interrupt Flow** — Observe silently, promote automatically, veto if needed.
 
 ---
 
-## v6.1 Quality Gates
+## v7.6 Quality Gates
 
-1. **Vocabulary Integration** — No hardcoded terms, all from vocabulary.yaml
-2. **Taste-Key Curation** — canonical-candidate status requires explicit approval
-3. **Hard Eviction** — Virtual Sanctuary evicts when real components exist
-4. **Optimistic Divergence** — Taste violations tagged, not blocked
+1. **Survival Criteria** — 5+ Gold imports, 2+ weeks stable, 0 mutinies
+2. **Linter Gate** — ESLint 0 warnings, TSC strict, no console.log, has docstring
+3. **Slot-Based Composition** — Gold components accept Draft as children (no direct import)
+4. **CI/CD Offload** — Heavy operations queued for GitHub Actions, not agent
 
 ---
 
@@ -81,15 +83,27 @@ Sigil is a design context framework that helps AI agents make consistent design 
 | File | Purpose |
 |------|---------|
 | `.sigil/workshop.json` | Pre-computed index (materials, components, physics) |
+| `.sigil/survival-stats.json` | v7.6: Component survival tracking |
+| `.sigil/pending-ops.json` | v7.6: CI/CD operation queue |
 | `.sigil/survival.json` | Pattern tracking (status, occurrences, files) |
-| `.sigil/taste-key.yaml` | v6.1: Curated pattern approvals |
 | `.sigil/seed.yaml` | Virtual Sanctuary taste (cold starts) |
 | `.sigil/craft-log/*.md` | Session craft logs |
 | `.sigil/eras/*.json` | Archived era patterns |
 | `sigil-mark/moodboard.md` | Product feel, references |
 | `sigil-mark/rules.md` | Design rules by category |
-| `sigil-mark/vocabulary/vocabulary.yaml` | v6.1: Term definitions |
+| `sigil-mark/vocabulary/vocabulary.yaml` | Term definitions |
 | `.sigilrc.yaml` | Zone definitions, physics |
+
+### v7.6 Executable Principles
+
+| File | Purpose |
+|------|---------|
+| `src/components/gold/hooks/useMotion.ts` | Motion physics hook |
+| `src/components/gold/utils/colors.ts` | OKLCH color system |
+| `src/components/gold/utils/spacing.ts` | 4px-based spacing scale |
+| `sigil-mark/process/survival-engine.ts` | Auto-promotion engine |
+| `sigil-mark/process/linter-gate.ts` | Quality gate checks |
+| `sigil-mark/process/filesystem-registry.ts` | Path-based tier lookup |
 
 ---
 
@@ -563,33 +577,44 @@ import { CriticalZone, GlassLayout, MachineryLayout } from 'sigil-mark';
 
 ```
 .sigil/
-├── workshop.json       # Pre-computed index
-├── survival.json       # Pattern tracking
-├── seed.yaml          # Virtual Sanctuary
-├── craft-log/         # Session logs
+├── workshop.json        # Pre-computed index
+├── survival-stats.json  # v7.6: Component survival tracking
+├── pending-ops.json     # v7.6: CI/CD operation queue
+├── survival.json        # Pattern tracking
+├── seed.yaml           # Virtual Sanctuary
+├── craft-log/          # Session logs
 │   └── {date}-{component}.md
-└── eras/              # Archived eras
+└── eras/               # Archived eras
     └── {era-name}.json
+
+src/components/
+├── gold/               # v7.6: Promoted components
+│   ├── hooks/
+│   │   └── useMotion.ts
+│   └── utils/
+│       ├── colors.ts
+│       └── spacing.ts
+├── silver/             # Promoted but not gold
+└── draft/              # Experimental
 
 sigil-mark/
 ├── kernel/            # Constitution (unchanged)
 ├── providers/         # SigilProvider
 ├── hooks/             # useSigilMutation
 ├── layouts/           # Zone layouts
-├── process/           # Agent-time utilities (v6.0)
+├── process/           # Agent-time utilities (v7.6)
+│   ├── survival-engine.ts      # v7.6: Auto-promotion
+│   ├── linter-gate.ts          # v7.6: Quality gate
+│   ├── filesystem-registry.ts  # v7.6: Tier lookup
 │   ├── workshop-builder.ts
 │   ├── workshop-query.ts
 │   ├── startup-sentinel.ts
-│   ├── discovery-scanner.ts
 │   ├── physics-validator.ts
 │   ├── seed-manager.ts
-│   ├── ephemeral-context.ts
-│   ├── forge-mode.ts
 │   ├── era-manager.ts
 │   ├── survival-observer.ts
 │   ├── chronicling-rationale.ts
-│   ├── auditing-cohesion.ts
-│   └── agent-orchestration.ts
+│   └── auditing-cohesion.ts
 ├── moodboard.md
 └── rules.md
 
@@ -636,5 +661,5 @@ Key changes:
 
 ---
 
-*Sigil v6.1.0 "Agile Muse"*
-*Last Updated: 2026-01-08*
+*Sigil v7.6.0 "The Living Canon"*
+*Last Updated: 2026-01-10*

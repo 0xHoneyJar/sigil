@@ -1,11 +1,11 @@
-# Sigil v6.0 — Craft Agent
+# Sigil v7.6 — Craft Agent
 #
 # Orchestrates all 10 skills for the /craft flow.
 #
-# Philosophy: "Code is precedent. Survival is the vote. Never interrupt flow."
+# Philosophy: "Stop asking for permission to be great. If the code survives and is clean, it is Gold."
 
 name: sigil-craft
-version: 6.0.0
+version: 7.6.0
 description: Design context agent for component generation
 
 # Trigger patterns

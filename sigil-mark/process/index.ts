@@ -1091,3 +1091,77 @@ export {
   type OrchestrationOptions,
   type BenchmarkResult,
 } from './agent-orchestration';
+
+// =============================================================================
+// FILESYSTEM REGISTRY (v7.6 - Sprint 1)
+// =============================================================================
+
+export {
+  // Core functions
+  getTier,
+  getComponentsInTier,
+  moveComponent,
+  regenerateIndex,
+  isImportAllowed,
+  // Helpers
+  getComponentPath,
+  initializeTierStructure,
+  // Types
+  type Tier,
+  type ComponentInfo,
+  type MoveResult,
+  type ImportCheck,
+} from './filesystem-registry';
+
+// =============================================================================
+// LINTER GATE (v7.6 - Sprint 1)
+// =============================================================================
+
+export {
+  // Quick check
+  canPromote,
+  // Full gate
+  runLinterGate,
+  // Individual checks
+  runEslintCheck,
+  runTypescriptCheck,
+  runSigilChecks,
+  // Utilities
+  formatReport,
+  loadConfig,
+  // Types
+  type LinterGateConfig,
+  type CheckResult,
+  type LinterGateResult,
+} from './linter-gate';
+
+// =============================================================================
+// SURVIVAL ENGINE (v7.6 - Sprint 1)
+// =============================================================================
+
+export {
+  // Main engine
+  runSurvivalEngine,
+  // Criteria checks
+  meetsSurvivalCriteria,
+  meetsCleanlinessGate,
+  // Promotion
+  promoteComponent,
+  vetoPromotion,
+  // Demotion
+  demoteComponent,
+  // Stats
+  loadStats,
+  saveStats,
+  recordMutiny,
+  // Utilities
+  generateReport,
+  // Types
+  type SurvivalStats,
+  type ComponentStats,
+  type PendingPromotion,
+  type Demotion,
+  type SurvivalCriteria,
+  type TriggerType,
+  type SurvivalEngineResult,
+} from './survival-engine';

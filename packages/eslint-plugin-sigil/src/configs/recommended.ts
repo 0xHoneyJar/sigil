@@ -5,7 +5,7 @@
  * Provides sensible defaults for design system enforcement.
  *
  * @module configs/recommended
- * @version 4.1.0
+ * @version 7.6.0
  *
  * @example
  * // eslint.config.js (flat config)
@@ -31,6 +31,7 @@ import type { Linter } from "eslint";
  * - enforce-tokens: error - Arbitrary values break design consistency
  * - zone-compliance: warn - Timing violations should be reviewed
  * - input-physics: warn - Keyboard support is important but may have exceptions
+ * - gold-imports-only: error - Tier violations break contagion prevention (v7.6)
  */
 export const recommended: Linter.Config = {
   plugins: ["sigil"],
@@ -46,6 +47,10 @@ export const recommended: Linter.Config = {
     // Enforce keyboard navigation in admin zones
     // Warn because native elements are exempt
     "sigil/input-physics": "warn",
+
+    // Enforce tier-based import restrictions (v7.6)
+    // Error because Gold importing Draft breaks contagion prevention
+    "sigil/gold-imports-only": "error",
   },
 };
 
@@ -58,6 +63,7 @@ export const strict: Linter.Config = {
     "sigil/enforce-tokens": "error",
     "sigil/zone-compliance": "error",
     "sigil/input-physics": "error",
+    "sigil/gold-imports-only": "error",
   },
 };
 
@@ -70,6 +76,7 @@ export const relaxed: Linter.Config = {
     "sigil/enforce-tokens": "warn",
     "sigil/zone-compliance": "warn",
     "sigil/input-physics": "warn",
+    "sigil/gold-imports-only": "warn",
   },
 };
 

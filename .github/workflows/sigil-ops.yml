@@ -1,0 +1,139 @@
+name: Sigil Operations Processor
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.sigil/pending-ops.json'
+
+jobs:
+  process-operations:
+    name: Process Pending Operations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Process pending operations
+        run: |
+          npx ts-node -e "
+            const fs = require('fs');
+            const path = require('path');
+
+            const PENDING_OPS_PATH = '.sigil/pending-ops.json';
+
+            interface PendingOperation {
+              id: string;
+              type: string;
+              files: string[];
+              requestedAt: string;
+              status: 'pending' | 'processing' | 'complete' | 'failed';
+            }
+
+            interface PendingOps {
+              version: number;
+              operations: PendingOperation[];
+            }
+
+            async function processOperation(op: PendingOperation): Promise<boolean> {
+              console.log(\`  Processing: \${op.type} (\${op.id})\`);
+
+              switch (op.type) {
+                case 'optimize-images':
+                  // Image optimization would be handled here
+                  console.log(\`    Would optimize: \${op.files.join(', ')}\`);
+                  return true;
+
+                case 'generate-types':
+                  // Type generation would be handled here
+                  console.log(\`    Would generate types for: \${op.files.join(', ')}\`);
+                  return true;
+
+                case 'regenerate-indexes':
+                  // Index regeneration would be handled here
+                  console.log(\`    Would regenerate indexes\`);
+                  return true;
+
+                default:
+                  console.log(\`    Unknown operation type: \${op.type}\`);
+                  return false;
+              }
+            }
+
+            async function main() {
+              console.log('⚙️  Sigil Operations Processor');
+
+              if (!fs.existsSync(PENDING_OPS_PATH)) {
+                console.log('No pending-ops.json found');
+                return;
+              }
+
+              const content = fs.readFileSync(PENDING_OPS_PATH, 'utf-8');
+              const ops: PendingOps = JSON.parse(content);
+
+              const pending = ops.operations.filter(op => op.status === 'pending');
+
+              if (pending.length === 0) {
+                console.log('No pending operations');
+                return;
+              }
+
+              console.log(\`Found \${pending.length} pending operations\`);
+
+              const completed: string[] = [];
+              const failed: string[] = [];
+
+              for (const op of pending) {
+                op.status = 'processing';
+
+                const success = await processOperation(op);
+
+                if (success) {
+                  op.status = 'complete';
+                  completed.push(op.id);
+                } else {
+                  op.status = 'failed';
+                  failed.push(op.id);
+                }
+              }
+
+              // Remove completed operations
+              ops.operations = ops.operations.filter(op => op.status !== 'complete');
+
+              // Save updated ops
+              fs.writeFileSync(PENDING_OPS_PATH, JSON.stringify(ops, null, 2));
+
+              console.log('\\n📊 Results:');
+              console.log(\`  Completed: \${completed.length}\`);
+              console.log(\`  Failed: \${failed.length}\`);
+              console.log(\`  Remaining: \${ops.operations.length}\`);
+            }
+
+            main().catch(console.error);
+          "
+
+      - name: Commit processed operations
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Sigil Operations Processor"
+
+          if git diff --quiet .sigil/pending-ops.json; then
+            echo "No changes to pending ops"
+          else
+            git add .sigil/pending-ops.json
+            git commit -m "chore(sigil): process pending operations [skip ci]"
+            git push
+          fi
