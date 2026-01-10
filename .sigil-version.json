@@ -1,9 +1,9 @@
 {
-  "sigil_version": "6.0.0",
-  "framework_version": "6.0.0",
-  "codename": "Native Muse",
-  "schema_version": 8,
-  "description": "Survival-based framework with Three Laws, pre-computed workshop, and silent pattern observation",
+  "sigil_version": "7.6.0",
+  "framework_version": "7.6.0",
+  "codename": "The Living Canon",
+  "schema_version": 9,
+  "description": "Survival-based framework with auto-promotion, linter gate, slot-based composition, and executable principles",
   "zones": {
     "system": ".claude/",
     "state": "sigil-mark/",
@@ -22,7 +22,7 @@
   ],
   "three_laws": [
     "Code is Precedent",
-    "Survival is the Vote",
+    "Survival + Cleanliness = Gold",
     "Never Interrupt Flow"
   ],
   "seven_laws": [
@@ -52,7 +52,12 @@
     "constitutional_kernel": true,
     "sigil_provider": true,
     "use_sigil_mutation": true,
-    "simulation_flow": true
+    "simulation_flow": true,
+    "survival_engine": true,
+    "linter_gate": true,
+    "slot_composition": true,
+    "executable_principles": true,
+    "cicd_offload": true
   },
   "kernel": {
     "constitution": "sigil-mark/kernel/constitution.yaml",
@@ -101,15 +106,56 @@
       "survival-observer.ts",
       "chronicling-rationale.ts",
       "auditing-cohesion.ts",
-      "agent-orchestration.ts"
+      "agent-orchestration.ts",
+      "survival-engine.ts",
+      "linter-gate.ts",
+      "filesystem-registry.ts"
     ]
+  },
+  "executable_principles": {
+    "hooks": "src/components/gold/hooks/",
+    "utils": "src/components/gold/utils/",
+    "modules": [
+      "useMotion.ts",
+      "colors.ts",
+      "spacing.ts"
+    ]
+  },
+  "tier_system": {
+    "gold": "src/components/gold/",
+    "silver": "src/components/silver/",
+    "draft": "src/components/draft/"
   },
   "runtime_state": {
     "workshop": ".sigil/workshop.json",
     "survival": ".sigil/survival.json",
+    "survival_stats": ".sigil/survival-stats.json",
+    "pending_ops": ".sigil/pending-ops.json",
     "seed": ".sigil/seed.yaml",
     "craft_logs": ".sigil/craft-log/",
     "eras": ".sigil/eras/"
+  },
+  "cicd": {
+    "survival_workflow": ".github/workflows/sigil-survival.yml",
+    "ops_workflow": ".github/workflows/sigil-ops.yml"
+  },
+  "artifact_model": {
+    "shared": [
+      ".sigil/survival.json",
+      ".sigil/survival-stats.json",
+      ".sigil/seed.yaml",
+      ".sigil/pending-ops.json",
+      ".sigil/eras/",
+      "sigil-mark/moodboard/*.md"
+    ],
+    "machine_generated": [
+      ".sigil/workshop.json",
+      ".sigil/craft-log/"
+    ],
+    "user_specific": [
+      "sigil-mark/moodboard/sandbox/",
+      "sigil-mark/moodboard/**/*.png"
+    ]
   },
   "governance": {
     "justifications_log": "sigil-mark/governance/justifications.log",
@@ -123,26 +169,24 @@
     "craft_log_ms": 100
   },
   "migration": {
-    "from_version": "5.0.0",
-    "migrated_at": "2026-01-08T00:00:00Z",
-    "migration_script": "scripts/migrate-v6.sh",
+    "from_version": "6.0.0",
+    "migrated_at": "2026-01-10T00:00:00Z",
     "changes": [
-      "Workshop index (5ms queries)",
-      "Survival observation (silent pattern tracking)",
-      "Virtual Sanctuary (seeds for cold starts)",
-      "Ephemeral inspiration (context forking)",
-      "Forge mode (precedent-breaking)",
-      "Era management (design direction shifts)",
-      "Craft logs (automatic documentation)",
-      "Cohesion auditing (visual consistency)",
-      "Agent orchestration (7-phase flow)",
-      "11 skills with lifecycle hooks"
+      "Survival Engine (auto-promotion with 24h veto)",
+      "Linter Gate (ESLint + TSC + Sigil checks)",
+      "Slot-Based Composition (Gold frames, Draft children)",
+      "Executable Principles (TypeScript hooks/utils)",
+      "CI/CD Offload (GitHub Actions workflows)",
+      "Filesystem Registry (O(1) path-based tier lookup)",
+      "Artifact Model (shared/machine-generated/user-specific)"
     ]
   },
   "deprecated": {
     "governance_dialogs": "Replaced by survival observation",
-    "jit_grep_primary": "Now fallback only, workshop is primary"
+    "jit_grep_primary": "Now fallback only, workshop is primary",
+    "nomination_prs": "Replaced by automatic survival engine",
+    "markdown_principles": "Replaced by executable TypeScript"
   },
   "setup_completed_at": "2026-01-08T00:00:00Z",
-  "last_updated": "2026-01-08T00:00:00Z"
+  "last_updated": "2026-01-10T00:00:00Z"
 }
