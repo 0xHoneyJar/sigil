@@ -132,3 +132,35 @@ app/package.json
 app/package-lock.json
 app/tsconfig.json
 app/ecosystem.config.js
+
+# =============================================================================
+# SIGIL MOODBOARD RAW ASSETS
+# =============================================================================
+# Raw moodboard assets are user-specific and should be processed/optimized
+# before being shared. Keep markdown docs and index, ignore raw images.
+
+# Raw image formats (unprocessed)
+sigil-mark/moodboard/**/*.png
+sigil-mark/moodboard/**/*.PNG
+sigil-mark/moodboard/**/*.jpg
+sigil-mark/moodboard/**/*.jpeg
+sigil-mark/moodboard/**/*.JPG
+sigil-mark/moodboard/**/*.JPEG
+sigil-mark/moodboard/**/*.gif
+sigil-mark/moodboard/**/*.GIF
+sigil-mark/moodboard/**/*.webp
+sigil-mark/moodboard/**/*.WEBP
+sigil-mark/moodboard/**/*.svg
+sigil-mark/moodboard/**/*.SVG
+sigil-mark/moodboard/**/*.psd
+sigil-mark/moodboard/**/*.PSD
+sigil-mark/moodboard/**/*.ai
+sigil-mark/moodboard/**/*.AI
+sigil-mark/moodboard/**/*.sketch
+sigil-mark/moodboard/**/*.fig
+
+# Keep structure files
+!sigil-mark/moodboard/**/.gitkeep
+!sigil-mark/moodboard/**/README.md
+!sigil-mark/moodboard/**/*.yaml
+!sigil-mark/moodboard/**/*.md
