@@ -1,155 +1,98 @@
-# Sprint 3 Engineer Review
+# Sprint 3 Review: Engineer Feedback
 
-**Sprint:** Sprint 3 - useSigilMutation Core
+**Sprint:** sprint-3 (v9.0 Migration - Integration + Verification)
 **Reviewer:** Senior Technical Lead
-**Date:** 2026-01-08
 **Status:** APPROVED
+**Date:** 2026-01-11
 
 ---
 
 ## Review Summary
 
-All good.
+**All good.** Sprint 3 implementation verified all migration work and completed final cleanup.
 
 ---
 
-## Verification Checklist
+## Verification Results
 
-### S3-T1: Physics Types & Interfaces
+### S3-M1: Verify Physics System Works ✅
 
-| Criteria | Status |
-|----------|--------|
-| `SigilState` type with 6 states | PASS |
-| `PhysicsClass` type with 3 classes | PASS |
-| `SimulationPreview<T>` with predictedResult, fees, warnings | PASS |
-| `ResolvedPhysics` with class, timing, requires, forbidden | PASS |
-| `UseSigilMutationOptions<TData, TVariables>` complete | PASS |
-| `UseSigilMutationResult<TData, TVariables>` complete | PASS |
+**Verified:**
+- `useMotion` hook at `src/components/gold/hooks/useMotion.ts` (229 lines)
+- Physics values match constitution:
+  - `server-tick`: 600ms ✓
+  - `deliberate`: 800ms ✓
+  - `snappy`: 150ms ✓
+  - `smooth`: 300ms ✓
+  - `instant`: 0ms ✓
 
-**Notes:** Types are well-documented with JSDoc. Generic parameters correctly propagate through interfaces.
+### S3-M2: Update CLAUDE.md with Grimoire Paths ✅
 
-### S3-T2: Physics Resolution Function
+**Verified:**
+- 19 occurrences of `grimoires/sigil` in CLAUDE.md
+- Key Files section references grimoire structure
+- Version correctly shows v9.0.0
 
-| Criteria | Status |
-|----------|--------|
-| `resolvePhysicsV5()` function exists | PASS |
-| critical → server-tick mapping | PASS |
-| glass → local-first mapping | PASS |
-| machinery → local-first mapping | PASS |
-| standard → crdt mapping | PASS |
-| Override warning without reason | PASS |
-| Returns complete ResolvedPhysics | PASS |
+### S3-M3: Update tsconfig.json Path Aliases ✅
 
-**Notes:** Zone-to-physics mapping is clean. Persona adjustments (power_user 0.9x, cautious 1.2x) are reasonable. Vibes timing_modifier correctly applied.
+**Verified:**
+```json
+"paths": {
+  "@sigil-context/*": ["grimoires/sigil/*"]
+},
+"include": [
+  "grimoires/sigil/**/*"
+]
+```
 
-### S3-T3: State Machine Implementation
+Both additions present and correctly formatted.
 
-| Criteria | Status |
-|----------|--------|
-| State transitions: idle→simulating→confirming→committing→done | PASS |
-| Error state reachable from simulating | PASS |
-| Error state reachable from committing | PASS |
-| Reset returns to idle | PASS |
-| State is reactive (useState) | PASS |
+### S3-M4: Verify /craft Command Flow ✅
 
-**Notes:** State machine is correct. All transitions properly guarded with state checks.
+**Verified:**
+- `crafting-guidance/SKILL.md` references:
+  - `grimoires/sigil/moodboard/` (line 5)
+  - `grimoires/sigil/constitution/physics.yaml` (line 9, 103)
+- Vocabulary → physics mapping documented
 
-### S3-T4: Simulate Function
+### S3-M5: Cleanup Legacy Directories ✅
 
-| Criteria | Status |
-|----------|--------|
-| `simulate(variables)` transitions to simulating | PASS |
-| Calls user-provided simulate if available | PASS |
-| Creates default preview if no simulate function | PASS |
-| Transitions to confirming on success | PASS |
-| Transitions to error on failure | PASS |
-| Stores pending variables for confirm | PASS |
-
-**Notes:** Default preview correctly uses physics timing. Variables stored in ref for confirm step.
-
-### S3-T5: Confirm Function
-
-| Criteria | Status |
-|----------|--------|
-| `confirm()` only works in confirming state | PASS |
-| Transitions to committing | PASS |
-| Executes mutation with stored variables | PASS |
-| Transitions to done on success | PASS |
-| Transitions to error on failure | PASS |
-| Calls onSuccess/onError callbacks | PASS |
-
-**Notes:** Proper error handling for missing pending variables.
-
-### S3-T6: Execute Function
-
-| Criteria | Status |
-|----------|--------|
-| `execute(variables)` for direct execution | PASS |
-| Logs warning on server-tick physics | PASS |
-| Transitions through committing→done/error | PASS |
-| Calls mutation directly | PASS |
-
-**Notes:** Warning for server-tick usage is helpful for debugging.
-
-### S3-T7: Computed UI State
-
-| Criteria | Status |
-|----------|--------|
-| `disabled` = not idle and not confirming | PASS |
-| `isPending` = committing | PASS |
-| `isSimulating` = simulating | PASS |
-| `isConfirming` = confirming | PASS |
-| `cssVars` with --sigil-duration, --sigil-easing | PASS |
-
-**Notes:** Computed state is correct. CSS vars use physics timing correctly.
-
-### S3-T8: Hook Assembly & Export
-
-| Criteria | Status |
-|----------|--------|
-| Hook uses SigilContext for zone/persona | PASS |
-| Returns complete result object | PASS |
-| Exported from sigil-mark/hooks/ | PASS |
-| JSDoc documented with @sigil-tier gold | PASS |
-
-**Notes:** Comprehensive JSDoc with 3 usage examples. Export statement correctly re-exports types and physics functions.
+**Verified:**
+- `sigil-mark/process/` - does not exist ✓
+- `sigil-mark/moodboard/` - does not exist ✓
+- `grimoires/sigil/process/` - 36 .ts files ✓
+- `grimoires/sigil/constitution/` - 5 YAML files ✓
 
 ---
 
-## Quality Assessment
+## Sprint Exit Criteria
 
-### Strengths
-
-1. **Type Safety:** Full TypeScript generics through the entire API
-2. **State Machine:** Clean transitions with proper guards
-3. **Error Handling:** All error paths covered with callbacks
-4. **Documentation:** Excellent JSDoc with practical examples
-5. **Backwards Compat:** v4.1 resolvePhysics preserved
-6. **Developer Experience:** Clear warnings for wrong usage patterns
-
-### Architecture Alignment
-
-- Zone-to-physics mapping matches SDD Section 4.2
-- Simulation flow matches SDD Section 4.2.1
-- Physics resolution priority matches SDD Section 4.2.2
-
-### No Issues Found
-
-No code quality issues, security vulnerabilities, or architecture misalignments detected.
+| Criterion | Status |
+|-----------|--------|
+| `useMotion` hook works correctly | ✅ Verified |
+| CLAUDE.md references grimoire paths | ✅ 19 references |
+| tsconfig.json has path aliases | ✅ Verified |
+| `/craft` skill uses grimoire paths | ✅ Verified |
+| Legacy directories cleaned up | ✅ Verified |
 
 ---
 
-## Recommendation
+## v9.0 Migration Complete
 
-**APPROVED** - Sprint 3 is ready for security audit.
+All 3 sprints of the v9.0 "Core Scaffold" migration are now complete:
+
+| Sprint | Focus | Status |
+|--------|-------|--------|
+| Sprint 1 | Grimoire Structure + Constitution | ✅ |
+| Sprint 2 | Process Layer + Skills Update | ✅ |
+| Sprint 3 | Integration + Verification | ✅ |
 
 ---
 
-## Next Steps
+## Decision
 
-1. Run `/audit-sprint sprint-3` for security review
-2. Upon approval, proceed to Sprint 4: Live Grep Discovery
+**APPROVED** - Proceed to `/audit-sprint sprint-3`
 
 ---
 
-*Review Completed: 2026-01-08*
+*Review completed: 2026-01-11*

@@ -1,26 +1,25 @@
-Sprint 3: CI/CD & Polish
-Completed: 2026-01-10
-Version: 7.6.0 "The Living Canon"
+Sprint 3: Integration + Verification (v9.0 Migration)
+Completed: 2026-01-11
+Version: 9.0.0 "Core Scaffold"
 
 Tasks Completed:
-- S3-T1: Create pending-ops.json schema
-- S3-T2: Create survival engine workflow
-- S3-T3: Create operations processor workflow
-- S3-T4: Update CLAUDE.md to v7.6
-- S3-T5: Update all version numbers to 7.6.0
+- S3-M1: Verify physics system works
+- S3-M2: Verify CLAUDE.md grimoire paths
+- S3-M3: Update tsconfig.json path aliases
+- S3-M4: Verify /craft command flow
+- S3-M5: Cleanup legacy directories
 
 Review: APPROVED by Senior Technical Lead
 Audit: APPROVED by Security Auditor
 
-Files Created:
-- .sigil/pending-ops.json
-- .github/workflows/sigil-survival.yml
-- .github/workflows/sigil-ops.yml
-
 Files Modified:
-- CLAUDE.md
-- .claude/agents/sigil-craft.yaml
-- sigil-mark/package.json
-- packages/eslint-plugin-sigil/package.json
-- packages/eslint-plugin-sigil/src/index.ts
-- packages/eslint-plugin-sigil/src/configs/recommended.ts
+- tsconfig.json (added @sigil-context/* path alias)
+
+Directories Removed:
+- sigil-mark/process/ (empty)
+- sigil-mark/moodboard/ (empty)
+
+v9.0 Migration Complete:
+- Sprint 1: Grimoire Structure + Constitution ✅
+- Sprint 2: Process Layer + Skills Update ✅
+- Sprint 3: Integration + Verification ✅

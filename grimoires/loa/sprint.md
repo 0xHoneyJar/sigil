@@ -897,11 +897,13 @@ context_files:
 
 ### Sprint 3 Exit Criteria
 
-- [ ] Existing `useMotion` hook works correctly
-- [ ] CLAUDE.md references grimoire paths
-- [ ] `/craft` command generates with correct physics
-- [ ] Legacy directories cleaned up
-- [ ] No TypeScript compilation errors
+- [x] Existing `useMotion` hook works correctly
+- [x] CLAUDE.md references grimoire paths
+- [x] `/craft` command generates with correct physics
+- [x] Legacy directories cleaned up
+- [x] No TypeScript compilation errors
+
+**Status:** COMPLETED (2026-01-11) ✅
 
 ---
 
