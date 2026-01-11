@@ -1,0 +1,21 @@
+# Sigil Zone Configuration
+# Marketing zone - delight and polish
+
+sigil: "1.2.4"
+
+# Use glass recipes for polished, inviting feel
+recipes: glass
+
+# Client-side animations are fine
+sync: client_authoritative
+
+# Zone-specific constraints
+constraints:
+  # Encourage delightful interactions
+  float_effects: encouraged
+  glow_effects: encouraged
+  spring_animations: encouraged
+  
+  # But don't overdo it
+  auto_play_video: discouraged
+  sound_effects: forbidden

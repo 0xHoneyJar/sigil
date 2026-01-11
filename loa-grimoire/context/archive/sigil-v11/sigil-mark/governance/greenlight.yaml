@@ -1,0 +1,176 @@
+# Sigil Governance: Greenlight Polling
+# Community polling for CONCEPTS only (not pixels)
+# Based on OSRS Polling Charter model
+
+version: "1.0"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# GREENLIGHT PROTOCOL
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# The Jagex/OSRS Polling Charter model:
+# 1. Greenlight Poll: "Should we explore building X?" (70% threshold)
+# 2. Refinement: Taste Owners craft the specifics (NO poll)
+# 3. Lock-in Poll: "We built X. Ship it?" (70% threshold)
+#
+# You poll the EXISTENCE of a feature, not the COLOR of the button.
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+
+protocol:
+  principle: "Poll concepts, dictate pixels"
+  
+  # Two-phase polling
+  phases:
+    greenlight:
+      name: "Greenlight Poll"
+      question_template: "Should we explore building {{feature}}?"
+      threshold: 0.70  # 70% Yes required
+      duration_days: 7
+      who_votes: "all_users"  # or "power_users", "token_holders"
+      outcome_yes: "Proceed to refinement"
+      outcome_no: "Archive to archaeology"
+    
+    lock_in:
+      name: "Lock-in Poll"
+      question_template: "We built {{feature}}. Should we ship it?"
+      threshold: 0.70
+      duration_days: 7
+      who_votes: "all_users"
+      outcome_yes: "Ship to production"
+      outcome_no: "Archive or iterate"
+  
+  # What's pollable
+  pollable_topics:
+    - "New major features"
+    - "Feature removal"
+    - "Major UI overhauls"
+    - "Product direction changes"
+    - "Pricing model changes"
+    - "New platforms/integrations"
+  
+  # What's NOT pollable (Taste Owner territory)
+  not_pollable:
+    - "Colors"
+    - "Fonts"
+    - "Animation timing"
+    - "Border radius"
+    - "Spacing values"
+    - "Shadow styles"
+    - "Icon designs"
+    - "Button shapes"
+    - "Micro-interactions"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ARCHAEOLOGY TOOL
+# Tracks rejections and near-misses for future reference
+# ═══════════════════════════════════════════════════════════════════════════════
+
+archaeology:
+  # Near-misses: Features that got close (60-69.9%)
+  # These can be reconsidered after cooldown
+  near_miss_threshold: [0.60, 0.699]
+  near_miss_cooldown_days: 180
+  
+  # Hard rejections: Features that failed badly (<60%)
+  # These require longer cooldown
+  hard_rejection_threshold: [0, 0.599]
+  hard_rejection_cooldown_days: 365
+  
+  # When user suggests a feature, agent checks archaeology:
+  agent_behavior: |
+    When a user suggests feature X:
+    1. Search archaeology for similar concepts
+    2. If found:
+       - Report: "This was polled in {{date}} and received {{vote}}%"
+       - If near-miss: "Cooldown ends {{date}}. Has context changed?"
+       - If hard-rejection: "This was firmly rejected. Would need major change."
+    3. If not found:
+       - Proceed with greenlight process
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# POLL RECORDS
+# History of all polls
+# ═══════════════════════════════════════════════════════════════════════════════
+
+polls: []
+  # Example:
+  # - id: "POLL-2025-001"
+  #   type: "greenlight"
+  #   feature: "Sailing Skill"
+  #   question: "Should we explore building a Sailing skill?"
+  #   opened_at: "2025-01-01T00:00:00Z"
+  #   closed_at: "2025-01-08T00:00:00Z"
+  #   votes:
+  #     yes: 7234
+  #     no: 2341
+  #     total: 9575
+  #   percentage: 75.5
+  #   threshold: 70
+  #   result: "passed"
+  #   next_phase: "refinement"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ACTIVE POLLS
+# Currently open polls
+# ═══════════════════════════════════════════════════════════════════════════════
+
+active: []
+  # - id: "POLL-2025-002"
+  #   type: "lock_in"
+  #   feature: "Sailing Skill"
+  #   question: "We built Sailing. Ship it?"
+  #   opened_at: "2025-03-01T00:00:00Z"
+  #   closes_at: "2025-03-08T00:00:00Z"
+  #   current_votes:
+  #     yes: 4521
+  #     no: 1234
+  #   current_percentage: 78.6
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ARCHAEOLOGY RECORDS
+# Near-misses and rejections
+# ═══════════════════════════════════════════════════════════════════════════════
+
+near_misses: []
+  # - id: "NM-2024-001"
+  #   feature: "Divine Spirit Shield"
+  #   poll_id: "POLL-2024-005"
+  #   percentage: 68.2
+  #   date: "2024-06-15"
+  #   reason: "Balance concerns from PvP community"
+  #   reconsider_after: "2024-12-15"
+  #   meta_changed: false
+
+hard_rejections: []
+  # - id: "HR-2024-001"
+  #   feature: "Auto-play Background Music"
+  #   poll_id: "POLL-2024-002"
+  #   percentage: 12.4
+  #   date: "2024-02-01"
+  #   reason: "Universally disliked"
+  #   permanent: true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CONFIGURATION
+# Poll settings
+# ═══════════════════════════════════════════════════════════════════════════════
+
+config:
+  # Minimum participation
+  min_participation: 100  # Minimum votes for poll to be valid
+  
+  # Who can create polls
+  poll_creators:
+    - "taste_owners"
+    - "product_team"
+  
+  # Poll announcement channels
+  announce_channels: []
+  #   - "discord"
+  #   - "twitter"
+  #   - "in-app"
+  
+  # Visual lock during poll
+  # Prevents visual changes to feature under poll
+  visual_lock_during_poll: true

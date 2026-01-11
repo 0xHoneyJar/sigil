@@ -1,0 +1,23 @@
+Sprint: v6.1-sprint-1
+Theme: Make It Work (P0)
+Status: COMPLETED
+
+Reviewer: Senior Technical Lead
+Review Date: 2026-01-08
+Review Verdict: All good
+
+Auditor: Paranoid Cypherpunk Auditor
+Audit Date: 2026-01-08
+Audit Verdict: APPROVED - LET'S FUCKING GO
+
+Completed: 2026-01-08T12:00:00Z
+
+Tasks Completed:
+- S1-T1: Create validate.sh hook script
+- S1-T2: Create observe.sh hook script
+- S1-T3: Create ensure-log.sh hook script
+- S1-T4: Add hook TypeScript exports
+- S1-T5: Fix queryMaterial parameter order
+- S1-T6: Add verify-on-read to workshop queries
+- S1-T7: Add hash and indexed_at to ComponentEntry
+- S1-T8: Implement workshop rebuild in startup sentinel

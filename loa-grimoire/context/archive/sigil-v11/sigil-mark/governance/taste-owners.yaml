@@ -1,0 +1,139 @@
+# Sigil Governance: Taste Owners
+# Named authorities who dictate (not vote) on visuals and vibe
+# "Quality doesn't come from committees... it comes from individuals with taste."
+
+version: "1.0"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TASTE OWNER PROTOCOL
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Taste Owners DICTATE visual and vibe decisions. They do not poll.
+#
+# This is the "Dictatorship of Craft" model from Linear:
+# - Committees produce average work
+# - Individuals with taste produce excellent work
+# - The community polls CONCEPTS, Taste Owners decide EXECUTION
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+
+protocol:
+  principle: "Poll concepts, dictate pixels"
+  
+  what_taste_owners_control:
+    - "Colors and color palettes"
+    - "Typography and font choices"
+    - "Animation timing and easing"
+    - "Border radius and spacing"
+    - "Shadow depth and style"
+    - "Icon style and weight"
+    - "Motion style (spring vs ease)"
+    - "Overall visual polish"
+    - "Component aesthetics"
+    - "Interaction feel"
+  
+  what_gets_polled_instead:
+    - "Should we build feature X?" (Concept Greenlight)
+    - "Should we ship feature X?" (Lock-in Greenlight)
+    - "Major direction changes"
+    - "Fundamental product pivots"
+  
+  never_polled:
+    - "What shade of blue?"
+    - "How bouncy should the animation be?"
+    - "Should buttons be rounded?"
+    - "What font should we use?"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# REGISTERED TASTE OWNERS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+taste_owners:
+  # Example structure:
+  # design:
+  #   name: "Design Lead"
+  #   handle: "@design-lead"
+  #   email: "design@example.com"
+  #   scope:
+  #     - "sigil-mark/**"
+  #     - "src/components/**"
+  #     - "app/**/*.tsx"
+  #   authority:
+  #     - "materials"
+  #     - "tensions"
+  #     - "motion"
+  #     - "colors"
+  #     - "typography"
+  #   trust_score: 100  # Starts at 100, decreases on reverted changes
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CHALLENGE PERIOD
+# Integrity changes auto-deploy but can be challenged
+# ═══════════════════════════════════════════════════════════════════════════════
+
+challenge_period:
+  enabled: true
+  duration_hours: 24
+  
+  # What happens during challenge period
+  process:
+    1: "Change auto-deploys"
+    2: "Appears in Challenge Dashboard"
+    3: "Any Taste Owner can flag as 'Content' vs 'Integrity'"
+    4: "If flagged as Content, immediately reverts"
+    5: "Deployer loses Trust Score on false Integrity claims"
+  
+  # Trust Score system
+  trust_score:
+    initial: 100
+    on_false_integrity: -10
+    on_successful_integrity: +1
+    minimum_to_deploy: 50
+  
+  # What qualifies as Integrity (not pollable)
+  integrity_criteria:
+    - "Bug fixes with no visual change"
+    - "Performance improvements"
+    - "Security patches"
+    - "Accessibility fixes"
+    - "Breaking change hotfixes"
+  
+  # What is Content (should be polled or dictated)
+  content_criteria:
+    - "New visual elements"
+    - "Changed animation timing"
+    - "New colors or styles"
+    - "Layout changes"
+    - "New features"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# APPROVAL RECORDS
+# Sign-offs from Taste Owners
+# ═══════════════════════════════════════════════════════════════════════════════
+
+approvals: []
+  # - id: "APPR-001"
+  #   pattern: "Primary button style"
+  #   scope: "**/Button.tsx"
+  #   approved_by: "@design-lead"
+  #   approved_at: "2025-01-15T10:30:00Z"
+  #   notes: "Blue gradient with spring animation"
+  #   
+  # - id: "APPR-002"
+  #   pattern: "Card elevation system"
+  #   scope: "**/Card.tsx"
+  #   approved_by: "@design-lead"
+  #   approved_at: "2025-01-16T14:00:00Z"
+  #   notes: "Three-level shadow system"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# OVERRIDE LOG
+# When Taste Owner decisions are overridden (rare, requires escalation)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+overrides: []
+  # - id: "OVRD-001"
+  #   original_approval: "APPR-001"
+  #   overridden_by: "@ceo"
+  #   reason: "Brand pivot requires different color"
+  #   date: "2025-02-01T09:00:00Z"

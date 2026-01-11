@@ -1,0 +1,165 @@
+# Sigil Resonance: Tensions (Tuning Sliders)
+# Tensions are continuous sliders, not binary choices.
+
+tensions:
+  description: |
+    Tensions are tuning knobs, not binary switches.
+    Each zone sets its tension values (0-100).
+    The agent uses these to calibrate generation.
+    
+    Think of these as "dials" on a mixing board—
+    you're blending different qualities.
+
+  # ═══════════════════════════════════════════════════════════════════
+  # THE SLIDERS
+  # ═══════════════════════════════════════════════════════════════════
+  
+  sliders:
+    playfulness:
+      range: [0, 100]
+      low: "Serious, professional, restrained"
+      high: "Fun, bouncy, surprising"
+      affects:
+        - "Animation easing (linear → bouncy)"
+        - "Color saturation"
+        - "Illustration style"
+        - "Micro-interactions"
+      examples:
+        0: "Banking app"
+        50: "Productivity tool"
+        100: "Game UI"
+    
+    weight:
+      range: [0, 100]
+      low: "Light, instant, effortless"
+      high: "Heavy, deliberate, confirmed"
+      affects:
+        - "Animation duration"
+        - "Shadow depth"
+        - "Press feedback intensity"
+        - "Transition timing"
+      examples:
+        0: "Linear (instant)"
+        50: "Standard web app"
+        100: "OSRS (tick-based)"
+    
+    density:
+      range: [0, 100]
+      low: "Spacious, minimal, focused"
+      high: "Dense, information-rich, efficient"
+      affects:
+        - "Spacing scale"
+        - "Font sizes"
+        - "Items per view"
+        - "Whitespace ratio"
+      examples:
+        0: "Apple marketing"
+        50: "Gmail"
+        100: "Bloomberg Terminal"
+    
+    speed:
+      range: [0, 100]
+      low: "Slow, considered, deliberate"
+      high: "Fast, instant, efficient"
+      affects:
+        - "Animation duration (inverse)"
+        - "Transition presence"
+        - "Loading strategy"
+        - "Feedback timing"
+      examples:
+        0: "Meditation app"
+        50: "Standard"
+        100: "Linear"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # ZONE PRESETS
+  # ═══════════════════════════════════════════════════════════════════
+  
+  presets:
+    critical:
+      playfulness: 20
+      weight: 80
+      density: 50
+      speed: 30
+      rationale: "Trust requires deliberation"
+      
+    transactional:
+      playfulness: 30
+      weight: 20
+      density: 80
+      speed: 95
+      rationale: "Efficiency is the goal"
+      
+    exploratory:
+      playfulness: 70
+      weight: 50
+      density: 40
+      speed: 60
+      rationale: "Discovery should delight"
+      
+    marketing:
+      playfulness: 80
+      weight: 60
+      density: 30
+      speed: 50
+      rationale: "Impression matters most"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # TENSION → CSS MAPPING
+  # ═══════════════════════════════════════════════════════════════════
+  
+  css_mapping:
+    playfulness:
+      0:
+        --spring-bounce: "0"
+        --color-saturation: "90%"
+        --animation-overshoot: "0"
+      100:
+        --spring-bounce: "0.4"
+        --color-saturation: "110%"
+        --animation-overshoot: "1.1"
+        
+    weight:
+      0:
+        --animation-duration: "0ms"
+        --shadow-opacity: "0"
+        --press-scale: "1"
+      100:
+        --animation-duration: "800ms"
+        --shadow-opacity: "0.15"
+        --press-scale: "0.96"
+        
+    density:
+      0:
+        --spacing-scale: "1.5"
+        --font-size-scale: "1.1"
+      100:
+        --spacing-scale: "0.75"
+        --font-size-scale: "0.9"
+        
+    speed:
+      0:
+        --transition-duration: "600ms"
+        --loading-delay: "200ms"
+      100:
+        --transition-duration: "0ms"
+        --loading-delay: "0ms"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # TENSION CONFLICTS
+  # ═══════════════════════════════════════════════════════════════════
+  
+  conflicts:
+    description: |
+      Some tension combinations create conflicts.
+      When conflicts occur, zone physics take precedence.
+    
+    rules:
+      - conflict: "High playfulness + Critical zone"
+        resolution: "Zone wins. Playfulness capped at 30."
+        
+      - conflict: "High speed + Server-authoritative"
+        resolution: "Physics wins. Speed cannot exceed tick rate."
+        
+      - conflict: "Low weight + Heavy material (clay)"
+        resolution: "Material wins. Weight minimum 60."

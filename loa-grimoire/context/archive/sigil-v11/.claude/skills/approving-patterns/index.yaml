@@ -1,0 +1,8 @@
+name: approving-patterns
+version: "1.0.0"
+description: "Taste Owner sign-off on patterns. No committees."
+role: "Taste Owner"
+command: /approve
+outputs:
+  - sigil-mark/governance/taste-owners.yaml
+dependencies: []

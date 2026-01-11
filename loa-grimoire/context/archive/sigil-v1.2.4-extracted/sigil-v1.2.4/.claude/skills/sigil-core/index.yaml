@@ -1,0 +1,26 @@
+name: sigil-core
+description: Core Sigil skill for design physics framework
+version: 1.2.4
+
+commands:
+  - craft
+  - sandbox
+  - codify
+  - inherit
+  - validate
+  - garden
+
+outputs:
+  - sigil-mark/recipes/**/*.tsx
+  - sigil-mark/reports/*.yaml
+  - .sigilrc.yaml
+  - .sigil-version.json
+
+dependencies:
+  - framer-motion
+  - react
+
+integrations:
+  - vercel
+  - github
+  - linear

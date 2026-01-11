@@ -1,0 +1,20 @@
+{
+  "name": "eslint-plugin-sigil",
+  "version": "7.5.0",
+  "description": "ESLint rules for Sigil contagion model",
+  "main": "index.js",
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "sigil",
+    "design-system"
+  ],
+  "author": "Sigil",
+  "license": "MIT",
+  "peerDependencies": {
+    "eslint": ">=7.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

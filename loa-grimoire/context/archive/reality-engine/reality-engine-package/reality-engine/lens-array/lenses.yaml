@@ -1,0 +1,274 @@
+# Lens Array — Multiple Visual Truths
+# Lenses are additive interpretations that coexist on top of the core.
+
+version: "1.0.0"
+
+description: |
+  The Lens Array supports multiple visual interpretations simultaneously.
+  HD doesn't replace Vanilla—they coexist.
+  
+  KEY RULES:
+  - Lenses are ADDITIVE (can stack)
+  - Lenses CANNOT alter hitboxes, timing, or game logic
+  - Lenses ONLY affect presentation
+  - All assets must validate in the most constrained lens
+
+# ═══════════════════════════════════════════════════════════════════════
+# LENS DEFINITIONS
+# ═══════════════════════════════════════════════════════════════════════
+
+lenses:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # NOSTALGIA LENS: The Purist Experience
+  # ─────────────────────────────────────────────────────────────────────
+  nostalgia:
+    name: "Nostalgia Lens"
+    description: "Pure, original, minimal interpretation"
+    priority: 1  # Highest priority for validation
+    
+    target_audience:
+      - "Purists who want the original experience"
+      - "Low-spec hardware"
+      - "Nostalgia seekers"
+    
+    interpretation:
+      rendering: "Software-style, no GPU effects"
+      textures: "Original resolution (64x64 max)"
+      lighting: "Flat, baked shadows only"
+      effects: "Minimal particles, no post-processing"
+      ui: "Classic interface, no scaling"
+    
+    resolution:
+      fixed_mode: "800x600"
+      required_validation: true
+    
+    constraints:
+      - "No dynamic shadows"
+      - "No bloom or post-processing"
+      - "No texture upscaling"
+      - "Classic UI layout"
+    
+    validation_rule: |
+      This is the TRUTH lens.
+      If an asset breaks in Nostalgia lens, it's broken.
+      All assets MUST pass Nostalgia validation.
+
+  # ─────────────────────────────────────────────────────────────────────
+  # MODERN LENS: The Enhanced Experience
+  # ─────────────────────────────────────────────────────────────────────
+  modern:
+    name: "Modern Lens"
+    description: "HD lighting, shadows, GPU enhancement"
+    priority: 2
+    
+    target_audience:
+      - "Players who want visual enhancement"
+      - "High-spec hardware"
+      - "Content creators"
+    
+    interpretation:
+      rendering: "GPU-accelerated"
+      textures: "AI-upscaled, filtered"
+      lighting: "Dynamic shadows, ambient occlusion"
+      effects: "Enhanced particles, subtle post-processing"
+      ui: "Scalable, resolution-independent"
+    
+    resolution:
+      supported: ["1080p", "1440p", "4K"]
+      scaling: true
+    
+    constraints:
+      - "Dynamic effects must not obscure gameplay"
+      - "Shadows must not hide important information"
+      - "Lighting must not break color-coded signals"
+      - "Must gracefully degrade to Nostalgia"
+    
+    validation_rule: |
+      Modern lens is an INTERPRETATION, not the truth.
+      Assets can look better here, but must work in Nostalgia.
+      HD is additive—it cannot change the core.
+
+  # ─────────────────────────────────────────────────────────────────────
+  # UTILITY LENS: The Accessible Experience
+  # ─────────────────────────────────────────────────────────────────────
+  utility:
+    name: "Utility Lens"
+    description: "Accessible, mobile, large targets"
+    priority: 3
+    
+    target_audience:
+      - "Mobile users"
+      - "Players with accessibility needs"
+      - "Casual engagement"
+    
+    interpretation:
+      rendering: "Optimized for battery/performance"
+      textures: "Simplified for clarity"
+      lighting: "High contrast"
+      effects: "Reduced for performance"
+      ui: "Large touch targets, high contrast"
+    
+    resolution:
+      mobile: ["720p", "1080p"]
+      tablet: ["1080p", "1440p"]
+    
+    constraints:
+      - "Touch targets >= 44px"
+      - "Contrast ratio >= 4.5:1"
+      - "Text readable at 12pt minimum"
+      - "No hover-dependent interactions"
+    
+    accessibility:
+      color_blind_modes: true
+      screen_reader_support: true
+      reduced_motion_option: true
+    
+    validation_rule: |
+      Utility lens ensures inclusive access.
+      Critical interactions must be usable.
+      No information can be lost in simplification.
+
+# ═══════════════════════════════════════════════════════════════════════
+# LENS STACKING
+# ═══════════════════════════════════════════════════════════════════════
+
+stacking:
+  
+  description: |
+    Multiple lenses can be active simultaneously.
+    When lenses conflict, priority order determines resolution.
+  
+  allowed_combinations:
+    - ["nostalgia"]
+    - ["modern"]
+    - ["utility"]
+    - ["modern", "utility"]  # HD with accessibility
+    - ["nostalgia", "utility"]  # Classic with accessibility
+  
+  conflict_resolution:
+    priority_order: ["utility", "nostalgia", "modern"]
+    rule: |
+      1. Utility (accessibility) takes precedence
+      2. Then Nostalgia (compatibility)
+      3. Then Modern (enhancement)
+      
+      Example: If utility requires high contrast but modern
+      wants subtle shadows, utility wins.
+
+# ═══════════════════════════════════════════════════════════════════════
+# IMMUTABLE PROPERTIES
+# ═══════════════════════════════════════════════════════════════════════
+
+immutable:
+  
+  description: |
+    These properties are the same across ALL lenses.
+    Lenses interpret visuals, not gameplay.
+  
+  properties:
+    hitboxes:
+      description: "Clickable/interactable areas"
+      rule: "Same across all lenses"
+    
+    timing:
+      description: "Game tick, action delays"
+      rule: "Same across all lenses (600ms tick)"
+    
+    game_logic:
+      description: "Rules, calculations, outcomes"
+      rule: "Same across all lenses"
+    
+    collision:
+      description: "Physical boundaries"
+      rule: "Same across all lenses"
+    
+    information:
+      description: "Gameplay-relevant data"
+      rule: "Same information available in all lenses"
+
+# ═══════════════════════════════════════════════════════════════════════
+# VALIDATION RULES
+# ═══════════════════════════════════════════════════════════════════════
+
+validation:
+  
+  process:
+    1_nostalgia_check: |
+      FIRST: Validate in Nostalgia lens (Fixed Mode 800x600).
+      This is the truth test. If it fails here, REJECT.
+    
+    2_modern_check: |
+      THEN: Validate in Modern lens.
+      Check that enhancements don't obscure gameplay.
+    
+    3_utility_check: |
+      THEN: Validate in Utility lens.
+      Check accessibility requirements.
+    
+    4_conflict_check: |
+      FINALLY: Check for lens conflicts.
+      Ensure stacked lenses work together.
+  
+  fixed_mode_requirement:
+    resolution: "800x600"
+    enforced: true
+    rationale: |
+      Fixed Mode is the closest to core reality.
+      Some players use it exclusively.
+      If it breaks in Fixed Mode, it's broken.
+  
+  failure_responses:
+    
+    nostalgia_fail:
+      severity: "CRITICAL"
+      action: "REJECT"
+      message: |
+        ⛔ NOSTALGIA LENS FAILURE
+        
+        Asset: {asset_name}
+        Issue: {issue_description}
+        
+        The asset does not work in Fixed Mode (800x600).
+        This is a critical failure—Fixed Mode is the truth test.
+        
+        The asset cannot ship until this is resolved.
+    
+    modern_fail:
+      severity: "WARNING"
+      action: "FLAG"
+      message: |
+        ⚠️ MODERN LENS ISSUE
+        
+        Asset: {asset_name}
+        Issue: {issue_description}
+        
+        The asset has issues in HD mode.
+        This should be fixed, but is not blocking.
+    
+    utility_fail:
+      severity: "HIGH"
+      action: "REQUIRE_REVIEW"
+      message: |
+        ⚠️ UTILITY LENS FAILURE
+        
+        Asset: {asset_name}
+        Issue: {issue_description}
+        
+        The asset fails accessibility requirements.
+        This blocks mobile deployment and a11y compliance.
+        
+        [Fix Required] [Request Exception]
+    
+    conflict_detected:
+      severity: "MEDIUM"
+      action: "FLAG"
+      message: |
+        📋 LENS CONFLICT DETECTED
+        
+        Lenses: {lens_a} + {lens_b}
+        Conflict: {conflict_description}
+        
+        Resolution: {resolution_applied}
+        
+        Please verify this is acceptable.

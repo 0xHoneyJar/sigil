@@ -1,0 +1,181 @@
+# Sigil v2.0 — Configuration
+# Reality Engine for design physics
+
+sigil: "2.0.0"
+
+# =============================================================================
+# ERGONOMIC PROFILER
+# =============================================================================
+
+ergonomics:
+  hitbox:
+    minTouchTarget: 44         # Minimum touch target in pixels
+    maxCenterDrift: 2          # Max drift from physics center
+    minClickableArea: 0.9      # Min percentage of visual area that's clickable
+
+  contrast:
+    minRatio: 4.5              # WCAG AA minimum
+    criticalMinRatio: 7.0      # WCAG AAA for critical elements
+    criticalElements:
+      - button
+      - a
+      - input
+      - select
+
+  focus:
+    indicatorRequired: true
+    minIndicatorContrast: 3.0
+
+# =============================================================================
+# INTEGRITY FLAGS
+# =============================================================================
+
+integrity:
+  classifications:
+    cosmetic:
+      description: "Colors, fonts, animations — safe everywhere"
+      permissions:
+        - colors
+        - typography
+        - spacing
+        - animations
+        - icons
+      restrictions: []
+
+    utility:
+      description: "Overlays, highlights — warning in critical"
+      permissions:
+        - colors
+        - typography
+        - spacing
+        - animations
+        - icons
+        - overlays
+        - highlights
+        - badges
+        - tooltips
+      restrictions:
+        - criticalZones
+
+    gameplay:
+      description: "Input hints — blocked in critical/financial"
+      permissions:
+        - colors
+        - typography
+        - spacing
+        - animations
+        - icons
+        - overlays
+        - highlights
+        - badges
+        - tooltips
+        - inputHints
+        - dataAugmentation
+      restrictions:
+        - criticalZones
+        - financialFlow
+        - competitiveMode
+
+# =============================================================================
+# ZONES
+# =============================================================================
+
+zones:
+  critical:
+    description: "High-stakes actions (checkout, payment)"
+    paths:
+      - "src/features/checkout/**"
+      - "src/features/payment/**"
+      - "src/features/transfer/**"
+    forceLens: StrictLens
+    timeAuthority: server-tick
+    financial: true
+
+  admin:
+    description: "Administrative interfaces"
+    paths:
+      - "src/features/admin/**"
+      - "src/features/settings/**"
+    timeAuthority: optimistic
+    allowedClassifications:
+      - cosmetic
+      - utility
+
+  marketing:
+    description: "Marketing and landing pages"
+    paths:
+      - "src/features/landing/**"
+      - "src/features/marketing/**"
+      - "app/(marketing)/**"
+    timeAuthority: optimistic
+    allowedClassifications:
+      - cosmetic
+      - utility
+      - gameplay
+
+# =============================================================================
+# PROPRIOCEPTION
+# =============================================================================
+
+proprioception:
+  # Self predictions (legal lies for responsive feel)
+  self:
+    rotation:
+      instant: true            # Face target immediately
+    animation:
+      optimistic: true         # Start animation immediately
+    position:
+      render: ghost            # Show predicted position as ghost
+      reconcile: lerp          # Smooth interpolation to server truth
+      maxDrift: 600            # Max ms prediction can diverge
+
+  # World truth (server-only, no lies)
+  world:
+    damage: server-only
+    balance: server-only
+    otherEntities: server-only
+    inventory: server-only
+
+# =============================================================================
+# LENSES
+# =============================================================================
+
+lenses:
+  DefaultLens:
+    classification: cosmetic
+    path: "@/lenses/default"
+    description: "Standard UI, 44px targets, animations"
+
+  StrictLens:
+    classification: cosmetic
+    path: "@/lenses/strict"
+    description: "Vanilla UI, forced in critical zones"
+
+  A11yLens:
+    classification: cosmetic
+    path: "@/lenses/a11y"
+    description: "High contrast, 56px targets, clear announcements"
+
+# =============================================================================
+# TIME AUTHORITY
+# =============================================================================
+
+timeAuthority:
+  optimistic:
+    description: "Client owns clock. Instant update. Silent rollback."
+    useCases:
+      - "Linear-style issue creation"
+      - "Local-first data editing"
+
+  server-tick:
+    description: "Server owns clock. Must show pending. Visible rollback."
+    useCases:
+      - "Banking transactions"
+      - "Blockchain transfers"
+      - "Critical financial operations"
+
+  hybrid:
+    description: "Optimistic with sync indicator. Visible rollback."
+    useCases:
+      - "Figma-style multiplayer"
+      - "Collaborative editing"

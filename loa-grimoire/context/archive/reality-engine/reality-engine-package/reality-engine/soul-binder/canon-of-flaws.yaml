@@ -1,0 +1,315 @@
+# Soul Binder — Canon of Flaws
+# These are "bugs" or "exploits" that became core gameplay.
+# They are PROTECTED. The agent cannot "fix" them.
+
+version: "1.0.0"
+
+description: |
+  The Canon of Flaws contains emergent behaviors that were never intended
+  but became essential to the product's identity and skill expression.
+  
+  CRITERIA FOR CANONIZATION:
+  - Used by >5% of engaged/high-level users
+  - Considered skill expression, not cheating
+  - Removal would cause significant community backlash
+  - Has become part of "how the game is played"
+  
+  AGENT BEHAVIOR:
+  Any code change that would "fix" a canonized flaw must be BLOCKED.
+  De-canonization requires community consultation and Taste Owner approval.
+
+# ═══════════════════════════════════════════════════════════════════════
+# PROTECTED FLAWS REGISTRY
+# ═══════════════════════════════════════════════════════════════════════
+
+flaws:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # FLAW-001: Prayer Flicking
+  # ─────────────────────────────────────────────────────────────────────
+  - id: "FLAW-001"
+    name: "Prayer Flicking"
+    type: "bug"
+    status: "PROTECTED"
+    canonized_date: "2015-03-01"
+    
+    description: |
+      Turning prayer on/off with frame-perfect timing to receive
+      the protective benefit while using minimal prayer points.
+    
+    intended_behavior: |
+      Prayer drains continuously when active.
+      Players should need to manage prayer points as a resource.
+    
+    emergent_behavior: |
+      By toggling prayer off and on within the same tick,
+      players can maintain protection indefinitely.
+      This requires precise timing and becomes a skill.
+    
+    usage:
+      percent_of_high_level: 45
+      contexts:
+        - "High-level PvM (raids, bosses)"
+        - "Extended boss fights"
+        - "Competitive speedrunning"
+    
+    why_protected: |
+      - Defines the skill ceiling for PvM content
+      - Hours of practice invested by players
+      - Removal would fundamentally change boss difficulty
+      - Community considers it core gameplay
+    
+    affected_code_patterns:
+      - "prayer*drain*"
+      - "prayer*tick*"
+      - "prayer*toggle*delay"
+      - "*continuous*prayer*"
+    
+    protection_rule: |
+      Any change to prayer drain calculation that would prevent
+      frame-perfect toggling must be BLOCKED.
+
+  # ─────────────────────────────────────────────────────────────────────
+  # FLAW-002: Tick Manipulation
+  # ─────────────────────────────────────────────────────────────────────
+  - id: "FLAW-002"
+    name: "Tick Manipulation"
+    type: "exploit"
+    status: "PROTECTED"
+    canonized_date: "2016-08-15"
+    
+    description: |
+      Using specific action sequences to perform skills faster than
+      the standard tick timing would allow.
+    
+    intended_behavior: |
+      Each skilling action takes a fixed number of ticks.
+      Standard fishing = 5 ticks. Standard woodcutting = 3-4 ticks.
+    
+    emergent_behavior: |
+      Certain action combinations (e.g., dropping + starting action)
+      can reduce the effective tick count.
+      3-tick fishing, 2-tick woodcutting, etc.
+    
+    usage:
+      percent_of_high_level: 30
+      contexts:
+        - "Efficient skilling"
+        - "Maxing accounts"
+        - "Skilling competitions"
+    
+    why_protected: |
+      - Adds depth to otherwise repetitive skills
+      - Rewards player knowledge and execution
+      - Defines efficiency meta
+      - Removal would invalidate years of optimization
+    
+    affected_code_patterns:
+      - "*tick*count*"
+      - "*action*queue*"
+      - "*skill*timing*"
+      - "*interrupt*action*"
+    
+    protection_rule: |
+      Any change to action queuing or tick timing that would prevent
+      established tick manipulation methods must be BLOCKED.
+
+  # ─────────────────────────────────────────────────────────────────────
+  # FLAW-003: Animation Canceling
+  # ─────────────────────────────────────────────────────────────────────
+  - id: "FLAW-003"
+    name: "Animation Canceling"
+    type: "bug"
+    status: "PROTECTED"
+    canonized_date: "2017-02-20"
+    
+    description: |
+      Canceling attack or ability animations through specific inputs
+      to attack faster than the animation would suggest.
+    
+    intended_behavior: |
+      Animation plays to completion before next action.
+      Visual feedback matches actual timing.
+    
+    emergent_behavior: |
+      Certain inputs (movement, equipment swap) cancel the animation
+      while preserving the attack. Skilled players attack faster.
+    
+    usage:
+      percent_of_high_level: 35
+      contexts:
+        - "PvP combat"
+        - "Boss DPS optimization"
+        - "Speedrunning"
+    
+    why_protected: |
+      - Core skill expression in PvP
+      - Raises combat skill ceiling significantly
+      - Deeply integrated into combat meta
+    
+    affected_code_patterns:
+      - "*animation*complete*"
+      - "*attack*delay*"
+      - "*combat*queue*"
+    
+    protection_rule: |
+      Any change to animation timing that would force animations
+      to complete before next action must be BLOCKED.
+
+  # ─────────────────────────────────────────────────────────────────────
+  # FLAW-004: 1-Tick Pray Swap
+  # ─────────────────────────────────────────────────────────────────────
+  - id: "FLAW-004"
+    name: "1-Tick Pray Swap"
+    type: "exploit"
+    status: "PROTECTED"
+    canonized_date: "2018-05-10"
+    
+    description: |
+      Swapping between protection prayers within a single game tick
+      to protect against different damage types in rapid succession.
+    
+    intended_behavior: |
+      Prayer swaps have a small delay.
+      Players must predict incoming damage type.
+    
+    emergent_behavior: |
+      Prayers can be swapped instantly within a tick.
+      Skilled players can react to animations in real-time.
+    
+    usage:
+      percent_of_high_level: 25
+      contexts:
+        - "Jad/Zuk fight"
+        - "Inferno challenge"
+        - "PvP hybrid combat"
+    
+    why_protected: |
+      - Defines iconic content (Inferno cape is prestige)
+      - Skill expression that separates good from great
+      - Community achievement tied to this mechanic
+    
+    affected_code_patterns:
+      - "*prayer*swap*delay*"
+      - "*protection*change*"
+    
+    protection_rule: |
+      Any change that introduces delay between prayer swaps
+      must be BLOCKED.
+
+# ═══════════════════════════════════════════════════════════════════════
+# CANONIZATION PROCESS
+# ═══════════════════════════════════════════════════════════════════════
+
+canonization:
+  
+  process:
+    1_identification: |
+      Community identifies emergent behavior.
+      Developers acknowledge it exists.
+    
+    2_measurement: |
+      Track usage among engaged users.
+      Must exceed 5% threshold.
+    
+    3_assessment: |
+      Is it skill expression or pure exploit?
+      Does it add depth or just break balance?
+    
+    4_consultation: |
+      Community input on protection vs. patch.
+      Not a binding vote, but strong signal.
+    
+    5_decision: |
+      Taste Owner decides: Canonize or Patch.
+      If canonized, add to this registry.
+  
+  criteria:
+    usage_threshold: 5  # percent of high-level users
+    skill_expression: true  # must reward skill, not just knowledge
+    community_attachment: "high"  # would removal cause backlash?
+    depth_added: true  # does it make the game richer?
+
+# ═══════════════════════════════════════════════════════════════════════
+# DE-CANONIZATION PROCESS
+# ═══════════════════════════════════════════════════════════════════════
+
+de_canonization:
+  
+  description: |
+    Protected Flaws can be de-canonized, but the bar is high.
+    This is for cases where the flaw becomes genuinely harmful.
+  
+  process:
+    1_proposal: |
+      Developer or Taste Owner proposes de-canonization.
+      Must document: Why now? What changed?
+    
+    2_impact_assessment: |
+      How many players affected?
+      What content becomes trivial/impossible?
+    
+    3_community_consultation: |
+      Full community consultation (concept blog + heatmap).
+      This is a major change and needs visibility.
+    
+    4_supermajority: |
+      Requires 70% community support for de-canonization.
+      Higher bar than normal features.
+    
+    5_taste_owner_approval: |
+      Final decision by relevant Taste Owner.
+      Can override if safety/critical issue.
+  
+  valid_reasons:
+    - "Creates insurmountable barrier for new players"
+    - "Enables genuinely harmful exploits (RWT, harassment)"
+    - "Technical necessity (security, stability)"
+  
+  invalid_reasons:
+    - "It wasn't intended"
+    - "It makes content too easy/hard"
+    - "It's too hard to learn"
+
+# ═══════════════════════════════════════════════════════════════════════
+# AGENT ENFORCEMENT
+# ═══════════════════════════════════════════════════════════════════════
+
+enforcement:
+  
+  on_code_change:
+    steps:
+      - "Parse changed files"
+      - "Check against affected_code_patterns for all PROTECTED flaws"
+      - "If match found, analyze if change would break the flaw"
+      - "If breaking, BLOCK with detailed message"
+  
+  block_message: |
+    ⚠️ PROTECTED FLAW AFFECTED
+    
+    Your change would impact: {flaw_name} ({flaw_id})
+    
+    INTENDED BEHAVIOR:
+    {intended_behavior}
+    
+    EMERGENT BEHAVIOR (PROTECTED):
+    {emergent_behavior}
+    
+    WHY IT'S PROTECTED:
+    {why_protected}
+    
+    USAGE: {usage_percent}% of high-level users in {contexts}
+    
+    ─────────────────────────────────────────
+    
+    This change cannot proceed as written.
+    
+    OPTIONS:
+    [Rewrite to Preserve Flaw] — Modify your approach to maintain the behavior
+    [Request De-Canonization] — Initiate the de-canonization process (high bar)
+    [Abandon Change] — Cancel this modification
+  
+  logging:
+    on_block: true
+    on_attempt: true
+    notify_taste_owner: true

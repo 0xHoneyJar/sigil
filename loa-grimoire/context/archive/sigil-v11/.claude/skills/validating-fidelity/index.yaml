@@ -1,0 +1,9 @@
+name: validating-fidelity
+version: "1.0.0"
+description: "Checks against Gold Standard. Fidelity Guardian role."
+role: "Fidelity Guardian"
+command: /validate
+outputs:
+  - sigil-mark/workbench/fidelity-report.yaml
+dependencies:
+  - codifying-materials

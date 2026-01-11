@@ -1,0 +1,193 @@
+# Sigil Vocabulary
+# Term → Physics mapping
+# Bridges human concepts and code
+
+version: "5.9.0"
+
+terms:
+
+  # FINANCIAL ACTIONS (server-tick)
+  
+  claim:
+    data_type: Money
+    physics: server-tick
+    engineering_name: ClaimAction
+    user_facing: ["Claim", "Harvest", "Collect"]
+    mental_model: "Harvesting rewards from a position"
+    zones: [critical]
+    requires: [simulation, confirmation]
+    motion: deliberate
+    
+  deposit:
+    data_type: Money
+    physics: server-tick
+    engineering_name: DepositAction
+    user_facing: ["Deposit", "Add", "Fund"]
+    mental_model: "Adding funds to grow"
+    zones: [critical]
+    requires: [simulation, confirmation]
+    motion: deliberate
+    
+  withdraw:
+    data_type: Money
+    physics: server-tick
+    engineering_name: WithdrawAction
+    user_facing: ["Withdraw", "Remove", "Cash Out"]
+    mental_model: "Taking funds out"
+    zones: [critical]
+    requires: [simulation, confirmation]
+    motion: deliberate
+    
+  transfer:
+    data_type: Money
+    physics: server-tick
+    engineering_name: TransferAction
+    user_facing: ["Transfer", "Send", "Move"]
+    mental_model: "Moving funds between accounts"
+    zones: [critical]
+    requires: [simulation, confirmation]
+    motion: deliberate
+    
+  swap:
+    data_type: Money
+    physics: server-tick
+    engineering_name: SwapAction
+    user_facing: ["Swap", "Exchange", "Trade"]
+    mental_model: "Exchanging one asset for another"
+    zones: [critical]
+    requires: [simulation, confirmation, slippage_warning]
+    motion: deliberate
+    
+  approve:
+    data_type: Money
+    physics: server-tick
+    engineering_name: ApproveAction
+    user_facing: ["Approve", "Allow", "Authorize"]
+    mental_model: "Granting permission to spend"
+    zones: [critical]
+    requires: [simulation, confirmation]
+    motion: deliberate
+
+  # DESTRUCTIVE ACTIONS (server-tick)
+  
+  delete:
+    data_type: any
+    physics: server-tick
+    engineering_name: DeleteAction
+    user_facing: ["Delete", "Remove", "Destroy"]
+    mental_model: "Permanent removal"
+    zones: [critical, admin]
+    requires: [confirmation, undo_period]
+    motion: deliberate
+    
+  cancel:
+    data_type: any
+    physics: server-tick
+    engineering_name: CancelAction
+    user_facing: ["Cancel", "Abort", "Stop"]
+    mental_model: "Stopping an in-progress action"
+    zones: [critical]
+    requires: [confirmation]
+    motion: snappy
+
+  # COLLABORATIVE ACTIONS (crdt)
+  
+  edit:
+    data_type: Task
+    physics: crdt
+    engineering_name: EditAction
+    user_facing: ["Edit", "Modify", "Update"]
+    mental_model: "Changing existing content"
+    zones: [standard]
+    requires: [conflict_resolution]
+    motion: warm
+    
+  comment:
+    data_type: Comment
+    physics: crdt
+    engineering_name: CommentAction
+    user_facing: ["Comment", "Reply", "Respond"]
+    mental_model: "Adding to a conversation"
+    zones: [standard]
+    requires: [background_sync]
+    motion: warm
+    
+  assign:
+    data_type: Task
+    physics: crdt
+    engineering_name: AssignAction
+    user_facing: ["Assign", "Delegate", "Give to"]
+    mental_model: "Transferring responsibility"
+    zones: [standard]
+    requires: [presence_awareness]
+    motion: snappy
+
+  # LOCAL ACTIONS (local-first)
+  
+  toggle:
+    data_type: Toggle
+    physics: local-first
+    engineering_name: ToggleAction
+    user_facing: ["Toggle", "Switch", "Turn on/off"]
+    mental_model: "Binary state change"
+    zones: [standard, admin]
+    requires: [instant_feedback]
+    motion: instant
+    
+  filter:
+    data_type: Filter
+    physics: local-first
+    engineering_name: FilterAction
+    user_facing: ["Filter", "Show only", "Hide"]
+    mental_model: "Narrowing visible items"
+    zones: [standard, admin]
+    requires: [instant_feedback]
+    motion: instant
+    
+  sort:
+    data_type: Sort
+    physics: local-first
+    engineering_name: SortAction
+    user_facing: ["Sort", "Order by", "Arrange"]
+    mental_model: "Reordering visible items"
+    zones: [standard, admin]
+    requires: [instant_feedback]
+    motion: instant
+    
+  save:
+    data_type: Draft
+    physics: local-first
+    engineering_name: SaveAction
+    user_facing: ["Save", "Save draft"]
+    mental_model: "Persisting work in progress"
+    zones: [standard]
+    requires: [background_persist]
+    motion: instant
+
+# Motion Profiles
+motion_profiles:
+  instant:
+    duration_ms: 0
+    easing: linear
+  snappy:
+    duration_ms: 150
+    easing: ease-out
+  warm:
+    duration_ms: 300
+    easing: ease-in-out
+  deliberate:
+    duration_ms: 800
+    easing: ease-out
+  reassuring:
+    duration_ms: 600
+    easing: ease-in-out
+  celebratory:
+    duration_ms: 1200
+    easing: spring
+
+# Agent Protocol
+lookup_protocol: |
+  1. Parse user prompt for vocabulary terms
+  2. Look up term → get data_type and physics
+  3. Apply constitution rules for that physics
+  4. Generate code with appropriate patterns

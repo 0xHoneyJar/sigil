@@ -1,0 +1,94 @@
+# Sigil Resonance: Essence (Product Soul)
+# Created by /envision command. Edit with care.
+
+essence:
+  # ═══════════════════════════════════════════════════════════════════
+  # PRODUCT IDENTITY
+  # ═══════════════════════════════════════════════════════════════════
+  
+  product:
+    name: "[Product Name]"
+    tagline: "[One-line description]"
+    created: "[Date]"
+    updated: "[Date]"
+  
+  # ═══════════════════════════════════════════════════════════════════
+  # SOUL STATEMENT
+  # ═══════════════════════════════════════════════════════════════════
+  
+  soul:
+    statement: |
+      [What is this product's soul? What makes it THIS product
+      and not just another app? Complete in 2-3 sentences.]
+    
+    invariants:
+      - "[Something that must ALWAYS be true about this product]"
+      - "[Another invariant]"
+      - "[Another invariant]"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # REFERENCE PRODUCTS
+  # ═══════════════════════════════════════════════════════════════════
+  
+  references:
+    games:
+      - name: "[Game]"
+        why: "[What aspect inspires this product?]"
+    
+    apps:
+      - name: "[App]"
+        why: "[What aspect inspires this product?]"
+    
+    physical:
+      - name: "[Physical product/place]"
+        why: "[What aspect inspires this product?]"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # FEEL DESCRIPTORS
+  # ═══════════════════════════════════════════════════════════════════
+  
+  feel:
+    by_context:
+      transactions:
+        feel: "[How should transactions feel?]"
+        reference: "[What's an example of this feel?]"
+        
+      success_states:
+        feel: "[How should success feel?]"
+        reference: "[What's an example of this feel?]"
+        
+      loading:
+        feel: "[How should waiting feel?]"
+        reference: "[What's an example of this feel?]"
+        
+      errors:
+        feel: "[How should errors feel?]"
+        reference: "[What's an example of this feel?]"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # ANTI-PATTERNS
+  # ═══════════════════════════════════════════════════════════════════
+  
+  anti_patterns:
+    - pattern: "[Pattern to avoid]"
+      why: "[Why does this violate the soul?]"
+      
+    - pattern: "[Pattern to avoid]"
+      why: "[Why does this violate the soul?]"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # KEY MOMENTS
+  # ═══════════════════════════════════════════════════════════════════
+  
+  key_moments:
+    high_stakes:
+      description: "[How should critical actions feel?]"
+      example: "[Specific example]"
+      
+    celebrations:
+      description: "[How should wins feel?]"
+      example: "[Specific example]"
+      
+    recovery:
+      description: "[How should error recovery feel?]"
+      example: "[Specific example]"

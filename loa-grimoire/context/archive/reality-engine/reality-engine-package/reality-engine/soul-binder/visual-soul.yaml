@@ -1,0 +1,276 @@
+# Soul Binder — Visual Soul
+# Cultural signatures that go beyond technical specifications.
+# Technical compliance ≠ Soul.
+
+version: "1.0.0"
+
+description: |
+  Visual soul captures the FEEL of assets, not just their specs.
+  An asset can meet every polygon budget and texture constraint
+  while still having the "Play-Doh" problem—too smooth, too clean.
+  
+  This file defines the cultural signatures that make assets feel right.
+
+# ═══════════════════════════════════════════════════════════════════════
+# THE MOD WEST PRINCIPLE
+# ═══════════════════════════════════════════════════════════════════════
+
+mod_west_principle:
+  description: |
+    Named after an artist who creates authentic-feeling assets
+    by studying the specific IMPERFECTIONS of original content.
+    
+    The key insight: The imperfections ARE the aesthetic.
+    Perfect recreations feel wrong because they're too clean.
+  
+  characteristics:
+    - name: "Slightly off-center textures"
+      description: "Hand-placed, not procedurally centered"
+    
+    - name: "Hand-painted noise"
+      description: "Visible brush strokes, not procedural noise"
+    
+    - name: "Color banding visibility"
+      description: "Distinct color steps, not smooth gradients"
+    
+    - name: "Deliberate rough edges"
+      description: "Edges that aren't perfectly anti-aliased"
+    
+    - name: "Asymmetric details"
+      description: "Not perfectly mirrored or balanced"
+
+# ═══════════════════════════════════════════════════════════════════════
+# THE MOD GHOST ANTIPATTERN
+# ═══════════════════════════════════════════════════════════════════════
+
+mod_ghost_antipattern:
+  description: |
+    Named after an artist whose technically superior assets
+    were culturally rejected by the community.
+    
+    The problem: Assets were too smooth, too high-fidelity,
+    too "modern" for the product's identity.
+  
+  warning_signs:
+    - name: "Smooth gradients"
+      description: "Colors blend too smoothly"
+      threshold: "gradient_smoothness > 0.7"
+    
+    - name: "Perfect edges"
+      description: "Anti-aliasing too clean"
+      threshold: "edge_sharpness < 0.3"
+    
+    - name: "Procedural textures"
+      description: "No hand-painted feel"
+      threshold: "hand_painted_indicators < 0.5"
+    
+    - name: "High detail uniformity"
+      description: "Same detail level everywhere"
+      threshold: "detail_variance < 0.3"
+
+# ═══════════════════════════════════════════════════════════════════════
+# GRIT SIGNATURES
+# ═══════════════════════════════════════════════════════════════════════
+
+grit_signatures:
+  
+  description: |
+    Measurable characteristics that indicate cultural fit.
+    Assets are compared against these signatures.
+  
+  metrics:
+    
+    edge_roughness:
+      description: "How rough/crisp the edges are"
+      scale: "0.0 (perfectly smooth) to 1.0 (very rough)"
+      minimum: 0.3
+      ideal_range: [0.4, 0.7]
+      measurement: |
+        Analyze edge pixels for variance in anti-aliasing.
+        Higher variance = more roughness = more character.
+    
+    color_band_visibility:
+      description: "How distinct color steps are"
+      scale: "0.0 (smooth gradient) to 1.0 (hard bands)"
+      minimum: 0.5
+      ideal_range: [0.5, 0.8]
+      measurement: |
+        Analyze color transitions for step vs gradient.
+        Distinct steps = more old-school feel.
+    
+    texture_noise:
+      description: "Amount of hand-painted noise/detail"
+      scale: "0.0 (flat) to 1.0 (heavily textured)"
+      minimum: 0.2
+      ideal_range: [0.3, 0.6]
+      measurement: |
+        Analyze texture for non-procedural variation.
+        Hand-painted indicators = authentic feel.
+    
+    silhouette_chunkiness:
+      description: "How chunky/readable the silhouette is"
+      scale: "0.0 (smooth/detailed) to 1.0 (blocky/iconic)"
+      minimum: 0.4
+      ideal_range: [0.5, 0.8]
+      measurement: |
+        Analyze silhouette at 50% scale.
+        Should be identifiable in 3 seconds.
+    
+    detail_hierarchy:
+      description: "Clear focal point vs uniform detail"
+      scale: "0.0 (uniform) to 1.0 (clear hierarchy)"
+      minimum: 0.5
+      ideal_range: [0.6, 0.9]
+      measurement: |
+        Analyze attention distribution.
+        One clear focal point = good hierarchy.
+
+# ═══════════════════════════════════════════════════════════════════════
+# ZONE-SPECIFIC SIGNATURES
+# ═══════════════════════════════════════════════════════════════════════
+
+zone_signatures:
+  
+  description: |
+    Different areas of the product may have different cultural signatures.
+    A dark zone should feel different than a cheerful zone.
+  
+  zones:
+    
+    default:
+      description: "Standard product feel"
+      edge_roughness: [0.3, 0.7]
+      color_saturation: [0.3, 0.6]
+      emotional_tone: "neutral"
+    
+    wilderness:
+      description: "Dangerous, desolate, threatening"
+      edge_roughness: [0.5, 0.8]
+      color_saturation: [0.1, 0.4]
+      emotional_tone: "dread"
+      special_constraints:
+        - "Desaturated palette"
+        - "Harsh contrast"
+        - "Minimal decoration"
+    
+    celebration:
+      description: "Triumphant, rewarding, earned"
+      edge_roughness: [0.3, 0.6]
+      color_saturation: [0.5, 0.8]
+      emotional_tone: "triumph"
+      special_constraints:
+        - "Bold colors allowed"
+        - "More detail for focal rewards"
+        - "Clear visual hierarchy"
+    
+    safe_zone:
+      description: "Comfortable, welcoming, familiar"
+      edge_roughness: [0.3, 0.5]
+      color_saturation: [0.4, 0.7]
+      emotional_tone: "comfort"
+      special_constraints:
+        - "Warmer palette"
+        - "Softer contrasts"
+        - "Recognizable landmarks"
+
+# ═══════════════════════════════════════════════════════════════════════
+# VALIDATION PROCESS
+# ═══════════════════════════════════════════════════════════════════════
+
+validation:
+  
+  process:
+    1_technical_check: |
+      First, validate technical constraints.
+      Polygon count, texture resolution, etc.
+      If technical fails, stop here with BLOCK.
+    
+    2_grit_measurement: |
+      Measure grit signature metrics.
+      Compare against minimum thresholds.
+    
+    3_zone_match: |
+      Determine asset's zone.
+      Check against zone-specific signatures.
+    
+    4_cultural_verdict: |
+      Technical PASS + Grit FAIL = Cultural Review Required
+      Technical PASS + Grit PASS = Approved
+  
+  outcomes:
+    
+    pass:
+      technical: true
+      grit: true
+      message: "✓ Asset passes technical and cultural checks"
+      action: "approve"
+    
+    cultural_review:
+      technical: true
+      grit: false
+      message: |
+        ⚠️ CULTURAL REVIEW REQUIRED
+        
+        Technical constraints: PASS
+        Cultural signature: FAIL
+        
+        Grit Scores:
+        - Edge roughness: {edge_roughness} (min: {min})
+        - Color banding: {color_band} (min: {min})
+        - Texture noise: {texture_noise} (min: {min})
+        
+        This asset may have the "Play-Doh" problem.
+        It meets specs but doesn't feel right.
+        
+        RECOMMENDATIONS:
+        {recommendations}
+        
+        [Proceed Anyway] [Revise for Grit] [Request Taste Owner Review]
+      
+      action: "flag_for_review"
+    
+    technical_fail:
+      technical: false
+      message: "⛔ Technical constraint violation"
+      action: "block"
+
+# ═══════════════════════════════════════════════════════════════════════
+# RECOMMENDATIONS ENGINE
+# ═══════════════════════════════════════════════════════════════════════
+
+recommendations:
+  
+  low_edge_roughness:
+    issue: "Edges are too smooth"
+    suggestions:
+      - "Reduce anti-aliasing on outline"
+      - "Add slight pixel-level irregularity to edges"
+      - "Study reference assets for edge treatment"
+  
+  low_color_banding:
+    issue: "Colors blend too smoothly"
+    suggestions:
+      - "Use fewer color steps with harder transitions"
+      - "Increase contrast between adjacent colors"
+      - "Avoid gradient tools; use flat fills with manual blending"
+  
+  low_texture_noise:
+    issue: "Surface appears too flat/clean"
+    suggestions:
+      - "Add hand-painted noise to large surfaces"
+      - "Vary color slightly across flat areas"
+      - "Add subtle wear/damage details"
+  
+  low_silhouette_chunkiness:
+    issue: "Silhouette is too complex/smooth"
+    suggestions:
+      - "Simplify small details that don't read at distance"
+      - "Make key shapes more distinct/blocky"
+      - "Test readability at 50% scale"
+  
+  low_detail_hierarchy:
+    issue: "No clear focal point"
+    suggestions:
+      - "Identify the most important element"
+      - "Increase detail/contrast on focal point"
+      - "Reduce detail in supporting areas"

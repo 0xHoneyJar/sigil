@@ -23,21 +23,45 @@ jobs:
         run: |
           echo "Checking for forbidden template files..."
 
-          # Define forbidden patterns for the Sigil template repository
-          # These files should NEVER be committed to the main Sigil template
+          # Define forbidden patterns for the loa template repository
+          # These files should NEVER be committed to the main loa template
           FORBIDDEN_FILES=(
-            "sigil-mark/moodboard.md"
-            "sigil-mark/rules.md"
-            "sigil-mark/inventory.md"
+            "grimoires/loa/prd.md"
+            "grimoires/loa/sdd.md"
+            "grimoires/loa/sprint.md"
+            "grimoires/loa/NOTES.md"
+          )
+
+          FORBIDDEN_DIRS=(
+            "grimoires/loa/a2a/sprint-"
+            "grimoires/loa/a2a/index.md"
+            "grimoires/loa/a2a/deployment-feedback.md"
+            "grimoires/loa/a2a/trajectory/"
+            "grimoires/loa/deployment/"
+            "grimoires/loa/reality/"
+            "grimoires/loa/analytics/"
+            "grimoires/loa/research/"
+            "grimoires/pub/"
+            ".claude/constructs/"
           )
 
           VIOLATIONS=()
 
-          # Check for forbidden files (excluding README.md placeholders)
+          # Check for forbidden files
           for pattern in "${FORBIDDEN_FILES[@]}"; do
             if [ -f "$pattern" ]; then
               VIOLATIONS+=("$pattern")
             fi
+          done
+
+          # Check for forbidden directories/patterns
+          for pattern in "${FORBIDDEN_DIRS[@]}"; do
+            # Find any files matching the pattern (excluding README.md)
+            while IFS= read -r file; do
+              if [[ "$file" != *"/README.md" ]]; then
+                VIOLATIONS+=("$file")
+              fi
+            done < <(find . -path "./$pattern*" -type f 2>/dev/null | head -50)
           done
 
           if [ ${#VIOLATIONS[@]} -gt 0 ]; then
@@ -46,13 +70,14 @@ jobs:
             echo "ERROR: Forbidden files detected in template repository!"
             echo "============================================================"
             echo ""
-            echo "The following files must NOT be committed to the Sigil template:"
+            echo "The following files must NOT be committed to the loa template:"
             echo ""
             for file in "${VIOLATIONS[@]}"; do
               echo "  - $file"
             done
             echo ""
-            echo "These files are project-specific and should be gitignored."
+            echo "These files are project-specific or contain licensed content and should be gitignored."
+            echo "Note: .claude/constructs/ contains user-licensed skills that should never be committed."
             echo "If this is intentional, add [skip-template-guard] to commit message."
             echo "============================================================"
             exit 1
@@ -89,55 +114,50 @@ jobs:
           done
           echo "All JSON files are valid"
 
-      - name: Check Sigil skill definitions exist
+      - name: Check skill definitions exist
         run: |
-          echo "Checking required Sigil skill definitions..."
+          echo "Checking required skill definitions..."
           SKILLS=(
-            ".claude/skills/initializing-sigil/SKILL.md"
-            ".claude/skills/envisioning-moodboard/SKILL.md"
-            ".claude/skills/codifying-rules/SKILL.md"
-            ".claude/skills/crafting-guidance/SKILL.md"
-            ".claude/skills/approving-patterns/SKILL.md"
-            ".claude/skills/inheriting-design/SKILL.md"
-            ".claude/skills/updating-framework/SKILL.md"
+            ".claude/skills/discovering-requirements/SKILL.md"
+            ".claude/skills/designing-architecture/SKILL.md"
+            ".claude/skills/planning-sprints/SKILL.md"
+            ".claude/skills/implementing-tasks/SKILL.md"
+            ".claude/skills/reviewing-code/SKILL.md"
+            ".claude/skills/deploying-infrastructure/SKILL.md"
+            ".claude/skills/auditing-security/SKILL.md"
+            ".claude/skills/translating-for-executives/SKILL.md"
           )
-          MISSING=0
           for skill in "${SKILLS[@]}"; do
             if [ ! -f "$skill" ]; then
-              echo "Missing Sigil skill: $skill"
-              MISSING=$((MISSING + 1))
+              echo "Missing required skill: $skill"
+              exit 1
             fi
           done
-          if [ $MISSING -gt 0 ]; then
-            echo "Warning: $MISSING Sigil skill(s) missing - this may be expected during development"
-          else
-            echo "All Sigil skills present"
-          fi
+          echo "All required skills present"
 
-      - name: Check Sigil command definitions exist
+      - name: Check command definitions exist
         run: |
-          echo "Checking required Sigil command definitions..."
+          echo "Checking required command definitions..."
           COMMANDS=(
+            ".claude/commands/plan-and-analyze.md"
+            ".claude/commands/architect.md"
+            ".claude/commands/sprint-plan.md"
+            ".claude/commands/implement.md"
+            ".claude/commands/review-sprint.md"
+            ".claude/commands/audit-sprint.md"
+            ".claude/commands/deploy-production.md"
+            ".claude/commands/audit.md"
             ".claude/commands/setup.md"
-            ".claude/commands/envision.md"
-            ".claude/commands/codify.md"
-            ".claude/commands/craft.md"
-            ".claude/commands/approve.md"
-            ".claude/commands/inherit.md"
+            ".claude/commands/feedback.md"
             ".claude/commands/update.md"
           )
-          MISSING=0
           for cmd in "${COMMANDS[@]}"; do
             if [ ! -f "$cmd" ]; then
-              echo "Missing Sigil command: $cmd"
-              MISSING=$((MISSING + 1))
+              echo "Missing required command: $cmd"
+              exit 1
             fi
           done
-          if [ $MISSING -gt 0 ]; then
-            echo "Warning: $MISSING Sigil command(s) missing - this may be expected during development"
-          else
-            echo "All Sigil commands present"
-          fi
+          echo "All required commands present"
 
       - name: Check documentation exists
         run: |
@@ -147,9 +167,9 @@ jobs:
             "CLAUDE.md"
             "PROCESS.md"
             "CONTRIBUTING.md"
+            "SECURITY.md"
             "CHANGELOG.md"
             "LICENSE.md"
-            "INSTALLATION.md"
           )
           for doc in "${DOCS[@]}"; do
             if [ ! -f "$doc" ]; then
@@ -167,41 +187,45 @@ jobs:
           CHANGELOG_VERSION=$(grep -oP '## \[\K[0-9]+\.[0-9]+\.[0-9]+' CHANGELOG.md | head -1)
           echo "CHANGELOG version: $CHANGELOG_VERSION"
 
-          # Get version from .sigil-version.json
-          if [ -f ".sigil-version.json" ]; then
-            VERSION_JSON=$(python3 -c "import json; print(json.load(open('.sigil-version.json'))['framework_version'])")
-            echo ".sigil-version.json version: $VERSION_JSON"
+          # Get version from README badge
+          README_VERSION=$(grep -oP 'version-\K[0-9]+\.[0-9]+\.[0-9]+' README.md | head -1)
+          echo "README version: $README_VERSION"
 
-            if [ "$CHANGELOG_VERSION" != "$VERSION_JSON" ]; then
-              echo "Version mismatch: CHANGELOG=$CHANGELOG_VERSION, .sigil-version.json=$VERSION_JSON"
-              exit 1
-            fi
+          if [ "$CHANGELOG_VERSION" != "$README_VERSION" ]; then
+            echo "Version mismatch: CHANGELOG=$CHANGELOG_VERSION, README=$README_VERSION"
+            exit 1
           fi
 
-          echo "Version consistency check passed"
+          echo "Versions are consistent: $CHANGELOG_VERSION"
 
       - name: Check for broken internal links
         run: |
           echo "Checking for broken internal links in documentation..."
 
-          for mdfile in README.md CLAUDE.md PROCESS.md CONTRIBUTING.md INSTALLATION.md; do
-            if [ -f "$mdfile" ]; then
-              # Extract markdown links like [text](file.md)
-              grep -oP '\[.*?\]\(\K[^)]+(?=\))' "$mdfile" 2>/dev/null | while read link; do
-                # Skip external URLs and anchors
-                if [[ "$link" == http* ]] || [[ "$link" == "#"* ]]; then
-                  continue
-                fi
+          # Check that referenced files exist
+          LINKS_OK=true
 
-                # Check if file exists
-                if [ ! -f "$link" ] && [ ! -d "$link" ]; then
-                  echo "Broken link in $mdfile: $link"
-                fi
-              done
-            fi
+          for mdfile in README.md CLAUDE.md PROCESS.md CONTRIBUTING.md; do
+            # Extract markdown links like [text](file.md) or [text](./path/file.md)
+            grep -oP '\[.*?\]\(\K[^)]+(?=\))' "$mdfile" 2>/dev/null | while read link; do
+              # Skip external URLs
+              if [[ "$link" == http* ]] || [[ "$link" == "#"* ]]; then
+                continue
+              fi
+
+              # Check if file exists
+              if [ ! -f "$link" ] && [ ! -d "$link" ]; then
+                echo "Broken link in $mdfile: $link"
+                LINKS_OK=false
+              fi
+            done
           done
 
-          echo "Internal link check completed"
+          if [ "$LINKS_OK" = false ]; then
+            exit 1
+          fi
+
+          echo "All internal links are valid"
 
   markdown-lint:
     name: Lint Markdown
@@ -233,8 +257,9 @@ jobs:
           EOF
 
       - name: Lint Markdown files
-        run: markdownlint '**/*.md' --ignore node_modules --ignore sigil-mark || true
+        run: markdownlint '**/*.md' --ignore node_modules --ignore grimoires/loa || true
         # Note: Using || true to not fail on lint warnings for now
+        # Remove || true once all markdown is cleaned up
 
   yaml-lint:
     name: Lint YAML

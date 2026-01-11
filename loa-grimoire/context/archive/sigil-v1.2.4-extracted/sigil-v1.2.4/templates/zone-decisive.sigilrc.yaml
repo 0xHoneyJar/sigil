@@ -1,0 +1,23 @@
+# Sigil Zone Configuration
+# Checkout zone - high-stakes transactions
+
+sigil: "1.2.4"
+
+# Use decisive recipes for heavy, trustworthy feel
+recipes: decisive
+
+# Server must confirm before UI updates
+sync: server_authoritative
+
+# 600ms tick - matches RuneScape deliberate pacing
+tick: 600ms
+
+# Zone-specific constraints
+constraints:
+  optimistic_ui: forbidden      # Never show success before server confirms
+  loading_spinners: forbidden   # Creates anxiety
+  playful_bounce: forbidden     # Undermines trust
+  
+  # Allowed patterns
+  deliberate_entrance: encouraged
+  confirmation_flow: encouraged

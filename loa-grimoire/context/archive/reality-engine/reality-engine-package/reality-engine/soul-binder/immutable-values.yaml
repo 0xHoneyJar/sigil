@@ -1,0 +1,208 @@
+# Soul Binder — Immutable Values
+# These are the non-negotiable principles that define your product's soul.
+# They represent the INTENDED design philosophy.
+
+version: "1.0.0"
+
+# The Immutable Values
+# These cannot be overridden by any feature, lens, or consultation.
+# Violations result in HARD BLOCK.
+
+values:
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # THE GRIND: Effort = Value
+  # ═══════════════════════════════════════════════════════════════════════
+  the_grind:
+    name: "The Grind"
+    description: |
+      Value comes from effort. There are no shortcuts.
+      The currency/items/achievements have meaning because earning them is hard.
+      Any feature that trivializes progression violates this value.
+    
+    enforcement:
+      type: "metric"
+      constraints:
+        - name: "xp_rate_cap"
+          description: "Maximum XP/value generation per hour"
+          threshold: "${thresholds.proving.xp_rate_cap}"
+          action: "block"
+        
+        - name: "no_pay_to_skip"
+          description: "No real-money shortcuts for progression"
+          action: "block"
+    
+    examples:
+      compliant:
+        - "Skill training that rewards active engagement"
+        - "Rare drops that take hours to obtain"
+        - "Achievements that represent real accomplishment"
+      
+      violations:
+        - "Double XP from microtransactions"
+        - "Instant level boosting"
+        - "Buying best-in-slot gear with real money"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # THE CLICK: Tactile, Mechanical, Responsive
+  # ═══════════════════════════════════════════════════════════════════════
+  the_click:
+    name: "The Click"
+    description: |
+      Every action should feel tactile and responsive.
+      The interface should feel mechanical, not gestural.
+      Players should feel each input register with clarity.
+    
+    enforcement:
+      type: "technical"
+      constraints:
+        - name: "tick_alignment"
+          description: "Core actions align to tick boundaries"
+          value: "600ms"
+          action: "block"
+        
+        - name: "easing_restriction"
+          description: "No fluid/gestural animations in core gameplay"
+          allowed: ["steps()", "linear"]
+          forbidden: ["ease-in-out", "spring"]
+          action: "warn"
+        
+        - name: "input_feedback"
+          description: "All inputs provide immediate visual feedback"
+          max_latency_ms: 100
+          action: "block"
+    
+    examples:
+      compliant:
+        - "Discrete tick-based combat"
+        - "Snappy, stepped animations"
+        - "Clear click feedback"
+      
+      violations:
+        - "Fluid, floaty animations"
+        - "Delayed input response"
+        - "Auto-play features"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # THE RISK: Loss is Real, Choices Matter
+  # ═══════════════════════════════════════════════════════════════════════
+  the_risk:
+    name: "The Risk"
+    description: |
+      Meaningful choices require meaningful consequences.
+      Loss creates tension. Risk creates engagement.
+      Players should feel the weight of their decisions.
+    
+    enforcement:
+      type: "design"
+      constraints:
+        - name: "death_penalty"
+          description: "Death has tangible consequences"
+          action: "review"
+        
+        - name: "pvp_stakes"
+          description: "PvP areas have real risk/reward"
+          action: "review"
+        
+        - name: "irreversible_choices"
+          description: "Some decisions cannot be undone"
+          action: "review"
+    
+    examples:
+      compliant:
+        - "Losing items on death"
+        - "Wilderness risk vs reward"
+        - "Permanent account choices"
+      
+      violations:
+        - "No-risk PvP"
+        - "Full item protection everywhere"
+        - "Undo buttons for everything"
+
+  # ═══════════════════════════════════════════════════════════════════════
+  # THE LOOK: Low-Fidelity with Soul
+  # ═══════════════════════════════════════════════════════════════════════
+  the_look:
+    name: "The Look"
+    description: |
+      Visual identity is low-fidelity but full of character.
+      Grit over polish. Texture over smoothness.
+      The imperfections ARE the aesthetic.
+    
+    enforcement:
+      type: "visual"
+      constraints:
+        - name: "polygon_budget"
+          description: "Maximum polygons per asset"
+          standard: 50
+          focal: 150
+          action: "block"
+        
+        - name: "texture_resolution"
+          description: "Maximum texture resolution"
+          max: "64x64"
+          action: "block"
+        
+        - name: "grit_signature"
+          description: "Must pass cultural signature check"
+          action: "warn"
+    
+    examples:
+      compliant:
+        - "Chunky, readable silhouettes"
+        - "Hand-painted texture feel"
+        - "Visible brush strokes in color banding"
+      
+      violations:
+        - "Smooth gradients"
+        - "High-resolution textures"
+        - "Play-Doh aesthetic (too smooth)"
+
+# ═══════════════════════════════════════════════════════════════════════
+# ENFORCEMENT RULES
+# ═══════════════════════════════════════════════════════════════════════
+
+enforcement:
+  on_violation:
+    block:
+      message: |
+        ⛔ IMMUTABLE VALUE VIOLATION
+        
+        Value: {value_name}
+        Constraint: {constraint_name}
+        Your value: {actual_value}
+        Required: {expected_value}
+        
+        This is a non-negotiable principle.
+        The change cannot proceed.
+      
+      actions:
+        - "block_pr"
+        - "notify_taste_owner"
+        - "log_violation"
+    
+    warn:
+      message: |
+        ⚠️ IMMUTABLE VALUE WARNING
+        
+        Value: {value_name}
+        Constraint: {constraint_name}
+        
+        This may violate our core principles.
+        Taste Owner review required before merge.
+      
+      actions:
+        - "require_approval"
+        - "notify_taste_owner"
+    
+    review:
+      message: |
+        📋 DESIGN REVIEW REQUIRED
+        
+        Value: {value_name}
+        Reason: This change affects core design principles.
+        
+        Please schedule a design review before proceeding.
+      
+      actions:
+        - "flag_for_review"

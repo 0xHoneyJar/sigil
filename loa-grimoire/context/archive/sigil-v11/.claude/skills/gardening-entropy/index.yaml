@@ -1,0 +1,8 @@
+name: gardening-entropy
+version: "1.0.0"
+description: "Tracks paper cuts, enforces 3:1 rule. Gardener role."
+role: "Gardener"
+command: /garden
+outputs:
+  - sigil-mark/workbench/paper-cuts.yaml
+dependencies: []

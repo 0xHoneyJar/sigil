@@ -1,0 +1,122 @@
+# Sigil Core: Budgets (Inflation Guardrails)
+# Fidelity ceiling prevents "too good." Budgets prevent "too much."
+
+budgets:
+  description: |
+    Budgets prevent "better is worse"—the trap where each component
+    passes physics but the composition fails.
+    
+    OSRS Goldilocks: Updates fail if too weak (dead content) OR 
+    too strong (power creep). The budget enforces the middle.
+    
+    Linear philosophy: Quality is removing the non-essential,
+    not adding more features.
+    
+    "A screen with 50 perfect buttons is still bad design."
+
+  # ═══════════════════════════════════════════════════════════════════
+  # COGNITIVE BUDGET
+  # ═══════════════════════════════════════════════════════════════════
+  
+  cognitive:
+    description: |
+      Maximum mental load per view. Prevents feature/button creep.
+    
+    metrics:
+      interactive_elements:
+        description: "Clickable/tappable items per viewport"
+        limits:
+          critical: 5       # High-stakes = focused
+          transactional: 12 # Work = efficient
+          exploratory: 20   # Browse = abundant
+          admin: 30         # Power users, relaxed
+        violation: "BUDGET_EXCEEDED — Cognitive overload"
+        
+      decisions_required:
+        description: "Choices user must make to complete primary action"
+        limits:
+          critical: 2       # Confirm + Cancel max
+          transactional: 5  # Reasonable workflow
+          exploratory: 10   # Discovery is ok
+        violation: "BUDGET_EXCEEDED — Decision fatigue"
+        
+      text_density:
+        description: "Words per viewport (excluding nav)"
+        limits:
+          critical: 50      # Minimal, focused
+          transactional: 150 # Informative
+          exploratory: 300  # Rich content ok
+        violation: "BUDGET_EXCEEDED — Text overload"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # VISUAL BUDGET
+  # ═══════════════════════════════════════════════════════════════════
+  
+  visual:
+    description: |
+      Maximum visual complexity. Works with fidelity ceiling.
+    
+    metrics:
+      color_count:
+        description: "Distinct hues per view (excluding grays)"
+        limit: 5
+        violation: "BUDGET_EXCEEDED — Color chaos"
+        
+      animation_count:
+        description: "Simultaneous animations"
+        limits:
+          critical: 1       # One thing moves, user focuses
+          transactional: 3  # Parallel ok for efficiency
+          exploratory: 5    # Delight allowed
+        violation: "BUDGET_EXCEEDED — Animation noise"
+        
+      depth_layers:
+        description: "Z-index layers (shadows, overlays, modals)"
+        limit: 4
+        violation: "BUDGET_EXCEEDED — Depth confusion"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # COMPLEXITY BUDGET
+  # ═══════════════════════════════════════════════════════════════════
+  
+  complexity:
+    description: |
+      Prevents feature creep at the system level.
+      Each new feature has a cost. The budget enforces trade-offs.
+    
+    metrics:
+      props_per_component:
+        description: "Max props a component can accept"
+        limit: 10
+        violation: "BUDGET_EXCEEDED — Component doing too much"
+        recommendation: "Split into smaller components"
+        
+      variants_per_component:
+        description: "Max visual variants (size, color, state)"
+        limit: 12  # 3 sizes × 2 colors × 2 states
+        violation: "BUDGET_EXCEEDED — Variant explosion"
+        recommendation: "Use composition over configuration"
+        
+      dependencies_per_component:
+        description: "External imports per component"
+        limit: 8
+        violation: "BUDGET_EXCEEDED — Coupling risk"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # BUDGET ENFORCEMENT
+  # ═══════════════════════════════════════════════════════════════════
+  
+  enforcement:
+    on_violation:
+      cognitive: "BLOCK — Cannot ship view exceeding cognitive budget"
+      visual: "WARN — Flag for review, may proceed"
+      complexity: "WARN — Flag for refactor consideration"
+    
+    exceptions:
+      admin_zones: "Budgets relaxed for power users"
+      debug_views: "Budgets suspended for development"
+      
+    taste_key_override:
+      allowed: true
+      requires: "Written justification in ruling"
+      tracked_in: "memory/decisions/"

@@ -1,0 +1,314 @@
+# Consultation Chamber — Soft Polling
+# Poll the WHAT. Consult the HOW. Dictate the DETAILS.
+
+version: "1.0.0"
+
+description: |
+  The Consultation Chamber manages community input without design-by-committee.
+  
+  THE SPECTRUM:
+  - STRATEGIC (Polled): Major features, skills, regions
+  - DIRECTION (Consulted): Visual style A vs B, tone choices
+  - EXECUTION (Dictated): Specific details, pixel-level decisions
+  
+  After direction is decided, execution is LOCKED.
+
+# ═══════════════════════════════════════════════════════════════════════
+# POLLING CATEGORIES
+# ═══════════════════════════════════════════════════════════════════════
+
+categories:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # STRATEGIC: Binding Community Polls
+  # ─────────────────────────────────────────────────────────────────────
+  strategic:
+    name: "Strategic Decisions"
+    process: "binding_poll"
+    threshold: 70  # percent required to pass
+    
+    description: |
+      Major decisions that significantly affect the product.
+      These get formal community polls with binding results.
+    
+    examples:
+      - "New skills or major features"
+      - "New regions or zones"
+      - "Major mechanic changes"
+      - "Economy-affecting updates"
+      - "Content removal or replacement"
+    
+    poll_requirements:
+      duration_days: 14
+      minimum_participation: 10000  # votes
+      supermajority: 70  # percent
+    
+    outcome:
+      pass: "Feature approved for development"
+      fail: "Feature shelved, can repoll after 6 months"
+
+  # ─────────────────────────────────────────────────────────────────────
+  # DIRECTION: Consultation with Heatmaps
+  # ─────────────────────────────────────────────────────────────────────
+  direction:
+    name: "Direction Consultation"
+    process: "concept_blog"
+    threshold: null  # Not binding
+    
+    description: |
+      Visual and tonal direction choices.
+      Community input gathered but not binding.
+      Taste Owner makes final decision.
+    
+    examples:
+      - "Visual style A vs B"
+      - "Art direction for new area"
+      - "Tone of new content"
+      - "Character design approaches"
+    
+    consultation_requirements:
+      duration_days: 7
+      concept_blog: true
+      sentiment_heatmap: true
+    
+    outcome:
+      positive: "Direction adopted, execution begins"
+      mixed: "Taste Owner decides with documented reasoning"
+      negative: "Consider alternative direction or proceed with override"
+
+  # ─────────────────────────────────────────────────────────────────────
+  # EXECUTION: Taste Owner Authority
+  # ─────────────────────────────────────────────────────────────────────
+  execution:
+    name: "Execution Details"
+    process: "dictated"
+    threshold: null  # Not polled
+    
+    description: |
+      Specific implementation details.
+      Not subject to polling or consultation.
+      Taste Owner has full authority.
+    
+    examples:
+      - "Specific pixel placement"
+      - "Exact color values"
+      - "Animation timing details"
+      - "Final polish decisions"
+    
+    requirements:
+      taste_owner_approval: true
+      documentation: "optional"
+    
+    outcome:
+      decision: "Taste Owner decides"
+      appeal: "None—execution is locked after direction"
+
+# ═══════════════════════════════════════════════════════════════════════
+# CONCEPT BLOG PROCESS
+# ═══════════════════════════════════════════════════════════════════════
+
+concept_blog:
+  
+  description: |
+    Concept blogs show options and gather community sentiment.
+    They are used for DIRECTION decisions.
+  
+  template:
+    title: "{Feature Name}: Direction Consultation"
+    
+    sections:
+      - name: "Introduction"
+        content: "What we're deciding and why"
+      
+      - name: "Option A"
+        content: "Visual/mockup, description, rationale"
+      
+      - name: "Option B"
+        content: "Visual/mockup, description, rationale"
+      
+      - name: "Option C (if applicable)"
+        content: "Visual/mockup, description, rationale"
+      
+      - name: "What We're NOT Deciding"
+        content: "Execution details that are off the table"
+      
+      - name: "Feedback Request"
+        content: "Specific questions for the community"
+  
+  distribution:
+    channels:
+      - type: "official_blog"
+        required: true
+      
+      - type: "reddit"
+        subreddit: "{project_subreddit}"
+        required: true
+      
+      - type: "discord"
+        channel: "#announcements"
+        required: true
+      
+      - type: "twitter"
+        required: false
+  
+  duration: 7  # days
+  
+  feedback_collection:
+    sources:
+      - "Blog comments"
+      - "Reddit comments"
+      - "Discord feedback channel"
+      - "In-game soft poll (non-binding)"
+
+# ═══════════════════════════════════════════════════════════════════════
+# SENTIMENT HEATMAP
+# ═══════════════════════════════════════════════════════════════════════
+
+sentiment_heatmap:
+  
+  description: |
+    Aggregated visualization of community sentiment.
+    Shows support/opposition by option and specific elements.
+  
+  keywords:
+    
+    strong_positive:
+      - "love"
+      - "perfect"
+      - "exactly right"
+      - "finally"
+      - "this is the one"
+    
+    moderate_positive:
+      - "prefer"
+      - "good"
+      - "like"
+      - "better"
+    
+    neutral:
+      - "okay"
+      - "fine"
+      - "either"
+      - "don't care"
+    
+    moderate_negative:
+      - "meh"
+      - "not sure"
+      - "prefer other"
+      - "concerned"
+    
+    strong_negative:
+      - "hate"
+      - "terrible"
+      - "garbage"
+      - "soulless"
+      - "Play-Doh"
+      - "RS3"
+      - "MTX-looking"
+  
+  output:
+    format: |
+      SENTIMENT HEATMAP: {Feature Name}
+      
+      Option A: {percent}% positive
+      [████████░░░░]
+      
+      Option B: {percent}% positive
+      [████░░░░░░░░]
+      
+      KEY THEMES:
+      
+      Positive:
+      • {theme_1}
+      • {theme_2}
+      
+      Negative:
+      • {theme_1}
+      • {theme_2}
+      
+      HOTSPOTS (specific elements with strong reaction):
+      • {element}: {sentiment}
+
+# ═══════════════════════════════════════════════════════════════════════
+# TASTE OWNER DECISION
+# ═══════════════════════════════════════════════════════════════════════
+
+taste_owner_decision:
+  
+  description: |
+    After consultation, the Taste Owner makes the final decision.
+    They can follow sentiment or override with documented reasoning.
+  
+  options:
+    
+    follow_sentiment:
+      action: "Adopt the community-preferred direction"
+      documentation: |
+        DECISION: Follow Sentiment
+        Direction chosen: {option}
+        Sentiment: {percent}% positive
+        Reasoning: Community preference aligns with our goals
+    
+    override:
+      action: "Choose different direction"
+      documentation_required: true
+      documentation: |
+        DECISION: Override Sentiment
+        Direction chosen: {option}
+        Sentiment was: {preferred_option} at {percent}%
+        
+        REASONING:
+        {detailed_explanation}
+        
+        This override is justified because:
+        {justification_points}
+    
+    iterate:
+      action: "Request revised concepts"
+      documentation: |
+        DECISION: Iterate
+        
+        Neither option is acceptable.
+        Specific feedback for revision:
+        {feedback}
+  
+  lock:
+    description: |
+      After decision, execution is LOCKED.
+      No further polling or consultation on details.
+    
+    message: |
+      Direction was consulted. Decision was made.
+      Execution is now locked.
+      
+      Decision: {option}
+      Decided by: {taste_owner}
+      Date: {date}
+      
+      Further polling on execution details is not available.
+
+# ═══════════════════════════════════════════════════════════════════════
+# BLOCKED REQUESTS
+# ═══════════════════════════════════════════════════════════════════════
+
+blocked_requests:
+  
+  description: |
+    Certain requests for community input are blocked.
+    Execution details are not subject to polling.
+  
+  patterns:
+    - "what do players think about {color}"
+    - "should we poll {specific_detail}"
+    - "community sentiment on {pixel_level_decision}"
+  
+  response: |
+    That's a tactical execution detail.
+    
+    The strategic greenlight was: {greenlight_poll}
+    Visual direction was consulted: {direction_decision}
+    
+    This specific detail is a Taste Owner decision, not a poll.
+    I won't surface sentiment on execution details.
+    
+    [Proceed with your judgment] [Escalate to Taste Owner]

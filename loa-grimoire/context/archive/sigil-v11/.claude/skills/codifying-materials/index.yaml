@@ -1,0 +1,14 @@
+name: codifying-materials
+version: "1.0.0"
+description: "Defines physics primitives and materials. Material Smith role."
+role: "Material Smith"
+commands:
+  - /codify
+  - /material
+outputs:
+  - sigil-mark/kernel/physics.yaml
+  - sigil-mark/kernel/sync.yaml
+  - sigil-mark/kernel/fidelity-ceiling.yaml
+  - sigil-mark/soul/materials.yaml
+dependencies:
+  - envisioning-soul

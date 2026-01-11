@@ -1,0 +1,146 @@
+# Sigil Constitution
+# Data type → Physics binding
+# This is LAW. The agent reads it. No guessing.
+
+version: "5.9.0"
+
+data_physics:
+  
+  # FINANCIAL — Server-Tick Required
+  # Loss of funds is irreversible. Wait for truth.
+  financial:
+    types:
+      - Money
+      - Balance
+      - Transfer
+      - Withdrawal
+      - Deposit
+      - Payment
+      - Subscription
+      - Invoice
+    physics: server-tick
+    requires:
+      - simulation      # Preview before commit
+      - confirmation    # Explicit user action after preview
+      - explicit-pending # Show waiting state clearly
+    forbidden:
+      - useOptimistic   # Never fake financial state
+      - instant-commit  # Never skip confirmation
+      - hiding-loading  # Never hide pending state
+    rationale: "Loss of funds is irreversible. Wait for truth."
+    
+  # HEALTH — Server-Tick Required
+  # Dead is dead. Server is truth.
+  health:
+    types:
+      - Health
+      - HP
+      - Hardcore
+      - Permadeath
+      - Lives
+      - Damage
+    physics: server-tick
+    requires:
+      - server-authoritative-state
+      - no-client-prediction-on-damage
+    forbidden:
+      - optimistic-hp-updates
+      - client-side-death-calculation
+    rationale: "Dead is dead. Server is truth."
+    
+  # COLLABORATIVE — CRDT Required
+  # Multiple editors. Merge, don't block.
+  collaborative:
+    types:
+      - Task
+      - Document
+      - Comment
+      - Thread
+      - Note
+      - Canvas
+      - Whiteboard
+    physics: crdt
+    requires:
+      - conflict-resolution   # Handle concurrent edits
+      - background-sync       # Sync without blocking
+      - presence-indicators   # Show who's editing
+    forbidden:
+      - blocking-save         # Never block on save
+      - full-page-refresh     # Never refresh on conflict
+      - lock-for-edit         # Never lock documents
+    rationale: "Multiple editors. Merge, don't block."
+    
+  # LOCAL — Local-First Required
+  # User's intent is truth. Server catches up.
+  local:
+    types:
+      - Preference
+      - Draft
+      - Toggle
+      - UI_State
+      - Theme
+      - Layout
+      - Filter
+      - Sort
+    physics: local-first
+    requires:
+      - useOptimistic         # Instant feedback
+      - instant-feedback      # < 50ms response
+      - background-persist    # Save without blocking
+    forbidden:
+      - loading-spinner-on-local  # Never spinner for local state
+      - server-round-trip         # Never wait for server
+      - blocking-ui               # Never block UI
+    rationale: "User's intent is truth. Server catches up."
+
+# Physics Definitions
+physics_profiles:
+  
+  server-tick:
+    description: "Server is authoritative. Wait for confirmation."
+    timing:
+      min_duration_ms: 600
+      recommended_ms: 800
+      max_duration_ms: 1200
+    easing: ease-out
+    states:
+      - idle
+      - simulating
+      - confirming
+      - committing
+      - done
+      - error
+    hook: useSigilMutation
+    
+  crdt:
+    description: "Optimistic with conflict resolution."
+    timing:
+      feedback_ms: 50
+      sync_interval_ms: 1000
+    easing: ease-in-out
+    states:
+      - idle
+      - pending
+      - syncing
+      - done
+      - conflict
+    hook: useSigilMutation
+    
+  local-first:
+    description: "Instant feedback. No server dependency."
+    timing:
+      max_feedback_ms: 50
+    easing: linear
+    states:
+      - idle
+      - done
+    hook: useOptimistic
+
+# Risk Hierarchy (for mixed types)
+risk_hierarchy:
+  - server-tick   # Highest risk → most conservative physics
+  - crdt          # Medium risk
+  - local-first   # Lowest risk
+
+# When multiple types detected, use highest-risk physics
+resolution_rule: "Tier(Physics) = max(risk(Type1), risk(Type2), ...)"

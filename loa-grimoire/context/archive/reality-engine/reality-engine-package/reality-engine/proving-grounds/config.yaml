@@ -1,0 +1,337 @@
+# Proving Grounds — Public Beta Validation
+# Scale reveals truth. Prove before you ship.
+
+version: "1.0.0"
+
+description: |
+  The Proving Grounds is where features are tested at scale.
+  Internal dogfooding catches obvious issues.
+  Public beta catches what 50 people can't find.
+  
+  WHY THIS MATTERS:
+  - 50 people can't simulate 1M player economy
+  - Internal teams don't grief each other
+  - Scale reveals emergent exploits
+  - Players optimize in ways devs don't predict
+
+# ═══════════════════════════════════════════════════════════════════════
+# DEPLOYMENT
+# ═══════════════════════════════════════════════════════════════════════
+
+deployment:
+  
+  environment:
+    name: "Beta World"
+    type: "sandboxed_copy"
+    isolation: true
+    
+    description: |
+      A separate environment that mirrors production.
+      Player actions don't affect the live game.
+      Telemetry is fully captured.
+  
+  access:
+    type: "opt_in"
+    requirements:
+      - "Account in good standing"
+      - "Accept beta terms"
+    
+    incentives:
+      - "Early access to content"
+      - "Beta tester recognition"
+      - "Feedback channels"
+  
+  communication:
+    on_deployment: |
+      🧪 PROVING GROUNDS: {Feature Name}
+      
+      This feature is being tested in public beta.
+      Your feedback and behavior data will help us decide if it ships.
+      
+      Known issues:
+      {known_issues_list}
+      
+      How to participate:
+      {instructions}
+      
+      Feedback channel: {channel}
+
+# ═══════════════════════════════════════════════════════════════════════
+# MONITORS
+# ═══════════════════════════════════════════════════════════════════════
+
+monitors:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # XP/VALUE RATE MONITOR
+  # ─────────────────────────────────────────────────────────────────────
+  xp_rate:
+    name: "XP/Value Rate Monitor"
+    description: "Track value generation rates against Constitutional caps"
+    
+    metrics:
+      - name: "xp_per_hour"
+        description: "XP generated per hour per skill"
+        
+      - name: "value_per_hour"
+        description: "Total value (gold equivalent) per hour"
+    
+    thresholds:
+      # Customize these for your product
+      constitutional_cap: 100000  # XP per hour
+      alert_at: 90  # percent of cap
+      violation_at: 110  # percent of cap
+    
+    on_alert:
+      severity: "WARNING"
+      message: |
+        ⚠️ XP RATE ALERT
+        
+        Method: {method_name}
+        Current rate: {rate} XP/hr
+        Constitutional cap: {cap} XP/hr
+        
+        This is approaching the limit.
+        Monitor for balance issues.
+    
+    on_violation:
+      severity: "CRITICAL"
+      action: "block_graduation"
+      message: |
+        ⛔ XP RATE VIOLATION
+        
+        Method: {method_name}
+        Current rate: {rate} XP/hr
+        Constitutional cap: {cap} XP/hr
+        Excess: {excess}%
+        
+        This feature cannot graduate until rates are adjusted.
+
+  # ─────────────────────────────────────────────────────────────────────
+  # ECONOMY MONITOR
+  # ─────────────────────────────────────────────────────────────────────
+  economy:
+    name: "Economy Monitor"
+    description: "Track gold/item flow and inflation"
+    
+    metrics:
+      - name: "gold_entering"
+        description: "Gold entering the economy per hour"
+        
+      - name: "gold_leaving"
+        description: "Gold leaving through sinks per hour"
+        
+      - name: "inflation_rate"
+        description: "Net inflation as daily percentage"
+        
+      - name: "item_prices"
+        description: "Price movement of key items"
+    
+    thresholds:
+      inflation_rate_max: 2.0  # percent per day
+      item_price_swing_max: 20  # percent per week
+      gold_ratio_healthy: [0.8, 1.2]  # entering:leaving
+    
+    on_violation:
+      severity: "CRITICAL"
+      action: "block_graduation"
+      message: |
+        ⛔ ECONOMY VIOLATION
+        
+        Issue: {issue_type}
+        Current: {current_value}
+        Threshold: {threshold}
+        
+        Primary source: {source}
+        
+        This feature is creating economic instability.
+        
+        IMPACT ANALYSIS:
+        {impact_analysis}
+
+  # ─────────────────────────────────────────────────────────────────────
+  # EXPLOIT RADAR
+  # ─────────────────────────────────────────────────────────────────────
+  exploit_radar:
+    name: "Exploit Radar"
+    description: "Detect anomalous player behavior patterns"
+    
+    patterns:
+      
+      wealth_transfer:
+        name: "Suspicious Wealth Transfer"
+        description: "Large amounts moving to new accounts"
+        threshold: "10M+ GP to accounts <7 days old"
+        severity: "HIGH"
+      
+      grief_patterns:
+        name: "Grief Exploitation"
+        description: "Repeated actions causing player loss"
+        threshold: "5+ affected players OR 10+ reports"
+        severity: "HIGH"
+      
+      bot_signatures:
+        name: "Bot Detection"
+        description: "Inhuman input patterns"
+        threshold: "3+ sigma deviation from human baseline"
+        severity: "MEDIUM"
+      
+      dupe_detection:
+        name: "Item Duplication"
+        description: "Items created without valid source"
+        threshold: "Any detection"
+        severity: "CRITICAL"
+      
+      unintended_interaction:
+        name: "Unintended Mechanic Interaction"
+        description: "Feature interactions creating exploits"
+        threshold: "Statistical anomaly in outcomes"
+        severity: "HIGH"
+    
+    on_detection:
+      action: "alert_and_investigate"
+      message: |
+        🚨 EXPLOIT DETECTED
+        
+        Pattern: {pattern_name}
+        Severity: {severity}
+        
+        Details:
+        {details}
+        
+        Affected players: {count}
+        Estimated impact: {impact}
+        
+        [Investigate] [Emergency Block] [Mark False Positive]
+
+  # ─────────────────────────────────────────────────────────────────────
+  # SENTIMENT MONITOR
+  # ─────────────────────────────────────────────────────────────────────
+  sentiment:
+    name: "Sentiment Monitor"
+    description: "Track community reception during beta"
+    
+    sources:
+      - "Reddit discussion"
+      - "Discord feedback"
+      - "In-game feedback"
+      - "Support tickets"
+    
+    metrics:
+      - name: "positive_ratio"
+        description: "Ratio of positive to negative feedback"
+        
+      - name: "key_complaints"
+        description: "Most common negative themes"
+        
+      - name: "key_praise"
+        description: "Most common positive themes"
+    
+    thresholds:
+      net_positive_required: true
+      minimum_feedback_count: 100
+    
+    output:
+      format: |
+        SENTIMENT: {Feature Name}
+        
+        Overall: {positive_percent}% positive
+        
+        Praise:
+        • {praise_1}
+        • {praise_2}
+        
+        Concerns:
+        • {concern_1}
+        • {concern_2}
+
+# ═══════════════════════════════════════════════════════════════════════
+# GRADUATION CRITERIA
+# ═══════════════════════════════════════════════════════════════════════
+
+graduation:
+  
+  requirements:
+    duration:
+      minimum_days: 7
+      description: "Feature must be in Proving Grounds for at least 7 days"
+    
+    monitors:
+      xp_rate: "green"
+      economy: "green"
+      exploit_radar: "no unresolved P1"
+      sentiment: "net_positive"
+    
+    manual_approval:
+      required: true
+      approver: "taste_owner"
+  
+  process:
+    1_check_duration: "Verify minimum time met"
+    2_check_monitors: "Verify all monitors green"
+    3_check_exploits: "Verify no unresolved P1 exploits"
+    4_check_sentiment: "Verify net positive reception"
+    5_taste_owner_review: "Final approval from Taste Owner"
+    6_graduate: "Promote to production Canon"
+  
+  on_pass:
+    message: |
+      ✅ GRADUATION APPROVED
+      
+      Feature: {feature_name}
+      Proving period: {days} days
+      
+      Monitor Results:
+      • XP Rate: ✓
+      • Economy: ✓
+      • Exploits: ✓
+      • Sentiment: {positive_percent}% positive
+      
+      Approved by: {taste_owner}
+      
+      Feature will be promoted to production.
+  
+  on_fail:
+    message: |
+      ⛔ GRADUATION BLOCKED
+      
+      Feature: {feature_name}
+      
+      Blocking issues:
+      {issues_list}
+      
+      The feature cannot graduate until these are resolved.
+      
+      OPTIONS:
+      [Extend Proving Period]
+      [Hotfix Issues]
+      [Abort Feature]
+
+# ═══════════════════════════════════════════════════════════════════════
+# EMERGENCY PROCEDURES
+# ═══════════════════════════════════════════════════════════════════════
+
+emergency:
+  
+  emergency_block:
+    trigger: "Critical exploit OR economy break"
+    action: "Immediately disable feature in beta"
+    notification: "All stakeholders"
+    
+    message: |
+      🚨 EMERGENCY BLOCK
+      
+      Feature: {feature_name}
+      Reason: {reason}
+      
+      The feature has been disabled in Proving Grounds.
+      Investigation required before re-enabling.
+  
+  early_graduation:
+    trigger: "Exceptional performance + urgent need"
+    requirements:
+      - "Minimum 3 days (not 7)"
+      - "All monitors green"
+      - "Taste Owner + Lead approval"
+    
+    documentation: "Required—justify early graduation"

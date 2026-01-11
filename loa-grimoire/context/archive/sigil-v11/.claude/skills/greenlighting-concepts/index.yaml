@@ -1,0 +1,8 @@
+name: greenlighting-concepts
+version: "1.0.0"
+description: "Community polling for concepts only. Pollster role."
+role: "Pollster"
+command: /greenlight
+outputs:
+  - sigil-mark/governance/greenlight.yaml
+dependencies: []

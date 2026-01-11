@@ -1,0 +1,101 @@
+# Sigil Core: Fidelity Ceiling (The Mod Ghost Rule)
+# Technical superiority is NOT justification for breaking resonance.
+
+fidelity:
+  # ═══════════════════════════════════════════════════════════════════
+  # THE MOD GHOST RULE
+  # ═══════════════════════════════════════════════════════════════════
+  
+  rule: |
+    Technical superiority is NOT a justification for breaking resonance.
+    "Better graphics" that don't match the product's soul are WORSE.
+    
+    Named after the 2016 OSRS incident where objectively higher-quality
+    elf models were rejected because they "looked too RS3" or "Play-Doh."
+    
+    The lesson: It is not enough to make good art; the art must match
+    the product's soul. High-fidelity assets can violate low-fidelity
+    product identity.
+
+  # ═══════════════════════════════════════════════════════════════════
+  # THE CEILING
+  # ═══════════════════════════════════════════════════════════════════
+  
+  ceiling:
+    description: |
+      The fidelity ceiling is the maximum visual complexity allowed
+      in CORE assets. Assets that exceed the ceiling break resonance
+      with existing content.
+      
+      These are PHYSICS constraints, not style preferences.
+      The ceiling applies to vanilla/core layer only.
+      Lens layer may exceed these (user opt-in).
+    
+    constraints:
+      gradients:
+        max_stops: 2
+        violation: "CEILING_VIOLATION"
+        reason: "Complex gradients feel 'too modern' for most products"
+        
+      shadows:
+        max_layers: 3
+        violation: "CEILING_VIOLATION"
+        reason: "Excessive shadows create visual noise"
+        
+      animation:
+        max_duration_ms: 800
+        violation: "CEILING_VIOLATION"
+        reason: "Animations longer than 800ms feel sluggish"
+        
+      blur:
+        max_radius_px: 16
+        violation: "CEILING_VIOLATION"
+        reason: "Heavy blur is expensive and often unnecessary"
+        
+      border_radius:
+        max_px: 24
+        violation: "CEILING_VIOLATION"
+        reason: "Extreme rounding breaks grid alignment"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # AGENT BEHAVIOR
+  # ═══════════════════════════════════════════════════════════════════
+  
+  agent_rules:
+    - rule: "Generate at ceiling, not above"
+      detail: |
+        When generating assets, use the maximum allowed values
+        only when the design requires it. Default to simpler.
+        
+    - rule: "Simpler is often better"
+      detail: |
+        A single-color background is not 'boring'—it's clean.
+        Don't add gradients/shadows just because you can.
+        
+    - rule: "Match adjacent content"
+      detail: |
+        New assets should match the fidelity of adjacent existing
+        assets. A high-poly button next to low-poly text breaks
+        visual coherence.
+        
+    - rule: "Lens handles enhancement"
+      detail: |
+        If user wants HD/enhanced visuals, that's a Lens concern.
+        Core assets stay at ceiling.
+
+  # ═══════════════════════════════════════════════════════════════════
+  # VIOLATION HANDLING
+  # ═══════════════════════════════════════════════════════════════════
+  
+  violations:
+    severity: "BLOCK"
+    override: "Taste Key can override with justification"
+    
+    examples:
+      - input: "Add a 5-stop gradient background"
+        response: "CEILING_VIOLATION: max 2 gradient stops"
+        suggestion: "Use 2-stop gradient or solid color"
+        
+      - input: "Add subtle parallax with 1200ms animation"
+        response: "CEILING_VIOLATION: max 800ms animation"
+        suggestion: "Reduce to 800ms or remove parallax"

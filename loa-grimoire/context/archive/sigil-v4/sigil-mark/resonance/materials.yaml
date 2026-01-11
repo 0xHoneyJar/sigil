@@ -1,0 +1,150 @@
+# Sigil Resonance: Materials
+# Materials are physics configurations, not themes.
+
+materials:
+  description: |
+    Materials define how UI elements behave physically.
+    They are not color palettes—they are physics configurations.
+    
+    Choose material based on:
+    1. What zone is the component in?
+    2. What feeling should the interaction create?
+    3. What sync model does this zone use?
+
+  # ═══════════════════════════════════════════════════════════════════
+  # CLAY
+  # "Things made of clay have weight. They resist. They confirm."
+  # ═══════════════════════════════════════════════════════════════════
+  
+  clay:
+    physics:
+      light: diffuse      # Soft, absorbed light
+      weight: heavy       # Resists movement
+      motion: spring      # Overshoots, settles
+      feedback: depress   # Pushes in on press
+    
+    feel: |
+      Clay buttons feel like pressing into soft material.
+      There's resistance. There's confirmation.
+      Actions feel deliberate because the material resists.
+    
+    sync_affinity:
+      - server_authoritative
+      - discrete_tick
+    
+    zone_affinity:
+      - critical
+      - celebration
+    
+    css_implications:
+      box_shadow: "0 2px 4px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.05)"
+      transition: "transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)"
+      active_transform: "scale(0.97)"
+      
+    spring_config:
+      stiffness: 120
+      damping: 14
+      
+    when_to_use:
+      - "High-stakes actions (claim, trade, checkout)"
+      - "Irreversible operations"
+      - "Success celebrations"
+      - "Anything that should feel 'earned'"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # MACHINERY
+  # "Machinery is instant. No bounce. No weight. Pure efficiency."
+  # ═══════════════════════════════════════════════════════════════════
+  
+  machinery:
+    physics:
+      light: flat         # No depth, no shadow
+      weight: none        # Weightless, instant
+      motion: instant     # No animation
+      feedback: highlight # Color change only
+    
+    feel: |
+      Machinery has no personality. It has function.
+      Buttons don't animate because animation is latency.
+      State changes are instant because waiting is failure.
+    
+    sync_affinity:
+      - client_authoritative
+      - continuous
+    
+    zone_affinity:
+      - transactional
+      - admin
+    
+    css_implications:
+      box_shadow: "none"
+      transition: "background-color 50ms"
+      active_transform: "none"
+      
+    spring_config: null  # No spring, instant
+      
+    when_to_use:
+      - "High-frequency actions (task creation, toggles)"
+      - "Admin interfaces"
+      - "Power user workflows"
+      - "Anything that should feel 'efficient'"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # GLASS
+  # "Glass refracts. It suggests depth without weight."
+  # ═══════════════════════════════════════════════════════════════════
+  
+  glass:
+    physics:
+      light: refract      # Bends light, translucent
+      weight: weightless  # Floats, no resistance
+      motion: ease        # Smooth, no overshoot
+      feedback: glow      # Illuminates on interaction
+    
+    feel: |
+      Glass elements float above the surface.
+      They're present but not heavy.
+      Good for overlays, modals, floating actions.
+    
+    sync_affinity:
+      - client_authoritative
+    
+    zone_affinity:
+      - exploratory
+      - marketing
+    
+    css_implications:
+      backdrop_filter: "blur(8px)"
+      background: "rgba(255,255,255,0.8)"
+      transition: "opacity 200ms ease-out"
+      
+    spring_config:
+      stiffness: 200
+      damping: 20
+      
+    when_to_use:
+      - "Modals and overlays"
+      - "Floating action buttons"
+      - "Browse/discovery interfaces"
+      - "Marketing pages"
+      - "Anything that should feel 'light'"
+
+  # ═══════════════════════════════════════════════════════════════════
+  # MATERIAL SELECTION GUIDE
+  # ═══════════════════════════════════════════════════════════════════
+  
+  selection_guide:
+    by_action_weight:
+      irreversible: clay
+      frequent: machinery
+      exploratory: glass
+      
+    by_user_emotion:
+      trust_required: clay
+      efficiency_required: machinery
+      delight_required: glass
+      
+    by_zone:
+      critical: clay
+      transactional: machinery
+      exploratory: glass
