@@ -694,3 +694,329 @@ jobs:
 *PRD Generated: 2026-01-10*
 *Sources: SIGIL_LIVING_CANON_ARCHITECTURE.md*
 *Next Step: `/architect` for Software Design Document*
+
+---
+
+# Addendum: Sigil Grimoire Migration (v7.7)
+
+**Date:** 2026-01-11
+**Depends on:** v7.6 implementation
+**Trigger:** Loa v0.12.0 grimoire restructure
+
+---
+
+## A1. Problem Statement
+
+Following Loa v0.12.0's `grimoires/` restructure, Sigil's design context is now scattered across incompatible locations:
+
+| Current Location | Issue |
+|------------------|-------|
+| `sigil-mark/` | Mixes public framework with private state |
+| `.sigil/` | Runtime state in hidden directory |
+| `.sigilrc.yaml` | Config at root (fine) |
+| `.claude/skills/sigil-core/` | Skill definition (fine) |
+
+The Loa pattern provides a clean model:
+- `grimoires/loa/` - Private project state (gitignored)
+- `grimoires/pub/` - Public shareable content (tracked)
+
+Sigil should adopt `grimoires/sigil/` with the same public/private separation.
+
+---
+
+## A2. Goals
+
+1. **Consolidate Sigil context** into `grimoires/sigil/`
+2. **Separate public (framework) from private (state)**
+3. **Coexist cleanly** with `grimoires/loa/` and `grimoires/pub/`
+4. **Enable distribution** - Sigil can be mounted onto other repos
+
+---
+
+## A3. Directory Structure
+
+```
+grimoires/
+├── sigil/                      # NEW: Sigil grimoire
+│   │
+│   │── # PUBLIC (tracked in git)
+│   ├── constitution/           # Core design laws
+│   │   ├── physics.yaml        # Motion, timing, easing
+│   │   ├── zones.yaml          # Zone definitions
+│   │   ├── lenses.yaml         # Lens configurations
+│   │   ├── fidelity.yaml       # From kernel/
+│   │   └── laws.md             # The Seven Laws
+│   ├── moodboard/              # Visual references
+│   │   ├── references/         # Inspiration images
+│   │   ├── palettes/           # Color systems
+│   │   └── moodboard.md        # Overall feel document
+│   ├── vocabulary/             # Term definitions
+│   │   └── vocabulary.yaml
+│   ├── seeds/                  # Virtual Sanctuary seeds
+│   │   ├── linear-like.yaml
+│   │   ├── vercel-like.yaml
+│   │   └── stripe-like.yaml
+│   ├── process/                # Agent-time utilities
+│   │   ├── survival-engine.ts
+│   │   ├── linter-gate.ts
+│   │   ├── filesystem-registry.ts
+│   │   └── ...
+│   │
+│   │── # PRIVATE (gitignored)
+│   ├── state/                  # Runtime state
+│   │   ├── workshop.json       # Pre-computed index
+│   │   ├── survival-stats.json
+│   │   ├── pending-ops.json
+│   │   ├── survival.json       # Pattern tracking
+│   │   └── craft-log/          # Session logs
+│   └── archive/                # Historical data
+│       ├── eras/               # Era snapshots
+│       └── sigil/              # Sprint history (already migrated)
+│
+├── loa/                        # Loa grimoire (existing)
+└── pub/                        # Public documents (existing)
+```
+
+---
+
+## A4. Public vs Private Classification
+
+### A4.1 PUBLIC (Tracked in Git)
+
+| Category | Path | Rationale |
+|----------|------|-----------|
+| Constitution | `grimoires/sigil/constitution/` | Core design laws are the framework |
+| Moodboard | `grimoires/sigil/moodboard/` | Visual references are shareable |
+| Vocabulary | `grimoires/sigil/vocabulary/` | Term definitions are the framework |
+| Seeds | `grimoires/sigil/seeds/` | Starter templates for new projects |
+| Process | `grimoires/sigil/process/` | Agent utilities are the framework |
+
+### A4.2 PRIVATE (Gitignored)
+
+| Category | Path | Rationale |
+|----------|------|-----------|
+| State | `grimoires/sigil/state/` | Per-project runtime data |
+| Workshop | `grimoires/sigil/state/workshop.json` | Generated index, project-specific |
+| Survival | `grimoires/sigil/state/survival-stats.json` | Project usage tracking |
+| Craft Logs | `grimoires/sigil/state/craft-log/` | Session-specific logs |
+| Archive | `grimoires/sigil/archive/` | Historical project data |
+
+---
+
+## A5. Migration Mapping
+
+### A5.1 From sigil-mark/ to grimoires/sigil/
+
+| Source | Destination | Notes |
+|--------|-------------|-------|
+| `sigil-mark/constitution/` | `grimoires/sigil/constitution/` | Direct move |
+| `sigil-mark/moodboard/` | `grimoires/sigil/moodboard/` | Direct move |
+| `sigil-mark/vocabulary/` | `grimoires/sigil/vocabulary/` | Direct move |
+| `sigil-mark/kernel/` | `grimoires/sigil/constitution/` | Merge into constitution |
+| `sigil-mark/process/` | `grimoires/sigil/process/` | Direct move |
+| `sigil-mark/lenses/` | `src/sigil/lenses/` | Runtime code to src |
+| `sigil-mark/hooks/` | `src/sigil/hooks/` | Runtime code to src |
+| `sigil-mark/layouts/` | `src/sigil/layouts/` | Runtime code to src |
+| `sigil-mark/providers/` | `src/sigil/providers/` | Runtime code to src |
+| `sigil-mark/core/` | `src/sigil/core/` | Runtime code to src |
+| `sigil-mark/types/` | `src/sigil/types/` | Runtime code to src |
+| `sigil-mark/index.ts` | `src/sigil/index.ts` | Package entry |
+| `sigil-mark/__tests__/` | `src/sigil/__tests__/` | With runtime code |
+| `sigil-mark/__examples__/` | `grimoires/sigil/examples/` | Public examples |
+
+### A5.2 From .sigil/ to grimoires/sigil/state/
+
+| Source | Destination |
+|--------|-------------|
+| `.sigil/workshop.json` | `grimoires/sigil/state/workshop.json` |
+| `.sigil/survival-stats.json` | `grimoires/sigil/state/survival-stats.json` |
+| `.sigil/pending-ops.json` | `grimoires/sigil/state/pending-ops.json` |
+| `.sigil/survival.json` | `grimoires/sigil/state/survival.json` |
+| `.sigil/craft-log/` | `grimoires/sigil/state/craft-log/` |
+| `.sigil/eras/` | `grimoires/sigil/archive/eras/` |
+| `.sigil/seed.yaml` | `grimoires/sigil/state/seed.yaml` |
+
+### A5.3 Stays in Place
+
+| Location | Reason |
+|----------|--------|
+| `.sigilrc.yaml` | Root project config (like `.loa.config.yaml`) |
+| `src/**/.sigilrc.yaml` | Zone-specific overrides, collocated with code |
+| `.claude/skills/sigil-core/` | Skill definition, Loa pattern |
+| `.claude/commands/` | Sigil commands, Loa pattern |
+
+---
+
+## A6. Runtime Code Separation
+
+The key insight: **grimoires hold design context, src holds runtime code**.
+
+### A6.1 Design Context (grimoires/sigil/)
+
+Files read by agents at design-time:
+- Physics constants
+- Zone definitions
+- Moodboard references
+- Vocabulary terms
+
+### A6.2 Runtime Code (src/sigil/)
+
+Files imported by application at runtime:
+- React hooks (`useMotion`, `useSigilMutation`)
+- Layout components (`CriticalZone`, `GlassLayout`)
+- Lens implementations (`DefaultLens`, `StrictLens`)
+- Provider components (`SigilProvider`)
+
+### A6.3 Package Structure
+
+```typescript
+// src/sigil/index.ts - Main entry point
+export * from './hooks';
+export * from './layouts';
+export * from './providers';
+export * from './lenses';
+export * from './core';
+export type * from './types';
+```
+
+---
+
+## A7. Gitignore Updates
+
+Add to `.gitignore`:
+
+```gitignore
+# Sigil grimoire state (private, per-project)
+grimoires/sigil/state/*
+!grimoires/sigil/state/README.md
+grimoires/sigil/archive/*
+!grimoires/sigil/archive/README.md
+```
+
+---
+
+## A8. Skill Updates
+
+Update `.claude/skills/sigil-core/SKILL.md`:
+
+```diff
+- Read design context from sigil-mark/
++ Read design context from grimoires/sigil/
++ Fall back to sigil-mark/ during transition (deprecated)
+```
+
+Update paths in `index.yaml`:
+
+```yaml
+context_files:
+  - grimoires/sigil/constitution/physics.yaml
+  - grimoires/sigil/constitution/zones.yaml
+  - grimoires/sigil/moodboard/moodboard.md
+  - grimoires/sigil/vocabulary/vocabulary.yaml
+```
+
+---
+
+## A9. Backwards Compatibility
+
+### Phase 1: Dual Support
+- Both paths work during transition
+- Deprecation warnings when legacy paths used
+- `sigil-mark/` becomes symlink to `grimoires/sigil/`
+
+### Phase 2: Legacy Removal (v8.0)
+- Remove symlink
+- Remove legacy path support
+- Clean migration completed
+
+---
+
+## A10. Implementation Plan
+
+### Sprint 1: Directory Structure
+1. Create `grimoires/sigil/` directory structure
+2. Update `.gitignore` for private state
+3. Create README files for each directory
+
+### Sprint 2: Public Migration
+4. Move constitution files
+5. Move moodboard files
+6. Move vocabulary files
+7. Move process files
+8. Move seeds
+
+### Sprint 3: Runtime Code Migration
+9. Create `src/sigil/` directory
+10. Move hooks, layouts, providers, lenses, core
+11. Update package.json exports
+12. Update import paths throughout codebase
+
+### Sprint 4: State Migration
+13. Move .sigil/* to grimoires/sigil/state/
+14. Update skill to read from new locations
+15. Add symlink for backwards compatibility
+16. Remove .sigil/ directory
+
+---
+
+## A11. Open Questions
+
+### Q1: Runtime Code Package?
+
+Should `src/sigil/` be a separate package?
+
+**Option A: Directory with Path Aliases (Recommended)**
+```json
+{
+  "paths": {
+    "@sigil/*": ["src/sigil/*"]
+  }
+}
+```
+- Simpler, no package management
+- Works with existing monorepo setup
+
+**Option B: Workspace Package**
+```
+packages/sigil-core/
+├── package.json
+└── src/
+```
+- Better for external distribution
+- More complex setup
+
+**Recommendation**: Start with Option A, migrate to Option B if external distribution needed.
+
+### Q2: sigil-workbench and sigil-hud?
+
+Current packages:
+- `packages/sigil-hud/` - Debug overlay
+- `sigil-workbench/` - Development playground
+
+**Recommendation**: Keep as separate packages, read from `grimoires/sigil/` for context.
+
+### Q3: Zone Configs Location?
+
+Current: `src/**/.sigilrc.yaml` (zone-specific overrides)
+
+**Options:**
+- A: Keep collocated with code (current)
+- B: Consolidate to `grimoires/sigil/zones/`
+
+**Recommendation**: Option A - Keep collocated. Zone overrides are part of the application code, not the framework.
+
+---
+
+## A12. Success Metrics
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| Sigil context locations | 4 (sigil-mark, .sigil, skills, configs) | 2 (grimoires/sigil, src/sigil) |
+| Clear public/private separation | No | Yes |
+| Agent context discovery | Multiple paths | Single grimoire path |
+| Framework distributable | No | Yes (mount grimoires/sigil) |
+
+---
+
+*Addendum Generated: 2026-01-11*
+*Sources: Loa v0.12.0 release notes, filesystem analysis*

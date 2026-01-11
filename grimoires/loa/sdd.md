@@ -949,3 +949,770 @@ src/components/
 *SDD Generated: 2026-01-10*
 *Based on: PRD v7.6.0*
 *Next Step: `/sprint-plan` to break down into sprints*
+
+---
+
+# Addendum: Sigil Grimoire Migration Architecture (v7.7)
+
+**Date:** 2026-01-11
+**Depends on:** v7.6 SDD
+**Based on:** PRD v7.7 Addendum
+
+---
+
+## A1. Executive Summary
+
+This addendum describes the technical architecture for migrating Sigil to the `grimoires/` pattern introduced in Loa v0.12.0. The migration:
+
+1. **Consolidates** design context from `sigil-mark/` + `.sigil/` into `grimoires/sigil/`
+2. **Separates** public framework from private state
+3. **Moves** runtime code to `src/sigil/` with path aliases
+4. **Consolidates** zone configs to `grimoires/sigil/zones/`
+5. **Archives** unused packages (sigil-workbench, sigil-hud)
+
+### Key Decisions (from PRD review)
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Runtime code package | Path aliases | Simpler, no package management overhead |
+| sigil-workbench, sigil-hud | Archive/delete | Not actively used, optimizing for depth |
+| Zone configs | Consolidate | Single source of truth in grimoire |
+
+---
+
+## A2. Directory Architecture
+
+### A2.1 Target Structure
+
+```
+grimoires/
+├── sigil/                          # Sigil grimoire
+│   │
+│   │── # PUBLIC (git-tracked)
+│   ├── constitution/               # Core design laws
+│   │   ├── physics.yaml            # Motion timing, easing
+│   │   ├── zones.yaml              # Zone definitions (consolidated)
+│   │   ├── lenses.yaml             # Lens configurations
+│   │   ├── fidelity.yaml           # Fidelity ceiling rules
+│   │   ├── vocabulary.yaml         # Term definitions (moved from kernel)
+│   │   ├── workflow.yaml           # Workflow rules (moved from kernel)
+│   │   └── protected-capabilities.yaml
+│   │
+│   ├── moodboard/                  # Visual references
+│   │   ├── moodboard.md            # Main feel document
+│   │   ├── references/             # Inspiration images
+│   │   ├── palettes/               # Color systems
+│   │   └── rules.md                # Design rules
+│   │
+│   ├── zones/                      # Zone configurations (consolidated)
+│   │   ├── critical.yaml           # CriticalZone overrides
+│   │   ├── admin.yaml              # MachineryLayout overrides
+│   │   ├── marketing.yaml          # GlassLayout overrides
+│   │   └── README.md               # Zone config documentation
+│   │
+│   ├── seeds/                      # Virtual Sanctuary
+│   │   ├── linear-like.yaml
+│   │   ├── vercel-like.yaml
+│   │   ├── stripe-like.yaml
+│   │   └── blank.yaml
+│   │
+│   ├── process/                    # Agent-time utilities
+│   │   ├── survival-engine.ts
+│   │   ├── linter-gate.ts
+│   │   ├── filesystem-registry.ts
+│   │   ├── workshop-builder.ts
+│   │   ├── workshop-query.ts
+│   │   ├── startup-sentinel.ts
+│   │   ├── physics-validator.ts
+│   │   └── ...
+│   │
+│   ├── examples/                   # Example code (from __examples__)
+│   │   └── ...
+│   │
+│   │── # PRIVATE (gitignored)
+│   ├── state/                      # Runtime state
+│   │   ├── workshop.json           # Pre-computed index
+│   │   ├── survival-stats.json     # Component tracking
+│   │   ├── pending-ops.json        # CI/CD queue
+│   │   ├── survival.json           # Pattern tracking
+│   │   ├── seed.yaml               # Active seed selection
+│   │   └── craft-log/              # Session logs
+│   │
+│   └── archive/                    # Historical data
+│       ├── eras/                   # Era snapshots
+│       └── sprints/                # Sprint history (already here)
+│
+├── loa/                            # Loa grimoire (existing)
+└── pub/                            # Public documents (existing)
+
+src/
+├── sigil/                          # Runtime code (NEW)
+│   ├── index.ts                    # Package entry
+│   ├── hooks/                      # React hooks
+│   │   ├── index.ts
+│   │   ├── useMotion.ts
+│   │   ├── useSigilMutation.ts
+│   │   └── ...
+│   ├── layouts/                    # Zone layouts
+│   │   ├── index.ts
+│   │   ├── CriticalZone.tsx
+│   │   ├── GlassLayout.tsx
+│   │   └── MachineryLayout.tsx
+│   ├── providers/                  # Context providers
+│   │   ├── index.ts
+│   │   └── SigilProvider.tsx
+│   ├── lenses/                     # Lens implementations
+│   │   ├── index.ts
+│   │   ├── DefaultLens.tsx
+│   │   ├── StrictLens.tsx
+│   │   └── A11yLens.tsx
+│   ├── core/                       # Core utilities
+│   │   └── ...
+│   ├── types/                      # Type definitions
+│   │   └── index.ts
+│   └── __tests__/                  # Tests
+│       └── ...
+```
+
+### A2.2 Zone Config Consolidation
+
+**Current (scattered):**
+```
+.sigilrc.yaml                       # Root config
+src/.sigilrc.yaml                   # src zone
+src/admin/.sigilrc.yaml             # admin zone
+src/checkout/.sigilrc.yaml          # checkout zone
+src/marketing/.sigilrc.yaml         # marketing zone
+```
+
+**Target (consolidated):**
+```
+.sigilrc.yaml                       # Root config (paths to grimoire)
+grimoires/sigil/zones/
+├── critical.yaml                   # checkout → critical
+├── admin.yaml                      # admin zone
+├── marketing.yaml                  # marketing zone
+└── default.yaml                    # default fallback
+```
+
+**Zone Resolution Strategy:**
+```typescript
+// Zone detected by:
+// 1. Layout component wrapper (CriticalZone, MachineryLayout, etc.)
+// 2. Path mapping in .sigilrc.yaml (optional override)
+// 3. Default zone fallback
+
+interface ZoneConfig {
+  extends?: string;           // Parent zone to inherit from
+  physics: PhysicsConfig;
+  lens: LensConfig;
+  constraints: ConstraintConfig;
+  persona_overrides: Record<string, PersonaOverride>;
+}
+```
+
+---
+
+## A3. Path Alias Configuration
+
+### A3.1 TypeScript Configuration
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      // Sigil runtime (new paths)
+      "@sigil": ["src/sigil/index.ts"],
+      "@sigil/*": ["src/sigil/*"],
+
+      // Sigil grimoire (design context)
+      "@sigil-context/*": ["grimoires/sigil/*"],
+
+      // Legacy aliases (deprecated, remove in v8.0)
+      "@sigil/hooks": ["src/sigil/hooks/index.ts"],
+      "@sigil/hooks/*": ["src/sigil/hooks/*"],
+      "@sigil/core/*": ["src/sigil/core/*"]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "grimoires/sigil/process/**/*"
+  ]
+}
+```
+
+### A3.2 Import Patterns
+
+```typescript
+// Runtime imports (from src/sigil/)
+import { useMotion, useSigilMutation } from '@sigil/hooks';
+import { CriticalZone, GlassLayout } from '@sigil/layouts';
+import { SigilProvider } from '@sigil/providers';
+import type { PhysicsConfig, ZoneConfig } from '@sigil/types';
+
+// Context imports (from grimoires/sigil/ - agent-time only)
+// These are YAML files read at build/agent time, not runtime
+import physics from '@sigil-context/constitution/physics.yaml';
+```
+
+---
+
+## A4. Migration Script Architecture
+
+### A4.1 Migration Script Structure
+
+```bash
+# .claude/scripts/migrate-sigil-grimoire.sh
+
+migrate-sigil-grimoire.sh check     # Assess current state
+migrate-sigil-grimoire.sh plan      # Preview changes
+migrate-sigil-grimoire.sh run       # Execute migration
+migrate-sigil-grimoire.sh rollback  # Revert if needed
+```
+
+### A4.2 Migration Phases
+
+```typescript
+interface MigrationPlan {
+  phase1_structure: {
+    action: 'create';
+    paths: [
+      'grimoires/sigil/constitution/',
+      'grimoires/sigil/moodboard/',
+      'grimoires/sigil/zones/',
+      'grimoires/sigil/seeds/',
+      'grimoires/sigil/process/',
+      'grimoires/sigil/examples/',
+      'grimoires/sigil/state/',
+      'grimoires/sigil/archive/',
+      'src/sigil/',
+    ];
+  };
+
+  phase2_public: {
+    action: 'move';
+    mappings: [
+      { from: 'sigil-mark/constitution/*', to: 'grimoires/sigil/constitution/' },
+      { from: 'sigil-mark/kernel/*.yaml', to: 'grimoires/sigil/constitution/' },
+      { from: 'sigil-mark/moodboard/*', to: 'grimoires/sigil/moodboard/' },
+      { from: 'sigil-mark/vocabulary/*', to: 'grimoires/sigil/constitution/' },
+      { from: 'sigil-mark/process/*', to: 'grimoires/sigil/process/' },
+      { from: 'sigil-mark/__examples__/*', to: 'grimoires/sigil/examples/' },
+    ];
+  };
+
+  phase3_zones: {
+    action: 'consolidate';
+    sources: [
+      '.sigilrc.yaml',              // Extract zone sections
+      'src/.sigilrc.yaml',
+      'src/admin/.sigilrc.yaml',
+      'src/checkout/.sigilrc.yaml',
+      'src/marketing/.sigilrc.yaml',
+    ];
+    target: 'grimoires/sigil/zones/';
+  };
+
+  phase4_runtime: {
+    action: 'move';
+    mappings: [
+      { from: 'sigil-mark/hooks/*', to: 'src/sigil/hooks/' },
+      { from: 'sigil-mark/layouts/*', to: 'src/sigil/layouts/' },
+      { from: 'sigil-mark/providers/*', to: 'src/sigil/providers/' },
+      { from: 'sigil-mark/lenses/*', to: 'src/sigil/lenses/' },
+      { from: 'sigil-mark/core/*', to: 'src/sigil/core/' },
+      { from: 'sigil-mark/types/*', to: 'src/sigil/types/' },
+      { from: 'sigil-mark/__tests__/*', to: 'src/sigil/__tests__/' },
+      { from: 'sigil-mark/index.ts', to: 'src/sigil/index.ts' },
+    ];
+    update_imports: true;
+  };
+
+  phase5_state: {
+    action: 'move';
+    mappings: [
+      { from: '.sigil/*', to: 'grimoires/sigil/state/' },
+    ];
+    update_references: true;
+  };
+
+  phase6_cleanup: {
+    action: 'archive';
+    paths: [
+      'sigil-workbench/',           // Archive
+      'packages/sigil-hud/',        // Archive
+      'sigil-mark/',                // Delete after symlink period
+      '.sigil/',                    // Delete after migration
+    ];
+    archive_to: 'grimoires/sigil/archive/deprecated/';
+  };
+}
+```
+
+### A4.3 Import Update Script
+
+```typescript
+// grimoires/sigil/process/update-imports.ts
+
+interface ImportMapping {
+  old: RegExp;
+  new: string;
+}
+
+const IMPORT_MAPPINGS: ImportMapping[] = [
+  // hooks
+  { old: /from ['"]sigil-mark\/hooks['"]/, new: "from '@sigil/hooks'" },
+  { old: /from ['"]sigil-mark\/hooks\/(.+)['"]/, new: "from '@sigil/hooks/$1'" },
+
+  // layouts
+  { old: /from ['"]sigil-mark\/layouts['"]/, new: "from '@sigil/layouts'" },
+  { old: /from ['"]sigil-mark\/layouts\/(.+)['"]/, new: "from '@sigil/layouts/$1'" },
+
+  // providers
+  { old: /from ['"]sigil-mark\/providers['"]/, new: "from '@sigil/providers'" },
+
+  // lenses
+  { old: /from ['"]sigil-mark\/lenses['"]/, new: "from '@sigil/lenses'" },
+
+  // core
+  { old: /from ['"]sigil-mark\/core\/(.+)['"]/, new: "from '@sigil/core/$1'" },
+
+  // types
+  { old: /from ['"]sigil-mark\/types['"]/, new: "from '@sigil/types'" },
+
+  // main entry
+  { old: /from ['"]sigil-mark['"]/, new: "from '@sigil'" },
+];
+
+async function updateImports(files: string[]): Promise<void> {
+  for (const file of files) {
+    let content = await fs.readFile(file, 'utf-8');
+
+    for (const mapping of IMPORT_MAPPINGS) {
+      content = content.replace(mapping.old, mapping.new);
+    }
+
+    await fs.writeFile(file, content);
+  }
+}
+```
+
+---
+
+## A5. Skill Configuration Updates
+
+### A5.1 Updated index.yaml
+
+```yaml
+# .claude/skills/sigil-core/index.yaml
+name: sigil-core
+description: Sigil v7.7 design physics framework skill
+version: 7.7.0
+
+triggers:
+  - /craft
+  - /sandbox
+  - /codify
+  - /inherit
+  - /validate
+  - /garden
+  - /map
+  - /zone
+
+context_files:
+  # Constitution (design laws)
+  - grimoires/sigil/constitution/physics.yaml
+  - grimoires/sigil/constitution/zones.yaml
+  - grimoires/sigil/constitution/lenses.yaml
+  - grimoires/sigil/constitution/fidelity.yaml
+  - grimoires/sigil/constitution/vocabulary.yaml
+
+  # Moodboard (visual references)
+  - grimoires/sigil/moodboard/moodboard.md
+
+  # Zones (consolidated)
+  - grimoires/sigil/zones/
+
+  # Root config
+  - .sigilrc.yaml
+
+state_files:
+  - grimoires/sigil/state/workshop.json
+  - grimoires/sigil/state/survival-stats.json
+  - grimoires/sigil/state/survival.json
+
+resources:
+  - scripts/sigil-detect-zone.sh
+
+dependencies: []
+```
+
+### A5.2 Zone Detection Update
+
+```bash
+#!/bin/bash
+# .claude/skills/sigil-core/scripts/sigil-detect-zone.sh
+
+# Zone detection now checks grimoires/sigil/zones/ for config
+
+detect_zone() {
+  local file_path="$1"
+
+  # 1. Check for Layout wrapper in file (existing logic)
+  if grep -q "CriticalZone" "$file_path"; then
+    echo "critical"
+    return
+  fi
+
+  if grep -q "MachineryLayout" "$file_path"; then
+    echo "admin"
+    return
+  fi
+
+  if grep -q "GlassLayout" "$file_path"; then
+    echo "marketing"
+    return
+  fi
+
+  # 2. Check path mapping in root config
+  local zone=$(yq '.zone_mappings[] | select(.path == "'"$file_path"'") | .zone' .sigilrc.yaml 2>/dev/null)
+  if [[ -n "$zone" ]]; then
+    echo "$zone"
+    return
+  fi
+
+  # 3. Default zone
+  echo "default"
+}
+
+# Get zone config from consolidated location
+get_zone_config() {
+  local zone="$1"
+  local config_path="grimoires/sigil/zones/${zone}.yaml"
+
+  if [[ -f "$config_path" ]]; then
+    cat "$config_path"
+  else
+    # Fall back to default
+    cat "grimoires/sigil/zones/default.yaml"
+  fi
+}
+```
+
+---
+
+## A6. Gitignore Configuration
+
+```gitignore
+# .gitignore additions
+
+# Sigil grimoire state (private, per-project)
+grimoires/sigil/state/*
+!grimoires/sigil/state/README.md
+
+grimoires/sigil/archive/*
+!grimoires/sigil/archive/README.md
+
+# Legacy paths (remove after v8.0)
+# .sigil/  # Already deleted
+```
+
+---
+
+## A7. Root Config Update
+
+```yaml
+# .sigilrc.yaml (updated)
+
+sigil: "7.7.0"
+codename: "Grimoire Migration"
+
+# Point to grimoire for design context
+grimoire: grimoires/sigil/
+
+# Zone configuration location
+zones_config: grimoires/sigil/zones/
+
+# Optional path-based zone overrides (for edge cases)
+zone_mappings:
+  - path: "src/checkout/**"
+    zone: critical
+  - path: "src/admin/**"
+    zone: admin
+  - path: "src/marketing/**"
+    zone: marketing
+
+# Physics (imported from grimoire at runtime)
+physics:
+  source: grimoires/sigil/constitution/physics.yaml
+
+# Lenses (imported from grimoire at runtime)
+lenses:
+  source: grimoires/sigil/constitution/lenses.yaml
+
+# Sandbox files (managed by /sandbox command)
+sandbox: []
+
+# Refinement
+refinement:
+  sources:
+    - vercel_preview_comments
+    - github_pr_comments
+    - linear_issue_comments
+  auto_commit: true
+  commit_prefix: "refine"
+```
+
+---
+
+## A8. Package Cleanup
+
+### A8.1 Packages to Archive
+
+```bash
+# Move to grimoires/sigil/archive/deprecated/
+sigil-workbench/    → grimoires/sigil/archive/deprecated/sigil-workbench/
+packages/sigil-hud/ → grimoires/sigil/archive/deprecated/sigil-hud/
+```
+
+### A8.2 packages/ Directory Cleanup
+
+After archiving sigil-hud:
+```bash
+# Check if packages/ is empty
+if [ -z "$(ls -A packages/)" ]; then
+  rm -rf packages/
+fi
+```
+
+---
+
+## A9. Backwards Compatibility
+
+### A9.1 Transition Period (v7.7)
+
+During v7.7, both paths work:
+
+```typescript
+// Skill checks both locations
+const CONTEXT_PATHS = [
+  'grimoires/sigil/',           // New (preferred)
+  'sigil-mark/',                // Legacy (deprecated)
+];
+
+function resolveContextPath(relativePath: string): string | null {
+  for (const base of CONTEXT_PATHS) {
+    const fullPath = path.join(base, relativePath);
+    if (fs.existsSync(fullPath)) {
+      if (base === 'sigil-mark/') {
+        console.warn(`[DEPRECATED] Using legacy path: ${fullPath}`);
+        console.warn(`             Migrate to: grimoires/sigil/${relativePath}`);
+      }
+      return fullPath;
+    }
+  }
+  return null;
+}
+```
+
+### A9.2 Legacy Removal (v8.0)
+
+- Remove `sigil-mark/` symlink
+- Remove legacy path support
+- Remove deprecated path aliases from tsconfig.json
+- Update CLAUDE.md to remove legacy references
+
+---
+
+## A10. Data Flow
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         SIGIL v7.7 DATA FLOW                            │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  DESIGN TIME (Agent)                 RUNTIME (Application)              │
+│  ─────────────────────               ──────────────────────             │
+│                                                                          │
+│  ┌─────────────────────┐            ┌─────────────────────┐             │
+│  │ grimoires/sigil/    │            │    src/sigil/       │             │
+│  │                     │            │                     │             │
+│  │ ├── constitution/   │────────────▶│ ├── hooks/         │             │
+│  │ │   ├── physics     │  informs   │ │   └── useMotion   │             │
+│  │ │   ├── zones       │  design    │ │                   │             │
+│  │ │   └── lenses      │            │ ├── layouts/        │             │
+│  │ │                   │            │ │   ├── Critical    │             │
+│  │ ├── moodboard/      │            │ │   ├── Glass       │             │
+│  │ │   └── references  │            │ │   └── Machinery   │             │
+│  │ │                   │            │ │                   │             │
+│  │ ├── zones/          │────────────▶│ ├── lenses/        │             │
+│  │ │   ├── critical    │  configures│ │   ├── Default     │             │
+│  │ │   ├── admin       │            │ │   ├── Strict      │             │
+│  │ │   └── marketing   │            │ │   └── A11y        │             │
+│  │ │                   │            │ │                   │             │
+│  │ ├── process/        │            │ └── providers/      │             │
+│  │ │   └── utilities   │            │     └── SigilProv   │             │
+│  │ │                   │            │                     │             │
+│  │ └── state/          │            └─────────────────────┘             │
+│  │     └── (gitignored)│                       │                        │
+│  │                     │                       │                        │
+│  └─────────────────────┘                       │                        │
+│           │                                    │                        │
+│           │ Agent reads                        │ App imports            │
+│           ▼                                    ▼                        │
+│  ┌─────────────────────┐            ┌─────────────────────┐             │
+│  │   Claude Code       │            │   React App         │             │
+│  │   Skills/Commands   │            │   Components        │             │
+│  └─────────────────────┘            └─────────────────────┘             │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## A11. Testing Strategy
+
+### A11.1 Migration Validation
+
+```typescript
+// grimoires/sigil/process/__tests__/migration.test.ts
+
+describe('Grimoire Migration', () => {
+  it('should have all constitution files', () => {
+    const required = [
+      'grimoires/sigil/constitution/physics.yaml',
+      'grimoires/sigil/constitution/zones.yaml',
+      'grimoires/sigil/constitution/lenses.yaml',
+      'grimoires/sigil/constitution/fidelity.yaml',
+      'grimoires/sigil/constitution/vocabulary.yaml',
+    ];
+
+    for (const file of required) {
+      expect(fs.existsSync(file)).toBe(true);
+    }
+  });
+
+  it('should have zone configs consolidated', () => {
+    const zones = ['critical', 'admin', 'marketing', 'default'];
+
+    for (const zone of zones) {
+      expect(fs.existsSync(`grimoires/sigil/zones/${zone}.yaml`)).toBe(true);
+    }
+
+    // Legacy zone files should not exist
+    expect(fs.existsSync('src/admin/.sigilrc.yaml')).toBe(false);
+  });
+
+  it('should have runtime code in src/sigil', () => {
+    const required = [
+      'src/sigil/index.ts',
+      'src/sigil/hooks/index.ts',
+      'src/sigil/layouts/index.ts',
+      'src/sigil/providers/index.ts',
+      'src/sigil/lenses/index.ts',
+    ];
+
+    for (const file of required) {
+      expect(fs.existsSync(file)).toBe(true);
+    }
+  });
+
+  it('should have no legacy sigil-mark imports', async () => {
+    const srcFiles = await glob('src/**/*.{ts,tsx}');
+
+    for (const file of srcFiles) {
+      const content = await fs.readFile(file, 'utf-8');
+      expect(content).not.toMatch(/from ['"]sigil-mark/);
+    }
+  });
+});
+```
+
+### A11.2 Path Alias Validation
+
+```typescript
+// src/sigil/__tests__/imports.test.ts
+
+describe('Path Aliases', () => {
+  it('should resolve @sigil imports', () => {
+    // These should compile without error
+    import('@sigil').then(m => {
+      expect(m.useMotion).toBeDefined();
+      expect(m.CriticalZone).toBeDefined();
+      expect(m.SigilProvider).toBeDefined();
+    });
+  });
+
+  it('should resolve @sigil/* imports', () => {
+    import('@sigil/hooks').then(m => {
+      expect(m.useMotion).toBeDefined();
+    });
+
+    import('@sigil/layouts').then(m => {
+      expect(m.CriticalZone).toBeDefined();
+    });
+  });
+});
+```
+
+---
+
+## A12. Performance Targets
+
+| Operation | Target | Notes |
+|-----------|--------|-------|
+| Zone config lookup | <2ms | Direct file read |
+| Context path resolution | <5ms | Two-path check |
+| Import alias resolution | 0ms | Compile time |
+| Migration script (full) | <30s | All phases |
+| Migration rollback | <10s | Git restore |
+
+---
+
+## A13. Implementation Checklist
+
+### Sprint 1: Structure & Gitignore
+- [ ] Create `grimoires/sigil/` directory structure
+- [ ] Update `.gitignore` for private state
+- [ ] Create README files for each directory
+- [ ] Archive `sigil-workbench/` and `packages/sigil-hud/`
+
+### Sprint 2: Constitution & Moodboard
+- [ ] Move `sigil-mark/constitution/` → `grimoires/sigil/constitution/`
+- [ ] Merge `sigil-mark/kernel/*.yaml` → `grimoires/sigil/constitution/`
+- [ ] Move `sigil-mark/moodboard/` → `grimoires/sigil/moodboard/`
+- [ ] Move `sigil-mark/vocabulary/` → `grimoires/sigil/constitution/`
+
+### Sprint 3: Zone Consolidation
+- [ ] Create `grimoires/sigil/zones/` directory
+- [ ] Extract zones from `.sigilrc.yaml`
+- [ ] Migrate `src/**/.sigilrc.yaml` → `grimoires/sigil/zones/`
+- [ ] Remove scattered `.sigilrc.yaml` zone files
+- [ ] Update zone detection script
+
+### Sprint 4: Runtime Code
+- [ ] Create `src/sigil/` directory
+- [ ] Move hooks, layouts, providers, lenses, core, types
+- [ ] Update `tsconfig.json` path aliases
+- [ ] Run import update script
+- [ ] Verify all imports resolve
+
+### Sprint 5: State & Process
+- [ ] Move `.sigil/*` → `grimoires/sigil/state/`
+- [ ] Move `sigil-mark/process/` → `grimoires/sigil/process/`
+- [ ] Update skill `index.yaml` with new paths
+- [ ] Remove `.sigil/` directory
+
+### Sprint 6: Cleanup & Validation
+- [ ] Remove empty `sigil-mark/` directory
+- [ ] Run migration validation tests
+- [ ] Update CLAUDE.md documentation
+- [ ] Update version to 7.7.0
+
+---
+
+*SDD Addendum Generated: 2026-01-11*
+*Based on: PRD v7.7 Addendum*
+*Decisions: Path aliases, archive workbench/hud, consolidate zones*
