@@ -1,9 +1,9 @@
 {
-  "sigil_version": "7.6.0",
-  "framework_version": "7.6.0",
-  "codename": "The Living Canon",
-  "schema_version": 9,
-  "description": "Survival-based framework with auto-promotion, linter gate, slot-based composition, and executable principles",
+  "sigil_version": "7.7.0",
+  "framework_version": "7.7.0",
+  "codename": "Clean Slate",
+  "schema_version": 10,
+  "description": "Consolidated archive structure, cleaner sigil-mark/ directory for better DX",
   "zones": {
     "system": ".claude/",
     "state": "sigil-mark/",
@@ -48,7 +48,6 @@
     "evidence_based_context": true,
     "live_grep_discovery": true,
     "jit_polish_workflow": true,
-    "governance_system": true,
     "constitutional_kernel": true,
     "sigil_provider": true,
     "use_sigil_mutation": true,
@@ -57,7 +56,8 @@
     "linter_gate": true,
     "slot_composition": true,
     "executable_principles": true,
-    "cicd_offload": true
+    "cicd_offload": true,
+    "consolidated_archive": true
   },
   "kernel": {
     "constitution": "sigil-mark/kernel/constitution.yaml",
@@ -155,11 +155,33 @@
     "user_specific": [
       "sigil-mark/moodboard/sandbox/",
       "sigil-mark/moodboard/**/*.png"
+    ],
+    "archived": [
+      "sigil-mark/.archive/"
     ]
   },
-  "governance": {
-    "justifications_log": "sigil-mark/governance/justifications.log",
-    "amendments_dir": "sigil-mark/governance/amendments/"
+  "directory_structure": {
+    "active": [
+      "sigil-mark/core/",
+      "sigil-mark/hooks/",
+      "sigil-mark/layouts/",
+      "sigil-mark/lenses/",
+      "sigil-mark/providers/",
+      "sigil-mark/types/",
+      "sigil-mark/process/",
+      "sigil-mark/kernel/",
+      "sigil-mark/vocabulary/",
+      "sigil-mark/constitution/",
+      "sigil-mark/moodboard/",
+      "sigil-mark/__tests__/",
+      "sigil-mark/__examples__/",
+      "sigil-mark/scripts/"
+    ],
+    "archived": [
+      "sigil-mark/.archive/v1.0/",
+      "sigil-mark/.archive/v3.0/",
+      "sigil-mark/.archive/v4.0/"
+    ]
   },
   "performance": {
     "workshop_query_ms": 5,
@@ -169,23 +191,27 @@
     "craft_log_ms": 100
   },
   "migration": {
-    "from_version": "6.0.0",
+    "from_version": "7.6.0",
     "migrated_at": "2026-01-10T00:00:00Z",
+    "script": "scripts/migrate-v7.7.sh",
     "changes": [
-      "Survival Engine (auto-promotion with 24h veto)",
-      "Linter Gate (ESLint + TSC + Sigil checks)",
-      "Slot-Based Composition (Gold frames, Draft children)",
-      "Executable Principles (TypeScript hooks/utils)",
-      "CI/CD Offload (GitHub Actions workflows)",
-      "Filesystem Registry (O(1) path-based tier lookup)",
-      "Artifact Model (shared/machine-generated/user-specific)"
+      "Consolidated archives under sigil-mark/.archive/",
+      "Deleted empty directories (canon, codebase, knowledge)",
+      "Archived v3.0 legacy (lens-array, soul-binder, zones, components)",
+      "Archived v4.0 legacy (consultation-chamber, evidence, governance, personas, remote-config, surveys, skills)",
+      "Added migration script for /update command"
     ]
   },
   "deprecated": {
     "governance_dialogs": "Replaced by survival observation",
     "jit_grep_primary": "Now fallback only, workshop is primary",
     "nomination_prs": "Replaced by automatic survival engine",
-    "markdown_principles": "Replaced by executable TypeScript"
+    "markdown_principles": "Replaced by executable TypeScript",
+    "lens_array": "Archived in .archive/v3.0/",
+    "soul_binder": "Archived in .archive/v3.0/",
+    "consultation_chamber": "Archived in .archive/v4.0/",
+    "personas_yaml": "Archived in .archive/v4.0/",
+    "surveys": "Archived in .archive/v4.0/"
   },
   "setup_completed_at": "2026-01-08T00:00:00Z",
   "last_updated": "2026-01-10T00:00:00Z"
