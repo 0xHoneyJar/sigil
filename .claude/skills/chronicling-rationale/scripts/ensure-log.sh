@@ -18,7 +18,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="${1:-$(cd "$SCRIPT_DIR/../../../../.." && pwd)}"
 
 # Path to pending session file
-PENDING_SESSION_PATH="$PROJECT_ROOT/.sigil/.pending-session.json"
+PENDING_SESSION_PATH="$PROJECT_ROOT/grimoires/sigil/state/.pending-session.json"
 
 # Check if pending session exists
 if [[ ! -f "$PENDING_SESSION_PATH" ]]; then

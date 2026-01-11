@@ -29,7 +29,7 @@ generate consistent components even before any real components exist.
 
 ## Output
 
-- `.sigil/seed.yaml` - Selected seed configuration
+- `grimoires/sigil/state/seed.yaml` - Selected seed configuration
 
 ## Seed Selection Flow
 
@@ -37,7 +37,7 @@ generate consistent components even before any real components exist.
 1. Detect empty Sanctuary
 2. Present seed options via AskUserQuestion
 3. User selects seed (or blank)
-4. Write seed to .sigil/seed.yaml
+4. Write seed to grimoires/sigil/state/seed.yaml
 5. Scanning skill uses seed as virtual components
 ```
 

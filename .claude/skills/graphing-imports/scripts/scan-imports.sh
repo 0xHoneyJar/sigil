@@ -6,7 +6,7 @@ set -e
 
 # Configuration
 SRC_DIR="${1:-src}"
-OUTPUT_FILE="${2:-.sigil/imports.yaml}"
+OUTPUT_FILE="${2:-grimoires/sigil/state/imports.yaml}"
 DRY_RUN="${3:-false}"
 
 # Colors for output

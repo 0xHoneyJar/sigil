@@ -87,10 +87,10 @@ export interface EraLogEntry {
 export const DEFAULT_ERA = 'v1';
 
 /** Default eras directory */
-export const ERAS_DIRECTORY = '.sigil/eras';
+export const ERAS_DIRECTORY = 'grimoires/sigil/state/eras';
 
 /** Survival.json path */
-export const SURVIVAL_PATH = '.sigil/survival.json';
+export const SURVIVAL_PATH = 'grimoires/sigil/state/survival.json';
 
 // =============================================================================
 // ERA READING

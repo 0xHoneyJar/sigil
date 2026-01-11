@@ -11,7 +11,7 @@
 set -e
 
 PROJECT_ROOT="${1:-.}"
-SURVIVAL_PATH="$PROJECT_ROOT/.sigil/survival.json"
+SURVIVAL_PATH="$PROJECT_ROOT/grimoires/sigil/state/survival.json"
 SRC_DIR="$PROJECT_ROOT/src"
 
 echo "🌱 Sigil Gardener Scan"

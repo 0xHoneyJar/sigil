@@ -25,7 +25,7 @@ Located at: `scripts/scan-imports.sh`
 2. Filter for external packages (not relative imports)
 3. Extract unique package names
 4. Handle scoped packages (@scope/package)
-5. Write to .sigil/imports.yaml
+5. Write to grimoires/sigil/state/imports.yaml
 
 ### Ripgrep Pattern
 
@@ -38,7 +38,7 @@ rg "from ['\"]([^.'/\"]+)" src/ -o --no-filename | \
 
 ## Output
 
-Writes to `.sigil/imports.yaml`:
+Writes to `grimoires/sigil/state/imports.yaml`:
 
 ```yaml
 # Auto-generated import list

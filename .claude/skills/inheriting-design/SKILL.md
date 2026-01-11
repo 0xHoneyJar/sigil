@@ -189,7 +189,7 @@ Write `sigil-mark/inventory.md`:
 
 ### Step 5: Generate Draft Moodboard
 
-Write `sigil-mark/moodboard.md`:
+Write `grimoires/sigil/moodboard.md`:
 
 ```markdown
 # Product Moodboard
@@ -369,7 +369,7 @@ Scanned:
 
 Generated:
   - sigil-mark/inventory.md (X components)
-  - sigil-mark/moodboard.md (DRAFT)
+  - grimoires/sigil/moodboard.md (DRAFT)
   - sigil-mark/rules.md (DRAFT)
 
 Drafts are marked for human review.

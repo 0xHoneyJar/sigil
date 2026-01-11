@@ -101,7 +101,7 @@ export interface ObservationResult {
 // =============================================================================
 
 /** Survival.json path */
-export const SURVIVAL_PATH = '.sigil/survival.json';
+export const SURVIVAL_PATH = 'grimoires/sigil/state/survival.json';
 
 /** Pattern tag format */
 export const PATTERN_TAG_PREFIX = '// @sigil-pattern:';
@@ -802,7 +802,7 @@ export function observeForHook(
 import * as yaml from 'js-yaml';
 
 /** Taste-key config path */
-export const TASTE_KEY_PATH = '.sigil/taste-key.yaml';
+export const TASTE_KEY_PATH = 'grimoires/sigil/state/taste-key.yaml';
 
 /**
  * Pending promotion entry.

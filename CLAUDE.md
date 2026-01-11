@@ -78,20 +78,20 @@ Sigil is a design context framework that helps AI agents make consistent design 
 | chronicling-rationale | Stop | Craft log generation |
 | auditing-cohesion | /audit | Visual consistency checks |
 
-### Key Files
+### Key Files (v9.0 Grimoire Structure)
 
 | File | Purpose |
 |------|---------|
-| `.sigil/workshop.json` | Pre-computed index (materials, components, physics) |
-| `.sigil/survival-stats.json` | v7.6: Component survival tracking |
-| `.sigil/pending-ops.json` | v7.6: CI/CD operation queue |
-| `.sigil/survival.json` | Pattern tracking (status, occurrences, files) |
-| `.sigil/seed.yaml` | Virtual Sanctuary taste (cold starts) |
-| `.sigil/craft-log/*.md` | Session craft logs |
-| `.sigil/eras/*.json` | Archived era patterns |
-| `sigil-mark/moodboard.md` | Product feel, references |
-| `sigil-mark/rules.md` | Design rules by category |
-| `sigil-mark/vocabulary/vocabulary.yaml` | Term definitions |
+| `grimoires/sigil/constitution/physics.yaml` | Motion timing definitions |
+| `grimoires/sigil/constitution/vocabulary.yaml` | Term definitions |
+| `grimoires/sigil/constitution/constitution.yaml` | Data type → physics bindings |
+| `grimoires/sigil/moodboard/README.md` | Product feel, references |
+| `grimoires/sigil/state/workshop.json` | Pre-computed index (materials, components, physics) |
+| `grimoires/sigil/state/survival-stats.json` | Component survival tracking |
+| `grimoires/sigil/state/pending-ops.json` | CI/CD operation queue |
+| `grimoires/sigil/state/survival.json` | Pattern tracking (status, occurrences, files) |
+| `grimoires/sigil/state/seed.yaml` | Virtual Sanctuary taste (cold starts) |
+| `grimoires/sigil/process/*.ts` | Agent-time utilities (37 modules) |
 | `.sigilrc.yaml` | Zone definitions, physics |
 
 ### v7.6 Executable Principles
@@ -220,7 +220,7 @@ Phase 7: Chronicling
 
 ## Workshop Index
 
-Pre-computed at `.sigil/workshop.json`:
+Pre-computed at `grimoires/sigil/state/workshop.json`:
 
 ```json
 {
@@ -267,7 +267,7 @@ Pre-computed at `.sigil/workshop.json`:
 
 ## Survival Index
 
-Pattern tracking at `.sigil/survival.json`:
+Pattern tracking at `grimoires/sigil/state/survival.json`:
 
 ```json
 {
@@ -426,10 +426,10 @@ Design direction shifts without losing history:
 
 ```bash
 /new-era "Tactile"
-→ Archives current patterns to .sigil/eras/v1.json
+→ Archives current patterns to grimoires/sigil/state/eras/v1.json
 → Creates new era "Tactile"
 → Resets pattern counts (history preserved)
-→ Updates rules.md with era marker
+→ Updates constitution with era marker
 ```
 
 ### Era in Craft Logs
@@ -573,19 +573,31 @@ import { CriticalZone, GlassLayout, MachineryLayout } from 'sigil-mark';
 
 ---
 
-## Directory Structure
+## Directory Structure (v9.0 Grimoire)
 
 ```
-.sigil/
-├── workshop.json        # Pre-computed index
-├── survival-stats.json  # v7.6: Component survival tracking
-├── pending-ops.json     # v7.6: CI/CD operation queue
-├── survival.json        # Pattern tracking
-├── seed.yaml           # Virtual Sanctuary
-├── craft-log/          # Session logs
-│   └── {date}-{component}.md
-└── eras/               # Archived eras
-    └── {era-name}.json
+grimoires/sigil/
+├── constitution/           # Core design laws
+│   ├── constitution.yaml   # Data type → physics bindings
+│   ├── physics.yaml        # Motion timing definitions
+│   ├── vocabulary.yaml     # Term definitions
+│   ├── workflow.yaml       # Workflow rules
+│   └── fidelity.yaml       # Fidelity constraints
+├── moodboard/              # Visual references
+│   ├── README.md           # Product feel
+│   ├── references/         # Design references
+│   └── anti-patterns/      # What to avoid
+├── process/                # Agent-time utilities (37 modules)
+│   ├── survival-engine.ts
+│   ├── linter-gate.ts
+│   ├── physics-validator.ts
+│   └── ...
+└── state/                  # Runtime state (gitignored)
+    ├── workshop.json       # Pre-computed index
+    ├── survival-stats.json # Component survival tracking
+    ├── pending-ops.json    # CI/CD operation queue
+    ├── survival.json       # Pattern tracking
+    └── seed.yaml           # Virtual Sanctuary
 
 src/components/
 ├── gold/               # v7.6: Promoted components
@@ -598,25 +610,11 @@ src/components/
 └── draft/              # Experimental
 
 sigil-mark/
-├── kernel/            # Constitution (unchanged)
+├── core/              # Runtime core (useCriticalAction, physics)
 ├── providers/         # SigilProvider
 ├── hooks/             # useSigilMutation
-├── layouts/           # Zone layouts
-├── process/           # Agent-time utilities (v7.6)
-│   ├── survival-engine.ts      # v7.6: Auto-promotion
-│   ├── linter-gate.ts          # v7.6: Quality gate
-│   ├── filesystem-registry.ts  # v7.6: Tier lookup
-│   ├── workshop-builder.ts
-│   ├── workshop-query.ts
-│   ├── startup-sentinel.ts
-│   ├── physics-validator.ts
-│   ├── seed-manager.ts
-│   ├── era-manager.ts
-│   ├── survival-observer.ts
-│   ├── chronicling-rationale.ts
-│   └── auditing-cohesion.ts
-├── moodboard.md
-└── rules.md
+├── layouts/           # Zone layouts (CriticalZone, GlassLayout)
+└── lenses/            # DefaultLens, StrictLens
 
 .claude/
 ├── skills/
@@ -640,7 +638,7 @@ sigil-mark/
 ## Coexistence with Loa
 
 Sigil and Loa can coexist. They have separate:
-- State zones (sigil-mark/ + .sigil/ vs loa-grimoire/)
+- State zones (grimoires/sigil/ vs grimoires/loa/)
 - Config files (.sigilrc.yaml vs .loa.config.yaml)
 - Skills (design-focused vs workflow-focused)
 
@@ -648,18 +646,16 @@ No automatic cross-loading - developer decides when to reference design context.
 
 ---
 
-## Migration from v5.0
+## v9.0 Migration Notes
 
-See [MIGRATION.md](MIGRATION.md) for migration guide.
-
-Key changes:
-- Added `.sigil/` directory for runtime state
-- Workshop index replaces JIT grep
-- Survival observation replaces governance dialogs
-- Seeds for cold starts
-- Ephemeral inspiration for one-time references
+Key changes from v7.6:
+- Moved kernel configs to `grimoires/sigil/constitution/`
+- Moved moodboard to `grimoires/sigil/moodboard/`
+- Moved process layer to `grimoires/sigil/process/`
+- Moved runtime state to `grimoires/sigil/state/` (gitignored)
+- Updated all skill context paths
 
 ---
 
-*Sigil v7.6.0 "The Living Canon"*
-*Last Updated: 2026-01-10*
+*Sigil v9.0.0 "Core Scaffold"*
+*Last Updated: 2026-01-11*

@@ -3,10 +3,10 @@ zones:
   state:
     paths:
       - sigil-mark/rules.md
-      - sigil-mark/moodboard.md
-      - sigil-mark/moodboard/
+      - grimoires/sigil/moodboard.md
+      - grimoires/sigil/moodboard/
       - sigil-mark/vocabulary/vocabulary.yaml
-      - sigil-mark/kernel/physics.yaml
+      - grimoires/sigil/constitution/physics.yaml
       - .sigilrc.yaml
     permission: read
   output:
@@ -133,7 +133,7 @@ mcp__claude-in-chrome__computer({
 
 ```
 1. Read sigil-mark/rules.md
-2. Read sigil-mark/moodboard.md (for feel reference)
+2. Read grimoires/sigil/moodboard.md (for feel reference)
 3. Read .sigilrc.yaml (for zone definitions)
 4. Load vocabulary if component name matches a term
 ```

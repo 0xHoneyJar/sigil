@@ -767,12 +767,14 @@ context_files:
 
 ### Sprint 2 Exit Criteria
 
-- [ ] `grimoires/sigil/process/` has 39 modules
-- [ ] `grimoires/sigil/state/` has migrated state files
-- [ ] Skills read from grimoire paths
-- [ ] No broken imports in process layer
-- [ ] `sigil-mark/process/` is empty (files moved)
-- [ ] `.sigil/` is empty or removed
+- [x] `grimoires/sigil/process/` has 37 modules (36 .ts + 1 .tsx)
+- [x] `grimoires/sigil/state/` has migrated state files
+- [x] Skills read from grimoire paths
+- [x] No broken imports in process layer
+- [x] `sigil-mark/process/` is empty (files moved)
+- [x] `.sigil/` is removed
+
+**Status:** COMPLETED (2026-01-11) ✅
 
 ---
 

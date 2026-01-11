@@ -106,7 +106,7 @@ function loadFidelity(basePath?: string): FidelityConfig {
 
   const paths = [
     basePath ? join(basePath, 'kernel/fidelity.yaml') : null,
-    join(process.cwd(), 'sigil-mark/kernel/fidelity.yaml'),
+    join(process.cwd(), 'grimoires/sigil/constitution/fidelity.yaml'),
     join(__dirname, '../kernel/fidelity.yaml'),
   ].filter(Boolean) as string[];
 

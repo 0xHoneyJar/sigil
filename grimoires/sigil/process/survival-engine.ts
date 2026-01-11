@@ -82,7 +82,7 @@ export interface SurvivalEngineResult {
 // Configuration
 // ============================================================================
 
-const STATS_FILE = '.sigil/survival-stats.json';
+const STATS_FILE = 'grimoires/sigil/state/survival-stats.json';
 const VETO_WINDOW_HOURS = 24;
 
 const DEFAULT_CRITERIA: SurvivalCriteria = {

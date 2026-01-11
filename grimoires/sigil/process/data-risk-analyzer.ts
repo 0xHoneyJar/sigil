@@ -128,7 +128,7 @@ function loadConstitution(basePath?: string): ConstitutionData {
   // Try to find constitution.yaml
   const paths = [
     basePath ? join(basePath, 'kernel/constitution.yaml') : null,
-    join(process.cwd(), 'sigil-mark/kernel/constitution.yaml'),
+    join(process.cwd(), 'grimoires/sigil/constitution/constitution.yaml'),
     join(__dirname, '../kernel/constitution.yaml'),
   ].filter(Boolean) as string[];
 

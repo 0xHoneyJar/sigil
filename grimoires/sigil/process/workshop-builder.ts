@@ -53,10 +53,10 @@ export function getPackageHash(projectRoot: string): string {
 }
 
 /**
- * Calculate MD5 hash of .sigil/imports.yaml.
+ * Calculate MD5 hash of grimoires/sigil/state/imports.yaml.
  */
 export function getImportsHash(projectRoot: string): string {
-  return getFileHash(path.join(projectRoot, '.sigil', 'imports.yaml'));
+  return getFileHash(path.join(projectRoot, 'grimoires', 'sigil', 'state', 'imports.yaml'));
 }
 
 // =============================================================================
@@ -147,7 +147,7 @@ export function isWorkshopStale(projectRoot: string, workshopPath?: string): boo
 // =============================================================================
 
 /**
- * Read imports list from .sigil/imports.yaml.
+ * Read imports list from grimoires/sigil/state/imports.yaml.
  */
 export function readImportsList(importsPath: string): string[] {
   try {

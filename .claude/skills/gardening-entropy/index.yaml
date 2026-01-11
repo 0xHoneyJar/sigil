@@ -4,10 +4,10 @@ description: "Context health monitoring with drift detection and validation. v4.
 role: "Health Monitor"
 command: /garden
 outputs:
-  - sigil-mark/reports/garden-{date}.yaml
+  - grimoires/sigil/reports/garden-{date}.yaml
 reads:
-  - sigil-mark/moodboard.md
-  - sigil-mark/rules.md
+  - grimoires/sigil/moodboard/README.md
+  - grimoires/sigil/constitution/constitution.yaml
   - sigil-mark/personas/personas.yaml
   - sigil-mark/evidence/
   - sigil-mark/.sigil-observations/feedback/

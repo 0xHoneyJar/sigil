@@ -47,7 +47,7 @@ era_started: "2026-01-09T00:00:00Z"
 When `/new-era` is invoked:
 
 1. **Archive Current Era**:
-   - Create `.sigil/eras/{era-name}.json`
+   - Create `grimoires/sigil/state/eras/{era-name}.json`
    - Copy current survival patterns
    - Add `era_ended` timestamp
    - Mark archive as read-only
@@ -81,7 +81,7 @@ Logs can be filtered by era for historical analysis.
 
 ## Era Archive Format
 
-`.sigil/eras/v1-Flat.json`:
+`grimoires/sigil/state/eras/v1-Flat.json`:
 ```json
 {
   "era": "v1-Flat",
@@ -119,4 +119,4 @@ Current era and historical eras visible in:
 - survival.json (current only)
 - rules.md (all eras)
 - craft logs (per-entry)
-- `.sigil/eras/` directory (archives)
+- `grimoires/sigil/state/eras/` directory (archives)

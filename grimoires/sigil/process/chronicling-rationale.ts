@@ -15,7 +15,7 @@ import * as path from 'path';
 // CONSTANTS
 // =============================================================================
 
-export const CRAFT_LOG_DIR = '.sigil/craft-log';
+export const CRAFT_LOG_DIR = 'grimoires/sigil/state/craft-log';
 
 // =============================================================================
 // TYPES
@@ -400,7 +400,7 @@ export function formatLogList(logs: string[]): string {
 /**
  * Path to pending session file.
  */
-export const PENDING_SESSION_PATH = '.sigil/.pending-session.json';
+export const PENDING_SESSION_PATH = 'grimoires/sigil/state/.pending-session.json';
 
 /**
  * Hook result type for bash script bridge.

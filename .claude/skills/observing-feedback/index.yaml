@@ -38,9 +38,9 @@ outputs:
     description: Feedback report with questions and recommendations
 
 checks:
-  - path: sigil-mark/rules.md
-    description: Load design rules for analysis
-  - path: sigil-mark/moodboard.md
+  - path: grimoires/sigil/constitution/constitution.yaml
+    description: Load design constitution for analysis
+  - path: grimoires/sigil/moodboard/README.md
     description: Load moodboard for feel comparison
   - path: .sigilrc.yaml
     description: Load zone definitions

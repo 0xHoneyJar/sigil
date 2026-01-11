@@ -3,7 +3,7 @@ zones:
   state:
     paths:
       - sigil-mark/rules.md
-      - sigil-mark/moodboard.md
+      - grimoires/sigil/moodboard.md
       - sigil-mark/vocabulary/
       - .sigilrc.yaml
     permission: read-write
@@ -95,7 +95,7 @@ Now let's define your design rules.
 ## Pre-Flight Checks
 
 1. **Auto-Setup**: If `.sigil-setup-complete` missing, initialize Sigil
-2. **Moodboard Context**: Read `sigil-mark/moodboard.md` for context (optional)
+2. **Moodboard Context**: Read `grimoires/sigil/moodboard.md` for context (optional)
 3. **Personas Context**: Read `sigil-mark/personas/personas.yaml` for persona list
 4. **Existing Rules**: Check if rules.md has content (offer update vs replace)
 

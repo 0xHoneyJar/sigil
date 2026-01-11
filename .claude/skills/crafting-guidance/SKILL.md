@@ -2,11 +2,11 @@
 zones:
   state:
     paths:
-      - sigil-mark/moodboard/
-      - sigil-mark/moodboard.md
+      - grimoires/sigil/moodboard/
+      - grimoires/sigil/moodboard.md
       - sigil-mark/rules.md
       - sigil-mark/vocabulary/vocabulary.yaml
-      - sigil-mark/kernel/physics.yaml
+      - grimoires/sigil/constitution/physics.yaml
       - sigil-mark/constitution/protected-capabilities.yaml
       - sigil-mark/personas/personas.yaml
       - sigil-mark/consultation-chamber/decisions/
@@ -100,7 +100,7 @@ Proceeding with default context...
 3. **Zone Config**: Load zones from `.sigilrc.yaml`
 4. **Personas**: Load from `sigil-mark/personas/personas.yaml`
 5. **Vocabulary**: Load from `sigil-mark/vocabulary/vocabulary.yaml`
-6. **Physics**: Load from `sigil-mark/kernel/physics.yaml` (v4.1)
+6. **Physics**: Load from `grimoires/sigil/constitution/physics.yaml` (v4.1)
 7. **Philosophy**: Load from `sigil-mark/philosophy/philosophy.yaml`
 8. **Decisions**: Load from `sigil-mark/consultation-chamber/decisions/`
 

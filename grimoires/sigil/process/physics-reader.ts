@@ -240,7 +240,7 @@ export const DEFAULT_PHYSICS_CONFIG: PhysicsConfig = {
 /**
  * Default path to the physics file.
  */
-export const DEFAULT_PHYSICS_PATH = 'sigil-mark/kernel/physics.yaml';
+export const DEFAULT_PHYSICS_PATH = 'grimoires/sigil/constitution/physics.yaml';
 
 // =============================================================================
 // CACHE

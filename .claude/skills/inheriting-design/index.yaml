@@ -12,9 +12,9 @@ examples:
 inputs: []
 
 outputs:
-  - path: sigil-mark/inventory.md
+  - path: grimoires/sigil/inventory.md
     description: Component inventory
-  - path: sigil-mark/moodboard.md
+  - path: grimoires/sigil/moodboard/README.md
     description: Draft moodboard (needs review)
-  - path: sigil-mark/rules.md
+  - path: grimoires/sigil/constitution/rules.yaml
     description: Draft rules (needs review)

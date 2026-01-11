@@ -21,7 +21,7 @@ an audit trail that explains why patterns were chosen.
 - Runs at end of /craft session (Stop hook)
 - Non-blocking (never interrupts generation)
 - Silent (no user prompts)
-- Writes to .sigil/craft-log/
+- Writes to grimoires/sigil/state/craft-log/
 
 ## Craft Log Format
 
@@ -56,9 +56,9 @@ Era: v1
 
 ## Output Path
 
-`.sigil/craft-log/{date}-{component}.md`
+`grimoires/sigil/state/craft-log/{date}-{component}.md`
 
-Example: `.sigil/craft-log/2026-01-08-ClaimButton.md`
+Example: `grimoires/sigil/state/craft-log/2026-01-08-ClaimButton.md`
 
 ## Log Sections
 

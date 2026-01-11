@@ -853,7 +853,7 @@ export function validatePhysicsForHook(
 ): HookValidationResult {
   // Load workshop if available
   let workshop: Workshop | undefined;
-  const workshopPath = `${projectRoot}/.sigil/workshop.json`;
+  const workshopPath = `${projectRoot}/grimoires/sigil/state/workshop.json`;
 
   try {
     workshop = loadWorkshop(workshopPath);

@@ -402,7 +402,7 @@ function capitalize(s: string): string {
 // v6.1: SURVIVAL PATTERN SCANNING
 // =============================================================================
 
-const SURVIVAL_PATH = '.sigil/survival.json';
+const SURVIVAL_PATH = 'grimoires/sigil/state/survival.json';
 const SCAN_PATHS = ['src/', 'sigil-mark/'];
 const SURVIVING_THRESHOLD = 3;
 const CANONICAL_CANDIDATE_THRESHOLD = 5;

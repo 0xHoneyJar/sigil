@@ -27,7 +27,7 @@ import { ComponentTier } from '../types/workshop';
 /**
  * Default path for seed configuration.
  */
-export const DEFAULT_SEED_PATH = '.sigil/seed.yaml';
+export const DEFAULT_SEED_PATH = 'grimoires/sigil/state/seed.yaml';
 
 /**
  * Path to seed library.
@@ -39,7 +39,7 @@ export const SEED_LIBRARY_PATH = '.claude/skills/seeding-sanctuary/seeds';
 // =============================================================================
 
 /**
- * Load seed from .sigil/seed.yaml.
+ * Load seed from grimoires/sigil/state/seed.yaml.
  */
 export function loadSeed(projectRoot: string = process.cwd()): Seed | null {
   const seedPath = path.join(projectRoot, DEFAULT_SEED_PATH);
@@ -78,7 +78,7 @@ export function loadSeedFromLibrary(
 }
 
 /**
- * Save seed to .sigil/seed.yaml.
+ * Save seed to grimoires/sigil/state/seed.yaml.
  */
 export function saveSeed(seed: Seed, projectRoot: string = process.cwd()): boolean {
   const seedPath = path.join(projectRoot, DEFAULT_SEED_PATH);

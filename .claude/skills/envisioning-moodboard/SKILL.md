@@ -2,8 +2,8 @@
 zones:
   state:
     paths:
-      - sigil-mark/moodboard/
-      - sigil-mark/moodboard.md
+      - grimoires/sigil/moodboard/
+      - grimoires/sigil/moodboard.md
       - sigil-mark/personas/
       - sigil-mark/personas/personas.yaml
       - sigil-mark/evidence/
@@ -85,7 +85,7 @@ I notice Sigil hasn't been set up yet. I'll initialize it now...
 
 Created:
   - sigil-mark/
-  - sigil-mark/moodboard/
+  - grimoires/sigil/moodboard/
   - sigil-mark/personas/
   - sigil-mark/evidence/
   - .sigilrc.yaml
@@ -100,7 +100,7 @@ Now let's capture your product's soul.
 1. **Auto-Setup**: If `.sigil-setup-complete` missing, initialize Sigil
 2. **Existing State**: Check for existing files and offer to update vs replace
 3. **Section Focus**: If section argument provided, skip other sections
-4. **Moodboard Folder**: Check if `sigil-mark/moodboard/` exists for v3.1 inspiration collection
+4. **Moodboard Folder**: Check if `grimoires/sigil/moodboard/` exists for v3.1 inspiration collection
 
 ---
 
@@ -409,7 +409,7 @@ Prompt users about the moodboard folder:
 ```
 Sigil supports a moodboard folder for collecting design inspiration:
 
-  sigil-mark/moodboard/
+  grimoires/sigil/moodboard/
   ├── references/     → Product screenshots, flows (organize by source)
   ├── articles/       → Design article syntheses
   ├── anti-patterns/  → Patterns to avoid
@@ -430,7 +430,7 @@ Would you like to:
 
 ### Moodboard Output
 
-Write to `sigil-mark/moodboard.md`:
+Write to `grimoires/sigil/moodboard.md`:
 
 ```markdown
 # Product Moodboard
@@ -605,7 +605,7 @@ multiSelect: false
 Product Soul Captured!
 
 Written to:
-  - sigil-mark/moodboard.md
+  - grimoires/sigil/moodboard.md
   - sigil-mark/personas/personas.yaml
   [- sigil-mark/evidence/analytics-2026-01-07.yaml]
 
@@ -621,7 +621,7 @@ Personas Created:
   - watcher (observation, low trust)
 
 Moodboard Folder:
-  sigil-mark/moodboard/ is ready for inspiration artifacts.
+  grimoires/sigil/moodboard/ is ready for inspiration artifacts.
   Drop screenshots, articles, and references anytime.
 
 Next steps:

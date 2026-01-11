@@ -20,9 +20,9 @@ inputs:
     description: "Optional section to focus on (moodboard, values, lenses)"
 
 outputs:
-  - path: sigil-mark/moodboard.md
+  - path: grimoires/sigil/moodboard/README.md
     description: Product moodboard with design context
-  - path: sigil-mark/soul-binder/immutable-values.yaml
+  - path: grimoires/sigil/constitution/immutable-values.yaml
     description: Core values with enforcement rules
-  - path: sigil-mark/lens-array/lenses.yaml
+  - path: grimoires/sigil/constitution/lenses.yaml
     description: User persona lens definitions
