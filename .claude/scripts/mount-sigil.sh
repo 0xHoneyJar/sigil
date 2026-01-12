@@ -25,7 +25,8 @@ SIGIL_HOME="${SIGIL_HOME:-$HOME/.sigil/sigil}"
 SIGIL_REPO="${SIGIL_REPO:-https://github.com/0xHoneyJar/sigil.git}"
 SIGIL_BRANCH="${SIGIL_BRANCH:-main}"
 VERSION_FILE=".sigil-version.json"
-SIGIL_VERSION="11.0.0"
+SIGIL_VERSION="11.0.1"
+AUTO_YES=false
 
 # === Argument Parsing ===
 while [[ $# -gt 0 ]]; do
@@ -38,6 +39,10 @@ while [[ $# -gt 0 ]]; do
       SIGIL_HOME="$2"
       shift 2
       ;;
+    -y|--yes)
+      AUTO_YES=true
+      shift
+      ;;
     -h|--help)
       echo "Usage: mount-sigil.sh [OPTIONS]"
       echo ""
@@ -46,16 +51,19 @@ while [[ $# -gt 0 ]]; do
       echo "Options:"
       echo "  --branch <name>   Sigil branch to use (default: main)"
       echo "  --home <path>     Sigil home directory (default: ~/.sigil/sigil)"
+      echo "  -y, --yes         Auto-confirm updates (for piped installation)"
       echo "  -h, --help        Show this help message"
       echo ""
       echo "What this does:"
       echo "  1. Creates .claude/rules/ with Sigil physics instructions"
-      echo "  2. Creates grimoires/sigil/ with constitution.yaml"
-      echo "  3. Creates examples/ with reference components"
-      echo "  4. NEVER touches existing CLAUDE.md in your repo"
+      echo "  2. Creates .claude/skills/ with mason, gardener, diagnostician"
+      echo "  3. Creates grimoires/sigil/ with constitution.yaml"
+      echo "  4. Creates examples/ with reference components"
+      echo "  5. NEVER touches existing CLAUDE.md in your repo"
       echo ""
       echo "Examples:"
       echo "  curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash"
+      echo "  curl ... | bash -s -- -y    # Auto-confirm updates"
       exit 0
       ;;
     *)
@@ -76,9 +84,13 @@ preflight() {
   if [[ -f "$VERSION_FILE" ]]; then
     local existing=$(jq -r '.version // "unknown"' "$VERSION_FILE" 2>/dev/null || echo "unknown")
     warn "Sigil is already mounted (version: $existing)"
-    read -p "Update Sigil? This will refresh .claude/rules/ files. (y/N) " -n 1 -r
-    echo ""
-    [[ $REPLY =~ ^[Yy]$ ]] || { log "Aborted."; exit 0; }
+    if [[ "$AUTO_YES" == "true" ]]; then
+      log "Auto-confirming update (-y flag)"
+    else
+      read -p "Update Sigil? This will refresh .claude/rules/ and skills. (y/N) " -n 1 -r </dev/tty
+      echo ""
+      [[ $REPLY =~ ^[Yy]$ ]] || { log "Aborted."; exit 0; }
+    fi
   fi
 
   # Check for existing CLAUDE.md (info only, we don't touch it)
@@ -167,15 +179,39 @@ install_examples() {
   fi
 }
 
+# === Install Skills ===
+install_skills() {
+  step "Installing Sigil skills..."
+
+  local skills=("mason" "gardener" "diagnostician")
+  local installed=0
+
+  for skill in "${skills[@]}"; do
+    if [[ -d "$SIGIL_HOME/.claude/skills/$skill" ]]; then
+      mkdir -p ".claude/skills/$skill"
+      cp "$SIGIL_HOME/.claude/skills/$skill/"* ".claude/skills/$skill/" 2>/dev/null || true
+      log "  Installed $skill skill"
+      ((installed++))
+    fi
+  done
+
+  log "Installed $installed skills"
+}
+
 # === Install Commands ===
 install_commands() {
-  step "Installing /craft command..."
+  step "Installing commands..."
 
   mkdir -p .claude/commands
 
   if [[ -f "$SIGIL_HOME/.claude/commands/craft.md" ]]; then
     cp "$SIGIL_HOME/.claude/commands/craft.md" ".claude/commands/craft.md"
     log "  Installed /craft command"
+  fi
+
+  if [[ -f "$SIGIL_HOME/.claude/commands/garden.md" ]]; then
+    cp "$SIGIL_HOME/.claude/commands/garden.md" ".claude/commands/garden.md"
+    log "  Installed /garden command"
   fi
 }
 
@@ -203,7 +239,7 @@ EOF
 main() {
   echo ""
   log "======================================================================="
-  log "  Sigil v11 — Pure Craft"
+  log "  Sigil v11.0.1 — Pure Craft"
   log "  Design Physics for Code Generation"
   log "======================================================================="
   log "  Branch: $SIGIL_BRANCH"
@@ -212,6 +248,7 @@ main() {
   preflight
   setup_sigil_home
   install_rules
+  install_skills
   install_constitution
   install_examples
   install_commands
@@ -223,21 +260,23 @@ main() {
   log "======================================================================="
   echo ""
   info "What was installed:"
-  info "  .claude/rules/sigil-*.md  -> Physics instructions (auto-discovered)"
-  info "  grimoires/sigil/          -> Constitution config"
-  info "  examples/                 -> Reference components"
-  info "  .claude/commands/craft.md -> /craft command"
-  info "  .sigil-version.json       -> Version tracking"
+  info "  .claude/rules/sigil-*.md   -> Physics (auto-discovered)"
+  info "  .claude/skills/            -> mason, gardener, diagnostician"
+  info "  .claude/commands/          -> /craft, /garden"
+  info "  grimoires/sigil/           -> Constitution config"
+  info "  examples/                  -> Reference components"
+  info "  .sigil-version.json        -> Version tracking"
   echo ""
   info "What was NOT touched:"
-  info "  CLAUDE.md                 -> Your existing file is preserved!"
+  info "  CLAUDE.md                  -> Your existing file is preserved!"
   echo ""
   info "Usage:"
-  info "  /craft \"claim button\"     -> Generates with 800ms pessimistic physics"
-  info "  /craft \"like button\"      -> Generates with 200ms optimistic physics"
-  info "  /craft \"dark mode toggle\" -> Generates with 100ms immediate physics"
+  info "  /craft \"claim button\"      -> Mason generates with 800ms pessimistic"
+  info "  /craft \"like button\"       -> Mason generates with 200ms optimistic"
+  info "  /garden                    -> Gardener reports pattern authority"
+  info "  \"dialog flickers\"          -> Diagnostician debugs issues"
   echo ""
-  info "The physics are applied automatically. No configuration needed."
+  info "Skills are prompt-based. No configuration needed."
   echo ""
 }
 
