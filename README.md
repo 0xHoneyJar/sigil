@@ -219,26 +219,81 @@ vocabulary:
 
 ---
 
+## Skills
+
+Sigil ships with three skills that orchestrate specialized workflows:
+
+### Mason — Generation
+
+```
+/craft "trustworthy claim button"
+```
+
+Mason generates components with correct physics:
+1. Parses intent from natural language
+2. Determines effect type (financial, destructive, standard, local)
+3. Searches for canonical patterns in codebase
+4. Generates with correct physics applied
+
+No questions asked. Physics inferred automatically.
+
+### Gardener — Governance
+
+```
+/garden
+```
+
+Gardener reports on pattern authority:
+- **Gold** (10+ imports, 14+ days): Canonical patterns
+- **Silver** (5+ imports): Established patterns
+- **Draft** (<5 imports): Experimental
+
+Authority is computed from usage, not configuration.
+
+### Diagnostician — Debugging
+
+```
+"my dialog flickers on mobile"
+```
+
+Diagnostician matches symptoms to patterns:
+- Hydration mismatches
+- Dialog/modal issues
+- Performance problems
+- Layout shift (CLS)
+- Server component errors
+- Animation glitches
+
+Never asks "check the console." Just diagnoses and provides solutions.
+
+---
+
 ## Architecture
 
 ```
-.claude/rules/
-├── sigil-physics.md       # Core physics table + detection rules
-└── sigil-examples.md      # Reference examples for each effect
+.claude/
+├── rules/
+│   ├── sigil-physics.md       # Core physics + detection rules
+│   └── sigil-examples.md      # Reference examples
+├── skills/
+│   ├── mason/                 # Generation skill
+│   ├── gardener/              # Governance skill
+│   └── diagnostician/         # Debugging skill
+└── commands/
+    ├── craft.md               # /craft → mason
+    └── garden.md              # /garden → gardener
 
 grimoires/sigil/
-└── constitution.yaml      # Effects, authority, vocabulary, animations
+└── constitution.yaml          # Effects, authority, vocabulary
 
 examples/components/
-├── ClaimButton.tsx        # Financial mutation
-├── DeleteButton.tsx       # Soft delete with undo
-├── LikeButton.tsx         # Standard mutation
-└── ThemeToggle.tsx        # Local state
+├── ClaimButton.tsx            # Financial mutation
+├── DeleteButton.tsx           # Soft delete with undo
+├── LikeButton.tsx             # Standard mutation
+└── ThemeToggle.tsx            # Local state
 ```
 
-**Total:** ~650 lines of markdown/yaml + 4 example components.
-
-No runtime. No hooks. No build step. Just prompts.
+Skills are prompt-based workflows. No runtime, no hooks, no build step.
 
 ---
 

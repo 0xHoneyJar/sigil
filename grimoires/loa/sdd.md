@@ -1,740 +1,627 @@
-# Software Design Document: Sigil v9.1 "Migration Debt Zero"
+# Software Design Document: Sigil v10.1 "Usage Reality"
 
-**Version:** 9.1.0
-**Codename:** Migration Debt Zero
+**Version:** 10.1.0
 **Status:** SDD Complete
 **Date:** 2026-01-11
-**Supersedes:** v9.0.0 "Core Scaffold" SDD
-**Based on:** PRD v9.1.0
-**Sources:** MIGRATION_AUDIT_REPORT.md, FULL_TECHNICAL_AUDIT.md, migrate-to-grimoire.sh
+**PRD Reference:** grimoires/loa/prd.md
+**Architecture:** Hooks-Based Skill Enhancement
 
 ---
 
 ## 1. Executive Summary
 
-This document describes the technical approach for completing the v9.0 migration. The audits reveal:
+This SDD describes the technical architecture for Sigil v10.1, which bridges the gap between the existing TypeScript library (`src/lib/sigil/`) and Claude Code skills using the **hooks system**.
 
-| Issue | Count | Impact |
-|-------|-------|--------|
-| Hardcoded `sigil-mark/` references | 81 | Agent loads wrong paths |
-| Version numbers in use | 6+ | Version confusion |
-| Missing referenced files | 6 | Skills fail to load |
-| Phantom skill references | 3 | Skill points to non-existent files |
-| Old `sigil-mark/` directory | Exists | Contains orphaned files |
+**Key Architectural Decisions:**
+1. **Hooks as Bridge** — SessionStart and PreToolUse hooks inject context and validate output
+2. **Skills as Readers** — Skills read library modules for patterns, not execute them
+3. **Bash as Runtime** — Shell scripts compute values (import counts, stability days)
+4. **JSON Context** — Accumulated context stored in `.context/` directory
 
-### 1.1 Architecture Philosophy
-
-This is a **path migration**, not a feature build:
-
-```
-NO new components.
-NO new features.
-NO new APIs.
-
-ONLY path updates.
-ONLY file moves.
-ONLY version consolidation.
-```
-
-### 1.2 Scope
-
-| In Scope | Out of Scope |
-|----------|--------------|
-| Fix 81 path references | Runtime layer creation |
-| Move orphaned files | New features |
-| Consolidate version numbers | Documentation overhaul |
-| Update skill paths | Component creation |
-| Delete legacy `sigil-mark/` | Phase 2 features |
+**Components:**
+- 2 hooks (SessionStart, PreToolUse)
+- 3 enhanced skills (Mason, Gardener, Diagnostician)
+- 4 bash helper scripts
+- 1 context accumulator
 
 ---
 
 ## 2. System Architecture
 
-### 2.1 Current State (Broken)
+### 2.1 High-Level Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        CURRENT STATE (v9.0)                          │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  ┌──────────────────┐         ┌──────────────────┐                  │
-│  │   Agent/Skills   │────────▶│  sigil-mark/     │ ❌ WRONG PATH    │
-│  │                  │ reads   │  (legacy)        │                  │
-│  │ SKILL.md says:   │         │                  │                  │
-│  │ "sigil-mark/..." │         └──────────────────┘                  │
-│  └──────────────────┘                                               │
-│                                                                      │
-│  ┌──────────────────┐         ┌──────────────────┐                  │
-│  │   Process Layer  │────────▶│  sigil-mark/     │ ❌ WRONG PATH    │
-│  │                  │ refs    │  (doesn't exist) │                  │
-│  │ DEFAULT_PATH =   │         │                  │                  │
-│  │ "sigil-mark/..." │         └──────────────────┘                  │
-│  └──────────────────┘                                               │
-│                                                                      │
-│  ┌──────────────────┐                                               │
-│  │ grimoires/sigil/ │ ✅ EXISTS but unused                          │
-│  │ └── constitution │                                               │
-│  │ └── moodboard    │                                               │
-│  │ └── process      │                                               │
-│  └──────────────────┘                                               │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           CLAUDE CODE SESSION                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────────┐     ┌─────────────────────────────────────────┐   │
+│  │   SessionStart      │     │  SKILLS LAYER                           │   │
+│  │   Hook              │────▶│  ┌───────────┐ ┌───────────┐ ┌────────┐ │   │
+│  │   sigil-init.sh     │     │  │  Mason    │ │ Gardener  │ │ Diag.  │ │   │
+│  │   - Inject physics  │     │  │  /craft   │ │ /garden   │ │ errors │ │   │
+│  │   - Inject authority│     │  └───────────┘ └───────────┘ └────────┘ │   │
+│  └─────────────────────┘     └─────────────────────────────────────────┘   │
+│                                              │                              │
+│                                              ▼                              │
+│  ┌─────────────────────┐     ┌─────────────────────────────────────────┐   │
+│  │   PreToolUse        │     │  LIBRARY LAYER (Read-Only)              │   │
+│  │   Hook              │◀───│  ┌───────────────────────────────────┐   │   │
+│  │   validate-physics  │     │  │ src/lib/sigil/                    │   │   │
+│  │   - Check timing    │     │  │ - physics.ts    - context.ts     │   │   │
+│  │   - Check sync      │     │  │ - survival.ts   - ast-reader.ts  │   │   │
+│  │   - Warn on error   │     │  │ - search.ts     - diagnostician.ts│  │   │
+│  └─────────────────────┘     │  └───────────────────────────────────┘   │   │
+│                              └─────────────────────────────────────────┘   │
+│                                              │                              │
+│                                              ▼                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  BASH HELPERS                                                        │   │
+│  │  ┌────────────────┐  ┌─────────────────┐  ┌───────────────────────┐ │   │
+│  │  │ count-imports  │  │ check-stability │  │ validate-physics.sh  │ │   │
+│  │  │ .sh            │  │ .sh             │  │ (PreToolUse)         │ │   │
+│  │  └────────────────┘  └─────────────────┘  └───────────────────────┘ │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                              │                              │
+│                                              ▼                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  CONFIGURATION LAYER                                                 │   │
+│  │  ┌─────────────────────────┐  ┌────────────────────────────────────┐ │   │
+│  │  │ grimoires/sigil/        │  │ .claude/settings.local.json       │ │   │
+│  │  │ - constitution.yaml     │  │ - hooks configuration             │ │   │
+│  │  │ - authority.yaml        │  │                                    │ │   │
+│  │  │ - .context/             │  │                                    │ │   │
+│  │  └─────────────────────────┘  └────────────────────────────────────┘ │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Target State (v9.1)
+### 2.2 Data Flow
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        TARGET STATE (v9.1)                           │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│  ┌──────────────────┐         ┌──────────────────┐                  │
-│  │   Agent/Skills   │────────▶│ grimoires/sigil/ │ ✅ CORRECT       │
-│  │                  │ reads   │                  │                  │
-│  │ SKILL.md says:   │         │ └── constitution │                  │
-│  │ "grimoires/..."  │         │ └── moodboard    │                  │
-│  └──────────────────┘         └──────────────────┘                  │
-│                                                                      │
-│  ┌──────────────────┐         ┌──────────────────┐                  │
-│  │   Process Layer  │────────▶│ grimoires/sigil/ │ ✅ CORRECT       │
-│  │                  │ refs    │ └── process      │                  │
-│  │ DEFAULT_PATH =   │         │ └── state        │                  │
-│  │ "grimoires/..."  │         │                  │                  │
-│  └──────────────────┘         └──────────────────┘                  │
-│                                                                      │
-│  ┌──────────────────┐                                               │
-│  │ sigil-mark/      │ ❌ DELETED                                    │
-│  └──────────────────┘                                               │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 3. Technical Approach
-
-### 3.1 Strategy: Find and Replace
-
-The migration is fundamentally a global find-and-replace with validation:
-
-```bash
-# The core operation
-sed -i 's|sigil-mark/|grimoires/sigil/|g' <file>
-```
-
-With caveats:
-1. Some paths need restructuring (e.g., `sigil-mark/vocabulary/` → `grimoires/sigil/constitution/`)
-2. Some referenced files don't exist and need creation
-3. Some references are to phantom features and need removal
-
-### 3.2 Path Mapping Table
-
-| Old Path | New Path | Action |
-|----------|----------|--------|
-| `sigil-mark/constitution/` | `grimoires/sigil/constitution/` | Direct map |
-| `sigil-mark/moodboard/` | `grimoires/sigil/moodboard/` | Direct map |
-| `sigil-mark/process/` | `grimoires/sigil/process/` | Direct map |
-| `sigil-mark/vocabulary/` | `grimoires/sigil/constitution/` | Merge into constitution |
-| `sigil-mark/personas/` | `grimoires/sigil/constitution/` | Merge into constitution |
-| `sigil-mark/kernel/` | `grimoires/sigil/constitution/` | Merge into constitution |
-| `sigil-mark/governance/` | `grimoires/sigil/state/` | Move to state |
-| `sigil-mark/consultation-chamber/` | `grimoires/sigil/constitution/` | Merge into constitution |
-| `sigil-mark/soul-binder/` | N/A | **DELETE** - phantom feature |
-| `sigil-mark/lens-array/` | N/A | **DELETE** - phantom feature |
-| `sigil-mark/surveys/` | N/A | **DELETE** - phantom feature |
-
-### 3.3 File Categories
-
-#### Category A: Direct Path Update
-Files where only the path prefix changes:
-
-```typescript
-// Before
-export const DEFAULT_MOODBOARD_PATH = 'sigil-mark/moodboard';
-// After
-export const DEFAULT_MOODBOARD_PATH = 'grimoires/sigil/moodboard';
-```
-
-#### Category B: Path Restructure
-Files where the path structure changes:
-
-```typescript
-// Before
-export const DEFAULT_VOCABULARY_PATH = 'sigil-mark/vocabulary/vocabulary.yaml';
-// After
-export const DEFAULT_VOCABULARY_PATH = 'grimoires/sigil/constitution/vocabulary.yaml';
-```
-
-#### Category C: Phantom Reference Removal
-References to non-existent features:
-
-```yaml
-# Before
-checks:
-  - path: sigil-mark/soul-binder/immutable-values.yaml
-# After
-# (line deleted - file doesn't exist)
+┌──────────────────────────────────────────────────────────────────────────┐
+│ 1. SESSION START                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│ sigil-init.sh executes                                                    │
+│ ┌──────────────────────────────────────────────────────────────────────┐ │
+│ │ Output to Claude's context:                                          │ │
+│ │ === SIGIL PHYSICS CONTEXT ===                                        │ │
+│ │ version: "10.1"                                                      │ │
+│ │ effect_physics:                                                      │ │
+│ │   mutation: { sync: pessimistic, timing: 800 }                       │ │
+│ │   query: { sync: optimistic, timing: 150 }                           │ │
+│ │   ...                                                                │ │
+│ │ ---                                                                  │ │
+│ │ gold: { min_imports: 10, min_stability_days: 14 }                    │ │
+│ │ silver: { min_imports: 5 }                                           │ │
+│ └──────────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│ 2. USER INVOKES /craft "claim button"                                     │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│ Mason Skill Activates                                                     │
+│ ┌──────────────────────────────────────────────────────────────────────┐ │
+│ │ 1. Read grimoires/sigil/constitution.yaml                            │ │
+│ │ 2. Parse "claim button" → { mutation: true, financial: true }        │ │
+│ │ 3. Apply physics decision tree → pessimistic, 800ms                  │ │
+│ │ 4. Search for canonical patterns in src/components/                  │ │
+│ │ 5. Generate component with useMotion('deliberate')                   │ │
+│ └──────────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│ 3. CLAUDE ATTEMPTS Edit/Write TOOL                                        │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│ PreToolUse Hook: validate-physics.sh                                      │
+│ ┌──────────────────────────────────────────────────────────────────────┐ │
+│ │ Input: Tool name, file path, content                                 │ │
+│ │ Process:                                                             │ │
+│ │   - Check for useMotion() calls                                      │ │
+│ │   - Verify timing matches effect type                                │ │
+│ │   - Check confirmation flow for financial mutations                  │ │
+│ │ Output:                                                              │ │
+│ │   - Pass: Allow tool execution                                       │ │
+│ │   - Warn: Show warning, allow execution                              │ │
+│ │   - Block: Prevent execution (future)                                │ │
+│ └──────────────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│ 4. FILE WRITTEN, CONTEXT UPDATED                                          │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 4. Component Design
+## 3. Component Design
 
-### 4.1 Process Layer Updates
+### 3.1 Hooks Configuration
 
-**Files requiring update (11 modules):**
-
-| File | Change Type |
-|------|-------------|
-| `constitution-reader.ts` | Category B (restructure) |
-| `moodboard-reader.ts` | Category A (direct) |
-| `persona-reader.ts` | Category B (restructure) |
-| `vocabulary-reader.ts` | Category B (restructure) |
-| `decision-reader.ts` | Category B (restructure) |
-| `philosophy-reader.ts` | Category B (restructure) |
-| `vibe-check-reader.ts` | Category C (remove) |
-| `lens-array-reader.ts` | Category C (remove) |
-| `governance-logger.ts` | Category B (restructure) |
-| `agent-orchestration.ts` | Category B (restructure) |
-| `garden-command.ts` | Category A (direct) |
-
-**Update Pattern:**
-
-```typescript
-// grimoires/sigil/process/constitution-reader.ts
-
-// BEFORE
-export const DEFAULT_CONSTITUTION_PATH = 'sigil-mark/constitution/protected-capabilities.yaml';
-
-// AFTER
-export const DEFAULT_CONSTITUTION_PATH = 'grimoires/sigil/constitution/protected-capabilities.yaml';
-```
-
-### 4.2 Skill Updates
-
-**File: `.claude/skills/crafting-guidance/SKILL.md`**
-
-```yaml
-# BEFORE (broken)
-zones:
-  state:
-    paths:
-      - sigil-mark/rules.md
-      - sigil-mark/vocabulary/vocabulary.yaml
-      - sigil-mark/constitution/protected-capabilities.yaml
-      - sigil-mark/personas/personas.yaml
-      - sigil-mark/consultation-chamber/decisions/
-      - sigil-mark/evidence/
-      - sigil-mark/philosophy/philosophy.yaml
-
-# AFTER (fixed)
-zones:
-  state:
-    paths:
-      - grimoires/sigil/constitution/rules.md
-      - grimoires/sigil/constitution/vocabulary.yaml
-      - grimoires/sigil/constitution/protected-capabilities.yaml
-      - grimoires/sigil/constitution/personas.yaml
-      - grimoires/sigil/constitution/decisions/
-      - grimoires/sigil/moodboard/evidence/
-      - grimoires/sigil/constitution/philosophy.yaml
-```
-
-**File: `.claude/skills/crafting-guidance/index.yaml`**
-
-```yaml
-# BEFORE (phantom references)
-checks:
-  - path: sigil-mark/soul-binder/immutable-values.yaml
-  - path: sigil-mark/soul-binder/canon-of-flaws.yaml
-  - path: sigil-mark/lens-array/lenses.yaml
-
-# AFTER (removed)
-# (checks section removed or emptied - files don't exist)
-```
-
-### 4.3 CLAUDE.md Updates
-
-**Key sections to update:**
-
-```markdown
-# BEFORE
-| `sigil-mark/process/survival-engine.ts` | Auto-promotion engine |
-
-# AFTER
-| `grimoires/sigil/process/survival-engine.ts` | Auto-promotion engine |
-```
-
-```markdown
-# BEFORE
-sigil-mark/
-├── core/
-├── providers/
-
-# AFTER
-grimoires/sigil/
-├── constitution/
-├── moodboard/
-├── process/
-├── state/
-```
-
-### 4.4 tsconfig.json Updates
+**File:** `.claude/settings.local.json`
 
 ```json
-// BEFORE (broken)
 {
-  "compilerOptions": {
-    "paths": {
-      "@sigil/recipes/*": ["sigil-mark/recipes/*"],
-      "@sigil/hooks": ["sigil-mark/hooks/index.ts"],
-      "@sigil/hooks/*": ["sigil-mark/hooks/*"],
-      "@sigil/core/*": ["sigil-mark/core/*"]
+  "hooks": {
+    "SessionStart": [
+      {
+        "script": ".claude/scripts/sigil-init.sh",
+        "timeout": 5000,
+        "description": "Inject Sigil physics context"
+      }
+    ],
+    "PreToolUse": {
+      "Edit": [
+        {
+          "script": ".claude/scripts/validate-physics.sh",
+          "timeout": 3000,
+          "description": "Validate physics compliance"
+        }
+      ],
+      "Write": [
+        {
+          "script": ".claude/scripts/validate-physics.sh",
+          "timeout": 3000,
+          "description": "Validate physics compliance"
+        }
+      ]
     }
-  },
-  "include": ["sigil-mark/**/*"]
-}
-
-// AFTER (fixed)
-{
-  "compilerOptions": {
-    "paths": {
-      "@sigil-context/*": ["grimoires/sigil/*"],
-      "@sigil/hooks": ["src/components/gold/hooks/index.ts"],
-      "@sigil/hooks/*": ["src/components/gold/hooks/*"],
-      "@sigil/utils/*": ["src/components/gold/utils/*"]
-    }
-  },
-  "include": ["grimoires/sigil/**/*", "src/**/*"]
+  }
 }
 ```
 
----
+**Design Rationale:**
+- `SessionStart` runs once at conversation start
+- `PreToolUse` runs before every Edit/Write operation
+- Timeout prevents hung scripts from blocking Claude
+- Separate hooks for separation of concerns
 
-## 5. Data Architecture
+### 3.2 SessionStart Hook: sigil-init.sh
 
-### 5.1 Files to Move
-
-| Source | Destination | Notes |
-|--------|-------------|-------|
-| `sigil-mark/constitution/protected-capabilities.yaml` | `grimoires/sigil/constitution/` | Critical - defines protected capabilities |
-| `sigil-mark/kernel/schemas/physics.schema.json` | `grimoires/sigil/schemas/` | Optional - JSON schema |
-| `sigil-mark/constitution/schemas/constitution.schema.json` | `grimoires/sigil/schemas/` | Optional - JSON schema |
-
-### 5.2 Files to Create
-
-| Path | Content | Purpose |
-|------|---------|---------|
-| `grimoires/sigil/constitution/personas.yaml` | Depositor, newcomer, power_user personas | Skills reference this |
-| `grimoires/sigil/constitution/philosophy.yaml` | Core principles | Skills reference this |
-| `grimoires/sigil/constitution/rules.md` | Motion rules summary | Skills reference this |
-| `grimoires/sigil/constitution/decisions/README.md` | Directory placeholder | Skills reference this dir |
-| `grimoires/sigil/moodboard/evidence/README.md` | Directory placeholder | Skills reference this dir |
-
-### 5.3 Placeholder Content
-
-**personas.yaml:**
-```yaml
-# Sigil Personas
-version: "9.1.0"
-
-personas:
-  depositor:
-    description: "Active user who deposits funds"
-    trust_level: high
-    preferences:
-      motion: deliberate
-
-  newcomer:
-    description: "New user exploring the platform"
-    trust_level: building
-    preferences:
-      motion: reassuring
-
-  power_user:
-    description: "Experienced user who wants efficiency"
-    trust_level: established
-    preferences:
-      motion: snappy
-```
-
-**philosophy.yaml:**
-```yaml
-# Sigil Philosophy
-version: "9.1.0"
-
-principles:
-  - id: flow-state
-    name: "Preserve Flow State"
-    description: "Never interrupt the designer's creative flow"
-
-  - id: invisible-infrastructure
-    name: "Invisible Infrastructure"
-    description: "Using it IS the experience"
-
-  - id: survival-over-ceremony
-    name: "Survival Over Ceremony"
-    description: "Patterns earn status through usage, not approval dialogs"
-```
-
-**rules.md:**
-```markdown
-# Sigil Design Rules
-
-## Motion
-- Critical zone: server-tick (600ms)
-- Important zone: deliberate (800ms)
-- Casual zone: snappy (150ms)
-
-## Protected Capabilities
-See: protected-capabilities.yaml
-
-## Vocabulary
-See: vocabulary.yaml
-```
-
----
-
-## 6. Version Consolidation
-
-### 6.1 Files Requiring Version Update
-
-| File | Current | Target |
-|------|---------|--------|
-| `grimoires/sigil/README.md` | 9.0.0 | 9.1.0 |
-| `.sigilrc.yaml` | 4.1.0 | 9.1.0 |
-| `grimoires/sigil/constitution/constitution.yaml` | 5.0.0 | 9.1.0 |
-| `grimoires/sigil/constitution/vocabulary.yaml` | 5.0.0 | 9.1.0 |
-| `CLAUDE.md` | v7.6 | v9.1 |
-| `grimoires/sigil/process/index.ts` | v4.1 | v9.1 |
-| `.claude/skills/crafting-guidance/SKILL.md` | v4.1 | v9.1 |
-
-### 6.2 Update Pattern
-
-```yaml
-# YAML files
-version: "9.1.0"
-
-# TypeScript headers
-/**
- * Sigil v9.1 - [Module Name]
- */
-
-# Markdown
-*Sigil v9.1.0 "Migration Debt Zero"*
-```
-
----
-
-## 7. Physics Value Alignment
-
-### 7.1 Current Inconsistencies
-
-| Motion | useMotion.ts | physics.yaml | vocabulary.yaml | .sigilrc.yaml |
-|--------|--------------|--------------|-----------------|---------------|
-| reassuring | N/A | N/A | 600ms | 1200ms |
-
-### 7.2 Resolution
-
-**Source of Truth:** `grimoires/sigil/constitution/physics.yaml`
-
-All other files must match physics.yaml. If a physics type doesn't exist in physics.yaml, it should be added or removed from other files.
-
-**Fix:**
-```yaml
-# grimoires/sigil/constitution/physics.yaml
-reassuring:
-  duration: 600
-  easing: "ease-out"
-  description: "Reassuring feedback for uncertain actions"
-```
-
-Then update `.sigilrc.yaml` to match.
-
----
-
-## 8. Deletion Strategy
-
-### 8.1 Pre-Deletion Checklist
-
-Before deleting `sigil-mark/`:
+**File:** `.claude/scripts/sigil-init.sh`
 
 ```bash
-# 1. Verify zero references remain
-grep -r "sigil-mark" --include="*.ts" --include="*.yaml" --include="*.md" | wc -l
-# Must return 0
+#!/opt/homebrew/bin/bash
+# Sigil v10.1 - Session Initialization Hook
+# Injects physics rules and authority thresholds into Claude's context
 
-# 2. Verify all required files exist in grimoire
-[ -f "grimoires/sigil/constitution/protected-capabilities.yaml" ] && echo "OK"
-[ -f "grimoires/sigil/constitution/vocabulary.yaml" ] && echo "OK"
-[ -f "grimoires/sigil/constitution/physics.yaml" ] && echo "OK"
+set -euo pipefail
 
-# 3. Verify skills load
-# (manual test of /craft command)
-```
+SIGIL_DIR="grimoires/sigil"
+CONSTITUTION="$SIGIL_DIR/constitution.yaml"
+AUTHORITY="$SIGIL_DIR/authority.yaml"
 
-### 8.2 Deletion Command
-
-```bash
-# After all checks pass
-rm -rf sigil-mark/
-```
-
-### 8.3 Rollback Plan
-
-If issues discovered after deletion:
-
-```bash
-# Restore from git
-git checkout HEAD~1 -- sigil-mark/
-```
-
----
-
-## 9. Validation Architecture
-
-### 9.1 Validation Script
-
-```bash
-#!/bin/bash
-# validate-migration.sh
-
-set -e
-
-echo "=== SIGIL v9.1 MIGRATION VALIDATION ==="
-
-# Check 1: No sigil-mark references
+echo "=== SIGIL v10.1 PHYSICS CONTEXT ==="
 echo ""
-echo "1. Checking for sigil-mark references..."
-REMAINING=$(grep -r "sigil-mark" \
-  --include="*.ts" \
-  --include="*.yaml" \
-  --include="*.md" \
-  --include="*.json" \
-  2>/dev/null | wc -l || echo "0")
 
-if [ "$REMAINING" -gt 0 ]; then
-  echo "❌ FAIL: $REMAINING references remain"
-  grep -r "sigil-mark" \
-    --include="*.ts" \
-    --include="*.yaml" \
-    --include="*.md" \
-    --include="*.json" \
-    2>/dev/null | head -10
-  exit 1
+# Inject constitution (effect physics)
+if [[ -f "$CONSTITUTION" ]]; then
+  echo "## Effect Physics (from constitution.yaml)"
+  echo ""
+  cat "$CONSTITUTION"
+  echo ""
 else
-  echo "✅ PASS: No sigil-mark references"
+  echo "WARNING: constitution.yaml not found at $CONSTITUTION"
 fi
 
-# Check 2: Required files exist
+echo "---"
 echo ""
-echo "2. Checking required files..."
-REQUIRED=(
-  "grimoires/sigil/constitution/constitution.yaml"
-  "grimoires/sigil/constitution/physics.yaml"
-  "grimoires/sigil/constitution/vocabulary.yaml"
-  "grimoires/sigil/constitution/protected-capabilities.yaml"
-  "grimoires/sigil/constitution/personas.yaml"
-  "grimoires/sigil/constitution/philosophy.yaml"
-  "grimoires/sigil/constitution/rules.md"
-)
 
-for f in "${REQUIRED[@]}"; do
-  if [ -f "$f" ]; then
-    echo "  ✓ $f"
-  else
-    echo "  ❌ MISSING: $f"
-    exit 1
+# Inject authority thresholds
+if [[ -f "$AUTHORITY" ]]; then
+  echo "## Authority Thresholds (from authority.yaml)"
+  echo ""
+  cat "$AUTHORITY"
+  echo ""
+else
+  echo "WARNING: authority.yaml not found at $AUTHORITY"
+fi
+
+echo "---"
+echo ""
+
+# Inject active context if exists
+CONTEXT_DIR="$SIGIL_DIR/.context"
+if [[ -d "$CONTEXT_DIR" ]]; then
+  echo "## Accumulated Context"
+  echo ""
+
+  # Taste preferences
+  if [[ -f "$CONTEXT_DIR/taste.json" ]]; then
+    echo "### Taste Preferences"
+    cat "$CONTEXT_DIR/taste.json"
+    echo ""
   fi
-done
 
-# Check 3: Version consistency
-echo ""
-echo "3. Checking version consistency..."
-VERSIONS=$(grep -r "version:" --include="*.yaml" grimoires/sigil/ | grep -v "9.1" | wc -l)
-if [ "$VERSIONS" -gt 0 ]; then
-  echo "⚠️  WARNING: Some files don't have version 9.1.0"
-  grep -r "version:" --include="*.yaml" grimoires/sigil/ | grep -v "9.1"
+  # Recent generations
+  if [[ -f "$CONTEXT_DIR/recent.json" ]]; then
+    echo "### Recent Generations"
+    cat "$CONTEXT_DIR/recent.json"
+    echo ""
+  fi
 fi
 
-# Check 4: sigil-mark directory deleted
-echo ""
-echo "4. Checking legacy cleanup..."
-if [ -d "sigil-mark" ]; then
-  echo "⚠️  WARNING: sigil-mark/ still exists"
+echo "=== END SIGIL CONTEXT ==="
+```
+
+### 3.3 PreToolUse Hook: validate-physics.sh
+
+**File:** `.claude/scripts/validate-physics.sh`
+
+```bash
+#!/opt/homebrew/bin/bash
+# Sigil v10.1 - Physics Validation Hook
+# Validates generated code matches physics constraints
+
+set -euo pipefail
+
+# Hook receives: TOOL_NAME, FILE_PATH, CONTENT (via stdin or env)
+TOOL_NAME="${CLAUDE_TOOL_NAME:-unknown}"
+FILE_PATH="${CLAUDE_FILE_PATH:-unknown}"
+
+# Read content from stdin if available
+CONTENT=""
+if [[ ! -t 0 ]]; then
+  CONTENT=$(cat)
+fi
+
+# Skip non-component files
+if [[ ! "$FILE_PATH" =~ \.(tsx|jsx)$ ]]; then
+  exit 0
+fi
+
+WARNINGS=()
+
+# Check 1: Financial mutations should have confirmation
+if echo "$CONTENT" | grep -qE "(claim|withdraw|transfer|deposit|swap)"; then
+  if ! echo "$CONTENT" | grep -qE "(confirm|confirmation|Confirm)"; then
+    WARNINGS+=("PHYSICS: Financial mutation detected but no confirmation flow found")
+  fi
+fi
+
+# Check 2: Mutations should use deliberate/server-tick timing
+if echo "$CONTENT" | grep -qE "useMutation|mutation:"; then
+  if echo "$CONTENT" | grep -qE "useMotion\(['\"]snappy['\"]|duration:\s*150"; then
+    WARNINGS+=("PHYSICS: Mutation using snappy (150ms) timing - should use deliberate (800ms)")
+  fi
+fi
+
+# Check 3: useMotion should be present for interactive components
+if echo "$CONTENT" | grep -qE "onClick|onSubmit|onPress"; then
+  if ! echo "$CONTENT" | grep -qE "useMotion|transition|animation"; then
+    WARNINGS+=("PHYSICS: Interactive component without motion/transition")
+  fi
+fi
+
+# Output warnings if any
+if [[ ${#WARNINGS[@]} -gt 0 ]]; then
+  echo "=== SIGIL PHYSICS WARNINGS ==="
+  for warning in "${WARNINGS[@]}"; do
+    echo "  - $warning"
+  done
+  echo "=== END WARNINGS ==="
+fi
+
+# Always exit 0 (warn, don't block)
+exit 0
+```
+
+### 3.4 Bash Helper: count-imports.sh
+
+**File:** `.claude/scripts/count-imports.sh`
+
+```bash
+#!/opt/homebrew/bin/bash
+# Count how many files import a given component
+# Usage: count-imports.sh ComponentName
+
+set -euo pipefail
+
+COMPONENT="${1:-}"
+
+if [[ -z "$COMPONENT" ]]; then
+  echo "Usage: count-imports.sh ComponentName" >&2
+  exit 1
+fi
+
+# Search for import statements
+COUNT=$(grep -rE "import.*${COMPONENT}.*from|from.*${COMPONENT}" \
+  src/ \
+  --include="*.tsx" \
+  --include="*.ts" \
+  --include="*.jsx" \
+  --include="*.js" \
+  2>/dev/null | wc -l | tr -d ' ')
+
+echo "$COUNT"
+```
+
+### 3.5 Bash Helper: check-stability.sh
+
+**File:** `.claude/scripts/check-stability.sh`
+
+```bash
+#!/opt/homebrew/bin/bash
+# Check days since last modification
+# Usage: check-stability.sh path/to/file.tsx
+
+set -euo pipefail
+
+FILE="${1:-}"
+
+if [[ -z "$FILE" ]]; then
+  echo "Usage: check-stability.sh path/to/file.tsx" >&2
+  exit 1
+fi
+
+if [[ ! -f "$FILE" ]]; then
+  echo "0"
+  exit 0
+fi
+
+# Get last commit timestamp for file
+LAST_MOD=$(git log -1 --format="%ct" -- "$FILE" 2>/dev/null || echo "0")
+
+if [[ "$LAST_MOD" == "0" ]]; then
+  LAST_MOD=$(stat -f "%m" "$FILE" 2>/dev/null || stat -c "%Y" "$FILE" 2>/dev/null || echo "0")
+fi
+
+NOW=$(date +%s)
+DAYS=$(( (NOW - LAST_MOD) / 86400 ))
+
+echo "$DAYS"
+```
+
+### 3.6 Bash Helper: infer-authority.sh
+
+**File:** `.claude/scripts/infer-authority.sh`
+
+```bash
+#!/opt/homebrew/bin/bash
+# Infer authority tier for a component
+# Usage: infer-authority.sh path/to/Component.tsx
+
+set -euo pipefail
+
+FILE="${1:-}"
+COMPONENT=$(basename "$FILE" .tsx | sed 's/.jsx$//')
+
+if [[ -z "$FILE" ]]; then
+  echo "Usage: infer-authority.sh path/to/Component.tsx" >&2
+  exit 1
+fi
+
+# Get import count and stability
+IMPORTS=$(.claude/scripts/count-imports.sh "$COMPONENT")
+STABILITY=$(.claude/scripts/check-stability.sh "$FILE")
+
+# Thresholds from authority.yaml
+GOLD_IMPORTS=10
+GOLD_STABILITY=14
+SILVER_IMPORTS=5
+
+# Determine tier
+if [[ "$IMPORTS" -ge "$GOLD_IMPORTS" && "$STABILITY" -ge "$GOLD_STABILITY" ]]; then
+  TIER="gold"
+elif [[ "$IMPORTS" -ge "$SILVER_IMPORTS" ]]; then
+  TIER="silver"
 else
-  echo "✅ PASS: sigil-mark/ deleted"
+  TIER="draft"
 fi
 
-echo ""
-echo "=== VALIDATION COMPLETE ==="
-```
-
-### 9.2 Integration Test
-
-```bash
-# Test /craft command works
-# 1. Start Claude Code
-# 2. Run: /craft "deposit button"
-# 3. Verify output uses useMotion('server-tick')
-# 4. Verify no errors about missing files
+cat <<EOF
+{
+  "component": "$COMPONENT",
+  "file": "$FILE",
+  "imports": $IMPORTS,
+  "stability_days": $STABILITY,
+  "tier": "$TIER"
+}
+EOF
 ```
 
 ---
 
-## 10. Implementation Order
+## 4. Skill Enhancements
 
-### 10.1 Dependency Graph
+### 4.1 Mason Skill Enhancement
 
-```
-1. Move protected-capabilities.yaml
-   └── No dependencies
+**Additions to `.claude/skills/mason/SKILL.md`:**
 
-2. Create placeholder files (personas, philosophy, rules)
-   └── No dependencies
+```markdown
+## Required Reading
 
-3. Update process layer paths
-   └── Depends on: 1, 2 (files must exist)
+Before generating ANY component, I MUST read these files:
 
-4. Update skill paths
-   └── Depends on: 1, 2 (files must exist)
+1. **Constitution** — `grimoires/sigil/constitution.yaml`
+2. **Authority** — `grimoires/sigil/authority.yaml`
+3. **Physics Library** — `src/lib/sigil/physics.ts` (lines 1-100)
 
-5. Update CLAUDE.md
-   └── Depends on: 3, 4 (paths must be correct)
+## Physics Decision Tree
 
-6. Update tsconfig.json
-   └── No dependencies
-
-7. Consolidate version numbers
-   └── Depends on: 1-6 (all files must exist)
-
-8. Align physics values
-   └── Depends on: 7 (versions consistent)
-
-9. Run validation
-   └── Depends on: 1-8
-
-10. Delete sigil-mark/
-    └── Depends on: 9 (validation must pass)
-```
-
-### 10.2 Sprint Breakdown
-
-**Sprint 1: Foundation (P0)**
-- Task 1.1: Move protected-capabilities.yaml
-- Task 1.2: Create placeholder files and directories
-- Task 1.3: Update all 11 process layer DEFAULT_PATH constants
-- Task 1.4: Run `grep sigil-mark process/` to verify
-
-**Sprint 2: Configuration (P0-P1)**
-- Task 2.1: Update SKILL.md paths
-- Task 2.2: Update index.yaml, remove phantom references
-- Task 2.3: Update CLAUDE.md paths
-- Task 2.4: Update tsconfig.json aliases
-- Task 2.5: Consolidate all version numbers to 9.1.0
-
-**Sprint 3: Cleanup (P1-P2)**
-- Task 3.1: Run validation script
-- Task 3.2: Fix any remaining references
-- Task 3.3: Align physics values across files
-- Task 3.4: Delete sigil-mark/ directory
-- Task 3.5: Final audit
-
----
-
-## 11. Risk Mitigation
-
-### 11.1 Known Risks
-
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| Missed reference breaks agent | Medium | High | Run validation after each sprint |
-| Placeholder files insufficient | Low | Medium | Placeholder is acceptable for v9.1 |
-| Physics value mismatch | Low | Low | physics.yaml is source of truth |
-| Rollback needed | Low | Medium | Git history preserved |
-
-### 11.2 Rollback Procedure
-
-```bash
-# If migration fails after deletion
-git checkout <commit-before-deletion> -- sigil-mark/
-
-# If migration fails before deletion
-# Just revert the path changes
-git checkout HEAD -- grimoires/sigil/process/
-git checkout HEAD -- .claude/skills/
-git checkout HEAD -- CLAUDE.md
-git checkout HEAD -- tsconfig.json
+┌─ Is this a MUTATION? (POST, PUT, DELETE, useMutation)
+│
+├─ YES ──┬─ Is it FINANCIAL? (claim, deposit, withdraw, transfer, swap, burn)
+│        │
+│        ├─ YES → SENSITIVE_MUTATION
+│        │        sync: pessimistic, timing: 1200ms, confirmation: true
+│        │        useMotion('server-tick')
+│        │
+│        └─ NO → MUTATION
+│                sync: pessimistic, timing: 800ms
+│                useMotion('deliberate')
+│
+└─ NO ───┬─ Is it a QUERY? (fetch, GET, useQuery, read)
+         │
+         ├─ YES → QUERY: sync: optimistic, timing: 150ms, useMotion('snappy')
+         │
+         └─ NO → LOCAL_STATE: sync: immediate, timing: 0ms
 ```
 
----
+### 4.2 Gardener Skill Enhancement
 
-## 12. Success Criteria
+**Additions to `.claude/skills/gardener/SKILL.md`:**
 
-### 12.1 Quantitative
+```markdown
+## Authority Computation
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| `sigil-mark/` references | 81 | 0 |
-| Version numbers in use | 6+ | 1 (v9.1.0) |
-| Missing referenced files | 6+ | 0 |
-| Phantom skill references | 3 | 0 |
-| `sigil-mark/` directory | Exists | Deleted |
+Run these commands to determine authority:
 
-### 12.2 Qualitative
+1. Count imports: `.claude/scripts/count-imports.sh ComponentName`
+2. Check stability: `.claude/scripts/check-stability.sh path/to/file.tsx`
+3. Infer authority: `.claude/scripts/infer-authority.sh path/to/file.tsx`
 
-| Test | Expected Result |
-|------|-----------------|
-| `/craft "deposit button"` | Generates with server-tick physics |
-| `/craft "tooltip"` | Generates with snappy physics |
-| Skill context load | No file not found errors |
-| TypeScript compilation | No path resolution errors |
+| Tier | Min Imports | Min Stability |
+|------|-------------|---------------|
+| Gold | 10+ | 14+ days |
+| Silver | 5+ | 7+ days |
+| Draft | < 5 | any |
+```
 
----
+### 4.3 Diagnostician Skill Enhancement
 
-## 13. Performance Considerations
+**Additions to `.claude/skills/diagnostician/SKILL.md`:**
 
-This migration has no runtime performance impact:
+```markdown
+## Required Reading
 
-- File reads happen at agent-time, not runtime
-- Path changes are string substitutions
-- No new code execution paths
+Read `src/lib/sigil/diagnostician.ts` for PATTERNS constant.
 
-**Build-time impact:**
-- TypeScript compilation may be slightly faster (smaller include set)
-- Skill loading unchanged (still reads YAML files)
+## Pattern Categories
 
----
+| Category | Keywords |
+|----------|----------|
+| hydration | mismatch, server/client, useMediaQuery |
+| dialog | positioning, z-index, scroll, modal |
+| performance | slow, re-render, laggy |
+| layout | shift, jump, CLS, flash |
+| server-component | 'use client', hooks in RSC |
+| react-19 | forwardRef, deprecated |
+| state | stale, closure, infinite loop |
+| async | race condition, unmounted, abort |
+| animation | AnimatePresence, exit, flicker |
 
-## 14. Documentation Updates
+## Never Ask
 
-### 14.1 CLAUDE.md Key Changes
-
-1. Update version header to v9.1
-2. Replace all `sigil-mark/` paths with `grimoires/sigil/`
-3. Update directory structure diagram
-4. Remove references to non-existent runtime layer
-5. Add note: "Full runtime layer (useSigilMutation, CriticalZone) is Phase 2"
-
-### 14.2 README Updates
-
-- `grimoires/sigil/README.md`: Update to v9.1.0
-- No new README files needed (placeholders have READMEs)
+NEVER ASK: "Can you check the console?", "What browser?", "Can you reproduce?"
+INSTEAD: Match patterns and provide solutions directly.
+```
 
 ---
 
-## 15. The v9.1 Principles
+## 5. Context Accumulation
 
-1. **Fix paths, not features** — This is debt cleanup only
-2. **Validate before delete** — Never delete without verification
-3. **Single source of truth** — physics.yaml defines physics
-4. **Version consistency** — All files report 9.1.0
-5. **Placeholder over phantom** — Real empty files beat imaginary features
+### 5.1 Directory Structure
+
+```
+grimoires/sigil/.context/
+├── taste.json           # Design preferences
+├── persona.json         # Audience context
+├── project.json         # Project conventions
+├── recent.json          # Recent generations (last 10)
+└── feedback.jsonl       # Append-only feedback log
+```
+
+### 5.2 Context Schema
+
+**taste.json:**
+```json
+{
+  "version": "10.1",
+  "preferences": {
+    "animation_library": "framer-motion",
+    "button_style": "rounded",
+    "color_scheme": "emerald"
+  },
+  "reinforcement": {
+    "accepted": 0,
+    "modified": 0,
+    "rejected": 0
+  }
+}
+```
+
+---
+
+## 6. File Structure Summary
+
+### Files to Create
+
+| File | Purpose |
+|------|---------|
+| `.claude/settings.local.json` | Hooks configuration |
+| `.claude/scripts/sigil-init.sh` | SessionStart hook |
+| `.claude/scripts/validate-physics.sh` | PreToolUse hook |
+| `.claude/scripts/count-imports.sh` | Import counter |
+| `.claude/scripts/check-stability.sh` | Stability checker |
+| `.claude/scripts/infer-authority.sh` | Authority inferer |
+
+### Files to Update
+
+| File | Changes |
+|------|---------|
+| `.claude/skills/mason/SKILL.md` | Required Reading, Physics Decision Tree |
+| `.claude/skills/gardener/SKILL.md` | Authority Computation |
+| `.claude/skills/diagnostician/SKILL.md` | Pattern Categories, Never Ask |
+
+### Files Already Complete
+
+| File | Status |
+|------|--------|
+| `src/lib/sigil/*.ts` | 6 modules complete |
+| `grimoires/sigil/constitution.yaml` | Complete |
+| `grimoires/sigil/authority.yaml` | Complete |
+| `src/hooks/useMotion.ts` | Complete |
+
+---
+
+## 7. Testing Strategy
+
+### Manual Test Cases
+
+1. **Financial Mutation**: `/craft "claim button"` → 800ms pessimistic physics
+2. **Query Component**: `/craft "balance display"` → 150ms optimistic physics
+3. **Authority Check**: `/garden src/hooks/useMotion.ts` → Shows tier
+4. **Error Diagnosis**: "dialog jumping" → Matches pattern, no questions
+
+---
+
+## 8. Sprint Implementation
+
+### Sprint 1: Hooks Infrastructure
+
+1. Create `.claude/settings.local.json`
+2. Create `sigil-init.sh`
+3. Update Mason SKILL.md with Required Reading
+4. Test `/craft "claim button"`
+
+### Sprint 2: Helpers + Skills
+
+5. Create helper scripts (count-imports, check-stability, infer-authority)
+6. Update Gardener and Diagnostician SKILL.md
+7. Test `/garden` and error diagnosis
+
+### Sprint 3: Context
+
+8. Initialize `.context/` directory
+9. Create context accumulator
+10. Test full pipeline
 
 ---
 
 *SDD Generated: 2026-01-11*
-*Based on: PRD v9.1.0*
-*Sources: MIGRATION_AUDIT_REPORT.md, FULL_TECHNICAL_AUDIT.md*
-*Key Insight: This is path migration, not feature development*
-*Next Step: `/sprint-plan` to create implementation sprints*
+*Architecture: Hooks-Based Skill Enhancement*
+*Key Insight: Skills read, hooks inject, bash computes*

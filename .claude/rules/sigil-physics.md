@@ -182,6 +182,59 @@ Adopt what exists. Don't introduce new patterns without reason.
 
 ---
 
+## Skill Orchestration
+
+When a task requires specialized capabilities, invoke Sigil skills:
+
+```
+[skill-name skill] "task description"
+```
+
+### Sigil Skills
+
+| Skill | Purpose | Trigger |
+|-------|---------|---------|
+| **mason** | Generate components with physics | `/craft` |
+| **gardener** | Report pattern authority | `/garden` |
+| **diagnostician** | Debug UI issues | Problem descriptions |
+
+### When to Invoke Skills
+
+| Situation | Skill |
+|-----------|-------|
+| Generate new component | `[mason skill]` via `/craft` |
+| Check component health | `[gardener skill]` via `/garden` |
+| Debug flickering/broken UI | `[diagnostician skill]` |
+| Find canonical patterns | `[gardener skill]` |
+
+### Example: Complex Component
+
+```
+User: /craft "multi-step onboarding wizard"
+
+Mason:
+1. Parses intent → wizard with multiple steps
+2. Determines physics per step:
+   - Form steps: standard mutation (optimistic, 200ms)
+   - Payment step: financial mutation (pessimistic, 800ms)
+3. Searches for canonical wizard patterns
+4. Generates with correct physics per step
+```
+
+### Example: Debugging
+
+```
+User: "my dialog flickers on mobile"
+
+Diagnostician:
+1. Keywords: dialog, flickers, mobile
+2. Pattern match: Hydration + Dialog issues
+3. Diagnosis: useMediaQuery causing SSR mismatch
+4. Solution: CSS-only responsive or mount guard
+```
+
+---
+
 ## The One Rule
 
 **Every UI decision traces to physics. Physics trace to effect. Effect is determined by what the code does.**

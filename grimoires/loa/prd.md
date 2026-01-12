@@ -28,37 +28,46 @@ Sigil v10.1 "Usage Reality" completes the v10 vision with three core principles:
 The v10.1 concepts are documented in CLAUDE.md but the skills don't fully implement them. The skills reference library functions that exist but aren't wired into the `/craft` and `/garden` workflows.
 
 **The Solution:**
-Enhance the existing skills (Mason, Gardener, Diagnostician) to fully leverage the v10.1 library, enabling:
-- AST-based intent inference
-- Usage-based authority computation
-- Effect-based physics selection
-- Semantic pattern search
-- Pattern debugging without questions
+Use Claude Code's **hooks system** to bridge the library-skill gap:
+- **SessionStart hook** injects physics rules into context
+- **PreToolUse hook** validates generated code before writing
+- **Skills read** library modules for patterns (not call them)
+- **Bash scripts** compute runtime values (import counts, stability)
+
+This enables:
+- AST-based intent inference (skill reads ast-reader.ts patterns)
+- Usage-based authority computation (bash script counts imports)
+- Effect-based physics selection (hook injects constitution.yaml)
+- Semantic pattern search (skill queries indexed components)
+- Pattern debugging without questions (skill reads diagnostician.ts)
 
 ---
 
 ## 2. Problem Statement
 
-### 2.1 Skills Don't Use the Library
+### 2.1 Skills Can't Call Library Functions
 
-The Mason skill (`.claude/skills/mason/SKILL.md`) documents the correct workflow:
+**Critical Insight from Oracle Analysis:** Claude Code skills are **markdown prompts**, not code executors.
 
 ```markdown
-## Workflow
-1. Context Loading - Load accumulated taste from grimoires/sigil/.context/
-2. Intent Inference - Parse request for component type and purpose
-3. Pattern Discovery - Search codebase for canonical patterns via search.ts
-4. AST Analysis - Use ast-reader.ts to analyze similar components
-5. Generation - Generate component with correct physics
-6. Context Update - Record generated patterns
+# What skills CAN do:
+- Guide Claude's behavior with instructions
+- Reference files for Claude to read
+- Trigger bash scripts via hooks
+
+# What skills CANNOT do:
+import { inferIntent } from '@/lib/sigil/ast-reader';  // NOT POSSIBLE
+const intent = await inferIntent({ target: userRequest });
 ```
 
-But this workflow is **documentation**, not implementation. The skill file references:
-- `search.ts` for pattern discovery
-- `ast-reader.ts` for intent inference
-- `context.ts` for learning signals
+The Mason skill documents a workflow that assumes runtime function calls. But skills are prompts that Claude follows—they don't execute TypeScript.
 
-These modules exist in `src/lib/sigil/` but aren't invoked by the skill.
+**The Bridge: Hooks**
+
+Claude Code's hooks system allows scripts to run at lifecycle points:
+- `SessionStart` - Initialize context before conversation
+- `PreToolUse` - Validate before tool execution
+- `PostToolUse` - Process after tool execution
 
 ### 2.2 Library Modules Not Integrated
 
@@ -128,44 +137,75 @@ Mason internally:
 
 ## 4. Requirements
 
-### 4.1 P0: Mason Skill Integration
+### 4.1 P0: Hooks Infrastructure
 
-**Update `.claude/skills/mason/SKILL.md` to call library functions:**
+**Create Claude Code hooks to bridge library → skill gap:**
 
-The skill should:
-
-1. **Call inferIntent** on every /craft request:
-```typescript
-import { inferIntent } from '@/lib/sigil/ast-reader';
-const intent = await inferIntent({ target: userRequest });
+1. **Create `.claude/settings.local.json` with hooks:**
+```json
+{
+  "hooks": {
+    "SessionStart": [".claude/scripts/sigil-init.sh"],
+    "PreToolUse": {
+      "Edit": [".claude/scripts/validate-physics.sh"],
+      "Write": [".claude/scripts/validate-physics.sh"]
+    }
+  }
+}
 ```
 
-2. **Call inferPhysicsFromEffect** based on intent:
-```typescript
-import { inferPhysicsFromEffect } from '@/lib/sigil/physics';
-const physics = inferPhysicsFromEffect(intent);
+2. **Create `sigil-init.sh` (SessionStart hook):**
+```bash
+#!/bin/bash
+# Inject physics rules into Claude's context
+echo "=== SIGIL PHYSICS CONTEXT ==="
+cat grimoires/sigil/constitution.yaml
+echo "---"
+cat grimoires/sigil/authority.yaml
 ```
 
-3. **Call findCanonical** for pattern discovery:
-```typescript
-import { search, findCanonical } from '@/lib/sigil/search';
-const canonicals = await findCanonical(query, 'gold');
-```
-
-4. **Call analyzeAST** for pattern extraction:
-```typescript
-import { analyzeAST } from '@/lib/sigil/ast-reader';
-const patterns = await analyzeAST(canonicalFile);
-```
-
-5. **Call validateGeneration** after code generation:
-```typescript
-import { validateGeneration } from '@/lib/sigil/physics';
-const validation = validateGeneration(generatedCode, physics);
+3. **Create `validate-physics.sh` (PreToolUse hook):**
+```bash
+#!/bin/bash
+# Validate generated code matches physics constraints
+# Returns warning if timing/sync mismatches detected
 ```
 
 **Acceptance Criteria:**
-- [ ] Mason calls all 5 library functions in sequence
+- [ ] SessionStart hook runs on conversation start
+- [ ] Physics rules visible in Claude's context
+- [ ] PreToolUse hook validates Edit/Write operations
+
+---
+
+### 4.2 P0: Mason Skill Enhancement
+
+**Update `.claude/skills/mason/SKILL.md` to READ library modules:**
+
+Add "Required Reading" section:
+```markdown
+## Required Reading
+
+Before generating ANY component, I MUST read these files:
+
+1. `grimoires/sigil/constitution.yaml` - Effect → physics mapping
+2. `grimoires/sigil/authority.yaml` - Tier thresholds
+3. `src/lib/sigil/physics.ts` (lines 1-100) - EFFECT_PHYSICS constant
+
+## Physics Decision Tree
+
+1. Is this a mutation? (POST, PUT, DELETE, useMutation)
+   - Yes → Check if financial
+     - Financial keywords: claim, deposit, withdraw, transfer, swap
+     - Financial → pessimistic sync, 800ms, confirmation required
+     - Non-financial → optimistic sync, 150ms
+   - No → Query or display
+     - Query → optimistic sync, 150ms
+     - Display → immediate, 0ms
+```
+
+**Acceptance Criteria:**
+- [ ] Mason reads constitution.yaml before generating
 - [ ] Mason never asks "What physics do you prefer?"
 - [ ] Mason never asks "What zone should this be in?"
 - [ ] Generated code includes correct physics values
@@ -173,24 +213,41 @@ const validation = validateGeneration(generatedCode, physics);
 
 ---
 
-### 4.2 P0: Gardener Skill Integration
+### 4.3 P0: Gardener Skill Enhancement
 
-**Update `.claude/skills/gardener/SKILL.md` to call survival.ts:**
+**Update `.claude/skills/gardener/SKILL.md` to use bash scripts:**
 
-The skill should:
-
-1. **Call inferAuthority** for each component:
-```typescript
-import { inferAuthority, countImports } from '@/lib/sigil/survival';
-const authority = await inferAuthority(componentPath);
-// Returns: { tier: 'gold' | 'silver' | 'draft', imports: number, stability: number }
+1. **Create `count-imports.sh` helper:**
+```bash
+#!/bin/bash
+# Count imports of a component
+component="$1"
+grep -r "from.*${component}" src/ --include="*.tsx" --include="*.ts" | wc -l
 ```
 
-2. **Check promotion eligibility**:
-```typescript
-import { checkPromotion } from '@/lib/sigil/survival';
-const promotion = await checkPromotion(componentPath);
-// Returns: { eligible: boolean, confidence: number, blockers: string[] }
+2. **Create `check-stability.sh` helper:**
+```bash
+#!/bin/bash
+# Days since last modification
+file="$1"
+last_mod=$(git log -1 --format="%ct" -- "$file")
+now=$(date +%s)
+days=$(( (now - last_mod) / 86400 ))
+echo "$days"
+```
+
+3. **Add to Gardener SKILL.md:**
+```markdown
+## Authority Computation
+
+To determine a component's authority tier:
+
+1. Count imports: `bash .claude/scripts/count-imports.sh ComponentName`
+2. Check stability: `bash .claude/scripts/check-stability.sh path/to/file.tsx`
+3. Apply thresholds from grimoires/sigil/authority.yaml:
+   - Gold: 10+ imports AND 14+ days stable
+   - Silver: 5+ imports
+   - Draft: Everything else
 ```
 
 **Acceptance Criteria:**
@@ -201,36 +258,48 @@ const promotion = await checkPromotion(componentPath);
 
 ---
 
-### 4.3 P0: Diagnostician Skill Integration
+### 4.4 P0: Diagnostician Skill Enhancement
 
-**Update `.claude/skills/diagnostician/SKILL.md` to call diagnostician.ts:**
+**Update `.claude/skills/diagnostician/SKILL.md` to READ pattern library:**
 
-The skill should:
-
-1. **Call matchSymptoms** when errors reported:
-```typescript
-import { matchSymptoms, diagnose } from '@/lib/sigil/diagnostician';
-const matches = matchSymptoms(errorDescription);
-// Returns: { pattern: string, confidence: number, solution: string }[]
-```
-
-2. **Never ask diagnostic questions**:
+Add "Required Reading" section:
 ```markdown
+## Required Reading
+
+When a user reports an error, I MUST read:
+1. `src/lib/sigil/diagnostician.ts` - PATTERNS constant (9 categories)
+
+## Pattern Matching Process
+
+1. Extract keywords from error description
+2. Match against PATTERNS categories:
+   - hydration: useMediaQuery, Date in render, SSR mismatch
+   - dialog: positioning, scroll, z-index, portal
+   - performance: re-render, layout thrash, memo
+   - layout: CLS, image dimensions, shift
+   - server-component: 'use client', hooks in RSC
+   - react-19: forwardRef deprecated
+   - state: stale closure, infinite loop
+   - async: race condition, unmounted update
+   - animation: AnimatePresence, exit animation
+
+3. Return solutions ranked by keyword match count
+
+## Never Ask
+
 NEVER ASK:
 - "Can you check the console?"
 - "What browser are you using?"
 - "Can you reproduce the error?"
 
-INSTEAD INFER:
-- Match symptom patterns from PATTERNS constant
-- Provide likely solutions ranked by confidence
-- Run automated checks where possible
+INSTEAD: Match patterns and provide solutions directly.
 ```
 
 **Acceptance Criteria:**
+- [ ] Diagnostician reads diagnostician.ts patterns
 - [ ] Diagnostician matches symptoms without questions
 - [ ] Diagnostician provides solutions ranked by confidence
-- [ ] Covers 9 pattern categories (hydration, dialog, performance, etc.)
+- [ ] Covers 9 pattern categories
 
 ---
 
@@ -312,48 +381,56 @@ npx sigil index-components src/components/
 
 ## 5. Implementation Sprints
 
-### Sprint 1: Mason Pipeline (P0)
+### Sprint 1: Hooks Infrastructure (P0)
 
-1. Update Mason SKILL.md with library invocations
-2. Verify inferIntent() works with descriptions
-3. Verify inferPhysicsFromEffect() returns correct physics
-4. Verify findCanonical() returns Gold patterns
-5. Test end-to-end /craft flow
+1. Create `.claude/settings.local.json` with hooks config
+2. Create `sigil-init.sh` SessionStart hook
+3. Create `validate-physics.sh` PreToolUse hook
+4. Update Mason SKILL.md with "Required Reading" section
+5. Test: `/craft "claim button"` generates code with 800ms pessimistic physics
 
-**Exit Criteria:** `/craft "claim button"` generates code with 800ms pessimistic physics
+**Exit Criteria:** Hooks run, physics rules injected, Mason reads constitution.yaml
 
-### Sprint 2: Gardener + Diagnostician (P0)
+### Sprint 2: Skill Enhancements + Helpers (P0)
 
-6. Update Gardener SKILL.md with survival.ts calls
-7. Verify inferAuthority() counts imports correctly
-8. Update Diagnostician SKILL.md with diagnostician.ts calls
-9. Verify matchSymptoms() finds patterns
+6. Create `count-imports.sh` bash helper
+7. Create `check-stability.sh` bash helper
+8. Update Gardener SKILL.md with authority computation workflow
+9. Update Diagnostician SKILL.md with pattern reading workflow
+10. Test: `/garden` shows accurate authority, errors trigger pattern matching
 
-**Exit Criteria:** `/garden` shows accurate authority, errors trigger pattern matching
+**Exit Criteria:** All 3 skills enhanced, bash helpers working
 
-### Sprint 3: Context + Polish (P1-P2)
+### Sprint 3: Context + Validation (P1-P2)
 
-10. Wire context.ts into Mason workflow
-11. Add feedback signal processing
-12. Initialize search index
-13. Verify end-to-end /craft → /garden → Diagnostician flow
+11. Create SessionEnd hook for context logging
+12. Build JSON context accumulator in `.context/`
+13. Enhance PreToolUse validation with physics checking
+14. Verify end-to-end /craft → /garden → Diagnostician flow
 
-**Exit Criteria:** Full v10.1 pipeline operational
+**Exit Criteria:** Full v10.1 pipeline operational with hooks
 
 ---
 
 ## 6. File Changes Summary
 
+### Files to Create
+
+| File | Purpose |
+|------|---------|
+| `.claude/settings.local.json` | Hooks configuration |
+| `.claude/scripts/sigil-init.sh` | SessionStart hook - inject physics |
+| `.claude/scripts/validate-physics.sh` | PreToolUse hook - validate code |
+| `.claude/scripts/count-imports.sh` | Helper - count component imports |
+| `.claude/scripts/check-stability.sh` | Helper - check file stability |
+
 ### Files to Update
 
 | File | Changes |
 |------|---------|
-| `.claude/skills/mason/SKILL.md` | Add library invocations |
-| `.claude/skills/gardener/SKILL.md` | Add survival.ts calls |
-| `.claude/skills/diagnostician/SKILL.md` | Add diagnostician.ts calls |
-| `.claude/skills/mason/index.yaml` | Update file references |
-| `.claude/skills/gardener/index.yaml` | Update file references |
-| `.claude/skills/diagnostician/index.yaml` | Update file references |
+| `.claude/skills/mason/SKILL.md` | Add "Required Reading" + physics decision tree |
+| `.claude/skills/gardener/SKILL.md` | Add authority computation workflow |
+| `.claude/skills/diagnostician/SKILL.md` | Add pattern reading workflow |
 
 ### Files Already Complete
 

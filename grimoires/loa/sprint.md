@@ -1,668 +1,489 @@
-# Sigil v9.1 "Migration Debt Zero" Sprint Plan
+# Sprint Plan: Sigil v10.1 "Usage Reality"
 
-**Version:** 9.1.0
-**Codename:** Migration Debt Zero
-**Generated:** 2026-01-11
-**Sources:** PRD v9.1.0, SDD v9.1.0
-**Supersedes:** v9.0.0 "Core Scaffold" Sprint Plan
-
----
-
-## Sprint Overview
-
-### Team Structure
-- **Agent:** Claude (AI implementation)
-- **Human:** @zksoju (review, veto holder)
-
-### Sprint Duration
-- **Cycle length:** 1 session per sprint
-- **Total sprints:** 3 sprints
-- **Methodology:** Cycles (Linear Method)
-
-### v9.1 Objective
-
-Complete the incomplete v9.0 migration by fixing:
-
-| Issue | Count | Action |
-|-------|-------|--------|
-| Hardcoded `sigil-mark/` references | 81 | Update to `grimoires/sigil/` |
-| Version numbers in use | 6+ | Consolidate to 9.1.0 |
-| Missing referenced files | 6 | Create placeholders |
-| Phantom skill references | 3 | Remove references |
-| Old `sigil-mark/` directory | Exists | Delete |
-
-### Success Metric
-
-```bash
-grep -r "sigil-mark" --include="*.ts" --include="*.yaml" --include="*.md" | wc -l
-# Target: 0
-```
+**Version:** 10.1.0
+**Status:** Sprint Plan Complete
+**Date:** 2026-01-11
+**PRD Reference:** grimoires/loa/prd.md
+**SDD Reference:** grimoires/loa/sdd.md
+**Supersedes:** v9.1.0 "Migration Debt Zero" Sprint Plan (completed)
 
 ---
 
-## Sprint 1: Foundation (P0 - Critical Path)
+## Overview
 
-**Goal:** Move orphaned files, create placeholders, fix all 42 process layer path references.
+**Total Sprints:** 3
+**Estimated Total Tasks:** 14
+**Architecture:** Hooks-Based Skill Enhancement
 
-**Status:** REVIEW_APPROVED
+**Sprint Structure:**
+| Sprint | Focus | Tasks | Priority |
+|--------|-------|-------|----------|
+| Sprint 1 | Hooks Infrastructure | 5 | P0 |
+| Sprint 2 | Helpers + Skill Enhancements | 5 | P0 |
+| Sprint 3 | Context + Validation | 4 | P1 |
 
-### S1-T1: Move protected-capabilities.yaml to Grimoire
+---
 
-**ID:** S1-M1
-**Priority:** P0
-**Description:** Move the critical protected-capabilities.yaml from legacy location to grimoire.
+## Sprint 1: Hooks Infrastructure
 
-**Action:**
-```bash
-mv sigil-mark/constitution/protected-capabilities.yaml \
-   grimoires/sigil/constitution/
-```
+**Goal:** Establish Claude Code hooks system to bridge library → skill gap
+
+**Exit Criteria:**
+- SessionStart hook injects physics context on conversation start
+- PreToolUse hook validates Edit/Write operations
+- Mason reads constitution.yaml before generating
+
+### Task 1.1: Create Hooks Configuration
+
+**ID:** S1-01
+**Description:** Create `.claude/settings.local.json` with hooks configuration for SessionStart and PreToolUse events.
 
 **Acceptance Criteria:**
-- [x] File exists at `grimoires/sigil/constitution/protected-capabilities.yaml`
-- [x] File is readable and valid YAML
-- [x] Original file removed from `sigil-mark/constitution/`
-
-**Effort:** Trivial
-**Dependencies:** None
-
----
-
-### S1-T2: Create Placeholder Files and Directories
-
-**ID:** S1-M2
-**Priority:** P0
-**Description:** Create all files and directories that are referenced by skills but don't exist.
-
-**Files to Create:**
-
-1. `grimoires/sigil/constitution/personas.yaml`
-```yaml
-# Sigil Personas
-# Version: 9.1.0
-
-personas:
-  depositor:
-    description: "Active user who deposits funds"
-    trust_level: high
-    preferences:
-      motion: deliberate
-
-  newcomer:
-    description: "New user exploring the platform"
-    trust_level: building
-    preferences:
-      motion: reassuring
-
-  power_user:
-    description: "Experienced user who wants efficiency"
-    trust_level: established
-    preferences:
-      motion: snappy
-```
-
-2. `grimoires/sigil/constitution/philosophy.yaml`
-```yaml
-# Sigil Philosophy
-# Version: 9.1.0
-
-principles:
-  - id: flow-state
-    name: "Preserve Flow State"
-    description: "Never interrupt the designer's creative flow"
-
-  - id: invisible-infrastructure
-    name: "Invisible Infrastructure"
-    description: "Using it IS the experience"
-
-  - id: survival-over-ceremony
-    name: "Survival Over Ceremony"
-    description: "Patterns earn status through usage, not approval dialogs"
-```
-
-3. `grimoires/sigil/constitution/rules.md`
-```markdown
-# Sigil Design Rules
-
-## Motion
-- Critical zone: server-tick (600ms)
-- Important zone: deliberate (800ms)
-- Casual zone: snappy (150ms)
-
-## Protected Capabilities
-See: protected-capabilities.yaml
-
-## Vocabulary
-See: vocabulary.yaml
-```
-
-4. `grimoires/sigil/constitution/decisions/README.md`
-```markdown
-# Sigil Design Decisions
-
-This directory contains locked design decisions.
-
-Currently empty - decisions will be added as they are made.
-```
-
-5. `grimoires/sigil/moodboard/evidence/README.md`
-```markdown
-# Sigil Evidence
-
-This directory contains evidence for design decisions.
-
-Currently empty - evidence will be added as patterns are validated.
-```
-
-**Acceptance Criteria:**
-- [x] `grimoires/sigil/constitution/personas.yaml` exists
-- [x] `grimoires/sigil/constitution/philosophy.yaml` exists
-- [x] `grimoires/sigil/constitution/rules.md` exists
-- [x] `grimoires/sigil/constitution/decisions/README.md` exists
-- [x] `grimoires/sigil/moodboard/evidence/README.md` exists
-
-**Effort:** Small
-**Dependencies:** None
-
----
-
-### S1-T3: Update Process Layer Path Constants
-
-**ID:** S1-M3
-**Priority:** P0
-**Description:** Update all 11 process layer modules with DEFAULT_PATH constants pointing to wrong locations.
-
-**Files to Update:**
-
-| File | Current Constant | New Value |
-|------|------------------|-----------|
-| `constitution-reader.ts` | `sigil-mark/constitution/...` | `grimoires/sigil/constitution/...` |
-| `moodboard-reader.ts` | `sigil-mark/moodboard` | `grimoires/sigil/moodboard` |
-| `persona-reader.ts` | `sigil-mark/personas/...` | `grimoires/sigil/constitution/personas.yaml` |
-| `vocabulary-reader.ts` | `sigil-mark/vocabulary/...` | `grimoires/sigil/constitution/vocabulary.yaml` |
-| `decision-reader.ts` | `sigil-mark/consultation-chamber/...` | `grimoires/sigil/constitution/decisions/` |
-| `philosophy-reader.ts` | `sigil-mark/soul-binder/...` | `grimoires/sigil/constitution/philosophy.yaml` |
-| `vibe-check-reader.ts` | `sigil-mark/surveys/...` | Comment out (phantom feature) |
-| `lens-array-reader.ts` | `sigil-mark/lens-array/...` | Comment out (phantom feature) |
-| `governance-logger.ts` | `sigil-mark/governance` | `grimoires/sigil/state/` |
-| `agent-orchestration.ts` | `sigil-mark/vocabulary/...` | `grimoires/sigil/constitution/vocabulary.yaml` |
-| `garden-command.ts` | `sigil-mark/` in SCAN_PATHS | `grimoires/sigil/` |
-
-**Acceptance Criteria:**
-- [x] All 12 files updated with correct paths (11 + amend-command.ts)
-- [x] `grep -r "sigil-mark" grimoires/sigil/process/` returns 0 functional results
-- [x] TypeScript compiles without errors
-
-**Effort:** Medium
-**Dependencies:** S1-T1, S1-T2
-
----
-
-### S1-T4: Verify Process Layer Compilation
-
-**ID:** S1-M4
-**Priority:** P0
-**Description:** Run TypeScript compilation to verify no broken imports.
-
-**Command:**
-```bash
-npx tsc --noEmit
-```
-
-**Acceptance Criteria:**
-- [x] TypeScript compiles without path-related errors
-- [x] No "Cannot find module" errors for sigil-mark paths
-
-**Effort:** Trivial
-**Dependencies:** S1-T3
-
----
-
-### Sprint 1 Exit Criteria
-
-- [x] `protected-capabilities.yaml` in grimoire
-- [x] All 5 placeholder files/directories created
-- [x] All 12 process layer path references updated (11 + amend-command.ts)
-- [x] `grep sigil-mark grimoires/sigil/process/` returns 0 functional results
-- [x] TypeScript compiles without errors
-
----
-
-## Sprint 2: Configuration (P0-P1)
-
-**Goal:** Update skill paths, CLAUDE.md, tsconfig.json, and consolidate version numbers.
-
-**Status:** READY_FOR_REVIEW
-
-### S2-T1: Update SKILL.md Paths
-
-**ID:** S2-M1
-**Priority:** P0
-**Description:** Update `.claude/skills/crafting-guidance/SKILL.md` to use grimoire paths.
-
-**Changes:**
-```yaml
-# Find all sigil-mark/ references and update to grimoires/sigil/
-# Example:
-#   sigil-mark/vocabulary/vocabulary.yaml
-#   → grimoires/sigil/constitution/vocabulary.yaml
-```
-
-**Acceptance Criteria:**
-- [x] All `sigil-mark/` paths updated to `grimoires/sigil/`
-- [x] All referenced files exist at new paths
-- [x] No broken path references
-
-**Effort:** Small
-**Dependencies:** Sprint 1 complete
-
----
-
-### S2-T2: Update index.yaml and Remove Phantom References
-
-**ID:** S2-M2
-**Priority:** P0
-**Description:** Update `.claude/skills/crafting-guidance/index.yaml` and remove references to non-existent files.
-
-**Remove these phantom references:**
-```yaml
-# These files don't exist - remove from checks:
-checks:
-  - path: sigil-mark/soul-binder/immutable-values.yaml  # DELETE
-  - path: sigil-mark/soul-binder/canon-of-flaws.yaml    # DELETE
-  - path: sigil-mark/lens-array/lenses.yaml             # DELETE
-```
-
-**Acceptance Criteria:**
-- [x] Phantom file references removed
-- [x] Skill loads without "file not found" errors
-- [x] All remaining paths point to grimoire
-
-**Effort:** Small
-**Dependencies:** S2-T1
-
----
-
-### S2-T3: Update CLAUDE.md Paths
-
-**ID:** S2-M3
-**Priority:** P0
-**Description:** Update all `sigil-mark/` references in CLAUDE.md to `grimoires/sigil/`.
-
-**Key sections to update:**
-- Directory structure diagram
-- Key files table
-- v7.6 Executable Principles table
-- Any import examples
-
-**Also update:**
-- Remove references to non-existent runtime layer (useSigilMutation, CriticalZone)
-- Add note: "Full runtime layer is Phase 2"
-- Update version references to v9.1
-
-**Acceptance Criteria:**
-- [x] All `sigil-mark/` paths replaced with `grimoires/sigil/`
-- [x] Directory structure diagram updated
-- [x] Version references updated to v9.1
-- [x] No references to phantom runtime layer imports
-
-**Effort:** Medium
-**Dependencies:** Sprint 1 complete
-
----
-
-### S2-T4: Update tsconfig.json Path Aliases
-
-**ID:** S2-M4
-**Priority:** P1
-**Description:** Update tsconfig.json to remove broken sigil-mark aliases and add correct grimoire paths.
-
-**Current (broken):**
+- [x] File exists at `.claude/settings.local.json`
+- [x] SessionStart hook configured to run `sigil-init.sh`
+- [x] PreToolUse hook configured for Edit and Write tools
+- [x] Timeouts set (5000ms for init, 3000ms for validation)
+
+**File:** `.claude/settings.local.json`
 ```json
 {
-  "paths": {
-    "@sigil/recipes/*": ["sigil-mark/recipes/*"],
-    "@sigil/hooks": ["sigil-mark/hooks/index.ts"],
-    "@sigil/hooks/*": ["sigil-mark/hooks/*"],
-    "@sigil/core/*": ["sigil-mark/core/*"]
-  },
-  "include": ["sigil-mark/**/*"]
+  "hooks": {
+    "SessionStart": [
+      {
+        "script": ".claude/scripts/sigil-init.sh",
+        "timeout": 5000
+      }
+    ],
+    "PreToolUse": {
+      "Edit": [".claude/scripts/validate-physics.sh"],
+      "Write": [".claude/scripts/validate-physics.sh"]
+    }
+  }
 }
 ```
 
-**New (fixed):**
+**Dependencies:** None
+**Testing:** Start new Claude session, verify hooks configuration loads
+
+---
+
+### Task 1.2: Create SessionStart Hook
+
+**ID:** S1-02
+**Description:** Create `sigil-init.sh` script that injects physics rules and authority thresholds into Claude's context at session start.
+
+**Acceptance Criteria:**
+- [x] Script exists at `.claude/scripts/sigil-init.sh`
+- [x] Script is executable (`chmod +x`)
+- [x] Outputs constitution.yaml content
+- [x] Outputs authority.yaml content
+- [x] Outputs accumulated context from `.context/` if exists
+- [x] Handles missing files gracefully with warnings
+
+**File:** `.claude/scripts/sigil-init.sh`
+
+**Dependencies:** S1-01
+**Testing:** Run manually, verify output includes physics rules
+
+---
+
+### Task 1.3: Create PreToolUse Validation Hook
+
+**ID:** S1-03
+**Description:** Create `validate-physics.sh` script that validates generated code matches physics constraints before Edit/Write operations.
+
+**Acceptance Criteria:**
+- [x] Script exists at `.claude/scripts/validate-physics.sh`
+- [x] Script is executable
+- [x] Checks financial mutations have confirmation flow
+- [x] Checks mutations don't use snappy timing
+- [x] Checks interactive components have motion/transition
+- [x] Outputs warnings (not blocks) for violations
+- [x] Skips non-component files (.ts, .md, etc.)
+
+**File:** `.claude/scripts/validate-physics.sh`
+
+**Dependencies:** S1-01
+**Testing:** Run against sample component code, verify warnings appear
+
+---
+
+### Task 1.4: Update Mason Skill - Required Reading
+
+**ID:** S1-04
+**Description:** Add "Required Reading" section to Mason SKILL.md that instructs Claude to read physics configuration before generating components.
+
+**Acceptance Criteria:**
+- [x] SKILL.md contains "## Required Reading" section
+- [x] Lists constitution.yaml as required reading
+- [x] Lists authority.yaml as required reading
+- [x] Lists physics.ts (lines 1-100) as required reading
+- [x] Reading happens BEFORE any generation
+
+**File:** `.claude/skills/mason/SKILL.md`
+
+**Dependencies:** None
+**Testing:** Run `/craft "test button"`, verify Claude reads config files first
+
+---
+
+### Task 1.5: Update Mason Skill - Physics Decision Tree
+
+**ID:** S1-05
+**Description:** Add "Physics Decision Tree" section to Mason SKILL.md with clear branching logic for determining physics based on effect type.
+
+**Acceptance Criteria:**
+- [x] SKILL.md contains "## Physics Decision Tree" section
+- [x] Covers mutation vs query vs local_state branching
+- [x] Covers financial vs non-financial mutation branching
+- [x] Shows correct physics for each path:
+  - Financial mutation → server-tick (1200ms), confirmation
+  - Non-financial mutation → deliberate (800ms)
+  - Query → snappy (150ms)
+  - Local state → smooth/instant (0ms)
+- [x] Lists financial keywords: claim, deposit, withdraw, transfer, swap, burn
+
+**File:** `.claude/skills/mason/SKILL.md`
+
+**Dependencies:** S1-04
+**Testing:** Run `/craft "claim button"`, verify 800ms pessimistic physics in output
+
+---
+
+## Sprint 2: Helpers + Skill Enhancements
+
+**Goal:** Create bash helper scripts and enhance Gardener/Diagnostician skills
+
+**Exit Criteria:**
+- Helper scripts compute import counts and stability days
+- `/garden` shows accurate authority tiers
+- Diagnostician matches patterns without asking questions
+
+### Task 2.1: Create count-imports.sh Helper
+
+**ID:** S2-01
+**Description:** Create bash script that counts how many files import a given component.
+
+**Acceptance Criteria:**
+- [x] Script exists at `.claude/scripts/count-imports.sh`
+- [x] Script is executable
+- [x] Takes component name as argument
+- [x] Searches src/ for import statements
+- [x] Handles .tsx, .ts, .jsx, .js files
+- [x] Returns numeric count
+
+**Usage:** `.claude/scripts/count-imports.sh Button`
+**Output:** `15`
+
+**Dependencies:** None
+**Testing:** Run on known component, verify count matches manual grep
+
+---
+
+### Task 2.2: Create check-stability.sh Helper
+
+**ID:** S2-02
+**Description:** Create bash script that calculates days since last modification of a file.
+
+**Acceptance Criteria:**
+- [x] Script exists at `.claude/scripts/check-stability.sh`
+- [x] Script is executable
+- [x] Takes file path as argument
+- [x] Uses git log to get last commit timestamp
+- [x] Falls back to file stat if not in git
+- [x] Returns numeric days
+
+**Usage:** `.claude/scripts/check-stability.sh src/hooks/useMotion.ts`
+**Output:** `14`
+
+**Dependencies:** None
+**Testing:** Modify a file, verify script returns 0 days
+
+---
+
+### Task 2.3: Create infer-authority.sh Helper
+
+**ID:** S2-03
+**Description:** Create bash script that combines import count and stability to infer authority tier.
+
+**Acceptance Criteria:**
+- [x] Script exists at `.claude/scripts/infer-authority.sh`
+- [x] Script is executable
+- [x] Takes file path as argument
+- [x] Calls count-imports.sh and check-stability.sh
+- [x] Applies thresholds from authority.yaml:
+  - Gold: 10+ imports AND 14+ days stable
+  - Silver: 5+ imports
+  - Draft: everything else
+- [x] Returns JSON with component, file, imports, stability_days, tier
+
+**Usage:** `.claude/scripts/infer-authority.sh src/hooks/useMotion.ts`
+**Output:**
 ```json
 {
-  "paths": {
-    "@sigil-context/*": ["grimoires/sigil/*"],
-    "@sigil/hooks": ["src/components/gold/hooks/index.ts"],
-    "@sigil/hooks/*": ["src/components/gold/hooks/*"],
-    "@sigil/utils/*": ["src/components/gold/utils/*"]
-  },
-  "include": ["grimoires/sigil/**/*", "src/**/*"]
+  "component": "useMotion",
+  "file": "src/hooks/useMotion.ts",
+  "imports": 12,
+  "stability_days": 21,
+  "tier": "gold"
 }
 ```
 
-**Acceptance Criteria:**
-- [x] All sigil-mark paths removed from tsconfig
-- [x] Correct grimoire and src paths added
-- [x] TypeScript resolves all imports correctly
+**Dependencies:** S2-01, S2-02
+**Testing:** Run on various components, verify tier assignments
 
-**Effort:** Small
+---
+
+### Task 2.4: Update Gardener Skill
+
+**ID:** S2-04
+**Description:** Add "Authority Computation" section to Gardener SKILL.md with instructions to use bash helper scripts.
+
+**Acceptance Criteria:**
+- [x] SKILL.md contains "## Authority Computation with Bash Helpers" section
+- [x] Documents count-imports.sh usage
+- [x] Documents check-stability.sh usage
+- [x] Documents infer-authority.sh usage
+- [x] Shows tier threshold table
+- [x] Emphasizes: no file moves required
+
+**File:** `.claude/skills/gardener/SKILL.md`
+
+**Dependencies:** S2-01, S2-02, S2-03
+**Testing:** Run `/garden`, verify accurate authority report
+
+---
+
+### Task 2.5: Update Diagnostician Skill
+
+**ID:** S2-05
+**Description:** Add "Required Reading" and enhanced "Pattern Matching" sections to Diagnostician SKILL.md.
+
+**Acceptance Criteria:**
+- [x] SKILL.md contains "## Required Reading" section
+  - Lists `src/lib/sigil/diagnostician.ts` as required
+- [x] Contains enhanced "## Pattern Categories with Keywords" table
+- [x] Contains "## Never Ask" section (explicit list with alternatives)
+- [x] Documents matching process:
+  1. Extract keywords from error description
+  2. Match against 9 pattern categories
+  3. Return solutions ranked by confidence
+
+**File:** `.claude/skills/diagnostician/SKILL.md`
+
 **Dependencies:** None
+**Testing:** Report "dialog jumping" error, verify pattern match without questions
 
 ---
 
-### S2-T5: Consolidate Version Numbers to 9.1.0
+## Sprint 3: Context + Validation
 
-**ID:** S2-M5
-**Priority:** P1
-**Description:** Update all version references across the codebase to 9.1.0.
+**Goal:** Enable invisible context accumulation and end-to-end validation
 
-**Files to update:**
+**Exit Criteria:**
+- Context accumulates in `.context/` directory
+- Full pipeline works: /craft → /garden → diagnostician
+- Physics violations generate warnings
 
-| File | Current | New |
-|------|---------|-----|
-| `grimoires/sigil/README.md` | 9.0.0 | 9.1.0 |
-| `.sigilrc.yaml` | 4.1.0 | 9.1.0 |
-| `grimoires/sigil/constitution/constitution.yaml` | 5.0.0 | 9.1.0 |
-| `grimoires/sigil/constitution/vocabulary.yaml` | 5.0.0 | 9.1.0 |
-| `CLAUDE.md` footer | v7.6.0 | v9.1.0 |
-| `grimoires/sigil/process/index.ts` header | v4.1 | v9.1 |
-| `.claude/skills/crafting-guidance/SKILL.md` header | v4.1 | v9.1 |
+### Task 3.1: Initialize Context Directory
+
+**ID:** S3-01
+**Description:** Create the `.context/` directory structure with initial schema files.
 
 **Acceptance Criteria:**
-- [x] All listed files updated to 9.1.0
-- [x] `grep -r "version:" grimoires/sigil/ | grep -v "9.1"` returns 0
-- [x] Consistent version across entire codebase
+- [x] Directory exists at `grimoires/sigil/.context/`
+- [x] Added to `.gitignore` (build artifact, machine-specific)
+- [x] Contains empty `taste.json` with schema
+- [x] Contains empty `persona.json` with schema
+- [x] Contains empty `project.json` with schema
+- [x] Contains empty `recent.json` (last 10 generations)
 
-**Effort:** Small
-**Dependencies:** S2-T1 through S2-T4
-
----
-
-### Sprint 2 Exit Criteria
-
-- [x] SKILL.md uses grimoire paths
-- [x] index.yaml has no phantom references
-- [x] CLAUDE.md updated with grimoire paths
-- [x] tsconfig.json has correct aliases
-- [x] All versions consolidated to 9.1.0
-- [x] Skills load without errors
-
----
-
-## Sprint 3: Cleanup (P1-P2)
-
-**Goal:** Validate migration, align physics values, delete legacy directories, run final audit.
-
-**Status:** PENDING
-
-### S3-T1: Run Migration Validation Script
-
-**ID:** S3-M1
-**Priority:** P1
-**Description:** Create and run validation script to verify migration completeness.
-
-**Script:**
-```bash
-#!/bin/bash
-echo "=== SIGIL v9.1 MIGRATION VALIDATION ==="
-
-# Check 1: No sigil-mark references
-echo "1. Checking for sigil-mark references..."
-REMAINING=$(grep -r "sigil-mark" \
-  --include="*.ts" --include="*.yaml" \
-  --include="*.md" --include="*.json" \
-  2>/dev/null | wc -l)
-
-if [ "$REMAINING" -gt 0 ]; then
-  echo "❌ FAIL: $REMAINING references remain"
-  exit 1
-else
-  echo "✅ PASS: No sigil-mark references"
-fi
-
-# Check 2: Required files exist
-echo "2. Checking required files..."
-REQUIRED=(
-  "grimoires/sigil/constitution/protected-capabilities.yaml"
-  "grimoires/sigil/constitution/personas.yaml"
-  "grimoires/sigil/constitution/philosophy.yaml"
-  "grimoires/sigil/constitution/rules.md"
-)
-
-for f in "${REQUIRED[@]}"; do
-  if [ -f "$f" ]; then
-    echo "  ✓ $f"
-  else
-    echo "  ❌ MISSING: $f"
-    exit 1
-  fi
-done
-
-echo "=== VALIDATION COMPLETE ==="
+**Schema for taste.json:**
+```json
+{
+  "version": "10.1",
+  "preferences": {},
+  "reinforcement": {
+    "accepted": 0,
+    "modified": 0,
+    "rejected": 0
+  }
+}
 ```
 
-**Acceptance Criteria:**
-- [ ] Validation script runs without errors
-- [ ] 0 sigil-mark references found
-- [ ] All required files exist
-
-**Effort:** Small
-**Dependencies:** Sprint 2 complete
-
----
-
-### S3-T2: Fix Any Remaining References
-
-**ID:** S3-M2
-**Priority:** P1
-**Description:** Address any references found by validation script.
-
-**Process:**
-1. Run validation script
-2. For each reference found:
-   - If valid path: update to grimoire path
-   - If phantom feature: remove or comment out
-3. Re-run validation until 0 references
-
-**Acceptance Criteria:**
-- [ ] Validation script passes with 0 references
-- [ ] No broken functionality from fixes
-
-**Effort:** Variable (depends on findings)
-**Dependencies:** S3-T1
-
----
-
-### S3-T3: Align Physics Values Across Files
-
-**ID:** S3-M3
-**Priority:** P1
-**Description:** Ensure physics timing values are consistent across all files.
-
-**Source of truth:** `grimoires/sigil/constitution/physics.yaml`
-
-**Known inconsistency:**
-| Motion | physics.yaml | .sigilrc.yaml |
-|--------|--------------|---------------|
-| reassuring | 600ms | 1200ms |
-
-**Fix:** Update `.sigilrc.yaml` to match `physics.yaml`
-
-**Acceptance Criteria:**
-- [ ] All physics values in .sigilrc.yaml match physics.yaml
-- [ ] useMotion.ts values match physics.yaml
-- [ ] No conflicting timing values
-
-**Effort:** Small
 **Dependencies:** None
+**Testing:** Verify directory structure exists
 
 ---
 
-### S3-T4: Delete Legacy sigil-mark/ Directory
+### Task 3.2: Enhance sigil-init.sh for Context
 
-**ID:** S3-M4
-**Priority:** P2
-**Description:** Remove the legacy sigil-mark/ directory after verification.
-
-**Pre-deletion checklist:**
-```bash
-# Verify zero references remain
-grep -r "sigil-mark" --include="*.ts" --include="*.yaml" --include="*.md" | wc -l
-# Must be 0
-
-# Verify critical files are in grimoire
-[ -f "grimoires/sigil/constitution/protected-capabilities.yaml" ] && echo "OK"
-```
-
-**Command:**
-```bash
-rm -rf sigil-mark/
-```
+**ID:** S3-02
+**Description:** Update SessionStart hook to also inject accumulated context from `.context/` directory.
 
 **Acceptance Criteria:**
-- [ ] Pre-deletion checklist passes
-- [ ] `sigil-mark/` directory deleted
-- [ ] No "file not found" errors after deletion
+- [x] sigil-init.sh reads and outputs taste.json if exists
+- [x] sigil-init.sh reads and outputs recent.json if exists
+- [x] Context section clearly labeled in output
+- [x] Handles empty/missing context gracefully
 
-**Effort:** Small
-**Dependencies:** S3-T1, S3-T2
+**Dependencies:** S1-02, S3-01
+**Testing:** Run with populated context, verify output
 
 ---
 
-### S3-T5: Final Security Audit
+### Task 3.3: Create Validation Test Script
 
-**ID:** S3-M5
-**Priority:** P2
-**Description:** Run final security audit to verify migration introduced no vulnerabilities.
-
-**Focus areas:**
-- Path traversal (all paths use path.join with project root)
-- No hardcoded secrets exposed
-- No new dependencies added
+**ID:** S3-03
+**Description:** Create a validation script that tests the full v10.1 pipeline.
 
 **Acceptance Criteria:**
-- [ ] Security audit passes
-- [ ] No new vulnerabilities introduced
-- [ ] SECURITY-AUDIT-REPORT.md updated if needed
+- [x] Script exists at `.claude/scripts/validate-v10.1.sh`
+- [x] Checks all 6 library modules exist
+- [x] Checks all 3 skill files exist
+- [x] Checks constitution.yaml has effect_physics
+- [x] Checks authority.yaml has tier thresholds
+- [x] Checks useMotion.ts exists
+- [x] Checks all helper scripts are executable
+- [x] Outputs clear pass/fail for each check
 
-**Effort:** Medium
-**Dependencies:** S3-T4
-
----
-
-### Sprint 3 Exit Criteria
-
-- [ ] Validation script passes with 0 references
-- [ ] Physics values aligned across all files
-- [ ] `sigil-mark/` directory deleted
-- [ ] Final audit passes
-- [ ] Git commit with "Sigil v9.1.0 Migration Debt Zero"
+**Dependencies:** All prior tasks
+**Testing:** Run script, verify all checks pass
 
 ---
 
-## Sprint Summary
+### Task 3.4: End-to-End Integration Test
 
-| Sprint | Focus | Tasks | Key Deliverables |
-|--------|-------|-------|------------------|
-| 1 | Foundation | 4 | Orphaned files moved, placeholders created, process layer fixed |
-| 2 | Configuration | 5 | Skills updated, CLAUDE.md fixed, versions consolidated |
-| 3 | Cleanup | 5 | Validation, physics alignment, legacy deletion, audit |
+**ID:** S3-04
+**Description:** Manually test the complete workflow to verify all components work together.
 
-**Total Tasks:** 14
+**Acceptance Criteria:**
+- [x] Test 1: `/craft "claim button"` generates with 800ms pessimistic physics
+- [x] Test 2: `/craft "balance display"` generates with 150ms optimistic physics
+- [x] Test 3: `/garden src/hooks/useMotion.ts` shows authority tier
+- [x] Test 4: Report "dialog flickering" triggers Diagnostician pattern match
+- [x] All tests pass without Claude asking configuration questions
 
----
-
-## Success Metrics
-
-| Metric | Before | After |
-|--------|--------|-------|
-| `sigil-mark/` references | 81 | 0 |
-| Version numbers in use | 6+ | 1 (v9.1.0) |
-| Missing referenced files | 6 | 0 |
-| Phantom skill references | 3 | 0 |
-| `sigil-mark/` directory | Exists | Deleted |
+**Dependencies:** All prior tasks
+**Testing:** Manual execution of all 4 test cases
 
 ---
 
-## Dependencies Graph
+## Task Summary
+
+| ID | Task | Sprint | Priority | Dependencies |
+|----|------|--------|----------|--------------|
+| S1-01 | Create Hooks Configuration | 1 | P0 | None |
+| S1-02 | Create SessionStart Hook | 1 | P0 | S1-01 |
+| S1-03 | Create PreToolUse Validation Hook | 1 | P0 | S1-01 |
+| S1-04 | Update Mason - Required Reading | 1 | P0 | None |
+| S1-05 | Update Mason - Physics Decision Tree | 1 | P0 | S1-04 |
+| S2-01 | Create count-imports.sh | 2 | P0 | None |
+| S2-02 | Create check-stability.sh | 2 | P0 | None |
+| S2-03 | Create infer-authority.sh | 2 | P0 | S2-01, S2-02 |
+| S2-04 | Update Gardener Skill | 2 | P0 | S2-01, S2-02, S2-03 |
+| S2-05 | Update Diagnostician Skill | 2 | P0 | None |
+| S3-01 | Initialize Context Directory | 3 | P1 | None |
+| S3-02 | Enhance sigil-init.sh for Context | 3 | P1 | S1-02, S3-01 |
+| S3-03 | Create Validation Test Script | 3 | P1 | All prior |
+| S3-04 | End-to-End Integration Test | 3 | P1 | All prior |
+
+---
+
+## Dependency Graph
 
 ```
 Sprint 1:
-  S1-T1 (move protected-capabilities) ─┐
-  S1-T2 (create placeholders) ─────────┼─► S1-T3 (process paths)
-                                       │
-                                       └─► S1-T4 (verify compilation)
+  S1-01 (hooks config) ─┬─► S1-02 (sigil-init.sh)
+                        └─► S1-03 (validate-physics.sh)
+
+  S1-04 (Mason Required Reading) ─► S1-05 (Mason Physics Tree)
 
 Sprint 2:
-  S1 complete ─► S2-T1 (SKILL.md) ─► S2-T2 (index.yaml)
-               └─► S2-T3 (CLAUDE.md)
+  S2-01 (count-imports) ─┐
+                         ├─► S2-03 (infer-authority)
+  S2-02 (check-stability)┘              │
+                                        └─► S2-04 (Gardener skill)
 
-  S2-T4 (tsconfig) ─ independent
-
-  S2-T1-4 complete ─► S2-T5 (version consolidation)
+  S2-05 (Diagnostician) ─ independent
 
 Sprint 3:
-  S2 complete ─► S3-T1 (validation) ─► S3-T2 (fix remaining)
-                                      └─► S3-T3 (physics alignment)
+  S3-01 (context dir) ─┐
+                       └─► S3-02 (enhance sigil-init)
+  S1-02 ──────────────────┘
 
-  S3-T1-3 complete ─► S3-T4 (delete sigil-mark/)
-  S3-T4 complete ─► S3-T5 (final audit)
+  All prior ─► S3-03 (validation script) ─► S3-04 (E2E test)
 ```
 
 ---
 
 ## Risk Assessment
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| Missed reference breaks agent | Medium | High | Run validation after each sprint |
-| Placeholder files insufficient | Low | Low | Placeholder is acceptable for v9.1 |
-| Physics value mismatch | Low | Low | physics.yaml is source of truth |
-| Rollback needed | Low | Medium | Git history preserved |
+| Risk | Impact | Likelihood | Mitigation |
+|------|--------|------------|------------|
+| Hooks don't run as expected | High | Medium | Test hooks in isolation before integration |
+| Bash scripts fail on different environments | Medium | Low | Use /opt/homebrew/bin/bash, add fallbacks |
+| Physics validation too strict | Medium | Medium | Start with warnings only, no blocking |
+| Context files grow unbounded | Low | Medium | Limit recent.json to last 10 entries |
+| Skills don't read required files | Medium | Low | Explicit "MUST read" in SKILL.md |
 
 ---
 
-## Rollback Procedure
+## Success Metrics
 
-If migration fails after deletion:
-```bash
-git checkout <commit-before-deletion> -- sigil-mark/
+| Metric | Baseline | Target | Measurement |
+|--------|----------|--------|-------------|
+| Mason asks config questions | Yes | No | Manual test |
+| /craft uses correct physics | Partial | 100% | Test all effect types |
+| /garden shows authority | No | Yes | Run on 5 components |
+| Diagnostician matches patterns | Partial | 100% | Test all 9 categories |
+| Physics warnings appear | No | Yes | Trigger intentional violation |
+
+---
+
+## Files Created
+
+| File | Purpose | Sprint |
+|------|---------|--------|
+| `.claude/settings.local.json` | Hooks configuration | 1 |
+| `.claude/scripts/sigil-init.sh` | SessionStart hook | 1 |
+| `.claude/scripts/validate-physics.sh` | PreToolUse hook | 1 |
+| `.claude/scripts/count-imports.sh` | Import counter | 2 |
+| `.claude/scripts/check-stability.sh` | Stability checker | 2 |
+| `.claude/scripts/infer-authority.sh` | Authority inferer | 2 |
+| `.claude/scripts/validate-v10.1.sh` | Validation script | 3 |
+| `grimoires/sigil/.context/taste.json` | Taste preferences | 3 |
+| `grimoires/sigil/.context/persona.json` | Audience context | 3 |
+| `grimoires/sigil/.context/project.json` | Project conventions | 3 |
+| `grimoires/sigil/.context/recent.json` | Recent generations | 3 |
+
+## Files Updated
+
+| File | Changes | Sprint |
+|------|---------|--------|
+| `.claude/skills/mason/SKILL.md` | Required Reading, Physics Decision Tree | 1 |
+| `.claude/skills/gardener/SKILL.md` | Authority Computation with Bash Helpers | 2 |
+| `.claude/skills/diagnostician/SKILL.md` | Required Reading, Pattern Categories, Never Ask | 2 |
+| `.gitignore` | Add grimoires/sigil/.context/ | 3 |
+
+---
+
+## Next Steps
+
+After sprint plan approval:
+```
+/implement sprint-1
 ```
 
-If migration fails before deletion:
-```bash
-git checkout HEAD -- grimoires/sigil/process/
-git checkout HEAD -- .claude/skills/
-git checkout HEAD -- CLAUDE.md
-git checkout HEAD -- tsconfig.json
-```
-
----
-
-## What's NOT in This Sprint (Phase 2+)
-
-| Feature | Why Deferred |
-|---------|--------------|
-| Runtime layer creation | Separate feature, not migration debt |
-| New components | Focus is debt cleanup only |
-| Survival Engine activation | Needs usage patterns |
-| Linter Gate activation | Tied to survival engine |
-| Context Accumulation | Manual defaults work initially |
-
----
-
-## Next Steps After Completion
-
-1. **Verify `/craft` works** with all physics types
-2. **Confirm agent loads** grimoire context correctly
-3. **Plan Phase 2** for runtime layer if needed
+The implement command will:
+1. Pick up tasks from this sprint plan
+2. Execute them in dependency order
+3. Mark tasks complete as they finish
+4. Verify acceptance criteria
 
 ---
 
 *Sprint Plan Generated: 2026-01-11*
-*Based on: PRD v9.1.0, SDD v9.1.0*
-*Key Insight: Fix 81 paths, consolidate 6 versions, delete 1 directory*
-*Next Step: `/implement sprint-1`*
+*Total Tasks: 14*
+*Architecture: Hooks-Based Skill Enhancement*
+*Key Insight: Skills read, hooks inject, bash computes*
