@@ -109,9 +109,72 @@ import { SurvivalEngine, inferAuthority, countImports } from '@sigil/survival';
 import { analyzeAST, inferIntent } from '@sigil/ast-reader';
 ```
 
-## Authority Computation
+---
 
-Authority is computed, never stored:
+## Authority Computation with Bash Helpers
+
+Authority is computed at runtime using bash helper scripts. **No file moves required.**
+
+### Helper Scripts
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `count-imports.sh` | Count files importing a component | `.claude/scripts/count-imports.sh ComponentName` |
+| `check-stability.sh` | Days since last modification | `.claude/scripts/check-stability.sh path/to/file.tsx` |
+| `infer-authority.sh` | Compute tier from metrics | `.claude/scripts/infer-authority.sh path/to/file.tsx` |
+
+### How to Check Authority
+
+To determine a component's authority tier, run:
+
+```bash
+# Option 1: Full authority inference (recommended)
+.claude/scripts/infer-authority.sh src/components/Button.tsx
+
+# Output:
+# {
+#   "component": "Button",
+#   "file": "src/components/Button.tsx",
+#   "imports": 12,
+#   "stability_days": 21,
+#   "tier": "gold"
+# }
+```
+
+Or check individual metrics:
+
+```bash
+# Count how many files import this component
+.claude/scripts/count-imports.sh Button
+# Output: 12
+
+# Check days since last modification
+.claude/scripts/check-stability.sh src/components/Button.tsx
+# Output: 21
+```
+
+### Tier Threshold Table
+
+| Tier | Min Imports | Min Stability | Description |
+|------|-------------|---------------|-------------|
+| **Gold** | 10+ | 14+ days | Production-ready, widely used |
+| **Silver** | 5+ | 7+ days | Proven patterns, gaining adoption |
+| **Draft** | < 5 | any | Experimental, new, or rarely used |
+
+### Key Principle
+
+**Authority is a computed property, not a stored value.**
+
+- No directories like `gold/`, `silver/`, `draft/`
+- No file moves required for promotion
+- No broken imports when authority changes
+- Authority changes automatically as usage patterns change
+
+---
+
+## Authority Computation (TypeScript Reference)
+
+The bash helpers implement this logic:
 
 ```typescript
 async function inferAuthority(component: string): Promise<Tier> {
@@ -123,8 +186,6 @@ async function inferAuthority(component: string): Promise<Tier> {
   return 'draft';
 }
 ```
-
-No file moves required. Authority is a computed property.
 
 ## GitHub Actions Integration
 

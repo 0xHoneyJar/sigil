@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# Sigil Framework: Mount Script
+# Sigil v11 "Pure Craft" — Mount Script
 # Design Physics Engine for AI-assisted development
+#
+# Key principle: NEVER override existing CLAUDE.md
+# Uses .claude/rules/ for framework instructions (Claude Code native discovery)
 set -euo pipefail
 
 # === Colors ===
@@ -22,6 +25,7 @@ SIGIL_HOME="${SIGIL_HOME:-$HOME/.sigil/sigil}"
 SIGIL_REPO="${SIGIL_REPO:-https://github.com/0xHoneyJar/sigil.git}"
 SIGIL_BRANCH="${SIGIL_BRANCH:-main}"
 VERSION_FILE=".sigil-version.json"
+SIGIL_VERSION="11.0.0"
 
 # === Argument Parsing ===
 while [[ $# -gt 0 ]]; do
@@ -37,16 +41,21 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       echo "Usage: mount-sigil.sh [OPTIONS]"
       echo ""
-      echo "Mount Sigil Design Physics Engine onto a repository."
+      echo "Mount Sigil v11 'Pure Craft' Design Physics Engine."
       echo ""
       echo "Options:"
       echo "  --branch <name>   Sigil branch to use (default: main)"
       echo "  --home <path>     Sigil home directory (default: ~/.sigil/sigil)"
       echo "  -h, --help        Show this help message"
       echo ""
+      echo "What this does:"
+      echo "  1. Creates .claude/rules/ with Sigil physics instructions"
+      echo "  2. Creates grimoires/sigil/ with constitution.yaml"
+      echo "  3. Creates examples/ with reference components"
+      echo "  4. NEVER touches existing CLAUDE.md in your repo"
+      echo ""
       echo "Examples:"
       echo "  curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash"
-      echo "  ./mount-sigil.sh --branch develop"
       exit 0
       ;;
     *)
@@ -67,18 +76,23 @@ preflight() {
   if [[ -f "$VERSION_FILE" ]]; then
     local existing=$(jq -r '.version // "unknown"' "$VERSION_FILE" 2>/dev/null || echo "unknown")
     warn "Sigil is already mounted (version: $existing)"
-    read -p "Remount/upgrade? This will refresh symlinks. (y/N) " -n 1 -r
+    read -p "Update Sigil? This will refresh .claude/rules/ files. (y/N) " -n 1 -r
     echo ""
     [[ $REPLY =~ ^[Yy]$ ]] || { log "Aborted."; exit 0; }
   fi
 
+  # Check for existing CLAUDE.md (info only, we don't touch it)
+  if [[ -f "CLAUDE.md" ]]; then
+    info "Found existing CLAUDE.md — Sigil will NOT modify it"
+    info "Sigil instructions will go in .claude/rules/ instead"
+  fi
+
   command -v git >/dev/null || err "git is required"
-  command -v jq >/dev/null || warn "jq not found (optional, for better JSON handling)"
 
   log "Pre-flight checks passed"
 }
 
-# === Clone or Update Sigil ===
+# === Clone or Update Sigil Home ===
 setup_sigil_home() {
   step "Setting up Sigil home..."
 
@@ -99,147 +113,86 @@ setup_sigil_home() {
   log "Sigil home ready at $SIGIL_HOME"
 }
 
-# === Sigil v3.x Skills ===
-SIGIL_SKILLS=(
-  "approving-patterns"
-  "canonizing-flaws"
-  "codifying-materials"
-  "codifying-recipes"
-  "codifying-rules"
-  "consulting-decisions"
-  "crafting-components"
-  "crafting-guidance"
-  "envisioning-moodboard"
-  "envisioning-soul"
-  "gardening-entropy"
-  "greenlighting-concepts"
-  "inheriting-design"
-  "initializing-sigil"
-  "mapping-zones"
-  "unlocking-decisions"
-  "updating-framework"
-  "validating-fidelity"
-)
+# === Install Rules (the key v11 pattern) ===
+install_rules() {
+  step "Installing Sigil rules to .claude/rules/..."
 
-# === Sigil v3.x Commands ===
-SIGIL_COMMANDS=(
-  "approve"
-  "canonize"
-  "codify"
-  "consult"
-  "craft"
-  "envision"
-  "garden"
-  "greenlight"
-  "inherit"
-  "map"
-  "material"
-  "recipe"
-  "sigil-setup"
-  "unlock"
-  "update"
-  "validate"
-)
+  mkdir -p .claude/rules
 
-# === Sigil v3.x Scripts ===
-SIGIL_SCRIPTS=(
-  "mount-sigil.sh"
-  "sigil-workbench.sh"
-  "sigil-tensions.sh"
-  "sigil-validate.sh"
-  "sigil-detect-zone.sh"
-  "sigil-diff.sh"
-)
-
-# === Create Symlinks ===
-create_symlinks() {
-  step "Creating symlinks..."
-
-  # Create .claude directories if needed
-  mkdir -p .claude/skills
-  mkdir -p .claude/commands
-
-  # Symlink Sigil v1.0 skills
-  local skill_count=0
-  for skill_name in "${SIGIL_SKILLS[@]}"; do
-    if [[ -d "$SIGIL_HOME/.claude/skills/$skill_name" ]]; then
-      # Remove existing symlink or directory
-      rm -rf ".claude/skills/$skill_name"
-      ln -sf "$SIGIL_HOME/.claude/skills/$skill_name" ".claude/skills/$skill_name"
-      ((skill_count++))
-    fi
-  done
-  log "Linked $skill_count skills"
-
-  # Symlink Sigil v1.0 commands
-  local cmd_count=0
-  for cmd in "${SIGIL_COMMANDS[@]}"; do
-    if [[ -f "$SIGIL_HOME/.claude/commands/${cmd}.md" ]]; then
-      rm -f ".claude/commands/${cmd}.md"
-      ln -sf "$SIGIL_HOME/.claude/commands/${cmd}.md" ".claude/commands/${cmd}.md"
-      ((cmd_count++))
-    fi
-  done
-  log "Linked $cmd_count commands"
-
-  # Symlink Sigil v1.0 scripts
-  mkdir -p .claude/scripts
-  local script_count=0
-  for script_name in "${SIGIL_SCRIPTS[@]}"; do
-    if [[ -f "$SIGIL_HOME/.claude/scripts/$script_name" ]]; then
-      # Don't overwrite mount script if it exists locally
-      if [[ "$script_name" != "mount-sigil.sh" ]] || [[ ! -f ".claude/scripts/$script_name" ]]; then
-        rm -f ".claude/scripts/$script_name"
-        ln -sf "$SIGIL_HOME/.claude/scripts/$script_name" ".claude/scripts/$script_name"
-        ((script_count++))
+  # Copy Sigil rule files (these are the physics instructions)
+  if [[ -d "$SIGIL_HOME/.claude/rules" ]]; then
+    for rule_file in "$SIGIL_HOME/.claude/rules"/sigil-*.md; do
+      if [[ -f "$rule_file" ]]; then
+        local filename=$(basename "$rule_file")
+        cp "$rule_file" ".claude/rules/$filename"
+        log "  Installed $filename"
       fi
+    done
+  else
+    # Fallback: create from CLAUDE.md if rules don't exist yet
+    warn "No .claude/rules/ found in Sigil home, checking for CLAUDE.md..."
+    if [[ -f "$SIGIL_HOME/CLAUDE.md" ]]; then
+      cp "$SIGIL_HOME/CLAUDE.md" ".claude/rules/sigil-physics.md"
+      log "  Created sigil-physics.md from CLAUDE.md"
     fi
-  done
-  log "Linked $script_count scripts"
+  fi
+
+  log "Rules installed (Claude Code will auto-discover these)"
 }
 
-# === Create State Zone Structure ===
-create_state_zone() {
-  step "Creating sigil-mark/ state zone..."
+# === Install Constitution ===
+install_constitution() {
+  step "Installing constitution.yaml..."
 
-  # Create v3.x directory structure
-  mkdir -p sigil-mark/moodboard/references
-  mkdir -p sigil-mark/moodboard/anti-patterns
-  mkdir -p sigil-mark/moodboard/articles
-  mkdir -p sigil-mark/moodboard/gtm
-  mkdir -p sigil-mark/moodboard/screenshots
-  mkdir -p sigil-mark/soul-binder
-  mkdir -p sigil-mark/lens-array
-  mkdir -p sigil-mark/consultation-chamber
-  mkdir -p sigil-mark/proving-grounds
+  mkdir -p grimoires/sigil
 
-  # Create .gitkeep files
-  touch sigil-mark/moodboard/references/.gitkeep
-  touch sigil-mark/moodboard/anti-patterns/.gitkeep
-  touch sigil-mark/moodboard/articles/.gitkeep
-  touch sigil-mark/moodboard/gtm/.gitkeep
-  touch sigil-mark/moodboard/screenshots/.gitkeep
+  if [[ -f "$SIGIL_HOME/grimoires/sigil/constitution.yaml" ]]; then
+    cp "$SIGIL_HOME/grimoires/sigil/constitution.yaml" "grimoires/sigil/constitution.yaml"
+    log "  Installed constitution.yaml"
+  else
+    warn "No constitution.yaml found in Sigil home"
+  fi
+}
 
-  log "State zone structure created"
+# === Install Examples ===
+install_examples() {
+  step "Installing example components..."
+
+  if [[ -d "$SIGIL_HOME/examples" ]]; then
+    mkdir -p examples
+    cp -r "$SIGIL_HOME/examples/"* examples/ 2>/dev/null || true
+    log "  Installed examples/"
+  else
+    info "No examples directory in Sigil home (optional)"
+  fi
+}
+
+# === Install Commands ===
+install_commands() {
+  step "Installing /craft command..."
+
+  mkdir -p .claude/commands
+
+  if [[ -f "$SIGIL_HOME/.claude/commands/craft.md" ]]; then
+    cp "$SIGIL_HOME/.claude/commands/craft.md" ".claude/commands/craft.md"
+    log "  Installed /craft command"
+  fi
 }
 
 # === Create Version File ===
 create_version_file() {
   step "Creating version manifest..."
 
-  local sigil_version="3.1.0"
-  if [[ -f "$SIGIL_HOME/VERSION" ]]; then
-    sigil_version=$(cat "$SIGIL_HOME/VERSION" | tr -d '[:space:]')
-  fi
-
   cat > "$VERSION_FILE" << EOF
 {
-  "version": "$sigil_version",
+  "version": "$SIGIL_VERSION",
+  "codename": "Pure Craft",
   "mounted_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "updated_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "sigil_home": "$SIGIL_HOME",
   "branch": "$SIGIL_BRANCH",
-  "architecture": "design-context-framework"
+  "architecture": "prompt-only",
+  "note": "Sigil uses .claude/rules/ - does not modify root CLAUDE.md"
 }
 EOF
 
@@ -250,16 +203,18 @@ EOF
 main() {
   echo ""
   log "======================================================================="
-  log "  Sigil v3.x — Design Context Framework"
-  log "  Making the right path easy, wrong path visible"
+  log "  Sigil v11 — Pure Craft"
+  log "  Design Physics for Code Generation"
   log "======================================================================="
   log "  Branch: $SIGIL_BRANCH"
   echo ""
 
   preflight
   setup_sigil_home
-  create_symlinks
-  create_state_zone
+  install_rules
+  install_constitution
+  install_examples
+  install_commands
   create_version_file
 
   echo ""
@@ -267,30 +222,22 @@ main() {
   log "  Sigil Successfully Mounted!"
   log "======================================================================="
   echo ""
-  info "Next steps:"
-  info "  1. Run 'claude' to start Claude Code"
-  info "  2. Run '/sigil-setup' to initialize Sigil"
-  info "  3. Run '/envision' to capture product moodboard"
-  info "  4. Run '/codify' to define design rules"
-  info "  5. Run '/craft' to get design guidance"
+  info "What was installed:"
+  info "  .claude/rules/sigil-*.md  -> Physics instructions (auto-discovered)"
+  info "  grimoires/sigil/          -> Constitution config"
+  info "  examples/                 -> Reference components"
+  info "  .claude/commands/craft.md -> /craft command"
+  info "  .sigil-version.json       -> Version tracking"
   echo ""
-  info "Framework structure:"
-  info "  .claude/skills/     -> ${#SIGIL_SKILLS[@]} Sigil skills symlinked"
-  info "  .claude/commands/   -> ${#SIGIL_COMMANDS[@]} Sigil commands symlinked"
-  info "  .claude/scripts/    -> ${#SIGIL_SCRIPTS[@]} Sigil scripts symlinked"
-  info "  sigil-mark/         -> Your design context (state zone)"
-  info "  .sigil-version.json -> Version tracking"
+  info "What was NOT touched:"
+  info "  CLAUDE.md                 -> Your existing file is preserved!"
   echo ""
-  info "Key directories:"
-  info "  sigil-mark/moodboard/    -> Design inspiration collection"
-  info "  sigil-mark/moodboard.md  -> Product feel descriptors"
-  info "  sigil-mark/rules.md      -> Design rules"
-  info "  .sigilrc.yaml            -> Zone configuration"
+  info "Usage:"
+  info "  /craft \"claim button\"     -> Generates with 800ms pessimistic physics"
+  info "  /craft \"like button\"      -> Generates with 200ms optimistic physics"
+  info "  /craft \"dark mode toggle\" -> Generates with 100ms immediate physics"
   echo ""
-  info "Philosophy:"
-  info "  - Make the right path easy"
-  info "  - Make the wrong path visible (not impossible)"
-  info "  - Human accountable for all decisions"
+  info "The physics are applied automatically. No configuration needed."
   echo ""
 }
 

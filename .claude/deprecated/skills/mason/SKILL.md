@@ -6,6 +6,81 @@
 
 Mason is the consolidated generation skill for Sigil v10.1. It generates UI components and copy with physics, using context inferred from the codebase rather than configuration questions.
 
+---
+
+## Required Reading
+
+**BEFORE generating ANY component, I MUST read these files:**
+
+1. **Constitution** — `grimoires/sigil/constitution.yaml`
+   - Effect → physics mapping
+   - Physics presets (server-tick, deliberate, snappy, smooth, instant)
+   - Protected capabilities (withdraw, deposit, balance)
+
+2. **Authority** — `grimoires/sigil/authority.yaml`
+   - Tier thresholds (gold: 10+ imports, silver: 5+, draft: rest)
+   - Promotion/demotion rules
+
+3. **Physics Library** — `src/lib/sigil/physics.ts` (lines 1-100)
+   - EFFECT_PHYSICS constant
+   - useMotion hook implementation
+   - inferPhysicsFromEffect function
+
+**Reading these files BEFORE generation ensures correct physics are applied.**
+
+---
+
+## Physics Decision Tree
+
+When generating a component, follow this decision tree to determine physics:
+
+```
+┌─ Is this a MUTATION? (POST, PUT, DELETE, useMutation, mutate())
+│
+├─ YES ──┬─ Is it FINANCIAL/SENSITIVE?
+│        │  Keywords: claim, deposit, withdraw, transfer, swap, burn,
+│        │            stake, unstake, ownership, permission, delete
+│        │
+│        ├─ YES → SENSITIVE_MUTATION
+│        │        • sync: pessimistic
+│        │        • timing: 1200ms
+│        │        • confirmation: REQUIRED
+│        │        • useMotion('server-tick')
+│        │        • Include: simulation step, confirmation dialog
+│        │
+│        └─ NO → MUTATION
+│                • sync: pessimistic
+│                • timing: 800ms
+│                • useMotion('deliberate')
+│                • Wait for server confirmation before UI update
+│
+└─ NO ───┬─ Is it a QUERY? (GET, fetch, useQuery, read operations)
+         │
+         ├─ YES → QUERY
+         │        • sync: optimistic
+         │        • timing: 150ms
+         │        • useMotion('snappy')
+         │        • Can show cached/predicted data immediately
+         │
+         └─ NO → LOCAL_STATE (useState, useReducer, form inputs)
+                 • sync: immediate
+                 • timing: 0ms
+                 • useMotion('instant') or no motion needed
+                 • No server round-trip
+```
+
+### Financial/Sensitive Keywords Reference
+
+**Always apply sensitive_mutation physics when these keywords appear:**
+
+| Category | Keywords |
+|----------|----------|
+| Financial | claim, deposit, withdraw, transfer, swap, stake, unstake, burn |
+| Ownership | ownership, permission, access, revoke, grant |
+| Destructive | delete, remove, destroy, clear, reset |
+
+---
+
 ## Invocation
 
 ```

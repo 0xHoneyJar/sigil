@@ -6,6 +6,59 @@
 
 Diagnostician is the debugging skill for Sigil v10.1. It matches user symptoms to known patterns and provides solutions without asking clarifying questions.
 
+---
+
+## Required Reading
+
+**BEFORE diagnosing ANY issue, I MUST read:**
+
+1. **Pattern Library** — `src/lib/sigil/diagnostician.ts`
+   - PATTERNS constant with 9 categories
+   - matchSymptoms() function implementation
+   - diagnose() function with confidence scoring
+
+This file contains the comprehensive pattern library with symptoms, keywords, causes, and solutions for all known issues.
+
+---
+
+## Never Ask
+
+**I NEVER ask these questions:**
+
+| Forbidden Question | Why It's Forbidden | What To Do Instead |
+|--------------------|-------------------|-------------------|
+| "Can you check the console?" | User may not know how | Read the error pattern, provide solution |
+| "What browser are you using?" | Usually irrelevant | Cover solutions for all browsers |
+| "Can you share more details?" | Delays resolution | Match patterns, list possibilities |
+| "What did you expect to happen?" | Wastes time | Infer expected behavior from context |
+| "Can you reproduce the error?" | User already did | Trust their description |
+
+**Instead, I:**
+- Match symptoms to known patterns immediately
+- Provide solutions ranked by confidence
+- List multiple possibilities if unsure
+- Show code fixes, not debugging steps
+
+---
+
+## Pattern Categories with Keywords
+
+When matching user descriptions, look for these keywords:
+
+| Category | Keywords to Match | Common Symptoms |
+|----------|-------------------|-----------------|
+| **hydration** | hydration, mismatch, server, client, SSR, useEffect, useState | Content differs between server and client render |
+| **dialog** | dialog, modal, drawer, popup, overlay, z-index, scroll, position | Modal positioning issues, scroll lock problems |
+| **performance** | slow, lag, freeze, re-render, memo, callback, useMemo | Unnecessary re-renders, layout thrashing |
+| **layout** | shift, jump, CLS, flash, image, dimension, height, width | Content layout shift, images without dimensions |
+| **server-component** | 'use client', RSC, server component, hooks, onClick, useState | Using client-side features in server components |
+| **react-19** | forwardRef, defaultProps, deprecated, React 19 | Using deprecated React patterns |
+| **state** | stale, closure, infinite, loop, object, reference, dependency | Stale closures, infinite re-render loops |
+| **async** | race, abort, unmounted, cancelled, pending, loading | Race conditions, updates after unmount |
+| **animation** | AnimatePresence, exit, flicker, animation, transition, motion | Missing exit animations, animation glitches |
+
+---
+
 ## Invocation
 
 Diagnostician activates on problem descriptions:
