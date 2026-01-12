@@ -22,7 +22,7 @@ taste_owners:
     name: "Design Lead"
     placeholder: "@design-lead"
     scope:
-      - "sigil-mark/**"
+      - "grimoires/sigil/**"
       - "src/components/**"
 
 # Domain for proving monitors

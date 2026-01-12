@@ -6,7 +6,7 @@
  * Draft content as children (slot-based composition).
  *
  * @module rules/gold-imports-only
- * @version 7.6.0
+ * @version 9.1.0
  *
  * Tier hierarchy:
  * - gold: Stable, production-ready components

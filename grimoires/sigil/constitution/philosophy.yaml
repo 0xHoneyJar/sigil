@@ -1,0 +1,48 @@
+# Sigil Philosophy
+# Version: 9.1.0
+#
+# Core principles that guide all design decisions.
+# These are the "why" behind the physics and zones.
+
+version: "9.1.0"
+
+principles:
+  - id: flow-state
+    name: "Preserve Flow State"
+    description: "Never interrupt the designer's creative flow"
+    implications:
+      - No auto-fix on save
+      - Polish is deliberate, not automatic
+      - Observe silently, interrupt rarely
+
+  - id: invisible-infrastructure
+    name: "Invisible Infrastructure"
+    description: "Using it IS the experience"
+    implications:
+      - No governance dialogs
+      - No approval workflows blocking creation
+      - Infrastructure fades into the background
+
+  - id: survival-over-ceremony
+    name: "Survival Over Ceremony"
+    description: "Patterns earn status through usage, not approval dialogs"
+    implications:
+      - 5+ Gold imports = canonical candidate
+      - 2+ weeks stable = ready for promotion
+      - Usage data over committee decisions
+
+  - id: code-is-precedent
+    name: "Code is Precedent"
+    description: "Patterns that survive become canonical"
+    implications:
+      - No nomination PRs
+      - Survival engine promotes automatically
+      - 24h veto window for human oversight
+
+  - id: physics-not-preferences
+    name: "Physics, Not Preferences"
+    description: "Block physics violations, not style novelty"
+    implications:
+      - Zone-physics mismatch = BLOCK
+      - Material-timing mismatch = BLOCK
+      - Style deviation = TAG (allow but track)

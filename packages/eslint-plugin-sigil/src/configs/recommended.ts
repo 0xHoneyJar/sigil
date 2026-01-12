@@ -5,7 +5,7 @@
  * Provides sensible defaults for design system enforcement.
  *
  * @module configs/recommended
- * @version 7.6.0
+ * @version 9.1.0
  *
  * @example
  * // eslint.config.js (flat config)

@@ -1,8 +1,8 @@
-# Sigil v4.1 Configuration
-# "Truth is Core. Experience is Lens. Layouts ARE Zones."
+# Sigil v10.1 Configuration
+# "The codebase is the dataset. Usage is the authority."
 
-sigil: "4.1.0"
-codename: "Living Guardrails"
+sigil: "10.1.0"
+codename: "Usage Reality"
 
 # ===============================================================================
 # PROJECT METADATA

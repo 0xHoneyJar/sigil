@@ -1,0 +1,9 @@
+# Sigil v10.1 Components Directory
+#
+# Flat structure - no tier directories (gold/silver/draft).
+# Authority is computed from usage, not location.
+#
+# Components added here will have their tier inferred:
+# - Gold: 10+ imports, 14+ days stable
+# - Silver: 5+ imports
+# - Draft: Everything else

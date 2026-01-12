@@ -1,0 +1,30 @@
+name: mason
+description: "Generation skill for UI + copy with physics"
+version: "10.1.0"
+
+trigger:
+  - /craft
+  - create
+  - generate
+  - build
+  - make
+
+reads:
+  - grimoires/sigil/.context/
+  - grimoires/sigil/constitution.yaml
+  - grimoires/sigil/authority.yaml
+  - src/components/**/*.tsx
+  - src/hooks/**/*.ts
+
+uses:
+  - src/lib/sigil/context.ts
+  - src/lib/sigil/physics.ts
+  - src/lib/sigil/ast-reader.ts
+  - src/lib/sigil/search.ts
+
+principles:
+  - Never ask configuration questions
+  - Infer physics from effect type (mutation/query/local)
+  - Use canonical patterns from codebase
+  - Apply context-aware copy and styling
+  - Cold start uses sensible defaults

@@ -2,9 +2,9 @@
  * eslint-plugin-sigil
  *
  * ESLint plugin for Sigil design system enforcement.
- * Part of Sigil v7.6 "The Living Canon" - compile-time enforcement.
+ * Part of Sigil v9.1 "Migration Debt Zero" - compile-time enforcement.
  *
- * @version 7.6.0
+ * @version 9.1.0
  *
  * Rules:
  * - enforce-tokens: Disallow arbitrary Tailwind values (use design tokens)
@@ -73,7 +73,7 @@ export const configs = {
  */
 export const meta = {
   name: "eslint-plugin-sigil",
-  version: "7.6.0",
+  version: "9.1.0",
 };
 
 /**

@@ -114,7 +114,7 @@ Refreshed:
   - 4 scripts
 
 Your state files are preserved:
-  - sigil-mark/moodboard.md
+  - grimoires/sigil/moodboard.md
   - sigil-mark/rules.md
   - .sigilrc.yaml
 ```

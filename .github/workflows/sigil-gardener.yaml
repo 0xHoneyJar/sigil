@@ -1,9 +1,9 @@
-# Sigil v6.1 — Merge-Driven Gardener
+# Sigil v10.1 — Usage Reality Gardener
 #
-# Runs pattern gardening on every push/merge to main.
-# Scans for @sigil-pattern tags and updates survival.json.
+# Runs survival engine on every push/merge to main.
+# Computes authority from imports, updates context.
 #
-# v6.1: Replaces weekly cron with merge-driven CI for <5 min latency.
+# v10.1: Uses new core library at src/lib/sigil/survival.ts
 
 name: Sigil Gardener
 
@@ -14,8 +14,6 @@ on:
     paths:
       - 'src/**/*.tsx'
       - 'src/**/*.ts'
-      - 'sigil-mark/**/*.tsx'
-      - 'sigil-mark/**/*.ts'
 
   # Also run on merged PRs to main
   pull_request:
@@ -45,31 +43,41 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: sigil-mark/package-lock.json
+
+      - name: Check for package.json
+        id: check_package
+        run: |
+          if [ -f "package.json" ]; then
+            echo "has_package=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_package=false" >> $GITHUB_OUTPUT
+            echo "No package.json found - skipping survival engine"
+          fi
 
       - name: Install dependencies
-        run: |
-          cd sigil-mark
-          npm ci
+        if: steps.check_package.outputs.has_package == 'true'
+        run: npm ci
 
-      - name: Run Gardener
+      - name: Run Survival Engine
+        if: steps.check_package.outputs.has_package == 'true'
         run: |
-          npx tsx sigil-mark/process/garden-command.ts
+          npx tsx src/lib/sigil/survival.ts
 
       - name: Check for changes
+        if: steps.check_package.outputs.has_package == 'true'
         id: check_changes
         run: |
-          if git diff --quiet .sigil/survival.json 2>/dev/null; then
+          if git diff --quiet grimoires/sigil/.context/ 2>/dev/null; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Commit survival.json
-        if: steps.check_changes.outputs.changed == 'true'
+      - name: Commit authority updates
+        if: steps.check_package.outputs.has_package == 'true' && steps.check_changes.outputs.changed == 'true'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .sigil/survival.json
-          git commit -m "chore(sigil): update survival patterns [skip ci]"
+          git config user.name "Sigil Gardener"
+          git config user.email "sigil@bot"
+          git add grimoires/sigil/.context/
+          git commit -m "chore(sigil): update authority metrics [skip ci]"
           git push

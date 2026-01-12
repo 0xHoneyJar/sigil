@@ -1,0 +1,226 @@
+# Sigil v4.1 - Physics Timing Configuration
+# Defines motion names, timing values, and sync strategies
+#
+# Philosophy: "Physics should feel intentional. Every timing value has meaning."
+#
+# This file is the source of truth for all motion timing in Sigil.
+# Used by:
+# - physics-reader.ts (agent-time)
+# - physics-resolver.ts (runtime)
+# - eslint-plugin-sigil/zone-compliance (compile-time)
+
+version: "9.1.0"
+
+# =============================================================================
+# MOTION DEFINITIONS
+# Maps motion names to timing, easing, and descriptions
+# =============================================================================
+
+motions:
+  instant:
+    description: "No perceptible delay. For feedback-critical interactions."
+    duration:
+      value: 0
+    unit: ms
+    easing: "linear"
+    use_cases:
+      - "Toggle switches"
+      - "Checkbox changes"
+      - "Form field focus"
+    zones:
+      prefer: [admin]
+      avoid: [critical]
+
+  snappy:
+    description: "Quick, responsive feel. For frequent, low-stakes actions."
+    duration:
+      min: 100
+      max: 200
+      default: 150
+    unit: ms
+    easing: "ease-out"
+    use_cases:
+      - "Button hover states"
+      - "Dropdown opens"
+      - "Tooltip appearance"
+    zones:
+      prefer: [admin, dashboard]
+      avoid: []
+
+  warm:
+    description: "Smooth, welcoming transitions. Default for marketing contexts."
+    duration:
+      min: 200
+      max: 400
+      default: 300
+    unit: ms
+    easing: "ease-in-out"
+    use_cases:
+      - "Page transitions"
+      - "Card reveals"
+      - "Modal opens"
+    zones:
+      prefer: [marketing, dashboard]
+      avoid: []
+
+  deliberate:
+    description: "Slower, considered motion. For high-stakes operations."
+    duration:
+      min: 500
+      max: 1000
+      default: 800
+    unit: ms
+    easing: "ease-out"
+    use_cases:
+      - "Transaction confirmations"
+      - "Critical state changes"
+      - "Loading states for important actions"
+    zones:
+      prefer: [critical]
+      avoid: [admin]
+
+  reassuring:
+    description: "Calm, steady motion. For anxiety-reducing contexts."
+    duration:
+      min: 800
+      max: 1500
+      default: 1200
+    unit: ms
+    easing: "ease-in-out"
+    use_cases:
+      - "First-time user onboarding"
+      - "Error recovery flows"
+      - "Complex form wizards"
+    zones:
+      prefer: [critical]
+      avoid: []
+
+  celebratory:
+    description: "Joyful, bouncy motion. For positive outcomes."
+    duration:
+      min: 800
+      max: 1500
+      default: 1200
+    unit: ms
+    easing: "cubic-bezier(0.34, 1.56, 0.64, 1)"
+    use_cases:
+      - "Reward claims"
+      - "Achievement unlocks"
+      - "Successful transactions"
+    zones:
+      prefer: [critical, marketing]
+      avoid: [admin]
+
+  reduced:
+    description: "Minimal motion for accessibility. Respects prefers-reduced-motion."
+    duration:
+      value: 0
+    unit: ms
+    easing: "linear"
+    use_cases:
+      - "Accessibility-conscious users"
+      - "Motion-sensitive contexts"
+      - "Low-power mode"
+    zones:
+      prefer: []
+      avoid: []
+    accessibility: true
+
+# =============================================================================
+# SYNC STRATEGIES
+# How mutations interact with server state
+# =============================================================================
+
+sync_strategies:
+  pessimistic:
+    description: "Server owns clock. Must show pending state. Visible rollback."
+    characteristics:
+      - "Button disabled while pending"
+      - "Loading indicator required"
+      - "Server confirmation before UI update"
+      - "Clear error states on failure"
+    default_motion: deliberate
+    zones:
+      prefer: [critical]
+      avoid: [marketing]
+    example: |
+      // Transaction requires server confirmation
+      const payment = useSigilMutation({
+        mutation: () => api.pay(amount),
+        // Pessimistic: button disabled, shows loading
+      });
+
+  optimistic:
+    description: "Client owns clock. Instant update. Silent rollback."
+    characteristics:
+      - "Immediate UI update"
+      - "No loading indicator"
+      - "Silent reconciliation on failure"
+      - "Best for low-stakes operations"
+    default_motion: snappy
+    zones:
+      prefer: [admin, marketing]
+      avoid: [critical]
+    example: |
+      // Toggle setting - instant feedback
+      const toggle = useSigilMutation({
+        mutation: () => api.updateSetting(value),
+        // Optimistic: instant update, silent rollback
+      });
+
+  hybrid:
+    description: "Optimistic with indicator. Visible rollback."
+    characteristics:
+      - "Immediate UI update with indicator"
+      - "Shows sync status (syncing, synced)"
+      - "Visible rollback on failure"
+      - "Good for collaborative contexts"
+    default_motion: warm
+    zones:
+      prefer: [dashboard]
+      avoid: []
+    example: |
+      // Collaborative document edit
+      const edit = useSigilMutation({
+        mutation: () => api.updateDoc(content),
+        // Hybrid: instant update, visible sync indicator
+      });
+
+# =============================================================================
+# TIMING CONSTRAINTS
+# Min/max values for ESLint zone-compliance rule
+# =============================================================================
+
+constraints:
+  instant:
+    min: 0
+    max: 50
+  snappy:
+    min: 100
+    max: 200
+  warm:
+    min: 200
+    max: 400
+  deliberate:
+    min: 500
+    max: 1000
+  reassuring:
+    min: 800
+    max: 1500
+  celebratory:
+    min: 800
+    max: 1500
+  reduced:
+    min: 0
+    max: 0
+
+# =============================================================================
+# DEFAULTS
+# Fallback values when physics.yaml is unavailable
+# =============================================================================
+
+defaults:
+  motion: warm
+  sync: optimistic
+  easing: "ease-in-out"
+  timing: 300

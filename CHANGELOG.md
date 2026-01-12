@@ -5,6 +5,75 @@ All notable changes to Sigil will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [10.1.0] - 2026-01-11 — "Usage Reality"
+
+### Summary
+
+v10.1 introduces the **Usage Reality** architecture — a complete consolidation of the Sigil framework. Usage-based authority replaces directory-based tiers, AST inference replaces JSDoc requirements, and invisible context accumulation replaces configuration dialogs.
+
+### The Layer Cake
+
+```
+Designer Experience → Skills Layer → Context Layer → Foundation
+                         │
+         ┌───────────────┼───────────────┐
+         │               │               │
+       MASON         GARDENER     DIAGNOSTICIAN
+     Generation      Governance      Debugging
+```
+
+### Key Changes
+
+- **49 → 14 skills** — Consolidated to 3 Sigil skills + 11 Loa skills
+- **37 → 6 modules** — Core library at `src/lib/sigil/`
+- **Usage-Based Authority** — Authority computed from imports (10+ = gold, 5+ = silver)
+- **Effect-Based Physics** — Physics inferred from effect type (mutation/query/local_state)
+- **AST Intent Inference** — TypeScript Compiler API reads code without JSDoc
+- **Invisible Context** — Taste, Persona, Project learned from accept/modify/reject
+
+### Added
+
+- **Core Library** — `src/lib/sigil/` with 6 modules:
+  - `context.ts` — Context management
+  - `survival.ts` — Authority computation
+  - `physics.ts` — Physics inference
+  - `ast-reader.ts` — AST intent inference
+  - `diagnostician.ts` — Pattern matching
+  - `search.ts` — Fuzzy file finding
+
+- **Three Consolidated Skills**
+  - `mason` — Zone-aware generation with context
+  - `gardener` — Survival engine, invisible promotion
+  - `diagnostician` — Pattern-based debugging
+
+- **Context Layer** — Invisible accumulation of:
+  - Taste (physics preferences from accept/modify/reject)
+  - Persona (audience from prompt language, copy survival)
+  - Project (conventions from file operations, imports)
+
+### Changed
+
+- **Directory Structure** — `grimoires/sigil/` replaces `sigil-mark/`
+- **GitHub Actions** — `sigil-gardener.yaml` uses new core library path
+- **Configuration** — `.sigilrc.yaml` updated to v10.1.0
+
+### Removed
+
+- **37 process files** — Consolidated into core library
+- **38 redundant skills** — Consolidated into Mason, Gardener, Diagnostician
+- **sigil-mark/ directory** — Migrated to grimoires/sigil/
+
+### Migration
+
+| Before (v9.1) | After (v10.1) |
+|---------------|---------------|
+| 49 skills | 14 skills |
+| 37 process files | 6 core library modules |
+| sigil-mark/ | grimoires/sigil/ |
+| JIT grep | Pre-computed authority |
+
+---
+
 ## [6.1.0] - 2026-01-08 — "Agile Muse"
 
 ### Summary

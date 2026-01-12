@@ -1,26 +1,38 @@
-Sprint 3: CI/CD & Polish
-Completed: 2026-01-10
-Version: 7.6.0 "The Living Canon"
+Sprint 3: Foundation (v9.1 Migration Debt Zero)
+Completed: 2026-01-11
+Version: 9.1.0 "Migration Debt Zero"
 
 Tasks Completed:
-- S3-T1: Create pending-ops.json schema
-- S3-T2: Create survival engine workflow
-- S3-T3: Create operations processor workflow
-- S3-T4: Update CLAUDE.md to v7.6
-- S3-T5: Update all version numbers to 7.6.0
+- S1-T1: Move protected-capabilities.yaml to grimoire
+- S1-T2: Create placeholder files and directories
+- S1-T3: Update process layer path constants (12 files)
+- S1-T4: Verify process layer compilation
 
 Review: APPROVED by Senior Technical Lead
 Audit: APPROVED by Security Auditor
 
-Files Created:
-- .sigil/pending-ops.json
-- .github/workflows/sigil-survival.yml
-- .github/workflows/sigil-ops.yml
+Files Moved:
+- protected-capabilities.yaml (sigil-mark/ → grimoires/sigil/constitution/)
 
-Files Modified:
-- CLAUDE.md
-- .claude/agents/sigil-craft.yaml
-- sigil-mark/package.json
-- packages/eslint-plugin-sigil/package.json
-- packages/eslint-plugin-sigil/src/index.ts
-- packages/eslint-plugin-sigil/src/configs/recommended.ts
+Files Created:
+- grimoires/sigil/constitution/personas.yaml
+- grimoires/sigil/constitution/philosophy.yaml
+- grimoires/sigil/constitution/rules.md
+- grimoires/sigil/constitution/decisions/README.md
+- grimoires/sigil/moodboard/evidence/README.md
+
+Files Modified (path constants):
+- constitution-reader.ts
+- moodboard-reader.ts
+- persona-reader.ts
+- vocabulary-reader.ts
+- decision-reader.ts
+- philosophy-reader.ts
+- lens-array-reader.ts
+- vibe-check-reader.ts
+- governance-logger.ts
+- agent-orchestration.ts
+- garden-command.ts
+- amend-command.ts
+
+v9.1 Sprint 1 Complete - Ready for Sprint 2 (Configuration)

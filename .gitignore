@@ -135,6 +135,24 @@ app/tsconfig.json
 app/ecosystem.config.js
 
 # =============================================================================
+# SIGIL GRIMOIRE STATE (v10.1+)
+# =============================================================================
+# Sigil grimoire runtime directories contain per-developer state.
+# These are gitignored to keep context invisible and developer-specific.
+
+# Invisible context accumulation (taste, persona, project)
+grimoires/sigil/.context/*
+!grimoires/sigil/.context/.gitkeep
+
+# Vector embeddings for semantic search
+grimoires/sigil/index/*
+!grimoires/sigil/index/.gitkeep
+
+# Legacy state directory (v9.x)
+grimoires/sigil/state/*
+!grimoires/sigil/state/README.md
+
+# =============================================================================
 # SIGIL ARTIFACT MODEL
 # =============================================================================
 # Sigil artifacts fall into three categories:

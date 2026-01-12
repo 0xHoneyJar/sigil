@@ -1,0 +1,106 @@
+# Sigil v10.1 "Usage Reality" - Constitution
+#
+# Effect-based physics mapping. The verb (effect) determines the physics,
+# not the noun (data type).
+#
+# "Is Credits Money? Is Points Money? Wrong question.
+#  Does the action MUTATE state? That's what matters."
+#
+# @version 10.1.0
+
+version: "10.1"
+codename: "Usage Reality"
+
+# =============================================================================
+# Effect-Based Physics
+# =============================================================================
+# The effect type (mutation, query, local_state) determines physics behavior.
+# This replaces ambiguous data-type-based physics (e.g., "is Credits Money?").
+
+effect_physics:
+  # Server mutations - pessimistic, wait for confirmation
+  mutation:
+    sync: pessimistic
+    timing: 800
+    simulation: true
+    description: "POST, PUT, DELETE operations that modify server state"
+
+  # Server queries - optimistic, show cached/predicted data
+  query:
+    sync: optimistic
+    timing: 150
+    simulation: false
+    description: "GET operations that read server state"
+
+  # Local state changes - immediate, no server round-trip
+  local_state:
+    sync: immediate
+    timing: 0
+    simulation: false
+    description: "useState/useReducer operations, no server involvement"
+
+  # Sensitive mutations - extra caution for irreversible actions
+  sensitive_mutation:
+    sync: pessimistic
+    timing: 1200
+    requires_confirmation: true
+    simulation: true
+    description: "Actions that cannot be easily undone"
+    patterns:
+      - ownership    # Transfer of ownership
+      - permission   # Access control changes
+      - delete       # Permanent removal
+      - transfer     # Asset/fund transfers
+
+# =============================================================================
+# Protected Capabilities
+# =============================================================================
+# Actions that MUST always work, regardless of network state.
+# These override normal physics for user trust.
+
+protected:
+  withdraw:
+    behavior: always_works
+    fallback: queue_for_retry
+    description: "User must always be able to withdraw funds"
+
+  deposit:
+    behavior: always_works
+    fallback: queue_for_retry
+    description: "User must always be able to deposit funds"
+
+  balance:
+    behavior: always_visible
+    cache_strategy: optimistic_with_refresh
+    description: "Balance must always be visible, even if stale"
+
+# =============================================================================
+# Physics Presets
+# =============================================================================
+# Named timing configurations referenced by effect_physics.
+
+physics_presets:
+  server-tick:
+    duration: 600
+    easing: "cubic-bezier(0.4, 0, 0.2, 1)"
+    use_case: "Server-dependent operations (claims, deposits)"
+
+  deliberate:
+    duration: 800
+    easing: "cubic-bezier(0.4, 0, 0.2, 1)"
+    use_case: "Critical confirmations, important actions"
+
+  snappy:
+    duration: 150
+    easing: "ease-out"
+    use_case: "Immediate feedback (buttons, toggles)"
+
+  smooth:
+    duration: 300
+    easing: "cubic-bezier(0.4, 0, 0.2, 1)"
+    use_case: "Ambient transitions (hover, focus)"
+
+  instant:
+    duration: 0
+    easing: "linear"
+    use_case: "Local state changes, no animation needed"

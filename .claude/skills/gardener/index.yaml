@@ -1,0 +1,29 @@
+name: gardener
+description: "Invisible governance and pattern promotion"
+version: "10.1.0"
+
+trigger:
+  - background
+  - /garden
+
+reads:
+  - src/components/**/*.tsx
+  - src/hooks/**/*.ts
+  - grimoires/sigil/authority.yaml
+
+uses:
+  - src/lib/sigil/survival.ts
+  - src/lib/sigil/ast-reader.ts
+
+schedule:
+  - on: push
+    branches: [main]
+  - on: cron
+    schedule: "0 0 * * *"
+
+principles:
+  - Auto-promote at 95%+ confidence
+  - Create PR at 80-95% confidence
+  - No approval dialogs
+  - Authority is computed, not stored
+  - Never interrupt designer flow

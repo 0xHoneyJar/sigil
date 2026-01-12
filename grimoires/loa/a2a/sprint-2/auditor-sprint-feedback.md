@@ -1,160 +1,153 @@
-# Sprint 2 Security Audit
+# Sprint 2 Security Audit Report
 
-**Sprint:** Sprint 2 - Runtime Provider & Context
-**Auditor:** Paranoid Cypherpunk Auditor
-**Date:** 2026-01-08
-**Status:** APPROVED - LET'S FUCKING GO
-
----
-
-## Audit Summary
-
-Sprint 2 implements React context providers and layout components. This is pure React code with no network operations, no data persistence, no user input handling. Minimal attack surface.
-
-**Risk Level:** LOW
+**Sprint:** sprint-2 (v9.0 Migration - Process Layer + Skills Update)
+**Auditor:** Security Analyst
+**Status:** APPROVED
+**Date:** 2026-01-11
 
 ---
 
-## Security Checklist
+## Audit Scope
 
-### Secrets & Credentials
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| No hardcoded passwords | PASS | None found |
-| No API keys | PASS | None found |
-| No private keys | PASS | None found |
-| No tokens | PASS | None found |
-| No credentials in config | PASS | Clean |
-
-**Scan Results:**
-- Searched: `password|secret|api_key|token|credential|private_key`
-- Path: `sigil-mark/types/`, `sigil-mark/providers/`, `sigil-mark/layouts/`
-- Found: None
-- Verdict: CLEAN
-
-### Code Execution
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| No eval/exec patterns | PASS | None found |
-| No dangerouslySetInnerHTML | PASS | None found |
-| No shell spawning | PASS | None found |
-| No dynamic code gen | PASS | None found |
-
-**Scan Results:**
-- Searched: `eval|exec|shell|spawn|child_process|dangerouslySetInnerHTML`
-- Found: None
-- Verdict: CLEAN
-
-### Network Operations
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| No hardcoded URLs | PASS | None in Sprint 2 code |
-| No localhost references | PASS | None found |
-| No external API calls | PASS | Context-only code |
-
-**Scan Results:**
-- Searched: `http://|https://|localhost|127.0.0.1`
-- Found: None
-- Verdict: CLEAN
-
-### React Security
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| No innerHTML usage | PASS | Uses React safely |
-| Props typed correctly | PASS | TypeScript enforced |
-| Context values safe | PASS | Strings and objects only |
-| No XSS vectors | PASS | Pure React components |
+Security audit of Sprint 2 implementation:
+- Process layer migration (37 modules, ~22K lines)
+- Runtime state migration
+- Skill path updates (14 files)
+- Import path updates (11 files)
 
 ---
 
-## Code Review Findings
+## Pre-Requisite Check
 
-### sigil-mark/types/index.ts
-
-**Security-Relevant:**
-- Pure TypeScript type definitions
-- No runtime code except constants (DEFAULT_PHYSICS, MOTION_PROFILES)
-- Constants are read-only objects with primitive values
-
-**Verdict:** CLEAN - Type definitions only
-
-### sigil-mark/providers/sigil-provider.tsx
-
-**Security-Relevant:**
-- Uses React Context (safe pattern)
-- State management via useState (safe)
-- Memoization via useMemo (safe)
-- No user input handling
-- No network operations
-- No data persistence
-
-**Verdict:** CLEAN - Standard React patterns
-
-### sigil-mark/layouts/*.tsx
-
-**Security-Relevant:**
-- Zone context providers (safe)
-- useEffect for zone registration (safe)
-- Event handlers (onClick, onMouseEnter, onKeyDown) are standard React
-- Keyboard navigation is safe (no command injection)
-- ARIA attributes are static strings
-
-**Verdict:** CLEAN - Standard React component patterns
+| Requirement | Status |
+|-------------|--------|
+| Senior engineer approval | ✅ Verified (engineer-feedback.md: "All good") |
+| Implementation complete | ✅ Verified (reviewer.md exists) |
+| Exit criteria met | ✅ Verified |
 
 ---
 
-## Architecture Security Review
+## Security Findings
 
-### Context Security
+### 1. Secrets & Credentials Scan ✅ PASS
 
-- Zone context stores string values ('critical', 'glass', 'machinery', 'standard')
-- Persona context stores string values ('default', 'power_user', 'cautious')
-- Vibes context stores configuration object (optional)
-- No sensitive data in context
+**Scanned for:**
+- Hardcoded passwords, API keys, tokens
+- Credential patterns in code
 
-**Verdict:** Context does not expose sensitive information.
+**Result:** No secrets found.
 
-### Type Safety
+Only false positive: "design tokens" referring to CSS design system tokens (colors, spacing), not authentication tokens.
 
-- TypeScript types enforce correct values
-- PhysicsClass is union type (cannot be arbitrary string)
-- SigilZone is union type (cannot be arbitrary string)
-- No `any` types in Sprint 2 code
+### 2. Command Execution Analysis ✅ PASS
 
-**Verdict:** Type safety prevents type confusion attacks.
+**Files using child_process:**
+| File | Usage | Risk Assessment |
+|------|-------|-----------------|
+| `violation-scanner.ts` | `find`, `git diff` | Low - standard CLI tools |
+| `status-propagation.ts` | `rg` (ripgrep) | Low - code search tool |
+| `sanctuary-scanner.ts` | `rg` (ripgrep) | Low - code search tool |
+| `linter-gate.ts` | `eslint`, `tsc` | Low - build tools |
+| `garden-command.ts` | `git` commands | Low - version control |
+| `component-scanner.ts` | `rg` (ripgrep) | Low - code search tool |
+
+**Analysis:**
+- All command execution uses fixed command patterns
+- No user input directly passed to shell commands
+- Commands are for legitimate development tooling (ripgrep, ESLint, TSC, git)
+- Execution happens with `encoding: 'utf-8'` and `cwd` constraints
+
+### 3. Code Injection Vectors ✅ PASS
+
+**Scanned for:**
+- `eval()` usage
+- `new Function()` constructor
+- Dynamic code execution
+
+**Result:** None found.
+
+Regex `.exec()` calls are safe - used for pattern matching, not code execution.
+
+### 4. SQL Injection ✅ N/A
+
+No SQL queries in process modules. Framework is file-based (YAML, JSON, TypeScript).
+
+### 5. Path Traversal Analysis ✅ PASS
+
+**Path handling patterns:**
+- All paths use `path.join()` with project root
+- No direct user input in file paths
+- Paths are relative to `process.cwd()` or explicit `projectRoot`
+
+**Example (seed-manager.ts:30):**
+```typescript
+export const DEFAULT_SEED_PATH = 'grimoires/sigil/state/seed.yaml';
+```
+
+Hardcoded relative paths prevent traversal attacks.
+
+### 6. Import Path Migration ✅ PASS
+
+**Verified:**
+```bash
+grep -r "sigil-mark/kernel|\.sigil/" grimoires/sigil/process/
+# No matches found
+```
+
+All old paths correctly migrated:
+- `sigil-mark/kernel/` → `grimoires/sigil/constitution/`
+- `.sigil/` → `grimoires/sigil/state/`
 
 ---
 
-## Positive Findings
+## OWASP Top 10 Assessment
 
-1. **Pure React Patterns:** All code uses standard React patterns (Context, hooks, components)
-2. **No Runtime Danger:** No eval, exec, or innerHTML usage
-3. **Type Safety:** TypeScript enforces correct values throughout
-4. **No Network:** No network operations in Sprint 2 code
-5. **No Data Persistence:** No localStorage, sessionStorage, or IndexedDB access
-6. **Backwards Compatible:** v4.1 APIs preserved (no breaking changes = no migration security issues)
-
----
-
-## Recommendations for Future Sprints
-
-1. **Sprint 3 (useSigilMutation):** Ensure mutation handlers validate input types
-2. **Sprint 4 (Live Grep):** Sanitize search patterns before passing to ripgrep
-3. **General:** Continue TypeScript strict mode for type safety
+| Category | Status | Notes |
+|----------|--------|-------|
+| A01: Broken Access Control | N/A | No auth in scope |
+| A02: Cryptographic Failures | N/A | No crypto in scope |
+| A03: Injection | ✅ PASS | No injection vectors |
+| A04: Insecure Design | ✅ PASS | Agent-time code, not user-facing |
+| A05: Security Misconfiguration | ✅ PASS | State properly gitignored |
+| A06: Vulnerable Components | N/A | No new dependencies |
+| A07: Auth Failures | N/A | No auth in scope |
+| A08: Data Integrity | ✅ PASS | File-based state with proper paths |
+| A09: Logging Failures | N/A | Console logging for agent |
+| A10: SSRF | N/A | No network requests |
 
 ---
 
-## Final Verdict
+## Risk Summary
 
-**APPROVED - LET'S FUCKING GO**
-
-Sprint 2 is secure. React context providers and layout components with no network operations, no secrets, no dangerous patterns. Pure UI code with minimal attack surface.
+| Risk Level | Count |
+|------------|-------|
+| Critical | 0 |
+| High | 0 |
+| Medium | 0 |
+| Low | 0 |
+| Info | 0 |
 
 ---
 
-*Audit Completed: 2026-01-08*
-*Auditor: Paranoid Cypherpunk Auditor*
+## Recommendations
+
+1. **Future consideration:** If command execution ever takes user input, implement proper escaping
+2. **Documentation:** Consider adding security notes to CLAUDE.md about the command execution patterns
+
+---
+
+## Approval
+
+**Security audit PASSED.** No blocking issues found.
+
+The Sprint 2 implementation:
+- Contains no secrets or credentials
+- Uses safe command execution patterns
+- Has no injection vulnerabilities
+- Properly migrated all paths
+
+**APPROVED** for completion.
+
+---
+
+*Audit completed: 2026-01-11*

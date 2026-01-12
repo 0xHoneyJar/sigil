@@ -1,177 +1,151 @@
 # Sprint 3 Security Audit
 
-**Sprint:** Sprint 3 - useSigilMutation Core
+**Sprint:** sprint-3 (v9.1 Migration Debt Zero - Foundation)
 **Auditor:** Paranoid Cypherpunk Auditor
-**Date:** 2026-01-08
+**Date:** 2026-01-11
 **Status:** APPROVED - LET'S FUCKING GO
 
 ---
 
 ## Audit Summary
 
-Sprint 3 implements a React hook for mutation state management. Pure React code with no network operations, no data persistence, no user input handling. Minimal attack surface.
+Sprint 3 (v9.1 Sprint 1) is a path migration sprint. Changes are string constant updates from `sigil-mark/` to `grimoires/sigil/` with zero security impact.
 
-**Risk Level:** LOW
+**Risk Level:** NONE
+
+---
+
+## Pre-Requisite Check
+
+| Requirement | Status |
+|-------------|--------|
+| Senior engineer approval | ✅ Verified ("All good" in engineer-feedback.md) |
+| Implementation complete | ✅ Verified (reviewer.md exists) |
+| Exit criteria met | ✅ Verified |
 
 ---
 
 ## Security Checklist
 
+### Changes Audited
+
+Sprint 3 made 4 categories of changes:
+
+| Change Category | Count | Security Impact |
+|-----------------|-------|-----------------|
+| YAML file moved (protected-capabilities) | 1 | NONE |
+| Placeholder files created | 5 | NONE |
+| Process layer path constants updated | 12 | NONE |
+| TypeScript compilation verified | 1 | NONE |
+
 ### Secrets & Credentials
 
 | Check | Status | Notes |
 |-------|--------|-------|
-| No hardcoded passwords | PASS | None found |
+| No hardcoded passwords | PASS | None found in placeholder files |
 | No API keys | PASS | None found |
-| No private keys | PASS | None found |
 | No tokens | PASS | None found |
-| No credentials in config | PASS | Clean |
 
 **Scan Results:**
-- Searched: `password|secret|api_key|token|credential|private_key`
-- Path: `sigil-mark/hooks/`
-- Found: None
-- Verdict: CLEAN
+```bash
+grep -i "password|secret|api_key|token|credential" grimoires/sigil/constitution/*.yaml
+# No matches (only "design tokens" - not credentials)
+```
 
 ### Code Execution
 
 | Check | Status | Notes |
 |-------|--------|-------|
-| No eval/exec patterns | PASS | `execute` is function name only |
-| No dangerouslySetInnerHTML | PASS | None found |
-| No shell spawning | PASS | None found |
-| No dynamic code gen | PASS | No `new Function` |
+| No eval/exec patterns | PASS | None in modified files |
+| No dynamic code gen | PASS | None found |
+| execSync usage | SAFE | Only for CLI tools (rg, tsc, git) |
 
 **Scan Results:**
-- Searched: `eval|exec|shell|spawn|child_process|dangerouslySetInnerHTML`
-- Found: `execute` function name (safe)
-- Verdict: CLEAN
+```bash
+grep -rn "eval\|new Function" grimoires/sigil/process/*.ts | grep -v "execSync"
+# executeSkill is a local function name, not dangerous code execution
+```
 
-### Network Operations
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| No hardcoded URLs | PASS | None found |
-| No localhost references | PASS | None found |
-| No fetch/XHR calls | PASS | Hook doesn't make network requests |
-
-**Scan Results:**
-- Searched: `http://|https://|localhost|127.0.0.1`
-- Found: None
-- Verdict: CLEAN
-
-### Data Persistence
+### Path Traversal Check
 
 | Check | Status | Notes |
 |-------|--------|-------|
-| No localStorage | PASS | None found |
-| No sessionStorage | PASS | None found |
-| No indexedDB | PASS | None found |
-| No cookies | PASS | None found |
-
-**Scan Results:**
-- Searched: `localStorage|sessionStorage|indexedDB|cookie`
-- Found: None
-- Verdict: CLEAN
-
-### React Security
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| No innerHTML usage | PASS | Uses React safely |
-| Props typed correctly | PASS | Full TypeScript generics |
-| State management safe | PASS | useState/useCallback/useRef |
-| No XSS vectors | PASS | Pure React components |
-
-### Type Safety
-
-| Check | Status | Notes |
-|-------|--------|-------|
-| No `any` types | PASS | None in Sprint 3 code |
-| No @ts-ignore | PASS | None found |
-| No @ts-nocheck | PASS | None found |
+| All paths use path.join | PASS | No raw string concatenation for user input |
+| All paths relative to project root | PASS | No absolute paths hardcoded |
+| No user-controlled path inputs | PASS | All paths are constants |
 
 ---
 
-## Code Review Findings
+## Files Audited
 
-### sigil-mark/types/index.ts (Sprint 3 additions)
+### Moved File: protected-capabilities.yaml
 
-**Security-Relevant:**
-- Pure TypeScript interfaces
-- No runtime code
-- Generic types propagate correctly
+**From:** `sigil-mark/constitution/protected-capabilities.yaml`
+**To:** `grimoires/sigil/constitution/protected-capabilities.yaml`
 
-**Verdict:** CLEAN - Type definitions only
+**Changes:**
+- Version: `7.6.0` → `9.1.0`
+- Audit path: `sigil-mark/constitution/audit.log` → `grimoires/sigil/state/constitution-audit.log`
 
-### sigil-mark/hooks/physics-resolver.ts (v5 additions)
+**Security Assessment:** CLEAN - Only string value changes, no logic changes.
 
-**Security-Relevant:**
-- `resolvePhysicsV5()` is pure function
-- No side effects except console.warn for override warning
-- Zone mapping is static Record (not user-controllable)
-- DEFAULT_PHYSICS from types (constants)
+### New Placeholder Files
 
-**Verdict:** CLEAN - Pure functions
+| File | Content Type | Security |
+|------|--------------|----------|
+| `personas.yaml` | User archetypes | CLEAN |
+| `philosophy.yaml` | Design principles | CLEAN |
+| `rules.md` | Motion physics docs | CLEAN |
+| `decisions/README.md` | Directory placeholder | CLEAN |
+| `evidence/README.md` | Directory placeholder | CLEAN |
 
-### sigil-mark/hooks/use-sigil-mutation.ts
+**Security Assessment:** All placeholder files contain only documentation. No executable code.
 
-**Security-Relevant:**
-- React hook with useState/useCallback/useRef
-- No network operations (mutation function is user-provided)
-- Console warnings for developer feedback only
-- State machine is internal, not exposed to external manipulation
-- Pending variables stored in ref (not leaked)
+### Process Layer Path Updates (12 files)
 
-**Potential Concern:** User-provided `mutation` and `simulate` functions
-- These are callbacks provided by the consumer
-- Hook does not validate or sanitize
-- **Acceptable:** This is by design - the hook is a state machine wrapper, not responsible for mutation implementation
+| File | Path Change | Security |
+|------|-------------|----------|
+| constitution-reader.ts | DEFAULT_CONSTITUTION_PATH | CLEAN |
+| moodboard-reader.ts | DEFAULT_MOODBOARD_PATH | CLEAN |
+| persona-reader.ts | DEFAULT_PERSONAS_PATH | CLEAN |
+| vocabulary-reader.ts | DEFAULT_VOCABULARY_PATH | CLEAN |
+| decision-reader.ts | DEFAULT_DECISIONS_PATH | CLEAN |
+| philosophy-reader.ts | DEFAULT_PHILOSOPHY_PATH | CLEAN |
+| lens-array-reader.ts | DEFAULT_LENS_ARRAY_PATH | CLEAN |
+| vibe-check-reader.ts | DEFAULT_VIBE_CHECKS_PATH | CLEAN |
+| governance-logger.ts | getGovernancePath() | CLEAN |
+| agent-orchestration.ts | vocabPath | CLEAN |
+| garden-command.ts | SCAN_PATHS | CLEAN |
+| amend-command.ts | proposalPath | CLEAN |
 
-**Verdict:** CLEAN - Standard React patterns
-
----
-
-## Architecture Security Review
-
-### State Machine Security
-
-- State transitions are guarded (can only transition from valid states)
-- No way to bypass confirming state for server-tick physics (can use execute but gets warning)
-- Variables stored in ref, not exposed externally
-- Reset clears all state properly
-
-**Verdict:** State machine is secure against manipulation.
-
-### Console Output
-
-- Warnings logged for:
-  - Physics override without reason
-  - execute() on server-tick physics
-  - Operations called from wrong state
-- No sensitive data logged
-- Warnings are developer-facing, not user-facing
-
-**Verdict:** Logging is appropriate and safe.
+**Security Assessment:** All changes are string constant updates. No logic changes, no new code execution paths.
 
 ---
 
-## Positive Findings
+## Verification
 
-1. **Pure React Patterns:** All code uses standard React hooks
-2. **No Runtime Danger:** No eval, exec, or innerHTML
-3. **Type Safety:** Full TypeScript with generics, no `any`
-4. **No Network:** Hook doesn't make network requests (mutation is user-provided)
-5. **No Data Persistence:** No localStorage, cookies, etc.
-6. **State Isolation:** Each hook instance has isolated state
+```bash
+# Verify no functional sigil-mark references remain
+grep -rn "sigil-mark" grimoires/sigil/process/*.ts | grep -v "//" | grep -v "@param"
+# Result: No functional references (only JSDoc comments for Sprint 2)
+
+# Verify paths are correct format
+grep "DEFAULT.*PATH\|SCAN_PATHS" grimoires/sigil/process/*.ts | grep "grimoires/sigil"
+# Result: All paths use grimoires/sigil/ pattern
+```
 
 ---
 
-## Recommendations for Future Sprints
+## v9.1 Sprint 1 Security Summary
 
-1. **Sprint 4 (Live Grep):** Sanitize search patterns before passing to ripgrep
-2. **General:** Continue TypeScript strict mode for type safety
-3. **Testing:** Consider adding tests for state transition edge cases
+| Category | Status |
+|----------|--------|
+| Secrets | ✅ None introduced |
+| Code Execution | ✅ No dangerous patterns |
+| Path Traversal | ✅ All paths are constants |
+| Input Validation | ✅ No new user inputs |
+| Authentication | N/A - No auth code changed |
+| Authorization | N/A - No authz code changed |
 
 ---
 
@@ -179,9 +153,15 @@ Sprint 3 implements a React hook for mutation state management. Pure React code 
 
 **APPROVED - LET'S FUCKING GO**
 
-Sprint 3 is secure. React hook with state machine, pure functions, and type definitions. No network operations, no secrets, no dangerous patterns. Pure UI state management code with minimal attack surface.
+Sprint 3 is secure. Path migration changes with zero security impact. All changes are:
+- String constant updates
+- Documentation/placeholder files
+- No new code execution paths
+- No user input handling changes
+
+The v9.1 "Migration Debt Zero" Sprint 1 is complete and security-approved.
 
 ---
 
-*Audit Completed: 2026-01-08*
+*Audit Completed: 2026-01-11*
 *Auditor: Paranoid Cypherpunk Auditor*

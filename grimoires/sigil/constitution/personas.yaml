@@ -1,0 +1,44 @@
+# Sigil Personas
+# Version: 9.1.0
+#
+# User archetypes that inform motion physics and interface behavior.
+# Each persona has different trust levels and motion preferences.
+
+version: "9.1.0"
+
+personas:
+  depositor:
+    description: "Active user who deposits funds"
+    trust_level: high
+    context: "Familiar with the platform, making financial commitments"
+    preferences:
+      motion: deliberate
+      confirmations: standard
+      feedback: immediate
+
+  newcomer:
+    description: "New user exploring the platform"
+    trust_level: building
+    context: "First-time visitor, learning the interface"
+    preferences:
+      motion: reassuring
+      confirmations: enhanced
+      feedback: educational
+
+  power_user:
+    description: "Experienced user who wants efficiency"
+    trust_level: established
+    context: "Daily user, values speed over hand-holding"
+    preferences:
+      motion: snappy
+      confirmations: minimal
+      feedback: concise
+
+  cautious_user:
+    description: "User who prefers extra confirmation"
+    trust_level: variable
+    context: "May have had negative experiences, values transparency"
+    preferences:
+      motion: deliberate
+      confirmations: enhanced
+      feedback: detailed

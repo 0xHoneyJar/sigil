@@ -1,0 +1,3 @@
+# Sigil Context Directory
+# This directory is gitignored - it contains per-developer invisible context
+# Files: taste.json, persona.json, project.json

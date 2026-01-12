@@ -1,0 +1,104 @@
+# Sigil v9.1 Constitution
+# Protected capabilities that ALWAYS work
+#
+# Philosophy: "Marketing needs levers. Product needs brakes."
+#
+# These capabilities cannot be overridden by:
+# - Remote configuration
+# - Marketing campaigns
+# - A/B tests
+# - Lens selection
+# - User preferences
+
+version: "9.1.0"
+enforcement: block
+
+protected:
+  - id: withdraw
+    name: Withdraw Funds
+    description: User can always exit their position and withdraw funds
+    enforcement: block
+    rationale: |
+      Financial autonomy is non-negotiable. Users must always have an escape hatch
+      to exit their positions. No marketing campaign or feature flag should ever
+      disable this capability.
+    zones:
+      - critical
+
+  - id: deposit
+    name: Deposit Funds
+    description: User can always add to their position
+    enforcement: block
+    rationale: |
+      Users must always be able to increase their position. Blocking deposits
+      would be a dark pattern that traps users.
+    zones:
+      - critical
+
+  - id: risk_alert
+    name: Risk Alerts
+    description: Warnings are shown for high-risk actions before execution
+    enforcement: block
+    rationale: |
+      High-risk actions (large transactions, high slippage, unusual conditions)
+      must always show warnings. Suppressing these for conversion optimization
+      is unacceptable.
+    zones:
+      - critical
+
+  - id: slippage_warning
+    name: Slippage Warning
+    description: Slippage is displayed before trades are executed
+    enforcement: block
+    rationale: |
+      Users must understand price impact before confirming trades. Hidden
+      slippage is deceptive and erodes trust.
+    zones:
+      - critical
+
+  - id: fee_disclosure
+    name: Fee Disclosure
+    description: All fees are shown before confirmation
+    enforcement: block
+    rationale: |
+      Fee transparency is a legal and ethical requirement. All costs must
+      be visible before users commit to actions.
+    zones:
+      - critical
+
+  - id: balance_visible
+    name: Balance Visibility
+    description: User can always see their current balance
+    enforcement: block
+    rationale: |
+      Users must always know their financial position. Hiding balances to
+      encourage spending is a dark pattern.
+    zones:
+      - critical
+      - marketing
+
+  - id: error_messages
+    name: Error Messages
+    description: Errors are never suppressed; users always see what went wrong
+    enforcement: block
+    rationale: |
+      Errors must be communicated clearly. Silencing errors to "reduce friction"
+      leaves users confused and unable to recover.
+    zones: []  # All zones
+
+  - id: help_access
+    name: Help Access
+    description: Help is available on every screen
+    enforcement: warn
+    rationale: |
+      Users should always be able to access help. While not as critical as
+      financial capabilities, removing help creates poor UX.
+    zones: []  # All zones
+
+override_audit:
+  enabled: true
+  path: grimoires/sigil/state/constitution-audit.log
+  requires_justification: true
+  notify:
+    - engineering-lead
+    - product-lead

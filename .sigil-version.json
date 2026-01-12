@@ -1,218 +1,96 @@
 {
-  "sigil_version": "7.7.0",
-  "framework_version": "7.7.0",
-  "codename": "Clean Slate",
-  "schema_version": 10,
-  "description": "Consolidated archive structure, cleaner sigil-mark/ directory for better DX",
+  "sigil_version": "10.1.0",
+  "framework_version": "10.1.0",
+  "codename": "Usage Reality",
+  "schema_version": 11,
+  "description": "Usage Reality - Invisible context, usage-based authority, consolidated skills",
   "zones": {
     "system": ".claude/",
-    "state": "sigil-mark/",
-    "runtime": ".sigil/"
+    "grimoire": "grimoires/sigil/",
+    "runtime": ".sigil/",
+    "core_library": "src/lib/sigil/"
   },
   "tools": [
-    "/envision",
-    "/codify",
     "/craft",
-    "/forge",
-    "/inspire",
-    "/sanctify",
     "/garden",
-    "/audit",
-    "/new-era"
+    "/audit"
   ],
   "three_laws": [
     "Code is Precedent",
     "Survival + Cleanliness = Gold",
     "Never Interrupt Flow"
   ],
-  "seven_laws": [
-    "Filesystem is Truth",
-    "Type Dictates Physics",
-    "Zone is Layout, Not Business Logic",
-    "Status Propagates",
-    "One Good Reason > 15% Silent Mutiny",
-    "Never Refuse Outright",
-    "Let Artists Stay in Flow"
+  "layer_cake": [
+    "Designer Experience",
+    "Skills Layer (Mason, Gardener, Diagnostician)",
+    "Context Layer (Taste, Persona, Project)",
+    "Foundation"
   ],
   "features": {
-    "workshop_index": true,
-    "survival_observation": true,
-    "virtual_sanctuary": true,
-    "ephemeral_inspiration": true,
-    "forge_mode": true,
-    "era_management": true,
-    "craft_logs": true,
-    "cohesion_auditing": true,
-    "agent_orchestration": true,
-    "progressive_disclosure": true,
-    "evidence_based_context": true,
-    "live_grep_discovery": true,
-    "jit_polish_workflow": true,
-    "constitutional_kernel": true,
-    "sigil_provider": true,
-    "use_sigil_mutation": true,
-    "simulation_flow": true,
-    "survival_engine": true,
-    "linter_gate": true,
-    "slot_composition": true,
-    "executable_principles": true,
-    "cicd_offload": true,
-    "consolidated_archive": true
+    "usage_based_authority": true,
+    "effect_based_physics": true,
+    "ast_intent_inference": true,
+    "invisible_context": true,
+    "pattern_diagnostics": true,
+    "consolidated_skills": true,
+    "core_library": true
   },
-  "kernel": {
-    "constitution": "sigil-mark/kernel/constitution.yaml",
-    "fidelity": "sigil-mark/kernel/fidelity.yaml",
-    "vocabulary": "sigil-mark/kernel/vocabulary.yaml",
-    "workflow": "sigil-mark/kernel/workflow.yaml"
-  },
-  "skills": [
-    "scanning-sanctuary",
-    "graphing-imports",
-    "querying-workshop",
-    "validating-physics",
-    "seeding-sanctuary",
-    "inspiring-ephemerally",
-    "forging-patterns",
-    "managing-eras",
-    "observing-survival",
-    "chronicling-rationale",
-    "auditing-cohesion"
-  ],
-  "hooks": {
-    "PreToolUse": "validating-physics",
-    "PostToolUse": "observing-survival",
-    "Stop": "chronicling-rationale"
-  },
-  "runtime": {
-    "provider": "sigil-mark/providers/sigil-provider.tsx",
-    "hooks": [
-      "useSigilMutation",
-      "useZoneContext"
-    ]
-  },
-  "process": {
-    "path": "sigil-mark/process/",
-    "agent_only": true,
+  "core_library": {
+    "path": "src/lib/sigil/",
     "modules": [
-      "workshop-builder.ts",
-      "workshop-query.ts",
-      "startup-sentinel.ts",
-      "discovery-scanner.ts",
-      "physics-validator.ts",
-      "seed-manager.ts",
-      "ephemeral-context.ts",
-      "forge-mode.ts",
-      "era-manager.ts",
-      "survival-observer.ts",
-      "chronicling-rationale.ts",
-      "auditing-cohesion.ts",
-      "agent-orchestration.ts",
-      "survival-engine.ts",
-      "linter-gate.ts",
-      "filesystem-registry.ts"
+      "index.ts",
+      "context.ts",
+      "survival.ts",
+      "physics.ts",
+      "ast-reader.ts",
+      "diagnostician.ts",
+      "search.ts"
     ]
   },
-  "executable_principles": {
-    "hooks": "src/components/gold/hooks/",
-    "utils": "src/components/gold/utils/",
-    "modules": [
-      "useMotion.ts",
-      "colors.ts",
-      "spacing.ts"
+  "skills": {
+    "sigil": [
+      "mason",
+      "gardener",
+      "diagnostician"
+    ],
+    "loa": [
+      "discovering-requirements",
+      "designing-architecture",
+      "planning-sprints",
+      "implementing-tasks",
+      "reviewing-code",
+      "auditing-security",
+      "deploying-infrastructure",
+      "translating-for-executives",
+      "mounting-framework",
+      "riding-codebase",
+      "updating-framework"
     ]
   },
-  "tier_system": {
-    "gold": "src/components/gold/",
-    "silver": "src/components/silver/",
-    "draft": "src/components/draft/"
+  "context_layer": {
+    "taste": "Design preferences from accept/modify/reject",
+    "persona": "Audience from prompt language, copy survival",
+    "project": "Conventions from file operations, imports"
   },
-  "runtime_state": {
-    "workshop": ".sigil/workshop.json",
-    "survival": ".sigil/survival.json",
-    "survival_stats": ".sigil/survival-stats.json",
-    "pending_ops": ".sigil/pending-ops.json",
-    "seed": ".sigil/seed.yaml",
-    "craft_logs": ".sigil/craft-log/",
-    "eras": ".sigil/eras/"
+  "authority_tiers": {
+    "gold": "10+ imports",
+    "silver": "5-9 imports",
+    "draft": "1-4 imports"
   },
   "cicd": {
-    "survival_workflow": ".github/workflows/sigil-survival.yml",
-    "ops_workflow": ".github/workflows/sigil-ops.yml"
-  },
-  "artifact_model": {
-    "shared": [
-      ".sigil/survival.json",
-      ".sigil/survival-stats.json",
-      ".sigil/seed.yaml",
-      ".sigil/pending-ops.json",
-      ".sigil/eras/",
-      "sigil-mark/moodboard/*.md"
-    ],
-    "machine_generated": [
-      ".sigil/workshop.json",
-      ".sigil/craft-log/"
-    ],
-    "user_specific": [
-      "sigil-mark/moodboard/sandbox/",
-      "sigil-mark/moodboard/**/*.png"
-    ],
-    "archived": [
-      "sigil-mark/.archive/"
-    ]
-  },
-  "directory_structure": {
-    "active": [
-      "sigil-mark/core/",
-      "sigil-mark/hooks/",
-      "sigil-mark/layouts/",
-      "sigil-mark/lenses/",
-      "sigil-mark/providers/",
-      "sigil-mark/types/",
-      "sigil-mark/process/",
-      "sigil-mark/kernel/",
-      "sigil-mark/vocabulary/",
-      "sigil-mark/constitution/",
-      "sigil-mark/moodboard/",
-      "sigil-mark/__tests__/",
-      "sigil-mark/__examples__/",
-      "sigil-mark/scripts/"
-    ],
-    "archived": [
-      "sigil-mark/.archive/v1.0/",
-      "sigil-mark/.archive/v3.0/",
-      "sigil-mark/.archive/v4.0/"
-    ]
-  },
-  "performance": {
-    "workshop_query_ms": 5,
-    "sanctuary_scan_ms": 50,
-    "full_rebuild_s": 2,
-    "pattern_observation_ms": 10,
-    "craft_log_ms": 100
+    "gardener_workflow": ".github/workflows/sigil-gardener.yaml"
   },
   "migration": {
-    "from_version": "7.6.0",
-    "migrated_at": "2026-01-10T00:00:00Z",
-    "script": "scripts/migrate-v7.7.sh",
+    "from_version": "9.1.0",
+    "migrated_at": "2026-01-11T00:00:00Z",
     "changes": [
-      "Consolidated archives under sigil-mark/.archive/",
-      "Deleted empty directories (canon, codebase, knowledge)",
-      "Archived v3.0 legacy (lens-array, soul-binder, zones, components)",
-      "Archived v4.0 legacy (consultation-chamber, evidence, governance, personas, remote-config, surveys, skills)",
-      "Added migration script for /update command"
+      "49 skills consolidated to 14 (3 Sigil + 11 Loa)",
+      "37 process files consolidated to 6 core library modules",
+      "sigil-mark/ fully migrated to grimoires/sigil/",
+      "Usage-based authority replaces directory-based tiers",
+      "AST intent inference replaces JSDoc requirements",
+      "Invisible context accumulation replaces configuration dialogs"
     ]
   },
-  "deprecated": {
-    "governance_dialogs": "Replaced by survival observation",
-    "jit_grep_primary": "Now fallback only, workshop is primary",
-    "nomination_prs": "Replaced by automatic survival engine",
-    "markdown_principles": "Replaced by executable TypeScript",
-    "lens_array": "Archived in .archive/v3.0/",
-    "soul_binder": "Archived in .archive/v3.0/",
-    "consultation_chamber": "Archived in .archive/v4.0/",
-    "personas_yaml": "Archived in .archive/v4.0/",
-    "surveys": "Archived in .archive/v4.0/"
-  },
-  "setup_completed_at": "2026-01-08T00:00:00Z",
-  "last_updated": "2026-01-10T00:00:00Z"
+  "last_updated": "2026-01-11T00:00:00Z"
 }

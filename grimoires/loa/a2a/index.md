@@ -688,5 +688,133 @@ This document tracks all sprint artifacts and their approval status.
 
 ---
 
-*Last Updated: 2026-01-08*
-*Current Version: Sigil v6.1.0 "Agile Muse" — IN PROGRESS*
+---
+
+## Sigil v9.1.0 (Migration Debt Zero)
+
+| Sprint | Theme | Status | Reviewer | Auditor |
+|--------|-------|--------|----------|---------|
+| 3 | Foundation (v9.1 Sprint 1) | COMPLETED | ✅ Approved | ✅ Approved |
+| v9.1-sprint-2 | Configuration (v9.1 Sprint 2) | COMPLETED | ✅ Approved | ✅ Approved |
+| v9.1-sprint-3 | Cleanup (v9.1 Sprint 3) | COMPLETED | ✅ Approved | ✅ Approved |
+
+---
+
+## v9.1 Sprint 2: Configuration
+
+**Duration:** 1 sprint
+**Theme:** Update skill paths, CLAUDE.md, tsconfig.json, and consolidate version numbers
+**Status:** COMPLETED
+
+### Artifacts
+- [reviewer.md](./v9.1-sprint-2/reviewer.md) - Implementation report
+- [engineer-feedback.md](./v9.1-sprint-2/engineer-feedback.md) - Tech lead review (APPROVED)
+- [auditor-sprint-feedback.md](./v9.1-sprint-2/auditor-sprint-feedback.md) - Security audit (APPROVED)
+- [COMPLETED](./v9.1-sprint-2/COMPLETED) - Completion marker
+
+### Key Deliverables
+- SKILL.md paths updated to grimoire structure
+- index.yaml phantom references removed
+- CLAUDE.md paths and Phase 2 notes added
+- tsconfig.json aliases updated
+- Version numbers consolidated to 9.1.0 (8 files)
+
+### Tasks Completed
+- [x] S2-T1: Update SKILL.md paths to grimoire
+- [x] S2-T2: Update index.yaml and remove phantom references
+- [x] S2-T3: Update CLAUDE.md paths
+- [x] S2-T4: Update tsconfig.json path aliases
+- [x] S2-T5: Consolidate version numbers to 9.1.0
+
+---
+
+## v9.1 Sprint 3: Foundation
+
+**Duration:** 1 sprint
+**Theme:** Migrate path references from sigil-mark/ to grimoires/sigil/
+**Status:** COMPLETED
+
+### Artifacts
+- [reviewer.md](./sprint-3/reviewer.md) - Implementation report
+- [engineer-feedback.md](./sprint-3/engineer-feedback.md) - Review feedback (APPROVED)
+- [auditor-sprint-feedback.md](./sprint-3/auditor-sprint-feedback.md) - Security audit (APPROVED)
+- [COMPLETED](./sprint-3/COMPLETED) - Completion marker
+
+### Key Deliverables
+- `protected-capabilities.yaml` moved to grimoire
+- Placeholder files for constitution layer
+- 11 process layer path constants updated
+- TypeScript compilation verified
+
+### Tasks Completed
+- [x] S1-T1: Move protected-capabilities.yaml to grimoire
+- [x] S1-T2: Create placeholder files and directories
+- [x] S1-T3: Update process layer path constants
+- [x] S1-T4: Verify process layer compilation
+
+---
+
+## v9.1 Sprint 3: Cleanup
+
+**Duration:** 1 sprint
+**Theme:** Validate migration, delete legacy directory, final audit
+**Status:** COMPLETED
+
+### Artifacts
+- [reviewer.md](./v9.1-sprint-3/reviewer.md) - Implementation report
+- [engineer-feedback.md](./v9.1-sprint-3/engineer-feedback.md) - Tech lead review (APPROVED)
+- [auditor-sprint-feedback.md](./v9.1-sprint-3/auditor-sprint-feedback.md) - Security audit (APPROVED)
+- [COMPLETED](./v9.1-sprint-3/COMPLETED) - Completion marker
+
+### Key Deliverables
+- Migration validation completed (0 active sigil-mark references)
+- 18 skill index.yaml files updated to grimoire paths
+- process-context.tsx JSDoc updated
+- .sigil-version.json paths updated
+- Legacy sigil-mark/ directory deleted
+- Physics values aligned across all files
+
+### Tasks Completed
+- [x] S3-T1: Run Migration Validation Script
+- [x] S3-T2: Fix Any Remaining References (21 files)
+- [x] S3-T3: Align Physics Values Across Files
+- [x] S3-T4: Delete Legacy sigil-mark/ Directory
+- [x] S3-T5: Final Security Audit
+
+---
+
+---
+
+## Sigil v10.1.0 (Usage Reality)
+
+| Sprint | Theme | Status | Reviewer | Auditor |
+|--------|-------|--------|----------|---------|
+| 1 | Foundation | COMPLETED | ✅ Approved | ✅ Approved |
+| 2 | Core Libraries (Part 1) | COMPLETED | ✅ Approved | ✅ Approved |
+| 3 | Core Libraries (Part 2) | COMPLETED | ✅ Approved | ✅ Approved |
+| 4 | Skill Consolidation | COMPLETED | ✅ Approved | ✅ Approved |
+| 5 | Cleanup | COMPLETED | ✅ Approved | ✅ Approved |
+
+### v10.1 Overview
+
+**Goal:** Complete invisible studio architecture
+
+| Metric | Current (v9.1) | Target (v10.1) |
+|--------|----------------|----------------|
+| Skills count | 49 | 3 |
+| Process files | 36 | 6 |
+| Config exposed to designer | Many | 0 |
+| Questions per /craft | Variable | 0 |
+| File moves for promotion | Required | 0 |
+
+**Key Principles:**
+1. Usage is Authority (not directory)
+2. AST is Documentation (not JSDoc)
+3. Effect is Physics (not data type)
+4. Atomic Streaming (not yield & patch)
+5. Vector Search (not grep at scale)
+
+---
+
+*Last Updated: 2026-01-11*
+*Current Version: Sigil v10.1.0 "Usage Reality" — Migration Complete*

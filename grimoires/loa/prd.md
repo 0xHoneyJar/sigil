@@ -1,696 +1,551 @@
-# Product Requirements Document: Sigil v7.6 "The Living Canon"
+# Product Requirements Document: Sigil v9.1 Migration Completion
 
-> *"Stop asking for permission to be great. If the code survives and is clean, it is Gold."*
-
-**Version:** 7.6.0
-**Codename:** The Living Canon
+**Version:** 9.1.0
+**Codename:** Migration Debt Zero
 **Status:** PRD Complete
-**Date:** 2026-01-10
-**Supersedes:** Sigil v7.5.0 "The Reference Studio" PRD
-**Sources:** SIGIL_LIVING_CANON_ARCHITECTURE.md (3 Reviewer Consensus)
+**Date:** 2026-01-11
+**Supersedes:** v9.0.0 "Core Scaffold" (partial migration)
+**Sources:** MIGRATION_AUDIT_REPORT.md, FULL_TECHNICAL_AUDIT.md, migrate-to-grimoire.sh
 
 ---
 
 ## 1. Executive Summary
 
-Sigil v7.6 "The Living Canon" addresses 6 fatal flaws identified in v7.5 implementation by 3 independent reviewers (Principal Engineer, Staff Design Engineer, Senior Agent Architect).
+The v9.0 "Core Scaffold" migration is **incomplete**. Three independent audits reveal:
 
-**The Problem with v7.5:**
-- Nomination PRs = bureaucracy (governance over flow)
-- Markdown principles = dead knowledge (essays, not physics)
-- Contagion rules = deadlock (can't iterate on Gold)
-- Registry parsing = overhead (build step for simple lookup)
-- Usage = quality (mob rule promotes bad patterns)
-- Background execution = flow interruption (30s blocks)
+- **81 hardcoded `sigil-mark/` references** throughout the codebase
+- **Version schizophrenia** (v2.6, v4.1, v5.0, v6.0, v6.1, v7.6, v9.0 across files)
+- **Missing runtime layer** (providers, hooks, layouts don't exist)
+- **Orphaned files** (protected-capabilities.yaml not migrated)
+- **Phantom features** (skills reference non-existent lens-array, soul-binder, vibe-checks)
 
-**The v7.6 Solution:**
-- **Survival Engine**: Auto-promote based on survival + cleanliness (human vetoes, not approves)
-- **Executable Principles**: Hooks and utilities, not markdown essays
-- **Slot-Based Composition**: Gold frames accept Draft content via children
-- **Filesystem as Database**: Path IS the API (`ls src/components/gold`)
-- **Linter Gate**: Usage generates candidacy, cleanliness generates promotion
-- **Offload to CI/CD**: Agent writes intent, CI executes heavy ops
+**The Problem:**
+> "This is not a v9.0 release. It's a partially renamed v4.1-v7.6 codebase."
+> — Staff Engineer (Adversarial Review)
 
-**Ratings from Review:**
+**Risk Level:** HIGH — Agent will fail to load context, reference wrong paths, and generate incorrect imports.
 
-| Reviewer | v7.5 Score | v7.6 Target |
-|----------|-----------|-------------|
-| Senior Agent Architect | 9/10 | 10/10 |
-| Principal Engineer | 7/10 | 9.9/10 |
-| Staff Design Engineer | A- | A |
-
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:662-668
+**The Solution:** Complete the migration by:
+1. Fixing all 81 path references
+2. Consolidating version numbers to 9.1.0
+3. Moving orphaned files to grimoire
+4. Removing references to phantom features
+5. Deleting legacy `sigil-mark/` directory
 
 ---
 
 ## 2. Problem Statement
 
-### 2.1 The Six Fatal Flaws
+### 2.1 The 81 Hardcoded References
 
-All three reviewers converged on the same critical issues:
+**Evidence from MIGRATION_AUDIT_REPORT.md:**
 
-#### Flaw 1: Nomination PRs are Bureaucracy
+| Location | Count | Impact |
+|----------|-------|--------|
+| `grimoires/sigil/process/*.ts` | 42 | Process layer points to old paths |
+| `.claude/skills/crafting-guidance/SKILL.md` | 15 | Skills load from wrong locations |
+| `CLAUDE.md` | 12 | Documentation misleads agent |
+| `tsconfig.json` | 6 | TypeScript aliases broken |
+| Other | 6 | Various |
 
-> "If a pattern is used 5 times without reverting, it IS the standard. We do not need a ceremony to confirm reality."
-> — Principal Engineer
+**Example violations:**
 
-**v7.5 Error**: `nomination-generator.ts` creates PRs requiring human approval.
-
-**Impact**: Governance interrupts flow. Engineers wait for approval instead of shipping.
-
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:24-33
-
----
-
-#### Flaw 2: Markdown Principles are Dead Knowledge
-
-> "You are teaching the agent to read Essays, not Physics."
-> — Staff Design Engineer
-
-**v7.5 Error**: `principles/*.md` files that the agent reads and interprets.
-
-**Impact**: Principles become opinions. Opinions are ignored under pressure.
-
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:37-47
-
----
-
-#### Flaw 3: Contagion Creates Deadlock
-
-> "To change a leaf node, you have to burn down the entire tree."
-> — Staff Design Engineer
-
-**Scenario**:
-1. You have a Gold Button
-2. You want to test a Draft animation inside it
-3. ESLint blocks (contagion rule)
-4. You must downgrade Button to Silver
-5. Now Header (Gold) can't import SilverButton → cascade failure
-
-**Impact**: Experimentation requires dismantling stable components.
-
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:50-63
-
----
-
-#### Flaw 4: Registry Parsing is Overhead
-
-> "The Agent shouldn't need to parse a registry to know if a component is Gold. It should just look at the path."
-> — Principal Engineer
-
-**v7.5 Error**: `registry-parser.ts` adds build step / runtime calculation.
-
-**Impact**: Simple lookups require complex parsing. Maintenance burden.
-
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:66-73
-
----
-
-#### Flaw 5: Usage Equals Quality (Mob Rule)
-
-> "If a Junior copy-pastes a button with hardcoded z-index: 9999 five times, your agent will nominate this pattern for Gold status. You are automating the canonization of technical debt."
-> — Staff Design Engineer
-
-**v7.5 Error**: 5 uses = canonical, regardless of code quality.
-
-**Impact**: Bad patterns get enshrined. Technical debt becomes "standard."
-
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:76-82
-
----
-
-#### Flaw 6: Background Execution Blocks Flow
-
-> "If your agent needs 30 seconds, you have failed Flow State."
-> — Principal Engineer
-
-**v7.5 Error**: Heavy operations (image processing) block agent loop.
-
-**Impact**: Engineer waits 30+ seconds. Flow state destroyed.
-
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:345-350
-
----
-
-## 3. Vision & Goals
-
-### 3.1 Vision
-
-```
-From "Reference Studio" (Bureaucracy) to "Living Canon" (Survival + Execution)
-```
-
-### 3.2 The Corrected Mental Model
-
-**Before (v7.5):**
-```
-Pattern Used 5 Times
-    ↓
-[Nomination Generator] → [Create PR] → [Human Approval] → [Merge]
-    ↓                         ↓
- Ceremony required      Flow interrupted
-```
-
-**After (v7.6):**
-```
-Pattern Used 5 Times
-    ↓
-[Survival Engine] → [Linter Gate Check]
-    ↓                     ↓
- Auto-promote        If fails: notify, don't promote
-    ↓
-[Notification] → [Human can VETO within 24h]
-    ↓
- Gold (if no veto)
-```
-
-### 3.3 The Three Laws (Evolved for v7.6)
-
-1. **Survival is the vote** — But cleanliness is the gate
-2. **Human vetoes, not approves** — Invert the control
-3. **Executable, not descriptive** — Hooks > Markdown
-
-### 3.4 Success Metrics
-
-| Metric | v7.5 Actual | v7.6 Target |
-|--------|-------------|-------------|
-| PRs for promotion | Required | **0 (auto + veto)** |
-| Markdown principles | 4+ files | **0 files** |
-| Registry parsing | Yes | **No (filesystem)** |
-| Contagion deadlock | Possible | **Impossible (slots)** |
-| Usage → Quality gate | None | **Linter required** |
-| Background ops in agent | Yes | **No (CI/CD)** |
-
----
-
-## 4. Requirements by Priority
-
-### 4.1 P0 — Critical (Core Architecture Changes)
-
-#### P0-1: Implement Survival Engine (Replace Nomination Generator)
-
-**Delete**: `sigil-mark/process/nomination-generator.ts`
-
-**Create**: `sigil-mark/process/survival-engine.ts`
-
-**Requirements:**
-- P0-1.1: Auto-promote when survival + cleanliness criteria met
-- P0-1.2: Survival criteria: 5+ Gold imports, 2+ weeks stable, 0 mutinies
-- P0-1.3: Cleanliness criteria: ESLint 0 warnings, TSC strict, no hardcoded values
-- P0-1.4: Send notification with 24h veto window
-- P0-1.5: Auto-confirm if no veto after 24h
-- P0-1.6: Auto-demote on modification or 3+ mutinies (immediate, no waiting)
-
-**Interface:**
 ```typescript
-interface SurvivalEngine {
-  trigger: 'git-push' | 'weekly-cron';
+// grimoires/sigil/process/constitution-reader.ts
+export const DEFAULT_CONSTITUTION_PATH = 'sigil-mark/constitution/protected-capabilities.yaml';
+// SHOULD BE: 'grimoires/sigil/constitution/protected-capabilities.yaml'
 
-  promotion: {
-    survivalCriteria: {
-      goldImports: '>= 5',
-      stabilityWeeks: '>= 2',
-      mutinies: '0',
-    };
-    cleanlinessCriteria: {
-      eslint: 'max-warnings 0',
-      typescript: 'strict',
-      noHardcoded: true,
-    };
-    action: 'auto-promote';
-    vetoWindow: '24h';
-  };
-
-  demotion: {
-    criteria: 'modified OR 3+ mutinies';
-    action: 'auto-demote';
-    immediate: true;
-  };
-}
+// grimoires/sigil/process/moodboard-reader.ts
+export const DEFAULT_MOODBOARD_PATH = 'sigil-mark/moodboard';
+// SHOULD BE: 'grimoires/sigil/moodboard'
 ```
 
-**Acceptance Criteria:**
-- [ ] `nomination-generator.ts` deleted
-- [ ] `survival-engine.ts` created
-- [ ] Promotion requires survival AND cleanliness
-- [ ] Notification sent with veto option
-- [ ] Auto-confirm after 24h with no veto
-- [ ] Demotion is immediate (no waiting)
+### 2.2 Version Schizophrenia
 
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:98-176
+**Evidence from FULL_TECHNICAL_AUDIT.md:**
 
----
+| File | Claims Version |
+|------|----------------|
+| `grimoires/sigil/README.md` | 9.0.0 |
+| `.sigilrc.yaml` | 4.1.0 |
+| `constitution.yaml` | 5.0.0 |
+| `vocabulary.yaml` | 5.0.0 |
+| `CLAUDE.md` | v7.6, v6.0, v6.1 (multiple refs) |
+| `process/constitution-reader.ts` | v2.6 (header) |
+| `process/index.ts` | v4.1 |
 
-#### P0-2: Implement Linter Gate
+**Impact:** Agent doesn't know what version it's operating on.
 
-**Create**: `sigil-mark/process/linter-gate.ts`
+### 2.3 Missing Runtime Layer
 
-**Requirements:**
-- P0-2.1: ESLint check with `sigil/no-hardcoded-values` rule
-- P0-2.2: ESLint check with `sigil/use-tokens` rule
-- P0-2.3: TypeScript strict mode check
-- P0-2.4: No `any` types allowed
-- P0-2.5: No `console.log` statements
-- P0-2.6: JSDoc required for exported functions
-- P0-2.7: Return boolean `canPromote()` result
+The skill tells agents to generate:
 
-**Interface:**
-```typescript
-interface LinterGate {
-  checks: {
-    eslint: { maxWarnings: 0, rules: string[] };
-    typescript: { strict: true, noAny: true };
-    sigil: { noConsoleLogs: true, hasDocstring: true };
-  };
-
-  canPromote(component: string): Promise<boolean>;
-}
+```tsx
+import { useCriticalAction, CriticalZone, useLens } from 'sigil-mark';
+import { useSigilMutation } from 'sigil-mark';
+import { CriticalZone, GlassLayout, MachineryLayout } from 'sigil-mark';
 ```
 
-**Acceptance Criteria:**
-- [ ] `linter-gate.ts` created
-- [ ] All checks implemented
-- [ ] Returns false if any check fails
-- [ ] Logs specific failures for debugging
+**None of these exist.** The runtime layer was either never created, deleted during migration, or lives in a different repository.
 
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:386-439
+### 2.4 Orphaned Files
 
----
+Files referenced but not in grimoire:
 
-#### P0-3: Convert Markdown Principles to Executable Code
+| Expected Path | Status |
+|---------------|--------|
+| `constitution/protected-capabilities.yaml` | Still in `sigil-mark/` |
+| `constitution/personas.yaml` | Referenced but doesn't exist |
+| `constitution/philosophy.yaml` | Referenced but doesn't exist |
+| `constitution/decisions/` | Referenced but doesn't exist |
+| `constitution/rules.md` | Referenced but doesn't exist |
+| `moodboard/evidence/` | Referenced but doesn't exist |
 
-**Delete**: `sigil-mark/principles/*.md` (all 4 files)
+### 2.5 Phantom Features
 
-**Create**: Executable hooks and utilities in `src/components/gold/`
+Skills reference non-existent files:
 
-**Requirements:**
-- P0-3.1: Create `src/components/gold/hooks/useMotion.ts` (replaces motion-implementation.md)
-- P0-3.2: Create `src/components/gold/utils/colors.ts` (replaces color-oklch.md)
-- P0-3.3: Create `src/components/gold/utils/spacing.ts` (spacing scale)
-- P0-3.4: Physics values as TypeScript constants, not markdown prose
-- P0-3.5: Type-safe enforcement at compile time
-
-**useMotion.ts:**
-```typescript
-export function useMotion(physics: PhysicsName): MotionStyle {
-  const PHYSICS = {
-    'server-tick': { duration: 600, easing: 'ease-out' },
-    'deliberate': { duration: 800, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
-    'snappy': { duration: 150, easing: 'ease-out' },
-    'smooth': { duration: 300, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
-  } as const;
-
-  return {
-    transition: `all ${PHYSICS[physics].duration}ms ${PHYSICS[physics].easing}`,
-  };
-}
-```
-
-**colors.ts:**
-```typescript
-export function oklch(l: number, c: number, h: number, a = 1): string {
-  if (l < 0 || l > 1) throw new Error('Lightness must be 0-1');
-  if (c < 0 || c > 0.4) throw new Error('Chroma must be 0-0.4');
-  if (h < 0 || h > 360) throw new Error('Hue must be 0-360');
-
-  return `oklch(${l * 100}% ${c} ${h} / ${a})`;
-}
-
-export const palette = {
-  primary: oklch(0.5, 0.2, 250),
-  success: oklch(0.6, 0.2, 145),
-  danger: oklch(0.5, 0.25, 25),
-} as const;
-```
-
-**Acceptance Criteria:**
-- [ ] `principles/*.md` deleted (4 files)
-- [ ] `useMotion.ts` created with physics constants
-- [ ] `colors.ts` created with OKLCH enforcement
-- [ ] `spacing.ts` created with scale
-- [ ] All hooks/utils are type-safe
-- [ ] Agent instruction: "Use useMotion for all motion"
-
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:179-236
-
----
-
-#### P0-4: Implement Slot-Based Composition (Fix Contagion Deadlock)
-
-**Modify**: ESLint rules to allow Draft content via children
-
-**Requirements:**
-- P0-4.1: Gold components accept `React.ReactNode` for content slots
-- P0-4.2: ESLint allows Draft→Gold when passed as children (not imported)
-- P0-4.3: Update `gold-imports-only` rule to exclude children props
-- P0-4.4: Document slot pattern in CLAUDE.md
-
-**Pattern:**
-```typescript
-// Gold component defines frame
-export function Button({ children, icon }: ButtonProps) {
-  return (
-    <button>
-      {icon && <span className="icon-slot">{icon}</span>}
-      {children}
-    </button>
-  );
-}
-
-// Feature code composes Draft into Gold
-import { Button } from '@/gold';
-import { DraftAnimation } from '@/draft';
-
-export function ClaimButton() {
-  return (
-    <Button>
-      <DraftAnimation />  {/* Draft as child, not import in Gold */}
-      Claim Rewards
-    </Button>
-  );
-}
-```
-
-**Rule**: "Gold defines the frame. The content can be Draft."
-
-**Acceptance Criteria:**
-- [ ] Gold components use `ReactNode` for content slots
-- [ ] ESLint allows Draft content as children
-- [ ] No cascade failure when iterating
-- [ ] Pattern documented in CLAUDE.md
-
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:240-288
-
----
-
-#### P0-5: Replace Registry Parsing with Filesystem Lookup
-
-**Delete**: `sigil-mark/process/registry-parser.ts`
-
-**Create**: `sigil-mark/process/filesystem-registry.ts`
-
-**Requirements:**
-- P0-5.1: Tier determined by path: `src/components/gold/Button.tsx` = Gold
-- P0-5.2: No parsing required, just `fs.existsSync()`
-- P0-5.3: Auto-generate `index.ts` files from directory contents
-- P0-5.4: Index regeneration on file change
-
-**Implementation:**
-```typescript
-function getTier(componentName: string): RegistryTier | null {
-  if (fs.existsSync(`src/components/gold/${componentName}.tsx`)) return 'gold';
-  if (fs.existsSync(`src/components/silver/${componentName}.tsx`)) return 'silver';
-  if (fs.existsSync(`src/components/draft/${componentName}.tsx`)) return 'draft';
-  return null;
-}
-
-async function regenerateIndex(tier: RegistryTier): Promise<void> {
-  const files = await fs.readdir(`src/components/${tier}`);
-  const exports = files
-    .filter(f => f.endsWith('.tsx') && f !== 'index.ts')
-    .map(f => `export * from './${f.replace('.tsx', '')}';`)
-    .join('\n');
-
-  await fs.writeFile(`src/components/${tier}/index.ts`, exports);
-}
-```
-
-**Acceptance Criteria:**
-- [ ] `registry-parser.ts` deleted
-- [ ] `filesystem-registry.ts` created
-- [ ] Path lookup replaces parsing
-- [ ] Index files auto-generated
-- [ ] Agent instruction: "To check tier, check path exists"
-
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:294-342
-
----
-
-#### P0-6: Offload Heavy Operations to CI/CD
-
-**Modify**: Heavy operations write intent, CI executes
-
-**Requirements:**
-- P0-6.1: Create `.sigil/pending-ops.json` for queued operations
-- P0-6.2: Agent writes intent instead of executing
-- P0-6.3: GitHub Actions workflow processes pending ops
-- P0-6.4: Notification when ops complete
-
-**Agent behavior:**
-```typescript
-// BEFORE (v7.5): Agent performs heavy operation
-async function optimizeImages(files: string[]): Promise<void> {
-  // 30+ seconds of image processing... ❌
-}
-
-// AFTER (v7.6): Agent writes intent
-async function requestImageOptimization(files: string[]): Promise<void> {
-  await appendToConfig('.sigil/pending-ops.json', {
-    operation: 'optimize-images',
-    files,
-    requestedAt: new Date().toISOString(),
-  });
-
-  console.log(`Queued ${files.length} images for optimization on next build.`);
-}
-```
-
-**GitHub Actions:**
 ```yaml
-# .github/workflows/sigil-ops.yml
-on:
-  push:
-    branches: [main]
-jobs:
-  process-pending-ops:
-    runs-on: ubuntu-latest
-    steps:
-      - run: npx sigil process-pending-ops
+# .claude/skills/crafting-guidance/index.yaml
+checks:
+  - path: sigil-mark/soul-binder/immutable-values.yaml  # DOESN'T EXIST
+  - path: sigil-mark/soul-binder/canon-of-flaws.yaml    # DOESN'T EXIST
+  - path: sigil-mark/lens-array/lenses.yaml             # DOESN'T EXIST
 ```
 
-**Rule**: "The Agent is an orchestrator, not a worker node."
+---
 
-**Acceptance Criteria:**
-- [ ] Pending ops config created
-- [ ] Agent writes intent for heavy ops
-- [ ] CI workflow processes ops
-- [ ] No 30s+ blocks in agent loop
+## 3. Goals
 
-> Source: SIGIL_LIVING_CANON_ARCHITECTURE.md:345-383
+### 3.1 Primary Goal
+
+**Zero `sigil-mark/` references remaining.**
+
+```bash
+grep -r "sigil-mark" --include="*.ts" --include="*.yaml" --include="*.md" | wc -l
+# Target: 0
+```
+
+### 3.2 Secondary Goals
+
+1. **Single version number** — All files report v9.1.0
+2. **Complete file migration** — All referenced files exist in grimoire
+3. **Clean skill paths** — Skills load from `grimoires/sigil/`
+4. **Working `/craft` flow** — Agent can generate code without errors
+5. **Deleted legacy directory** — No `sigil-mark/` in repo
+
+### 3.3 Non-Goals
+
+1. **Runtime layer creation** — That's a v10.0 feature, not migration debt
+2. **New features** — This is purely technical debt cleanup
+3. **Documentation overhaul** — Just path updates, not content changes
 
 ---
 
-### 4.2 P1 — High (Supporting Infrastructure)
+## 4. Requirements
 
-#### P1-1: Update Sentinel Validator for Slot Composition
+### 4.1 P0: Fix All Process Layer Paths
 
-**Modify**: `sigil-mark/process/sentinel-validator.ts`
+**Files to update (42 references):**
 
-**Requirements:**
-- P1-1.1: Allow Draft content passed as children to Gold
-- P1-1.2: Block direct imports of Draft into Gold (unchanged)
-- P1-1.3: Detect slot pattern and allow
+| File | Current Default | Should Be |
+|------|-----------------|-----------|
+| `constitution-reader.ts` | `sigil-mark/constitution/...` | `grimoires/sigil/constitution/...` |
+| `moodboard-reader.ts` | `sigil-mark/moodboard` | `grimoires/sigil/moodboard` |
+| `persona-reader.ts` | `sigil-mark/personas/...` | `grimoires/sigil/constitution/...` |
+| `vocabulary-reader.ts` | `sigil-mark/vocabulary/...` | `grimoires/sigil/constitution/...` |
+| `decision-reader.ts` | `sigil-mark/consultation-chamber/...` | `grimoires/sigil/constitution/...` |
+| `philosophy-reader.ts` | `sigil-mark/soul-binder/...` | `grimoires/sigil/constitution/...` |
+| `vibe-check-reader.ts` | `sigil-mark/surveys/...` | `grimoires/sigil/...` |
+| `lens-array-reader.ts` | `sigil-mark/lens-array/...` | `grimoires/sigil/...` |
+| `governance-logger.ts` | `sigil-mark/governance` | `grimoires/sigil/state/...` |
+| `agent-orchestration.ts` | `sigil-mark/vocabulary/...` | `grimoires/sigil/constitution/...` |
+| `garden-command.ts` | `sigil-mark/` in SCAN_PATHS | `grimoires/sigil/` |
 
 **Acceptance Criteria:**
-- [ ] Slot pattern recognized
-- [ ] Direct imports still blocked
-- [ ] Children composition allowed
+- [ ] All 42 process layer references updated
+- [ ] `grep -r "sigil-mark" grimoires/sigil/process/` returns 0 results
 
 ---
 
-#### P1-2: Update PreToolUse Hook for Filesystem Registry
+### 4.2 P0: Move Orphaned Files
 
-**Modify**: `.claude/hooks/pre-tool-use.yaml` and `sentinel-validate.sh`
+**Move `protected-capabilities.yaml`:**
 
-**Requirements:**
-- P1-2.1: Use filesystem lookup instead of registry parsing
-- P1-2.2: Faster validation (<20ms target)
-- P1-2.3: Remove registry cache (not needed)
+```bash
+mv sigil-mark/constitution/protected-capabilities.yaml \
+   grimoires/sigil/constitution/
+```
+
+**Create missing placeholder files:**
+
+```bash
+mkdir -p grimoires/sigil/constitution/decisions
+mkdir -p grimoires/sigil/moodboard/evidence
+
+touch grimoires/sigil/constitution/personas.yaml
+touch grimoires/sigil/constitution/philosophy.yaml
+touch grimoires/sigil/constitution/rules.md
+```
 
 **Acceptance Criteria:**
-- [ ] Hook uses filesystem lookup
-- [ ] Validation faster than v7.5
-- [ ] No registry caching overhead
+- [ ] `protected-capabilities.yaml` in grimoire
+- [ ] All referenced directories exist
+- [ ] All referenced files exist (can be placeholders)
 
 ---
 
-#### P1-3: Create Survival Stats Tracker
+### 4.3 P0: Fix Skill Paths
 
-**Create**: `.sigil/survival-stats.json`
+**Update `.claude/skills/crafting-guidance/SKILL.md`:**
 
-**Requirements:**
-- P1-3.1: Track usage count per component
-- P1-3.2: Track mutation history (modifications)
-- P1-3.3: Track mutiny count (overrides/reverts)
-- P1-3.4: Track stability duration
+Current (broken):
+```yaml
+zones:
+  state:
+    paths:
+      - sigil-mark/rules.md
+      - sigil-mark/vocabulary/vocabulary.yaml
+      - sigil-mark/constitution/protected-capabilities.yaml
+      - sigil-mark/personas/personas.yaml
+```
 
-**Schema:**
+Fixed:
+```yaml
+zones:
+  state:
+    paths:
+      - grimoires/sigil/constitution/rules.md
+      - grimoires/sigil/constitution/vocabulary.yaml
+      - grimoires/sigil/constitution/protected-capabilities.yaml
+      - grimoires/sigil/constitution/personas.yaml
+```
+
+**Update `.claude/skills/crafting-guidance/index.yaml`:**
+
+Remove phantom file references:
+```yaml
+# DELETE these lines - files don't exist
+checks:
+  - path: sigil-mark/soul-binder/immutable-values.yaml
+  - path: sigil-mark/soul-binder/canon-of-flaws.yaml
+  - path: sigil-mark/lens-array/lenses.yaml
+```
+
+**Acceptance Criteria:**
+- [ ] All skill paths point to `grimoires/sigil/`
+- [ ] No references to non-existent files
+- [ ] Skill loads successfully
+
+---
+
+### 4.4 P0: Fix CLAUDE.md References
+
+**Update references to use grimoire paths:**
+
+From:
+```markdown
+| `sigil-mark/process/survival-engine.ts` | Auto-promotion engine |
+```
+
+To:
+```markdown
+| `grimoires/sigil/process/survival-engine.ts` | Auto-promotion engine |
+```
+
+**Update import examples:**
+
+From:
+```typescript
+import { useSigilMutation } from 'sigil-mark';
+```
+
+To:
+```typescript
+import { useMotion } from '@sigil/hooks';
+// Note: Full runtime layer (useSigilMutation, CriticalZone) is Phase 2
+```
+
+**Acceptance Criteria:**
+- [ ] All CLAUDE.md paths point to grimoire
+- [ ] No references to non-existent runtime imports
+- [ ] Clear note about what exists vs Phase 2
+
+---
+
+### 4.5 P1: Consolidate Version Numbers
+
+**Update all files to v9.1.0:**
+
+| File | Current | Target |
+|------|---------|--------|
+| `grimoires/sigil/README.md` | 9.0.0 | 9.1.0 |
+| `.sigilrc.yaml` | 4.1.0 | 9.1.0 |
+| `constitution.yaml` | 5.0.0 | 9.1.0 |
+| `vocabulary.yaml` | 5.0.0 | 9.1.0 |
+| `CLAUDE.md` header | v7.6 | v9.1 |
+| `process/index.ts` header | v4.1 | v9.1 |
+| `skills/crafting-guidance/SKILL.md` | v4.1 | v9.1 |
+
+**Acceptance Criteria:**
+- [ ] All version references are 9.1.0
+- [ ] No mixed version numbers in codebase
+
+---
+
+### 4.6 P1: Update tsconfig.json
+
+**Current (broken):**
 ```json
 {
-  "components": {
-    "Button": {
-      "tier": "silver",
-      "goldImports": 7,
-      "lastModified": "2026-01-01",
-      "stabilityWeeks": 3,
-      "mutinies": 0
-    }
-  }
+  "paths": {
+    "@sigil/recipes/*": ["sigil-mark/recipes/*"],
+    "@sigil/hooks": ["sigil-mark/hooks/index.ts"],
+    "@sigil/hooks/*": ["sigil-mark/hooks/*"],
+    "@sigil/core/*": ["sigil-mark/core/*"]
+  },
+  "include": ["sigil-mark/**/*"]
+}
+```
+
+**Fixed:**
+```json
+{
+  "paths": {
+    "@sigil-context/*": ["grimoires/sigil/*"],
+    "@sigil/hooks": ["src/components/gold/hooks/index.ts"],
+    "@sigil/hooks/*": ["src/components/gold/hooks/*"],
+    "@sigil/utils/*": ["src/components/gold/utils/*"]
+  },
+  "include": ["grimoires/sigil/**/*", "src/**/*"]
 }
 ```
 
 **Acceptance Criteria:**
-- [ ] Stats tracked per component
-- [ ] Updated on git push
-- [ ] Used by survival engine
+- [ ] tsconfig paths point to correct locations
+- [ ] TypeScript compilation works
+- [ ] Imports resolve correctly
 
 ---
 
-### 4.3 P2 — Medium (Polish)
+### 4.7 P1: Align Physics Values
 
-#### P2-1: Update CLAUDE.md for v7.6
+**Current inconsistencies:**
 
-**Modify**: `CLAUDE.md`
+| Motion | useMotion.ts | physics.yaml | vocabulary.yaml | .sigilrc.yaml |
+|--------|--------------|--------------|-----------------|---------------|
+| reassuring | N/A | N/A | 600ms | 1200ms ⚠️ |
 
-**Requirements:**
-- P2-1.1: Remove nomination workflow section
-- P2-1.2: Add survival engine documentation
-- P2-1.3: Add slot composition pattern
-- P2-1.4: Update filesystem registry docs
-- P2-1.5: Remove background execution section (offloaded to CI)
+**Fix:** Use `physics.yaml` as source of truth, update all others.
 
----
-
-#### P2-2: Update Version Numbers
-
-**Modify**: All version references to 7.6.0
+**Acceptance Criteria:**
+- [ ] All physics values consistent across files
+- [ ] Single source of truth established
 
 ---
 
-#### P2-3: Clean Up Deleted Files
+### 4.8 P2: Delete Legacy Structure
 
-**Delete**:
-- `sigil-mark/process/nomination-generator.ts`
-- `sigil-mark/process/registry-parser.ts`
-- `sigil-mark/principles/motion-implementation.md`
-- `sigil-mark/principles/color-oklch.md`
-- `sigil-mark/principles/svg-patterns.md`
-- `sigil-mark/principles/image-tooling.md`
-- `sigil-mark/principles/README.md`
+**After all fixes verified:**
+
+```bash
+rm -rf sigil-mark/
+```
+
+**Safety check before deletion:**
+```bash
+# Verify no sigil-mark references remain
+grep -r "sigil-mark" --include="*.ts" --include="*.yaml" --include="*.md" | wc -l
+# Must be 0
+```
+
+**Acceptance Criteria:**
+- [ ] All references updated first
+- [ ] Validation script passes
+- [ ] `sigil-mark/` directory deleted
+- [ ] Git commit with deletion
 
 ---
 
 ## 5. File Changes Summary
 
-### Files to Delete
-
-| File | Reason |
-|------|--------|
-| `sigil-mark/process/nomination-generator.ts` | Replaced by survival engine |
-| `sigil-mark/process/registry-parser.ts` | Replaced by filesystem lookup |
-| `sigil-mark/principles/*.md` (5 files) | Replaced by executable code |
-
-### Files to Create
-
-| File | Purpose |
-|------|---------|
-| `sigil-mark/process/survival-engine.ts` | Auto-promote/demote with veto |
-| `sigil-mark/process/linter-gate.ts` | Cleanliness gate for promotion |
-| `sigil-mark/process/filesystem-registry.ts` | Path-based tier lookup |
-| `src/components/gold/hooks/useMotion.ts` | Motion physics as code |
-| `src/components/gold/utils/colors.ts` | OKLCH colors as code |
-| `src/components/gold/utils/spacing.ts` | Spacing scale as code |
-| `.sigil/survival-stats.json` | Usage/stability tracking |
-| `.sigil/pending-ops.json` | Heavy ops queue for CI |
-| `.github/workflows/sigil-ops.yml` | Process pending ops |
-
-### Files to Modify
+### Files to Update
 
 | File | Changes |
 |------|---------|
-| `sigil-mark/process/sentinel-validator.ts` | Slot composition support |
-| `.claude/hooks/pre-tool-use.yaml` | Filesystem registry |
-| `.claude/hooks/scripts/sentinel-validate.sh` | Filesystem registry |
-| `packages/eslint-plugin-sigil/src/rules/gold-imports-only.ts` | Allow children |
-| `CLAUDE.md` | v7.6 documentation |
-| `.claude/agents/sigil-craft.yaml` | Version 7.6.0 |
+| `grimoires/sigil/process/*.ts` (11 files) | Update DEFAULT_*_PATH constants |
+| `.claude/skills/crafting-guidance/SKILL.md` | Update all paths |
+| `.claude/skills/crafting-guidance/index.yaml` | Remove phantom references |
+| `CLAUDE.md` | Update paths, clarify runtime layer |
+| `tsconfig.json` | Fix path aliases |
+| `.sigilrc.yaml` | Update version |
+| `grimoires/sigil/constitution/*.yaml` | Update versions |
+| `grimoires/sigil/README.md` | Update version |
+
+### Files to Move
+
+| From | To |
+|------|-----|
+| `sigil-mark/constitution/protected-capabilities.yaml` | `grimoires/sigil/constitution/` |
+| `sigil-mark/kernel/schemas/*.json` | `grimoires/sigil/schemas/` |
+
+### Files to Create
+
+| Path | Content |
+|------|---------|
+| `grimoires/sigil/constitution/personas.yaml` | Placeholder with depositor, newcomer, power_user |
+| `grimoires/sigil/constitution/philosophy.yaml` | Placeholder with core principles |
+| `grimoires/sigil/constitution/rules.md` | Placeholder with motion rules |
+| `grimoires/sigil/constitution/decisions/README.md` | Directory placeholder |
+| `grimoires/sigil/moodboard/evidence/README.md` | Directory placeholder |
+
+### Files to Delete
+
+| Path | Reason |
+|------|--------|
+| `sigil-mark/` (entire directory) | Migration complete |
 
 ---
 
-## 6. Implementation Phases
+## 6. Implementation Sprints
 
-### Sprint 1: Core Architecture (P0-1 to P0-3)
-1. Delete nomination-generator.ts, create survival-engine.ts
-2. Create linter-gate.ts
-3. Delete principles/*.md, create executable hooks/utils
+### Sprint 1: Process Layer Fixes (P0)
 
-**Exit Criteria**: Survival engine running, principles executable.
+1. Update all 11 process layer files with correct paths
+2. Move `protected-capabilities.yaml` to grimoire
+3. Create missing placeholder files and directories
+4. Verify `grep sigil-mark process/` returns 0
 
-### Sprint 2: Composition & Registry (P0-4 to P0-5)
-4. Implement slot-based composition
-5. Delete registry-parser.ts, create filesystem-registry.ts
-6. Auto-generate index files
+**Exit Criteria:** Process layer compiles, no sigil-mark references
 
-**Exit Criteria**: No contagion deadlock, filesystem as database.
+### Sprint 2: Skills + Configuration (P0-P1)
 
-### Sprint 3: CI/CD & Polish (P0-6, P1, P2)
-7. Offload heavy ops to CI
-8. Update sentinel and hooks
-9. Clean up deleted files, update docs
+5. Update skill SKILL.md paths
+6. Update skill index.yaml, remove phantom references
+7. Fix CLAUDE.md references
+8. Update tsconfig.json aliases
+9. Consolidate version numbers to 9.1.0
 
-**Exit Criteria**: No flow interruption, clean codebase.
+**Exit Criteria:** Skills load, TypeScript compiles, consistent versions
 
----
+### Sprint 3: Validation + Cleanup (P1-P2)
 
-## 7. Success Metrics
+10. Run validation script
+11. Fix any remaining references
+12. Align physics values
+13. Delete `sigil-mark/` directory
+14. Final audit
 
-| Metric | v7.5 | v7.6 Target | Measurement |
-|--------|------|-------------|-------------|
-| PRs for promotion | Required | 0 | Count PRs |
-| Markdown principles | 4 files | 0 files | File count |
-| Registry parsing | Yes | No | Code audit |
-| Contagion deadlock | Possible | Impossible | Try slot pattern |
-| Linter gate | None | Required | Promotion logs |
-| Background ops | In agent | In CI | Timing audit |
+**Exit Criteria:** Zero sigil-mark references, clean repo
 
 ---
 
-## 8. The Final Principles
+## 7. Validation Script
 
-1. **Survival is the vote** — But cleanliness is the gate
-2. **Human vetoes, not approves** — Invert the control
-3. **Executable, not descriptive** — Hooks > Markdown
-4. **Gold frames, Draft content** — Slot-based composition
-5. **Filesystem is the registry** — Path IS the API
-6. **Offload heavy ops** — Agent writes intent, CI executes
-7. **Auto-generate indexes** — No manual registry maintenance
-8. **Zero warnings to promote** — Lint gate required
-9. **No parsing overhead** — Directory lookup only
-10. **Stop asking for permission** — If it survives, it's Gold
+```bash
+#!/bin/bash
+# Run after each sprint to verify progress
+
+echo "=== SIGIL v9.1 MIGRATION VALIDATION ==="
+
+echo ""
+echo "1. Checking for remaining sigil-mark references..."
+REMAINING=$(grep -r "sigil-mark" --include="*.ts" --include="*.yaml" --include="*.md" --include="*.json" 2>/dev/null | grep -v ".bak" | wc -l)
+
+if [ "$REMAINING" -gt 0 ]; then
+  echo "❌ FAIL: $REMAINING references remain"
+  grep -r "sigil-mark" --include="*.ts" --include="*.yaml" --include="*.md" --include="*.json" 2>/dev/null | head -10
+else
+  echo "✅ PASS: No sigil-mark references found"
+fi
+
+echo ""
+echo "2. Checking for required grimoire files..."
+REQUIRED_FILES=(
+  "grimoires/sigil/constitution/constitution.yaml"
+  "grimoires/sigil/constitution/physics.yaml"
+  "grimoires/sigil/constitution/vocabulary.yaml"
+  "grimoires/sigil/constitution/protected-capabilities.yaml"
+  "grimoires/sigil/constitution/personas.yaml"
+  "grimoires/sigil/constitution/philosophy.yaml"
+  "grimoires/sigil/constitution/rules.md"
+  "grimoires/sigil/moodboard/README.md"
+)
+
+for f in "${REQUIRED_FILES[@]}"; do
+  if [ -f "$f" ]; then
+    echo "  ✓ $f"
+  else
+    echo "  ❌ MISSING: $f"
+  fi
+done
+
+echo ""
+echo "3. Checking version consistency..."
+grep -r "version:" --include="*.yaml" grimoires/sigil/ | head -10
+
+echo ""
+echo "4. Checking process layer defaults..."
+grep -r "DEFAULT_.*_PATH" grimoires/sigil/process/*.ts 2>/dev/null | head -10
+
+echo ""
+echo "=== VALIDATION COMPLETE ==="
+```
 
 ---
 
-## 9. Risks & Mitigations
+## 8. Success Metrics
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| `sigil-mark/` references | 81 | 0 |
+| Version numbers in use | 6+ | 1 (v9.1.0) |
+| Missing referenced files | 6+ | 0 |
+| Phantom skill references | 3 | 0 |
+| `sigil-mark/` directory | Exists | Deleted |
+
+---
+
+## 9. Risk Mitigation
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Veto window too short | Promoted bad code | Configurable window (24h default) |
-| Linter gate too strict | Nothing promotes | Configurable rules |
-| Filesystem race conditions | Incorrect tier | Atomic operations |
-| CI queue backlog | Delayed ops | Priority queue |
-| Index generation conflicts | Git merge issues | Deterministic ordering |
+| Missed reference breaks agent | Agent fails to load context | Run validation after each sprint |
+| Placeholder files lack content | Skills work but incomplete | Placeholder is acceptable for v9.1 |
+| Breaking change for downstream | Imports fail | This repo is source of truth |
+| Runtime layer still missing | Imports fail | Document clearly as Phase 2 |
 
 ---
 
 ## 10. Out of Scope
 
-- Multi-repo support
-- Custom veto workflows
-- Alternative linters (only ESLint)
-- Non-TypeScript projects
+- **Runtime layer creation** (useSigilMutation, CriticalZone, etc.) — Phase 2
+- **New features or capabilities** — This is debt cleanup only
+- **Component creation** — Gold registry is empty, that's acceptable
+- **Documentation overhaul** — Just path updates
 
 ---
 
-*PRD Generated: 2026-01-10*
-*Sources: SIGIL_LIVING_CANON_ARCHITECTURE.md*
-*Next Step: `/architect` for Software Design Document*
+## 11. The Promise
+
+After v9.1:
+
+```
+grep -r "sigil-mark" | wc -l
+0
+
+ls sigil-mark/
+ls: sigil-mark/: No such file or directory
+
+cat grimoires/sigil/constitution/physics.yaml | head -1
+# Sigil v9.1.0 - Physics Configuration
+```
+
+**The migration will be complete.**
+
+---
+
+*PRD Generated: 2026-01-11*
+*Sources: MIGRATION_AUDIT_REPORT.md, FULL_TECHNICAL_AUDIT.md, migrate-to-grimoire.sh*
+*Key Insight: v9.0 was a partial rename. v9.1 completes the migration.*
+*Estimated Effort: 3 sprints, ~2-4 hours total*

@@ -1,8 +1,8 @@
-# Sprint 3 Engineer Review
+# Sprint 3 Engineering Review
 
-**Sprint:** Sprint 3 - useSigilMutation Core
+**Sprint:** Sprint 3 - Foundation (v9.1 Migration Debt Zero)
 **Reviewer:** Senior Technical Lead
-**Date:** 2026-01-08
+**Date:** 2026-01-11
 **Status:** APPROVED
 
 ---
@@ -11,145 +11,118 @@
 
 All good.
 
----
+Sprint 3 implementation is complete. All feedback has been addressed.
 
-## Verification Checklist
+### Overall Assessment
 
-### S3-T1: Physics Types & Interfaces
-
-| Criteria | Status |
-|----------|--------|
-| `SigilState` type with 6 states | PASS |
-| `PhysicsClass` type with 3 classes | PASS |
-| `SimulationPreview<T>` with predictedResult, fees, warnings | PASS |
-| `ResolvedPhysics` with class, timing, requires, forbidden | PASS |
-| `UseSigilMutationOptions<TData, TVariables>` complete | PASS |
-| `UseSigilMutationResult<TData, TVariables>` complete | PASS |
-
-**Notes:** Types are well-documented with JSDoc. Generic parameters correctly propagate through interfaces.
-
-### S3-T2: Physics Resolution Function
-
-| Criteria | Status |
-|----------|--------|
-| `resolvePhysicsV5()` function exists | PASS |
-| critical → server-tick mapping | PASS |
-| glass → local-first mapping | PASS |
-| machinery → local-first mapping | PASS |
-| standard → crdt mapping | PASS |
-| Override warning without reason | PASS |
-| Returns complete ResolvedPhysics | PASS |
-
-**Notes:** Zone-to-physics mapping is clean. Persona adjustments (power_user 0.9x, cautious 1.2x) are reasonable. Vibes timing_modifier correctly applied.
-
-### S3-T3: State Machine Implementation
-
-| Criteria | Status |
-|----------|--------|
-| State transitions: idle→simulating→confirming→committing→done | PASS |
-| Error state reachable from simulating | PASS |
-| Error state reachable from committing | PASS |
-| Reset returns to idle | PASS |
-| State is reactive (useState) | PASS |
-
-**Notes:** State machine is correct. All transitions properly guarded with state checks.
-
-### S3-T4: Simulate Function
-
-| Criteria | Status |
-|----------|--------|
-| `simulate(variables)` transitions to simulating | PASS |
-| Calls user-provided simulate if available | PASS |
-| Creates default preview if no simulate function | PASS |
-| Transitions to confirming on success | PASS |
-| Transitions to error on failure | PASS |
-| Stores pending variables for confirm | PASS |
-
-**Notes:** Default preview correctly uses physics timing. Variables stored in ref for confirm step.
-
-### S3-T5: Confirm Function
-
-| Criteria | Status |
-|----------|--------|
-| `confirm()` only works in confirming state | PASS |
-| Transitions to committing | PASS |
-| Executes mutation with stored variables | PASS |
-| Transitions to done on success | PASS |
-| Transitions to error on failure | PASS |
-| Calls onSuccess/onError callbacks | PASS |
-
-**Notes:** Proper error handling for missing pending variables.
-
-### S3-T6: Execute Function
-
-| Criteria | Status |
-|----------|--------|
-| `execute(variables)` for direct execution | PASS |
-| Logs warning on server-tick physics | PASS |
-| Transitions through committing→done/error | PASS |
-| Calls mutation directly | PASS |
-
-**Notes:** Warning for server-tick usage is helpful for debugging.
-
-### S3-T7: Computed UI State
-
-| Criteria | Status |
-|----------|--------|
-| `disabled` = not idle and not confirming | PASS |
-| `isPending` = committing | PASS |
-| `isSimulating` = simulating | PASS |
-| `isConfirming` = confirming | PASS |
-| `cssVars` with --sigil-duration, --sigil-easing | PASS |
-
-**Notes:** Computed state is correct. CSS vars use physics timing correctly.
-
-### S3-T8: Hook Assembly & Export
-
-| Criteria | Status |
-|----------|--------|
-| Hook uses SigilContext for zone/persona | PASS |
-| Returns complete result object | PASS |
-| Exported from sigil-mark/hooks/ | PASS |
-| JSDoc documented with @sigil-tier gold | PASS |
-
-**Notes:** Comprehensive JSDoc with 3 usage examples. Export statement correctly re-exports types and physics functions.
+| Category | Rating | Notes |
+|----------|--------|-------|
+| Task Completion | 100% | All tasks complete, feedback addressed |
+| Code Quality | Good | Clean path constant updates |
+| Acceptance Criteria | PASS | All criteria met |
+| Architecture Alignment | Good | Follows grimoire pattern correctly |
 
 ---
 
-## Quality Assessment
+## Issues Found
 
-### Strengths
+### ISSUE 1: Missed Functional Path Reference [FIXED]
 
-1. **Type Safety:** Full TypeScript generics through the entire API
-2. **State Machine:** Clean transitions with proper guards
-3. **Error Handling:** All error paths covered with callbacks
-4. **Documentation:** Excellent JSDoc with practical examples
-5. **Backwards Compat:** v4.1 resolvePhysics preserved
-6. **Developer Experience:** Clear warnings for wrong usage patterns
+**File:** `grimoires/sigil/process/amend-command.ts`
+**Line:** 110
 
-### Architecture Alignment
+**Previous Code:**
+```typescript
+proposalPath: `sigil-mark/governance/amendments/${proposal.id}.yaml`,
+```
 
-- Zone-to-physics mapping matches SDD Section 4.2
-- Simulation flow matches SDD Section 4.2.1
-- Physics resolution priority matches SDD Section 4.2.2
+**Fixed Code:**
+```typescript
+proposalPath: `grimoires/sigil/state/amendments/${proposal.id}.yaml`,
+```
 
-### No Issues Found
-
-No code quality issues, security vulnerabilities, or architecture misalignments detected.
+**Verified:** Fix confirmed in code review.
 
 ---
 
-## Recommendation
+## Verification Results
+
+### S1-T3 Acceptance Criteria Check
+
+| Criteria | Status | Notes |
+|----------|--------|-------|
+| All DEFAULT_PATH constants updated | PASS | All 12 files updated correctly |
+| No functional sigil-mark paths remain | PASS | Verified with grep |
+| Remaining refs are comments only | PASS | All functional paths migrated |
+
+### Files Correctly Updated
+
+All 11 files claimed in the report were verified:
+
+1. constitution-reader.ts - DEFAULT_CONSTITUTION_PATH correct
+2. moodboard-reader.ts - DEFAULT_MOODBOARD_PATH correct
+3. persona-reader.ts - DEFAULT_PERSONAS_PATH correct
+4. vocabulary-reader.ts - DEFAULT_VOCABULARY_PATH correct
+5. decision-reader.ts - DEFAULT_DECISIONS_PATH correct
+6. philosophy-reader.ts - DEFAULT_PHILOSOPHY_PATH correct
+7. lens-array-reader.ts - DEFAULT_LENS_ARRAY_PATH correct
+8. vibe-check-reader.ts - DEFAULT_VIBE_CHECKS_PATH correct
+9. governance-logger.ts - getGovernancePath() correct
+10. agent-orchestration.ts - vocabPath correct
+11. garden-command.ts - SCAN_PATHS correct
+
+### Placeholder Files Created
+
+All 5 placeholder files verified:
+
+1. grimoires/sigil/constitution/personas.yaml - Valid YAML, v9.1.0
+2. grimoires/sigil/constitution/philosophy.yaml - Valid YAML, v9.1.0
+3. grimoires/sigil/constitution/rules.md - Valid markdown
+4. grimoires/sigil/constitution/decisions/README.md - Directory exists
+5. grimoires/sigil/moodboard/evidence/README.md - Directory exists
+
+### protected-capabilities.yaml Migration
+
+Verified:
+- File exists at grimoires/sigil/constitution/protected-capabilities.yaml
+- Version updated to 9.1.0
+- Content is valid YAML
+
+---
+
+## Documentation Cleanup (INFO - Sprint 2 Scope)
+
+The following comment references remain but are correctly identified as Sprint 2 scope:
+
+- process-context.tsx: 11 import example references (deprecated module)
+- governance-logger.ts: 2 JSDoc references
+- amend-command.ts: 2 JSDoc references (lines 34, 71)
+- data-risk-analyzer.ts: 7 JSDoc references
+- violation-scanner.ts: 3 JSDoc references
+- polish-command.ts: 3 JSDoc references
+- garden-command.ts: 2 JSDoc references
+- index.ts: 4 JSDoc references
+
+These are all comments/documentation and do not affect functionality.
+
+---
+
+## Approval Checklist
+
+- [x] amend-command.ts:110 updated to grimoire path
+- [x] Verification grep returns no functional references
+- [x] All 4 sprint tasks complete
+- [x] All acceptance criteria met
+
+---
+
+## Decision
 
 **APPROVED** - Sprint 3 is ready for security audit.
 
----
-
-## Next Steps
-
-1. Run `/audit-sprint sprint-3` for security review
-2. Upon approval, proceed to Sprint 4: Live Grep Discovery
+**Next step:** `/audit-sprint sprint-3`
 
 ---
 
-*Review Completed: 2026-01-08*
+*Review completed: 2026-01-11*
+*Reviewer: Senior Technical Lead*

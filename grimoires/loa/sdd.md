@@ -1,951 +1,740 @@
-# Software Design Document: Sigil v7.6 "The Living Canon"
+# Software Design Document: Sigil v9.1 "Migration Debt Zero"
 
-> *"Stop asking for permission to be great. If the code survives and is clean, it is Gold."*
-
-**Version:** 7.6.0
-**Codename:** The Living Canon
+**Version:** 9.1.0
+**Codename:** Migration Debt Zero
 **Status:** SDD Complete
-**Date:** 2026-01-10
-**Supersedes:** SDD v7.5.0 "The Reference Studio"
-**Based on:** PRD v7.6.0
+**Date:** 2026-01-11
+**Supersedes:** v9.0.0 "Core Scaffold" SDD
+**Based on:** PRD v9.1.0
+**Sources:** MIGRATION_AUDIT_REPORT.md, FULL_TECHNICAL_AUDIT.md, migrate-to-grimoire.sh
 
 ---
 
 ## 1. Executive Summary
 
-This document describes the technical architecture for Sigil v7.6 "The Living Canon", which corrects 6 fatal flaws identified in v7.5:
+This document describes the technical approach for completing the v9.0 migration. The audits reveal:
 
-| Flaw | v7.5 Problem | v7.6 Solution |
-|------|--------------|---------------|
-| Nomination PRs | Bureaucracy | Survival Engine (auto + veto) |
-| Markdown principles | Dead knowledge | Executable hooks/utils |
-| Contagion deadlock | Cascade failures | Slot-based composition |
-| Registry parsing | Overhead | Filesystem as database |
-| Usage = Quality | Mob rule | Linter Gate |
-| Background execution | Flow interruption | Offload to CI/CD |
+| Issue | Count | Impact |
+|-------|-------|--------|
+| Hardcoded `sigil-mark/` references | 81 | Agent loads wrong paths |
+| Version numbers in use | 6+ | Version confusion |
+| Missing referenced files | 6 | Skills fail to load |
+| Phantom skill references | 3 | Skill points to non-existent files |
+| Old `sigil-mark/` directory | Exists | Contains orphaned files |
 
-### Architecture Philosophy
+### 1.1 Architecture Philosophy
+
+This is a **path migration**, not a feature build:
 
 ```
-"The Agent is an orchestrator, not a worker node."
-"If it survives and is clean, it is Gold."
-"Human vetoes, not approves."
+NO new components.
+NO new features.
+NO new APIs.
+
+ONLY path updates.
+ONLY file moves.
+ONLY version consolidation.
 ```
+
+### 1.2 Scope
+
+| In Scope | Out of Scope |
+|----------|--------------|
+| Fix 81 path references | Runtime layer creation |
+| Move orphaned files | New features |
+| Consolidate version numbers | Documentation overhaul |
+| Update skill paths | Component creation |
+| Delete legacy `sigil-mark/` | Phase 2 features |
 
 ---
 
 ## 2. System Architecture
 
-### 2.1 High-Level Component Diagram
+### 2.1 Current State (Broken)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                           SIGIL v7.6                                 │
+│                        CURRENT STATE (v9.0)                          │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                      │
-│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐  │
-│  │   Agent Layer    │  │  Process Layer   │  │   Runtime Layer  │  │
-│  │                  │  │                  │  │                  │  │
-│  │ - Claude Code    │  │ - Survival       │  │ - useMotion()    │  │
-│  │ - PreToolUse     │◀─▶│   Engine        │  │ - oklch()        │  │
-│  │ - PostToolUse    │  │ - Linter Gate    │  │ - spacing()      │  │
-│  │                  │  │ - Filesystem     │  │                  │  │
-│  └────────┬─────────┘  │   Registry       │  └──────────────────┘  │
-│           │            └────────┬─────────┘                         │
-│           │                     │                                    │
-│           ▼                     ▼                                    │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │                      Filesystem Layer                         │  │
-│  │                                                               │  │
-│  │  src/components/           .sigil/            .github/        │  │
-│  │  ├── gold/                 ├── survival-      └── workflows/  │  │
-│  │  │   ├── Button.tsx        │   stats.json        └── sigil-   │  │
-│  │  │   ├── hooks/           └── pending-            ops.yml    │  │
-│  │  │   │   └── useMotion.ts     ops.json                       │  │
-│  │  │   └── utils/                                               │  │
-│  │  │       └── colors.ts                                        │  │
-│  │  ├── silver/                                                  │  │
-│  │  └── draft/                                                   │  │
-│  └──────────────────────────────────────────────────────────────┘  │
+│  ┌──────────────────┐         ┌──────────────────┐                  │
+│  │   Agent/Skills   │────────▶│  sigil-mark/     │ ❌ WRONG PATH    │
+│  │                  │ reads   │  (legacy)        │                  │
+│  │ SKILL.md says:   │         │                  │                  │
+│  │ "sigil-mark/..." │         └──────────────────┘                  │
+│  └──────────────────┘                                               │
+│                                                                      │
+│  ┌──────────────────┐         ┌──────────────────┐                  │
+│  │   Process Layer  │────────▶│  sigil-mark/     │ ❌ WRONG PATH    │
+│  │                  │ refs    │  (doesn't exist) │                  │
+│  │ DEFAULT_PATH =   │         │                  │                  │
+│  │ "sigil-mark/..." │         └──────────────────┘                  │
+│  └──────────────────┘                                               │
+│                                                                      │
+│  ┌──────────────────┐                                               │
+│  │ grimoires/sigil/ │ ✅ EXISTS but unused                          │
+│  │ └── constitution │                                               │
+│  │ └── moodboard    │                                               │
+│  │ └── process      │                                               │
+│  └──────────────────┘                                               │
 │                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Data Flow
+### 2.2 Target State (v9.1)
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  git push   │────▶│  Survival   │────▶│   Linter    │
-│             │     │   Engine    │     │    Gate     │
-└─────────────┘     └──────┬──────┘     └──────┬──────┘
-                           │                    │
-                           │ Criteria Met?      │ Clean?
-                           ▼                    ▼
-                    ┌─────────────┐     ┌─────────────┐
-                    │   YES: mv   │     │  YES: Allow │
-                    │ to gold/    │     │  promotion  │
-                    └──────┬──────┘     └─────────────┘
-                           │
-                           ▼
-                    ┌─────────────┐
-                    │ Notify:     │
-                    │ "Veto in    │
-                    │  24h"       │
-                    └──────┬──────┘
-                           │
-                    No veto │ 24h
-                           ▼
-                    ┌─────────────┐
-                    │ PROMOTED    │
-                    │ TO GOLD     │
-                    └─────────────┘
+┌─────────────────────────────────────────────────────────────────────┐
+│                        TARGET STATE (v9.1)                           │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ┌──────────────────┐         ┌──────────────────┐                  │
+│  │   Agent/Skills   │────────▶│ grimoires/sigil/ │ ✅ CORRECT       │
+│  │                  │ reads   │                  │                  │
+│  │ SKILL.md says:   │         │ └── constitution │                  │
+│  │ "grimoires/..."  │         │ └── moodboard    │                  │
+│  └──────────────────┘         └──────────────────┘                  │
+│                                                                      │
+│  ┌──────────────────┐         ┌──────────────────┐                  │
+│  │   Process Layer  │────────▶│ grimoires/sigil/ │ ✅ CORRECT       │
+│  │                  │ refs    │ └── process      │                  │
+│  │ DEFAULT_PATH =   │         │ └── state        │                  │
+│  │ "grimoires/..."  │         │                  │                  │
+│  └──────────────────┘         └──────────────────┘                  │
+│                                                                      │
+│  ┌──────────────────┐                                               │
+│  │ sigil-mark/      │ ❌ DELETED                                    │
+│  └──────────────────┘                                               │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Technology Stack
+## 3. Technical Approach
 
-### 3.1 Core Technologies
+### 3.1 Strategy: Find and Replace
 
-| Layer | Technology | Justification |
-|-------|------------|---------------|
-| Language | TypeScript 5.x | Type safety, compile-time validation |
-| Runtime | Node.js 20+ | ES modules, native FS promises |
-| Linting | ESLint 8.x | Custom Sigil rules |
-| Build | TSX | Fast TypeScript execution |
-| CI/CD | GitHub Actions | Native Git integration |
+The migration is fundamentally a global find-and-replace with validation:
 
-### 3.2 Dependencies
+```bash
+# The core operation
+sed -i 's|sigil-mark/|grimoires/sigil/|g' <file>
+```
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `typescript` | ^5.3 | Type checking |
-| `eslint` | ^8.56 | Linting |
-| `@typescript-eslint/*` | ^6.0 | TypeScript ESLint |
+With caveats:
+1. Some paths need restructuring (e.g., `sigil-mark/vocabulary/` → `grimoires/sigil/constitution/`)
+2. Some referenced files don't exist and need creation
+3. Some references are to phantom features and need removal
 
-### 3.3 No New Dependencies
+### 3.2 Path Mapping Table
 
-v7.6 removes complexity. No new npm packages required.
+| Old Path | New Path | Action |
+|----------|----------|--------|
+| `sigil-mark/constitution/` | `grimoires/sigil/constitution/` | Direct map |
+| `sigil-mark/moodboard/` | `grimoires/sigil/moodboard/` | Direct map |
+| `sigil-mark/process/` | `grimoires/sigil/process/` | Direct map |
+| `sigil-mark/vocabulary/` | `grimoires/sigil/constitution/` | Merge into constitution |
+| `sigil-mark/personas/` | `grimoires/sigil/constitution/` | Merge into constitution |
+| `sigil-mark/kernel/` | `grimoires/sigil/constitution/` | Merge into constitution |
+| `sigil-mark/governance/` | `grimoires/sigil/state/` | Move to state |
+| `sigil-mark/consultation-chamber/` | `grimoires/sigil/constitution/` | Merge into constitution |
+| `sigil-mark/soul-binder/` | N/A | **DELETE** - phantom feature |
+| `sigil-mark/lens-array/` | N/A | **DELETE** - phantom feature |
+| `sigil-mark/surveys/` | N/A | **DELETE** - phantom feature |
+
+### 3.3 File Categories
+
+#### Category A: Direct Path Update
+Files where only the path prefix changes:
+
+```typescript
+// Before
+export const DEFAULT_MOODBOARD_PATH = 'sigil-mark/moodboard';
+// After
+export const DEFAULT_MOODBOARD_PATH = 'grimoires/sigil/moodboard';
+```
+
+#### Category B: Path Restructure
+Files where the path structure changes:
+
+```typescript
+// Before
+export const DEFAULT_VOCABULARY_PATH = 'sigil-mark/vocabulary/vocabulary.yaml';
+// After
+export const DEFAULT_VOCABULARY_PATH = 'grimoires/sigil/constitution/vocabulary.yaml';
+```
+
+#### Category C: Phantom Reference Removal
+References to non-existent features:
+
+```yaml
+# Before
+checks:
+  - path: sigil-mark/soul-binder/immutable-values.yaml
+# After
+# (line deleted - file doesn't exist)
+```
 
 ---
 
 ## 4. Component Design
 
-### 4.1 Survival Engine
+### 4.1 Process Layer Updates
 
-**File:** `sigil-mark/process/survival-engine.ts`
+**Files requiring update (11 modules):**
 
-**Purpose:** Auto-promote/demote components based on survival + cleanliness.
+| File | Change Type |
+|------|-------------|
+| `constitution-reader.ts` | Category B (restructure) |
+| `moodboard-reader.ts` | Category A (direct) |
+| `persona-reader.ts` | Category B (restructure) |
+| `vocabulary-reader.ts` | Category B (restructure) |
+| `decision-reader.ts` | Category B (restructure) |
+| `philosophy-reader.ts` | Category B (restructure) |
+| `vibe-check-reader.ts` | Category C (remove) |
+| `lens-array-reader.ts` | Category C (remove) |
+| `governance-logger.ts` | Category B (restructure) |
+| `agent-orchestration.ts` | Category B (restructure) |
+| `garden-command.ts` | Category A (direct) |
+
+**Update Pattern:**
 
 ```typescript
-/**
- * @sigil-tier gold
- * Sigil v7.6 — Survival Engine
- *
- * Auto-promote when survival + cleanliness criteria met.
- * Human vetoes, not approves.
- */
+// grimoires/sigil/process/constitution-reader.ts
 
-// =============================================================================
-// TYPES
-// =============================================================================
+// BEFORE
+export const DEFAULT_CONSTITUTION_PATH = 'sigil-mark/constitution/protected-capabilities.yaml';
 
-export type PromotionTrigger = 'git-push' | 'weekly-cron' | 'manual';
-
-export interface SurvivalCriteria {
-  /** Minimum imports from Gold components */
-  goldImports: number;
-  /** Minimum weeks without modification */
-  stabilityWeeks: number;
-  /** Maximum allowed mutinies (overrides/reverts) */
-  maxMutinies: number;
-}
-
-export interface CleanlinessCriteria {
-  /** ESLint max warnings */
-  eslintMaxWarnings: number;
-  /** TypeScript strict mode */
-  typescriptStrict: boolean;
-  /** No hardcoded values */
-  noHardcoded: boolean;
-  /** No console.log statements */
-  noConsoleLogs: boolean;
-  /** JSDoc required for exports */
-  requireDocstrings: boolean;
-}
-
-export interface PromotionCandidate {
-  /** Component name */
-  name: string;
-  /** Current tier */
-  currentTier: 'draft' | 'silver';
-  /** Target tier */
-  targetTier: 'silver' | 'gold';
-  /** Survival stats */
-  stats: ComponentStats;
-  /** Linter gate result */
-  linterResult: LinterResult;
-  /** Promotion eligibility */
-  eligible: boolean;
-  /** Reason if not eligible */
-  reason?: string;
-}
-
-export interface ComponentStats {
-  goldImports: number;
-  lastModified: string;
-  stabilityWeeks: number;
-  mutinies: number;
-}
-
-export interface LinterResult {
-  pass: boolean;
-  eslintWarnings: number;
-  eslintErrors: number;
-  typeErrors: number;
-  failures: string[];
-}
-
-export interface PromotionResult {
-  success: boolean;
-  promoted: string[];
-  demoted: string[];
-  pending: PromotionCandidate[];
-  errors: string[];
-}
-
-// =============================================================================
-// CONFIGURATION
-// =============================================================================
-
-export const DEFAULT_SURVIVAL_CRITERIA: SurvivalCriteria = {
-  goldImports: 5,
-  stabilityWeeks: 2,
-  maxMutinies: 0,
-};
-
-export const DEFAULT_CLEANLINESS_CRITERIA: CleanlinessCriteria = {
-  eslintMaxWarnings: 0,
-  typescriptStrict: true,
-  noHardcoded: true,
-  noConsoleLogs: true,
-  requireDocstrings: true,
-};
-
-export const VETO_WINDOW_HOURS = 24;
-
-// =============================================================================
-// CORE FUNCTIONS
-// =============================================================================
-
-/**
- * Run the survival engine.
- *
- * 1. Scan all Silver components
- * 2. Check survival criteria (usage, stability, mutinies)
- * 3. Check cleanliness criteria (lint, types)
- * 4. Auto-promote eligible components
- * 5. Notify with veto window
- */
-export async function runSurvivalEngine(
-  projectRoot: string,
-  trigger: PromotionTrigger = 'git-push'
-): Promise<PromotionResult>;
-
-/**
- * Check if component meets survival criteria.
- */
-export function meetsSurvivalCriteria(
-  stats: ComponentStats,
-  criteria?: SurvivalCriteria
-): boolean;
-
-/**
- * Check if component meets cleanliness criteria.
- */
-export async function meetsCleanlinessGate(
-  componentPath: string,
-  criteria?: CleanlinessCriteria
-): Promise<LinterResult>;
-
-/**
- * Promote component to next tier.
- * Moves file and regenerates indexes.
- */
-export async function promoteComponent(
-  componentName: string,
-  fromTier: 'draft' | 'silver',
-  toTier: 'silver' | 'gold',
-  projectRoot: string
-): Promise<void>;
-
-/**
- * Demote component (immediate, no waiting).
- * Triggered by modification or mutinies.
- */
-export async function demoteComponent(
-  componentName: string,
-  fromTier: 'gold' | 'silver',
-  toTier: 'silver' | 'draft',
-  reason: string,
-  projectRoot: string
-): Promise<void>;
-
-/**
- * Send notification with veto option.
- */
-export async function notifyPromotion(
-  candidate: PromotionCandidate,
-  vetoWindowHours?: number
-): Promise<void>;
-
-/**
- * Check for pending vetoes.
- */
-export async function checkVetoes(
-  projectRoot: string
-): Promise<string[]>;
+// AFTER
+export const DEFAULT_CONSTITUTION_PATH = 'grimoires/sigil/constitution/protected-capabilities.yaml';
 ```
 
-**Key Design Decisions:**
+### 4.2 Skill Updates
 
-1. **Survival + Cleanliness**: Both required for promotion
-2. **Auto-promote**: No PR ceremony
-3. **Veto window**: 24h default, configurable
-4. **Immediate demotion**: No waiting on mutations
+**File: `.claude/skills/crafting-guidance/SKILL.md`**
 
----
+```yaml
+# BEFORE (broken)
+zones:
+  state:
+    paths:
+      - sigil-mark/rules.md
+      - sigil-mark/vocabulary/vocabulary.yaml
+      - sigil-mark/constitution/protected-capabilities.yaml
+      - sigil-mark/personas/personas.yaml
+      - sigil-mark/consultation-chamber/decisions/
+      - sigil-mark/evidence/
+      - sigil-mark/philosophy/philosophy.yaml
 
-### 4.2 Linter Gate
-
-**File:** `sigil-mark/process/linter-gate.ts`
-
-**Purpose:** Quality gate for promotion candidacy.
-
-```typescript
-/**
- * @sigil-tier gold
- * Sigil v7.6 — Linter Gate
- *
- * Cleanliness gate for promotion.
- * Usage generates candidacy, cleanliness generates promotion.
- */
-
-// =============================================================================
-// TYPES
-// =============================================================================
-
-export interface LinterGateConfig {
-  eslint: {
-    maxWarnings: number;
-    rules: string[];
-  };
-  typescript: {
-    strict: boolean;
-    noAny: boolean;
-  };
-  sigil: {
-    noConsoleLogs: boolean;
-    noHardcodedValues: boolean;
-    hasDocstring: boolean;
-  };
-}
-
-export interface LinterGateResult {
-  pass: boolean;
-  checks: {
-    eslint: CheckResult;
-    typescript: CheckResult;
-    sigil: CheckResult;
-  };
-  failures: string[];
-  duration: number;
-}
-
-export interface CheckResult {
-  pass: boolean;
-  errors: number;
-  warnings: number;
-  details: string[];
-}
-
-// =============================================================================
-// CONFIGURATION
-// =============================================================================
-
-export const DEFAULT_LINTER_GATE_CONFIG: LinterGateConfig = {
-  eslint: {
-    maxWarnings: 0,
-    rules: [
-      'sigil/no-hardcoded-values',
-      'sigil/use-tokens',
-      'sigil/gold-imports-only',
-    ],
-  },
-  typescript: {
-    strict: true,
-    noAny: true,
-  },
-  sigil: {
-    noConsoleLogs: true,
-    noHardcodedValues: true,
-    hasDocstring: true,
-  },
-};
-
-// =============================================================================
-// CORE FUNCTIONS
-// =============================================================================
-
-/**
- * Check if component can be promoted.
- * Returns false if ANY check fails.
- */
-export async function canPromote(
-  componentPath: string,
-  config?: LinterGateConfig
-): Promise<boolean>;
-
-/**
- * Run full linter gate with detailed results.
- */
-export async function runLinterGate(
-  componentPath: string,
-  config?: LinterGateConfig
-): Promise<LinterGateResult>;
-
-/**
- * Run ESLint check on component.
- */
-export async function runEslintCheck(
-  componentPath: string,
-  rules: string[],
-  maxWarnings: number
-): Promise<CheckResult>;
-
-/**
- * Run TypeScript check on component.
- */
-export async function runTypescriptCheck(
-  componentPath: string,
-  strict: boolean,
-  noAny: boolean
-): Promise<CheckResult>;
-
-/**
- * Run Sigil-specific checks.
- */
-export async function runSigilChecks(
-  componentPath: string,
-  config: LinterGateConfig['sigil']
-): Promise<CheckResult>;
+# AFTER (fixed)
+zones:
+  state:
+    paths:
+      - grimoires/sigil/constitution/rules.md
+      - grimoires/sigil/constitution/vocabulary.yaml
+      - grimoires/sigil/constitution/protected-capabilities.yaml
+      - grimoires/sigil/constitution/personas.yaml
+      - grimoires/sigil/constitution/decisions/
+      - grimoires/sigil/moodboard/evidence/
+      - grimoires/sigil/constitution/philosophy.yaml
 ```
 
-**Key Design Decisions:**
+**File: `.claude/skills/crafting-guidance/index.yaml`**
 
-1. **All checks must pass**: Single failure = gate closed
-2. **Detailed failures**: Log exactly what failed
-3. **Fast execution**: <5s for full gate
-4. **Configurable rules**: Project can customize
+```yaml
+# BEFORE (phantom references)
+checks:
+  - path: sigil-mark/soul-binder/immutable-values.yaml
+  - path: sigil-mark/soul-binder/canon-of-flaws.yaml
+  - path: sigil-mark/lens-array/lenses.yaml
 
----
+# AFTER (removed)
+# (checks section removed or emptied - files don't exist)
+```
 
-### 4.3 Filesystem Registry
+### 4.3 CLAUDE.md Updates
 
-**File:** `sigil-mark/process/filesystem-registry.ts`
+**Key sections to update:**
 
-**Purpose:** Path-based tier lookup. No parsing.
+```markdown
+# BEFORE
+| `sigil-mark/process/survival-engine.ts` | Auto-promotion engine |
 
-```typescript
-/**
- * @sigil-tier gold
- * Sigil v7.6 — Filesystem Registry
- *
- * Path IS the API.
- * To check tier, check if path exists.
- */
+# AFTER
+| `grimoires/sigil/process/survival-engine.ts` | Auto-promotion engine |
+```
 
-import * as fs from 'fs';
-import * as path from 'path';
+```markdown
+# BEFORE
+sigil-mark/
+├── core/
+├── providers/
 
-// =============================================================================
-// TYPES
-// =============================================================================
+# AFTER
+grimoires/sigil/
+├── constitution/
+├── moodboard/
+├── process/
+├── state/
+```
 
-export type RegistryTier = 'gold' | 'silver' | 'draft';
+### 4.4 tsconfig.json Updates
 
-export interface ComponentInfo {
-  name: string;
-  tier: RegistryTier;
-  path: string;
-  hasIndex: boolean;
-}
-
-// =============================================================================
-// CONFIGURATION
-// =============================================================================
-
-export const COMPONENT_ROOT = 'src/components';
-
-export const TIER_PATHS: Record<RegistryTier, string> = {
-  gold: `${COMPONENT_ROOT}/gold`,
-  silver: `${COMPONENT_ROOT}/silver`,
-  draft: `${COMPONENT_ROOT}/draft`,
-};
-
-// =============================================================================
-// CORE FUNCTIONS
-// =============================================================================
-
-/**
- * Get tier of a component by checking path existence.
- * O(1) lookup via filesystem.
- */
-export function getTier(
-  componentName: string,
-  projectRoot: string = process.cwd()
-): RegistryTier | null {
-  for (const tier of ['gold', 'silver', 'draft'] as RegistryTier[]) {
-    const componentPath = path.join(
-      projectRoot,
-      TIER_PATHS[tier],
-      `${componentName}.tsx`
-    );
-    if (fs.existsSync(componentPath)) {
-      return tier;
+```json
+// BEFORE (broken)
+{
+  "compilerOptions": {
+    "paths": {
+      "@sigil/recipes/*": ["sigil-mark/recipes/*"],
+      "@sigil/hooks": ["sigil-mark/hooks/index.ts"],
+      "@sigil/hooks/*": ["sigil-mark/hooks/*"],
+      "@sigil/core/*": ["sigil-mark/core/*"]
     }
-  }
-  return null;
+  },
+  "include": ["sigil-mark/**/*"]
 }
 
-/**
- * Get all components in a tier.
- */
-export function getComponentsInTier(
-  tier: RegistryTier,
-  projectRoot: string = process.cwd()
-): string[] {
-  const tierPath = path.join(projectRoot, TIER_PATHS[tier]);
-
-  if (!fs.existsSync(tierPath)) {
-    return [];
-  }
-
-  return fs.readdirSync(tierPath)
-    .filter(f => f.endsWith('.tsx') && f !== 'index.tsx')
-    .map(f => f.replace('.tsx', ''));
+// AFTER (fixed)
+{
+  "compilerOptions": {
+    "paths": {
+      "@sigil-context/*": ["grimoires/sigil/*"],
+      "@sigil/hooks": ["src/components/gold/hooks/index.ts"],
+      "@sigil/hooks/*": ["src/components/gold/hooks/*"],
+      "@sigil/utils/*": ["src/components/gold/utils/*"]
+    }
+  },
+  "include": ["grimoires/sigil/**/*", "src/**/*"]
 }
-
-/**
- * Move component between tiers.
- * Atomic: move file, then regenerate both indexes.
- */
-export async function moveComponent(
-  componentName: string,
-  fromTier: RegistryTier,
-  toTier: RegistryTier,
-  projectRoot: string = process.cwd()
-): Promise<void> {
-  const fromPath = path.join(projectRoot, TIER_PATHS[fromTier], `${componentName}.tsx`);
-  const toPath = path.join(projectRoot, TIER_PATHS[toTier], `${componentName}.tsx`);
-
-  // Ensure target directory exists
-  const toDir = path.dirname(toPath);
-  if (!fs.existsSync(toDir)) {
-    fs.mkdirSync(toDir, { recursive: true });
-  }
-
-  // Move file
-  fs.renameSync(fromPath, toPath);
-
-  // Regenerate both indexes
-  await regenerateIndex(fromTier, projectRoot);
-  await regenerateIndex(toTier, projectRoot);
-}
-
-/**
- * Regenerate index.ts for a tier.
- * Auto-generates exports from directory contents.
- */
-export async function regenerateIndex(
-  tier: RegistryTier,
-  projectRoot: string = process.cwd()
-): Promise<void> {
-  const tierPath = path.join(projectRoot, TIER_PATHS[tier]);
-  const indexPath = path.join(tierPath, 'index.ts');
-
-  if (!fs.existsSync(tierPath)) {
-    return;
-  }
-
-  const files = fs.readdirSync(tierPath)
-    .filter(f => f.endsWith('.tsx') && f !== 'index.tsx')
-    .sort(); // Deterministic ordering
-
-  const exports = files
-    .map(f => `export * from './${f.replace('.tsx', '')}';`)
-    .join('\n');
-
-  const header = `/**
- * @sigil-tier ${tier}
- * Auto-generated index. Do not edit manually.
- * Regenerated by Sigil Survival Engine.
- */
-
-`;
-
-  fs.writeFileSync(indexPath, header + exports + '\n');
-}
-
-/**
- * Regenerate all tier indexes.
- */
-export async function regenerateAllIndexes(
-  projectRoot: string = process.cwd()
-): Promise<void> {
-  for (const tier of ['gold', 'silver', 'draft'] as RegistryTier[]) {
-    await regenerateIndex(tier, projectRoot);
-  }
-}
-
-/**
- * Check if import is allowed (contagion rules).
- * Gold can import: Gold, Silver
- * Silver can import: Gold, Silver, Draft
- * Draft can import: anything
- */
-export function isImportAllowed(
-  importerTier: RegistryTier,
-  importeeTier: RegistryTier
-): boolean {
-  if (importerTier === 'draft') return true;
-  if (importerTier === 'silver') return true;
-  if (importerTier === 'gold') {
-    return importeeTier === 'gold' || importeeTier === 'silver';
-  }
-  return false;
-}
-```
-
-**Key Design Decisions:**
-
-1. **No parsing**: `fs.existsSync()` is the API
-2. **Deterministic indexes**: Sorted alphabetically
-3. **Atomic moves**: File move + index regen in sequence
-4. **Contagion preserved**: Gold cannot import Draft
-
----
-
-### 4.4 Executable Principles
-
-**Location:** `src/components/gold/hooks/` and `src/components/gold/utils/`
-
-#### 4.4.1 useMotion Hook
-
-**File:** `src/components/gold/hooks/useMotion.ts`
-
-```typescript
-/**
- * @sigil-tier gold
- * Motion physics as executable code.
- *
- * Agent instruction: "Use useMotion for all motion."
- */
-
-export type PhysicsName =
-  | 'server-tick'   // 600ms - Financial mutations
-  | 'deliberate'    // 800ms - Critical actions
-  | 'snappy'        // 150ms - UI feedback
-  | 'smooth'        // 300ms - Standard transitions
-  | 'instant';      // 0ms - No transition
-
-export interface PhysicsConfig {
-  duration: number;
-  easing: string;
-}
-
-export interface MotionStyle {
-  transition: string;
-  '--sigil-duration': string;
-  '--sigil-easing': string;
-}
-
-export const PHYSICS: Record<PhysicsName, PhysicsConfig> = {
-  'server-tick': { duration: 600, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
-  'deliberate': { duration: 800, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
-  'snappy': { duration: 150, easing: 'ease-out' },
-  'smooth': { duration: 300, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
-  'instant': { duration: 0, easing: 'linear' },
-} as const;
-
-export function useMotion(physics: PhysicsName): MotionStyle {
-  const config = PHYSICS[physics];
-  return {
-    transition: `all ${config.duration}ms ${config.easing}`,
-    '--sigil-duration': `${config.duration}ms`,
-    '--sigil-easing': config.easing,
-  };
-}
-```
-
-#### 4.4.2 Colors Utility
-
-**File:** `src/components/gold/utils/colors.ts`
-
-```typescript
-/**
- * @sigil-tier gold
- * OKLCH color utilities as executable code.
- *
- * Agent instruction: "Use oklch() for all colors."
- */
-
-export function oklch(l: number, c: number, h: number, a: number = 1): string {
-  if (l < 0 || l > 1) throw new Error(`Lightness must be 0-1, got ${l}`);
-  if (c < 0 || c > 0.4) throw new Error(`Chroma must be 0-0.4, got ${c}`);
-  if (h < 0 || h > 360) throw new Error(`Hue must be 0-360, got ${h}`);
-
-  const base = `oklch(${(l * 100).toFixed(1)}% ${c.toFixed(3)} ${h.toFixed(1)})`;
-  return a === 1 ? base : `${base.slice(0, -1)} / ${a})`;
-}
-
-export const palette = {
-  primary: oklch(0.5, 0.2, 250),
-  success: oklch(0.6, 0.2, 145),
-  danger: oklch(0.5, 0.25, 25),
-  warning: oklch(0.7, 0.2, 85),
-} as const;
-```
-
-#### 4.4.3 Spacing Utility
-
-**File:** `src/components/gold/utils/spacing.ts`
-
-```typescript
-/**
- * @sigil-tier gold
- * Spacing scale as executable code.
- *
- * Agent instruction: "Use spacing() for all spacing."
- */
-
-export const SPACING = {
-  0: '0', 1: '4px', 2: '8px', 3: '12px', 4: '16px',
-  5: '20px', 6: '24px', 8: '32px', 10: '40px', 12: '48px',
-  16: '64px', 20: '80px', 24: '96px',
-} as const;
-
-export type SpacingKey = keyof typeof SPACING;
-
-export function spacing(key: SpacingKey): string {
-  return SPACING[key];
-}
-```
-
----
-
-### 4.5 Slot-Based Composition
-
-**Pattern:** Gold defines frame, content can be Draft via children.
-
-```typescript
-// Gold component defines frame (allowed)
-export function Button({ children, icon }: ButtonProps) {
-  return (
-    <button>
-      {icon && <span>{icon}</span>}
-      {children}
-    </button>
-  );
-}
-
-// Feature code composes Draft into Gold (allowed)
-import { Button } from '@/components/gold';
-import { DraftAnimation } from '@/components/draft';
-
-export function ClaimButton() {
-  return (
-    <Button>
-      <DraftAnimation />  {/* Draft as child - ALLOWED */}
-      Claim Rewards
-    </Button>
-  );
-}
-
-// Direct import in Gold (BLOCKED by ESLint)
-// src/components/gold/Button.tsx
-import { DraftAnimation } from '../draft'; // ERROR
 ```
 
 ---
 
 ## 5. Data Architecture
 
-### 5.1 Survival Stats Schema
+### 5.1 Files to Move
 
-**File:** `.sigil/survival-stats.json`
+| Source | Destination | Notes |
+|--------|-------------|-------|
+| `sigil-mark/constitution/protected-capabilities.yaml` | `grimoires/sigil/constitution/` | Critical - defines protected capabilities |
+| `sigil-mark/kernel/schemas/physics.schema.json` | `grimoires/sigil/schemas/` | Optional - JSON schema |
+| `sigil-mark/constitution/schemas/constitution.schema.json` | `grimoires/sigil/schemas/` | Optional - JSON schema |
 
-```json
-{
-  "version": 1,
-  "lastUpdated": "2026-01-10T12:00:00Z",
-  "components": {
-    "Button": {
-      "tier": "silver",
-      "goldImports": 7,
-      "lastModified": "2025-12-15T00:00:00Z",
-      "stabilityWeeks": 4,
-      "mutinies": 0,
-      "promotionEligible": true,
-      "linterGatePassed": true
-    }
-  },
-  "pendingPromotions": [],
-  "recentDemotions": []
-}
+### 5.2 Files to Create
+
+| Path | Content | Purpose |
+|------|---------|---------|
+| `grimoires/sigil/constitution/personas.yaml` | Depositor, newcomer, power_user personas | Skills reference this |
+| `grimoires/sigil/constitution/philosophy.yaml` | Core principles | Skills reference this |
+| `grimoires/sigil/constitution/rules.md` | Motion rules summary | Skills reference this |
+| `grimoires/sigil/constitution/decisions/README.md` | Directory placeholder | Skills reference this dir |
+| `grimoires/sigil/moodboard/evidence/README.md` | Directory placeholder | Skills reference this dir |
+
+### 5.3 Placeholder Content
+
+**personas.yaml:**
+```yaml
+# Sigil Personas
+version: "9.1.0"
+
+personas:
+  depositor:
+    description: "Active user who deposits funds"
+    trust_level: high
+    preferences:
+      motion: deliberate
+
+  newcomer:
+    description: "New user exploring the platform"
+    trust_level: building
+    preferences:
+      motion: reassuring
+
+  power_user:
+    description: "Experienced user who wants efficiency"
+    trust_level: established
+    preferences:
+      motion: snappy
 ```
 
-### 5.2 Pending Operations Schema
+**philosophy.yaml:**
+```yaml
+# Sigil Philosophy
+version: "9.1.0"
 
-**File:** `.sigil/pending-ops.json`
+principles:
+  - id: flow-state
+    name: "Preserve Flow State"
+    description: "Never interrupt the designer's creative flow"
 
-```json
-{
-  "version": 1,
-  "operations": [
-    {
-      "id": "op-001",
-      "type": "optimize-images",
-      "files": ["public/hero.png"],
-      "requestedAt": "2026-01-10T12:00:00Z",
-      "status": "pending"
-    }
-  ]
-}
+  - id: invisible-infrastructure
+    name: "Invisible Infrastructure"
+    description: "Using it IS the experience"
+
+  - id: survival-over-ceremony
+    name: "Survival Over Ceremony"
+    description: "Patterns earn status through usage, not approval dialogs"
+```
+
+**rules.md:**
+```markdown
+# Sigil Design Rules
+
+## Motion
+- Critical zone: server-tick (600ms)
+- Important zone: deliberate (800ms)
+- Casual zone: snappy (150ms)
+
+## Protected Capabilities
+See: protected-capabilities.yaml
+
+## Vocabulary
+See: vocabulary.yaml
 ```
 
 ---
 
-## 6. CI/CD Architecture
+## 6. Version Consolidation
 
-### 6.1 GitHub Actions Workflows
+### 6.1 Files Requiring Version Update
+
+| File | Current | Target |
+|------|---------|--------|
+| `grimoires/sigil/README.md` | 9.0.0 | 9.1.0 |
+| `.sigilrc.yaml` | 4.1.0 | 9.1.0 |
+| `grimoires/sigil/constitution/constitution.yaml` | 5.0.0 | 9.1.0 |
+| `grimoires/sigil/constitution/vocabulary.yaml` | 5.0.0 | 9.1.0 |
+| `CLAUDE.md` | v7.6 | v9.1 |
+| `grimoires/sigil/process/index.ts` | v4.1 | v9.1 |
+| `.claude/skills/crafting-guidance/SKILL.md` | v4.1 | v9.1 |
+
+### 6.2 Update Pattern
 
 ```yaml
-# .github/workflows/sigil-survival.yml
-name: Sigil Survival Engine
-on:
-  push:
-    branches: [main]
-jobs:
-  survival:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm ci
-      - run: npx tsx sigil-mark/process/survival-engine.ts
-      - run: |
-          git add .sigil/ src/components/
-          git commit -m "chore(sigil): survival engine [skip ci]" || true
-          git push
+# YAML files
+version: "9.1.0"
+
+# TypeScript headers
+/**
+ * Sigil v9.1 - [Module Name]
+ */
+
+# Markdown
+*Sigil v9.1.0 "Migration Debt Zero"*
 ```
 
+---
+
+## 7. Physics Value Alignment
+
+### 7.1 Current Inconsistencies
+
+| Motion | useMotion.ts | physics.yaml | vocabulary.yaml | .sigilrc.yaml |
+|--------|--------------|--------------|-----------------|---------------|
+| reassuring | N/A | N/A | 600ms | 1200ms |
+
+### 7.2 Resolution
+
+**Source of Truth:** `grimoires/sigil/constitution/physics.yaml`
+
+All other files must match physics.yaml. If a physics type doesn't exist in physics.yaml, it should be added or removed from other files.
+
+**Fix:**
 ```yaml
-# .github/workflows/sigil-ops.yml
-name: Sigil Operations
-on:
-  push:
-    paths: ['.sigil/pending-ops.json']
-jobs:
-  process:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npx tsx sigil-mark/process/ops-processor.ts
+# grimoires/sigil/constitution/physics.yaml
+reassuring:
+  duration: 600
+  easing: "ease-out"
+  description: "Reassuring feedback for uncertain actions"
 ```
+
+Then update `.sigilrc.yaml` to match.
 
 ---
 
-## 7. Migration from v7.5
+## 8. Deletion Strategy
 
-### 7.1 Files to Delete
+### 8.1 Pre-Deletion Checklist
+
+Before deleting `sigil-mark/`:
 
 ```bash
-rm sigil-mark/process/nomination-generator.ts
-rm sigil-mark/process/registry-parser.ts
-rm -rf sigil-mark/principles/
+# 1. Verify zero references remain
+grep -r "sigil-mark" --include="*.ts" --include="*.yaml" --include="*.md" | wc -l
+# Must return 0
+
+# 2. Verify all required files exist in grimoire
+[ -f "grimoires/sigil/constitution/protected-capabilities.yaml" ] && echo "OK"
+[ -f "grimoires/sigil/constitution/vocabulary.yaml" ] && echo "OK"
+[ -f "grimoires/sigil/constitution/physics.yaml" ] && echo "OK"
+
+# 3. Verify skills load
+# (manual test of /craft command)
 ```
 
-### 7.2 Files to Create
+### 8.2 Deletion Command
 
 ```bash
-# Core
-sigil-mark/process/survival-engine.ts
-sigil-mark/process/linter-gate.ts
-sigil-mark/process/filesystem-registry.ts
-
-# Executable Principles
-src/components/gold/hooks/useMotion.ts
-src/components/gold/utils/colors.ts
-src/components/gold/utils/spacing.ts
-
-# Config
-.sigil/survival-stats.json
-.sigil/pending-ops.json
-
-# CI/CD
-.github/workflows/sigil-survival.yml
-.github/workflows/sigil-ops.yml
+# After all checks pass
+rm -rf sigil-mark/
 ```
 
-### 7.3 Directory Structure
+### 8.3 Rollback Plan
 
-```
-src/components/
-├── gold/
-│   ├── index.ts          # Auto-generated
-│   ├── Button.tsx
-│   ├── hooks/
-│   │   └── useMotion.ts
-│   └── utils/
-│       ├── colors.ts
-│       └── spacing.ts
-├── silver/
-│   ├── index.ts          # Auto-generated
-│   └── Tooltip.tsx
-└── draft/
-    ├── index.ts          # Auto-generated
-    └── Experimental.tsx
+If issues discovered after deletion:
+
+```bash
+# Restore from git
+git checkout HEAD~1 -- sigil-mark/
 ```
 
 ---
 
-## 8. Performance Targets
+## 9. Validation Architecture
 
-| Operation | Target | Notes |
-|-----------|--------|-------|
-| `getTier()` | <5ms | Filesystem lookup |
-| `canPromote()` | <5s | Full lint + type check |
-| `regenerateIndex()` | <100ms | Directory scan + write |
-| Full survival engine | <30s | All components |
-| PreToolUse validation | <20ms | Cached lookup |
+### 9.1 Validation Script
+
+```bash
+#!/bin/bash
+# validate-migration.sh
+
+set -e
+
+echo "=== SIGIL v9.1 MIGRATION VALIDATION ==="
+
+# Check 1: No sigil-mark references
+echo ""
+echo "1. Checking for sigil-mark references..."
+REMAINING=$(grep -r "sigil-mark" \
+  --include="*.ts" \
+  --include="*.yaml" \
+  --include="*.md" \
+  --include="*.json" \
+  2>/dev/null | wc -l || echo "0")
+
+if [ "$REMAINING" -gt 0 ]; then
+  echo "❌ FAIL: $REMAINING references remain"
+  grep -r "sigil-mark" \
+    --include="*.ts" \
+    --include="*.yaml" \
+    --include="*.md" \
+    --include="*.json" \
+    2>/dev/null | head -10
+  exit 1
+else
+  echo "✅ PASS: No sigil-mark references"
+fi
+
+# Check 2: Required files exist
+echo ""
+echo "2. Checking required files..."
+REQUIRED=(
+  "grimoires/sigil/constitution/constitution.yaml"
+  "grimoires/sigil/constitution/physics.yaml"
+  "grimoires/sigil/constitution/vocabulary.yaml"
+  "grimoires/sigil/constitution/protected-capabilities.yaml"
+  "grimoires/sigil/constitution/personas.yaml"
+  "grimoires/sigil/constitution/philosophy.yaml"
+  "grimoires/sigil/constitution/rules.md"
+)
+
+for f in "${REQUIRED[@]}"; do
+  if [ -f "$f" ]; then
+    echo "  ✓ $f"
+  else
+    echo "  ❌ MISSING: $f"
+    exit 1
+  fi
+done
+
+# Check 3: Version consistency
+echo ""
+echo "3. Checking version consistency..."
+VERSIONS=$(grep -r "version:" --include="*.yaml" grimoires/sigil/ | grep -v "9.1" | wc -l)
+if [ "$VERSIONS" -gt 0 ]; then
+  echo "⚠️  WARNING: Some files don't have version 9.1.0"
+  grep -r "version:" --include="*.yaml" grimoires/sigil/ | grep -v "9.1"
+fi
+
+# Check 4: sigil-mark directory deleted
+echo ""
+echo "4. Checking legacy cleanup..."
+if [ -d "sigil-mark" ]; then
+  echo "⚠️  WARNING: sigil-mark/ still exists"
+else
+  echo "✅ PASS: sigil-mark/ deleted"
+fi
+
+echo ""
+echo "=== VALIDATION COMPLETE ==="
+```
+
+### 9.2 Integration Test
+
+```bash
+# Test /craft command works
+# 1. Start Claude Code
+# 2. Run: /craft "deposit button"
+# 3. Verify output uses useMotion('server-tick')
+# 4. Verify no errors about missing files
+```
 
 ---
 
-## 9. The 10 Principles
+## 10. Implementation Order
 
-1. **Survival is the vote** — But cleanliness is the gate
-2. **Human vetoes, not approves** — Invert the control
-3. **Executable, not descriptive** — Hooks > Markdown
-4. **Gold frames, Draft content** — Slot-based composition
-5. **Filesystem is the registry** — Path IS the API
-6. **Offload heavy ops** — Agent writes intent, CI executes
-7. **Auto-generate indexes** — No manual registry maintenance
-8. **Zero warnings to promote** — Lint gate required
-9. **No parsing overhead** — Directory lookup only
-10. **Stop asking for permission** — If it survives, it's Gold
+### 10.1 Dependency Graph
+
+```
+1. Move protected-capabilities.yaml
+   └── No dependencies
+
+2. Create placeholder files (personas, philosophy, rules)
+   └── No dependencies
+
+3. Update process layer paths
+   └── Depends on: 1, 2 (files must exist)
+
+4. Update skill paths
+   └── Depends on: 1, 2 (files must exist)
+
+5. Update CLAUDE.md
+   └── Depends on: 3, 4 (paths must be correct)
+
+6. Update tsconfig.json
+   └── No dependencies
+
+7. Consolidate version numbers
+   └── Depends on: 1-6 (all files must exist)
+
+8. Align physics values
+   └── Depends on: 7 (versions consistent)
+
+9. Run validation
+   └── Depends on: 1-8
+
+10. Delete sigil-mark/
+    └── Depends on: 9 (validation must pass)
+```
+
+### 10.2 Sprint Breakdown
+
+**Sprint 1: Foundation (P0)**
+- Task 1.1: Move protected-capabilities.yaml
+- Task 1.2: Create placeholder files and directories
+- Task 1.3: Update all 11 process layer DEFAULT_PATH constants
+- Task 1.4: Run `grep sigil-mark process/` to verify
+
+**Sprint 2: Configuration (P0-P1)**
+- Task 2.1: Update SKILL.md paths
+- Task 2.2: Update index.yaml, remove phantom references
+- Task 2.3: Update CLAUDE.md paths
+- Task 2.4: Update tsconfig.json aliases
+- Task 2.5: Consolidate all version numbers to 9.1.0
+
+**Sprint 3: Cleanup (P1-P2)**
+- Task 3.1: Run validation script
+- Task 3.2: Fix any remaining references
+- Task 3.3: Align physics values across files
+- Task 3.4: Delete sigil-mark/ directory
+- Task 3.5: Final audit
 
 ---
 
-*SDD Generated: 2026-01-10*
-*Based on: PRD v7.6.0*
-*Next Step: `/sprint-plan` to break down into sprints*
+## 11. Risk Mitigation
+
+### 11.1 Known Risks
+
+| Risk | Probability | Impact | Mitigation |
+|------|-------------|--------|------------|
+| Missed reference breaks agent | Medium | High | Run validation after each sprint |
+| Placeholder files insufficient | Low | Medium | Placeholder is acceptable for v9.1 |
+| Physics value mismatch | Low | Low | physics.yaml is source of truth |
+| Rollback needed | Low | Medium | Git history preserved |
+
+### 11.2 Rollback Procedure
+
+```bash
+# If migration fails after deletion
+git checkout <commit-before-deletion> -- sigil-mark/
+
+# If migration fails before deletion
+# Just revert the path changes
+git checkout HEAD -- grimoires/sigil/process/
+git checkout HEAD -- .claude/skills/
+git checkout HEAD -- CLAUDE.md
+git checkout HEAD -- tsconfig.json
+```
+
+---
+
+## 12. Success Criteria
+
+### 12.1 Quantitative
+
+| Metric | Current | Target |
+|--------|---------|--------|
+| `sigil-mark/` references | 81 | 0 |
+| Version numbers in use | 6+ | 1 (v9.1.0) |
+| Missing referenced files | 6+ | 0 |
+| Phantom skill references | 3 | 0 |
+| `sigil-mark/` directory | Exists | Deleted |
+
+### 12.2 Qualitative
+
+| Test | Expected Result |
+|------|-----------------|
+| `/craft "deposit button"` | Generates with server-tick physics |
+| `/craft "tooltip"` | Generates with snappy physics |
+| Skill context load | No file not found errors |
+| TypeScript compilation | No path resolution errors |
+
+---
+
+## 13. Performance Considerations
+
+This migration has no runtime performance impact:
+
+- File reads happen at agent-time, not runtime
+- Path changes are string substitutions
+- No new code execution paths
+
+**Build-time impact:**
+- TypeScript compilation may be slightly faster (smaller include set)
+- Skill loading unchanged (still reads YAML files)
+
+---
+
+## 14. Documentation Updates
+
+### 14.1 CLAUDE.md Key Changes
+
+1. Update version header to v9.1
+2. Replace all `sigil-mark/` paths with `grimoires/sigil/`
+3. Update directory structure diagram
+4. Remove references to non-existent runtime layer
+5. Add note: "Full runtime layer (useSigilMutation, CriticalZone) is Phase 2"
+
+### 14.2 README Updates
+
+- `grimoires/sigil/README.md`: Update to v9.1.0
+- No new README files needed (placeholders have READMEs)
+
+---
+
+## 15. The v9.1 Principles
+
+1. **Fix paths, not features** — This is debt cleanup only
+2. **Validate before delete** — Never delete without verification
+3. **Single source of truth** — physics.yaml defines physics
+4. **Version consistency** — All files report 9.1.0
+5. **Placeholder over phantom** — Real empty files beat imaginary features
+
+---
+
+*SDD Generated: 2026-01-11*
+*Based on: PRD v9.1.0*
+*Sources: MIGRATION_AUDIT_REPORT.md, FULL_TECHNICAL_AUDIT.md*
+*Key Insight: This is path migration, not feature development*
+*Next Step: `/sprint-plan` to create implementation sprints*

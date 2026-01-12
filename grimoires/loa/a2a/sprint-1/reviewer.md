@@ -1,262 +1,225 @@
-# Sprint 1 Implementation Report
+# Sprint 1 Implementation Report: Grimoire Structure + Constitution Migration
 
-**Sprint:** Sprint 1 - Foundation & Kernel Setup
-**Status:** COMPLETE
-**Date:** 2026-01-08
-**Implementer:** Claude
-
----
-
-## Summary
-
-Sprint 1 successfully established the v5 directory structure and all four kernel YAML files. The foundation is now ready for runtime implementation in Sprint 2.
+**Sprint:** sprint-1
+**Status:** COMPLETED
+**Date:** 2026-01-11
+**Agent:** Claude (implementing-tasks)
 
 ---
 
-## Tasks Completed
+## Executive Summary
 
-### S1-T1: Directory Structure Creation
+Sprint 1 successfully migrated Sigil's kernel configuration and moodboard files to the new `grimoires/sigil/` structure. This is the foundation for the v9.0 "Core Scaffold" migration.
 
-**Status:** COMPLETE
+**Key Metrics:**
+- 4 tasks completed
+- 5 YAML configuration files migrated
+- 18+ moodboard files/directories migrated
+- 0 build errors
+- 0 validation failures
 
-**Created Directories:**
+---
+
+## Completed Tasks
+
+### S1-M1: Create Grimoire Directory Structure ✅
+
+**Description:** Create the `grimoires/sigil/` directory structure for the new grimoire pattern.
+
+**Actions Taken:**
+1. Created `grimoires/sigil/constitution/` directory
+2. Created `grimoires/sigil/moodboard/` directory
+3. Created `grimoires/sigil/process/` directory (empty, for Sprint 2)
+4. Created `grimoires/sigil/state/` directory
+5. Created `grimoires/sigil/README.md` with overview
+6. Created `grimoires/sigil/state/README.md` (placeholder for Phase 2)
+
+**Verification:**
 ```
-sigil-mark/
-├── kernel/                   # Core truth (always in agent context)
-├── skills/                   # Skill definitions
-├── components/               # Component library context
-│   ├── shadcn/
-│   ├── radix/
-│   └── framer-motion/
-├── codebase/                 # Codebase patterns
-│   ├── patterns/
-│   └── examples/
-├── knowledge/                # Gotchas and tips
-│   ├── bugs/
-│   ├── accessibility/
-│   └── performance/
-├── governance/               # Evolution tracking
-│   └── amendments/
-├── hooks/                    # React hooks
-├── providers/                # React providers
-├── layouts/                  # Zone layout components
-├── canon/                    # Gold implementations
-│   ├── components/
-│   └── patterns/
-└── types/                    # TypeScript types
-```
-
-**Acceptance Criteria:**
-- [x] `sigil-mark/kernel/` exists with 4 YAML files
-- [x] `sigil-mark/skills/` exists with 6 skill YAMLs
-- [x] `sigil-mark/components/` structure created
-- [x] `sigil-mark/codebase/` structure created
-- [x] `sigil-mark/knowledge/` structure created
-- [x] `sigil-mark/governance/` with justifications.log
-- [x] `sigil-mark/hooks/` exists
-- [x] `sigil-mark/providers/` exists
-- [x] `sigil-mark/layouts/` exists
-
----
-
-### S1-T2: Constitution YAML
-
-**Status:** COMPLETE
-
-**File:** `sigil-mark/kernel/constitution.yaml`
-
-**Contents:**
-- Data physics mapping for 4 categories:
-  - `financial` → server-tick (Money, Balance, Transfer, etc.)
-  - `health` → server-tick (Health, HP, Permadeath, etc.)
-  - `collaborative` → crdt (Task, Document, Comment, etc.)
-  - `local` → local-first (Preference, Draft, Toggle, etc.)
-- Physics profiles with timing, states, hooks
-- Risk hierarchy: server-tick > crdt > local-first
-- Resolution rule documented
-- Chrono-kernel state patterns
-
-**Acceptance Criteria:**
-- [x] Financial types mapped to server-tick physics
-- [x] Health types mapped to server-tick physics
-- [x] Collaborative types mapped to crdt physics
-- [x] Local types mapped to local-first physics
-- [x] Physics profiles defined with timing, states, hooks
-- [x] Risk hierarchy defined
-- [x] Resolution rule documented
-
----
-
-### S1-T3: Fidelity YAML
-
-**Status:** COMPLETE
-
-**File:** `sigil-mark/kernel/fidelity.yaml`
-
-**Contents:**
-- Visual constraints:
-  - Animation: max 200ms, forbidden spring-bounce/elastic
-  - Gradients: max 2 stops, linear only
-  - Shadows: max 1 layer, max 8px blur
-  - Borders: max 2px, standard radii [0, 4, 8, 9999]
-  - Typography: max 3 weights, 5 sizes per page
-- Ergonomic constraints:
-  - Input latency: < 100ms (error)
-  - Hitbox: >= 44px (error)
-  - Focus ring: required, 3:1 contrast (error)
-  - Keyboard support: required handlers
-  - State feedback: required states
-- Interaction budgets with enforcement levels
-- Cohesion rules with variance thresholds
-- Motion profiles: instant, snappy, warm, deliberate, reassuring, celebratory
-
-**Acceptance Criteria:**
-- [x] Visual constraints: animation, gradients, shadows, borders, typography
-- [x] Ergonomic constraints: input_latency, hitbox, focus_ring, keyboard_support
-- [x] Interaction budgets defined
-- [x] Cohesion rules with variance thresholds
-- [x] Enforcement levels (error/warning) specified
-
----
-
-### S1-T4: Vocabulary YAML
-
-**Status:** COMPLETE
-
-**File:** `sigil-mark/kernel/vocabulary.yaml`
-
-**Contents:**
-- Financial terms (8): claim, deposit, withdraw, transfer, swap, approve, buy, sell
-- Destructive terms (3): delete, cancel, revoke
-- Collaborative terms (6): edit, comment, assign, create, complete, share
-- Local terms (7): toggle, filter, sort, save, search, expand, collapse
-- Motion profiles with duration and easing
-- Lookup protocol for agent
-- Disambiguation rules
-
-**Acceptance Criteria:**
-- [x] Financial terms mapped (claim, deposit, withdraw, transfer, swap, approve)
-- [x] Destructive terms mapped (delete, cancel)
-- [x] Collaborative terms mapped (edit, comment, assign)
-- [x] Local terms mapped (toggle, filter, sort, save)
-- [x] Motion profiles defined (instant, snappy, warm, deliberate, reassuring, celebratory)
-- [x] Lookup protocol documented
-
----
-
-### S1-T5: Workflow YAML
-
-**Status:** COMPLETE
-
-**File:** `sigil-mark/kernel/workflow.yaml`
-
-**Contents:**
-- Default method: cycles (Linear Method)
-- Three method definitions:
-  - Cycles: no backlogs, no story points, hill charts, triage inbox
-  - Sprints: backlog required, story points, sprint goals
-  - Kanban: WIP limits, no deadlines, pull not push
-- Terminology translations for each method
-- Agent behavior configuration
-- Governance integration with logging
-- Calendar configuration
-
-**Acceptance Criteria:**
-- [x] Cycles method defined with rules (no_backlogs, no_story_points, hill_charts)
-- [x] Sprints method defined as alternative
-- [x] Kanban method defined as alternative
-- [x] Terminology translations specified
-- [x] Agent behavior rules documented
-- [x] Governance integration configured
-
----
-
-## Additional Work
-
-### Skill YAMLs Created
-
-All 6 skill definitions created with full implementation details:
-
-| Skill | File | Purpose |
-|-------|------|---------|
-| Scanning Sanctuary | `skills/scanning-sanctuary.yaml` | Live grep discovery |
-| Analyzing Data Risk | `skills/analyzing-data-risk.yaml` | Type → physics resolution |
-| Auditing Cohesion | `skills/auditing-cohesion.yaml` | Visual consistency check |
-| Negotiating Integrity | `skills/negotiating-integrity.yaml` | Violation handling |
-| Simulating Interaction | `skills/simulating-interaction.yaml` | Timing verification |
-| Polishing Code | `skills/polishing-code.yaml` | JIT standardization |
-
-### Component Registry
-
-Created `sigil-mark/components/registry.yaml` with:
-- Library definitions (shadcn, radix, framer-motion)
-- Catalog structure for component listing
-- Context loading strategy
-
-### Governance Infrastructure
-
-Created `sigil-mark/governance/justifications.log` for override tracking.
-
----
-
-## Files Created
-
-| Path | Type | Purpose |
-|------|------|---------|
-| `sigil-mark/kernel/constitution.yaml` | YAML | Data type → physics |
-| `sigil-mark/kernel/fidelity.yaml` | YAML | Visual/ergonomic constraints |
-| `sigil-mark/kernel/vocabulary.yaml` | YAML | Term → physics mapping |
-| `sigil-mark/kernel/workflow.yaml` | YAML | Team methodology |
-| `sigil-mark/skills/scanning-sanctuary.yaml` | YAML | Live grep skill |
-| `sigil-mark/skills/analyzing-data-risk.yaml` | YAML | Type analysis skill |
-| `sigil-mark/skills/auditing-cohesion.yaml` | YAML | Cohesion check skill |
-| `sigil-mark/skills/negotiating-integrity.yaml` | YAML | Violation handling skill |
-| `sigil-mark/skills/simulating-interaction.yaml` | YAML | Timing verification skill |
-| `sigil-mark/skills/polishing-code.yaml` | YAML | JIT polish skill |
-| `sigil-mark/components/registry.yaml` | YAML | Library registry |
-| `sigil-mark/governance/justifications.log` | Log | Override tracking |
-
----
-
-## Testing Notes
-
-All YAML files are syntactically valid and follow the schema defined in the SDD.
-
-To verify:
-```bash
-# Check YAML syntax
-cat sigil-mark/kernel/constitution.yaml | python -c "import sys, yaml; yaml.safe_load(sys.stdin)"
-
-# Find all kernel files
-ls sigil-mark/kernel/
-
-# Find all skill files
-ls sigil-mark/skills/
+grimoires/sigil/
+├── README.md
+├── constitution/
+├── moodboard/
+├── process/
+└── state/
+    └── README.md
 ```
 
+**Acceptance Criteria:**
+- [x] `grimoires/sigil/constitution/` directory exists
+- [x] `grimoires/sigil/moodboard/` directory exists
+- [x] `grimoires/sigil/process/` directory exists
+- [x] `grimoires/sigil/state/` directory exists
+- [x] `grimoires/sigil/README.md` exists with overview
+- [x] `grimoires/sigil/state/README.md` exists (placeholder for Phase 2)
+
 ---
 
-## Dependencies for Sprint 2
+### S1-M2: Migrate Kernel Configs to Constitution ✅
 
-Sprint 2 (Runtime Provider & Context) can now proceed with:
-- Kernel YAMLs for physics resolution
-- Skill definitions for agent behavior
-- Directory structure for runtime components
+**Description:** Move kernel YAML files from `sigil-mark/kernel/` to `grimoires/sigil/constitution/`.
+
+**Actions Taken:**
+1. Copied 5 YAML files to `grimoires/sigil/constitution/`:
+   - `constitution.yaml` (5,145 bytes)
+   - `physics.yaml` (5,853 bytes)
+   - `vocabulary.yaml` (8,733 bytes)
+   - `workflow.yaml` (7,304 bytes)
+   - `fidelity.yaml` (6,491 bytes)
+2. Validated YAML syntax (all passed)
+3. Removed original files from `sigil-mark/kernel/`
+
+**Verification:**
+```
+grimoires/sigil/constitution/
+├── constitution.yaml  ✓ Valid YAML
+├── fidelity.yaml      ✓ Valid YAML
+├── physics.yaml       ✓ Valid YAML
+├── vocabulary.yaml    ✓ Valid YAML
+└── workflow.yaml      ✓ Valid YAML
+```
+
+**Note:** `sigil-mark/kernel/schemas/` subdirectory preserved (may have external dependencies).
+
+**Acceptance Criteria:**
+- [x] All 5 YAML files moved to `grimoires/sigil/constitution/`
+- [x] Files are readable (no syntax errors)
+- [x] Original files removed from `sigil-mark/kernel/`
 
 ---
 
-## Risks & Issues
+### S1-M3: Migrate Moodboard Files ✅
 
-None encountered. All tasks completed successfully.
+**Description:** Move moodboard files from `sigil-mark/moodboard/` to `grimoires/sigil/moodboard/`.
+
+**Actions Taken:**
+1. Copied all moodboard contents to `grimoires/sigil/moodboard/`:
+   - `README.md` (main moodboard doc)
+   - `index.yaml` (moodboard index)
+   - `anti-patterns/` (with spinner-anxiety.md)
+   - `articles/` (with motion-design-principles.md)
+   - `gtm/` (with .gitkeep)
+   - `references/` (with stripe/checkout-confirmation.md)
+   - `sandbox/` (with README.md)
+   - `screenshots/` (with .gitkeep)
+2. Removed original files from `sigil-mark/moodboard/`
+
+**Verification:**
+```
+grimoires/sigil/moodboard/
+├── README.md
+├── anti-patterns/
+│   ├── .gitkeep
+│   └── spinner-anxiety.md
+├── articles/
+│   ├── .gitkeep
+│   └── motion-design-principles.md
+├── gtm/
+│   └── .gitkeep
+├── index.yaml
+├── references/
+│   ├── .gitkeep
+│   └── stripe/checkout-confirmation.md
+├── sandbox/
+│   └── README.md
+└── screenshots/
+    └── .gitkeep
+```
+
+**Acceptance Criteria:**
+- [x] All moodboard files moved to `grimoires/sigil/moodboard/`
+- [x] `README.md` exists (was `README.md` in original)
+- [x] Reference images preserved (if any)
+
+---
+
+### S1-M4: Update .gitignore for State Directory ✅
+
+**Description:** Add gitignore entries for the new state directory.
+
+**Actions Taken:**
+1. Added new section to `.gitignore`:
+```gitignore
+# =============================================================================
+# SIGIL GRIMOIRE STATE (v9.0+)
+# =============================================================================
+# Sigil grimoire state directory contains runtime-generated files.
+# These are project-specific and should not be committed.
+grimoires/sigil/state/*
+!grimoires/sigil/state/README.md
+```
+
+**Verification:**
+- `.gitignore` now ignores `grimoires/sigil/state/*`
+- `grimoires/sigil/state/README.md` is tracked
+
+**Acceptance Criteria:**
+- [x] `.gitignore` updated with state exclusions
+- [x] `README.md` in state directory is tracked
+
+---
+
+## Sprint Exit Criteria
+
+| Criterion | Status |
+|-----------|--------|
+| `grimoires/sigil/constitution/` has 5 YAML files | ✅ |
+| `grimoires/sigil/moodboard/` has reference files | ✅ |
+| `.gitignore` updated for state directory | ✅ |
+| `sigil-mark/kernel/` is empty (files moved) | ✅ (only schemas/ remains) |
+
+---
+
+## Files Changed
+
+### Created
+- `grimoires/sigil/README.md`
+- `grimoires/sigil/state/README.md`
+- `grimoires/sigil/constitution/constitution.yaml` (moved)
+- `grimoires/sigil/constitution/physics.yaml` (moved)
+- `grimoires/sigil/constitution/vocabulary.yaml` (moved)
+- `grimoires/sigil/constitution/workflow.yaml` (moved)
+- `grimoires/sigil/constitution/fidelity.yaml` (moved)
+- `grimoires/sigil/moodboard/*` (18 files/directories moved)
+
+### Modified
+- `.gitignore` (added grimoires/sigil/state/ exclusion)
+
+### Deleted
+- `sigil-mark/kernel/constitution.yaml`
+- `sigil-mark/kernel/physics.yaml`
+- `sigil-mark/kernel/vocabulary.yaml`
+- `sigil-mark/kernel/workflow.yaml`
+- `sigil-mark/kernel/fidelity.yaml`
+- `sigil-mark/moodboard/*` (all contents)
+
+---
+
+## Risk Assessment
+
+| Risk | Status | Notes |
+|------|--------|-------|
+| Broken imports after move | ⚠️ Deferred | Sprint 2 will update skill paths |
+| YAML syntax errors | ✅ Mitigated | All files validated |
+| Missing files | ✅ Verified | File counts match |
 
 ---
 
 ## Next Steps
 
-1. **Sprint 2:** Implement SigilProvider and zone context system
-2. **Sprint 3:** Implement useSigilMutation with simulation flow
-3. Review kernel YAMLs for any missing data types or terms
+1. **Sprint 2:** Migrate process layer (39 modules, ~22K lines)
+2. **Sprint 2:** Update skill context paths to grimoire
+3. **Sprint 3:** Verify `/craft` command works with new paths
 
 ---
 
-*Report Generated: 2026-01-08*
+## Recommendations for Reviewer
+
+1. **Verify YAML content:** Spot-check `grimoires/sigil/constitution/physics.yaml` to ensure content integrity
+2. **Check gitignore:** Run `git status` to confirm state directory is properly ignored
+3. **Note schemas directory:** `sigil-mark/kernel/schemas/` was preserved; determine if it should migrate
+
+---
+
+*Implementation completed: 2026-01-11*
+*Ready for: /review-sprint sprint-1*

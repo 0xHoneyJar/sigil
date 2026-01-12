@@ -20,18 +20,17 @@
 
     "baseUrl": ".",
     "paths": {
-      "@sigil/recipes/*": ["sigil-mark/recipes/*"],
-      "@sigil/hooks": ["sigil-mark/hooks/index.ts"],
-      "@sigil/hooks/*": ["sigil-mark/hooks/*"],
-      "@sigil/core/*": ["sigil-mark/core/*"]
+      "@sigil-context/*": ["grimoires/sigil/*"],
+      "@sigil/hooks": ["src/components/gold/hooks/index.ts"],
+      "@sigil/hooks/*": ["src/components/gold/hooks/*"],
+      "@sigil/utils/*": ["src/components/gold/utils/*"]
     }
   },
   "include": [
     "src/**/*",
-    "sigil-mark/**/*"
+    "grimoires/sigil/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "sigil-mark/.archive-v1.0"
+    "node_modules"
   ]
 }

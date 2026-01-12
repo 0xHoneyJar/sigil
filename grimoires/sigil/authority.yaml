@@ -1,0 +1,77 @@
+# Sigil v10.1 "Usage Reality" - Authority Thresholds
+#
+# Usage-based authority system. Components earn their tier through
+# actual usage patterns, not directory location or manual promotion.
+#
+# "Stop asking for permission. If the code survives and is clean, it is Gold."
+#
+# @version 10.1.0
+
+version: "10.1"
+
+# =============================================================================
+# Tier Thresholds
+# =============================================================================
+# Authority is COMPUTED from usage, not STORED in directories.
+# No file moves required. No broken imports. No git noise.
+
+gold:
+  # Minimum number of files that import this component
+  min_imports: 10
+  # Minimum days since last modification (stability)
+  min_stability_days: 14
+  # Must pass quality gates
+  lint_clean: true
+  type_clean: true
+  description: "Production-ready, widely used, stable patterns"
+
+silver:
+  min_imports: 5
+  min_stability_days: 7
+  lint_clean: true
+  type_clean: true
+  description: "Proven patterns, gaining adoption"
+
+draft:
+  # Everything else is draft by default
+  min_imports: 0
+  min_stability_days: 0
+  description: "Experimental, new, or rarely used patterns"
+
+# =============================================================================
+# Evolution Thresholds
+# =============================================================================
+# Confidence levels for automatic vs human-reviewed promotion.
+
+evolution:
+  # At 95%+ confidence, promote automatically (no human needed)
+  auto_promote: 0.95
+
+  # At 80-95% confidence, create PR for human review
+  human_review: 0.80
+
+  # Below 80%, component stays at current tier
+  # (implicit - no action taken)
+
+# =============================================================================
+# Confidence Calculation
+# =============================================================================
+# How confidence is computed from signals.
+
+confidence_weights:
+  imports: 0.4          # Number of imports (normalized)
+  stability: 0.3        # Days since modification (normalized)
+  lint_clean: 0.15      # Passes ESLint
+  type_clean: 0.15      # Passes TypeScript strict
+
+# =============================================================================
+# Demotion Rules
+# =============================================================================
+# When components lose their tier.
+
+demotion:
+  # Demote if imports drop below threshold for this many days
+  import_threshold_days: 7
+  # Demote immediately if lint/type checks fail
+  fail_on_lint_error: true
+  fail_on_type_error: true

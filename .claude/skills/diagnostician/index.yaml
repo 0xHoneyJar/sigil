@@ -1,0 +1,39 @@
+name: diagnostician
+description: "Debug patterns without questions"
+version: "10.1.0"
+
+trigger:
+  - broken
+  - glitches
+  - not working
+  - error
+  - bug
+  - issue
+  - flicker
+  - mismatch
+
+reads:
+  - src/components/**/*.tsx
+  - src/**/*.ts
+
+uses:
+  - src/lib/sigil/diagnostician.ts
+  - src/lib/sigil/search.ts
+
+patterns:
+  - hydration
+  - dialog
+  - performance
+  - layout
+  - server-component
+  - react-19
+  - state
+  - async
+  - animation
+
+principles:
+  - Never ask "check the console"
+  - Never ask "what browser?"
+  - Match symptoms to known patterns
+  - Provide solutions, not questions
+  - Investigate before asking
