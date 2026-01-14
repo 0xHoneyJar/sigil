@@ -180,13 +180,24 @@ Adds rules to `.claude/rules/`. Your `CLAUDE.md` stays untouched.
 
 ---
 
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/craft` | Generate component with full physics (behavioral + animation + material) |
+| `/surface` | Apply material physics only (styling, no behavior) |
+| `/distill` | Break a task into craft-able Queue items |
+| `/inscribe` | Promote learned patterns to permanent rules |
+
+---
+
 ## Usage
 
 ```
 /craft "claim button"              # All three physics layers
 /craft "snappy like button"        # Adjectives inform physics
 /craft "glassmorphism card"        # Material keywords detected
-/craft "retro pixel badge"         # Grit signature applied
+/surface "docs callout"            # Material only, no behavior
 ```
 
 Before generating, Sigil shows its analysis:
