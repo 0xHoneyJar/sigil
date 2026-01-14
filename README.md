@@ -227,6 +227,61 @@ Corrections weight 5x. Usage is feedback. Taste is physics personalized.
 
 ---
 
+## Ralph Mode
+
+For continuous generation, Sigil supports [Ralph-style loops](https://ghuntley.com/ralph/) — run until the guitar is tuned.
+
+**The Loop:**
+```bash
+while :; do cat CRAFT.md | claude-code ; done
+```
+
+**CRAFT.md** — your prompt template:
+```markdown
+## Task
+Generate components for [PROJECT]:
+
+### ClaimButton
+Effect: financial
+Feel: trustworthy, deliberate
+Material: elevated
+
+### LikeButton
+Effect: standard
+Feel: snappy, playful
+Material: minimal
+
+## Tuning Notes
+- 2026-01-13: "harvest" should be financial
+- 2026-01-13: Prefer 600ms over 800ms
+- 2026-01-13: All buttons use 8px radius
+```
+
+**The Feedback Loop:**
+```
+CRAFT.md → Loop → Generate → Review → Tuning Notes
+                                          ↓
+                                       /tune
+                                          ↓
+                              Sigil rules updated
+                                          ↓
+                              Future /craft improved
+```
+
+**`/tune`** promotes learnings back to Sigil:
+```
+/tune
+
+Found 3 tuning notes to promote:
+• Add "harvest" to financial keywords? (y/n)
+• Adjust financial timing 800ms → 600ms? (y/n)
+• Set default radius to 8px? (y/n)
+```
+
+Each iteration tunes the guitar. Eventually, Sigil generates exactly what you want without correction.
+
+---
+
 ## Protected Capabilities
 
 Some things must always work:
