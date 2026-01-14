@@ -1,10 +1,22 @@
 # Sigil: Golden Patterns
 
-Reference implementations showing correct physics. Use as templates.
+Reference implementations demonstrating correct physics. Use as templates after discovering the project's conventions.
+
+## Before Using These Patterns
+
+Discover the project's conventions first:
+1. Check `package.json` for animation library (framer-motion, react-spring, or CSS)
+2. Check `package.json` for data fetching (tanstack-query, swr, or fetch)
+3. Read an existing component to understand import style and structure
+4. Match discovered conventions in generated code
 
 ---
 
-## Financial: ClaimButton (Pessimistic, 800ms)
+## Financial: ClaimButton
+
+**Effect:** Financial mutation
+**Physics:** Pessimistic, 800ms, confirmation required
+**Why:** Users need time to verify amounts. Server must confirm before UI updates.
 
 ```tsx
 import { useState } from 'react'
@@ -42,7 +54,7 @@ export function ClaimButton({ poolId, amount, onSuccess }) {
       <motion.button
         onClick={() => mutate()}
         disabled={isPending}
-        transition={{ duration: 0.8 }}  // Deliberate 800ms
+        transition={{ duration: 0.8 }}
       >
         {isPending ? 'Claiming...' : 'Confirm Claim'}
       </motion.button>
@@ -52,11 +64,21 @@ export function ClaimButton({ poolId, amount, onSuccess }) {
 }
 ```
 
-**Why correct**: Two-phase confirmation, cancel escape hatch, no optimistic update, 800ms timing, disabled during pending, error display.
+**Correct because:**
+- ✓ Two-phase confirmation (click → confirm)
+- ✓ Cancel escape hatch always visible
+- ✓ No `onMutate` (pessimistic = no optimistic updates)
+- ✓ 800ms deliberate animation timing
+- ✓ Disabled during pending state
+- ✓ Error display with message
 
 ---
 
-## Standard: LikeButton (Optimistic, 200ms)
+## Standard: LikeButton
+
+**Effect:** Standard mutation
+**Physics:** Optimistic, 200ms, no confirmation
+**Why:** Low stakes, reversible. Snappy feedback creates delight.
 
 ```tsx
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -68,7 +90,6 @@ export function LikeButton({ postId, isLiked }) {
   const { mutate } = useMutation({
     mutationFn: () => toggleLike(postId),
     onMutate: async () => {
-      // Optimistic update - UI changes immediately
       await queryClient.cancelQueries({ queryKey: ['post', postId] })
       const previous = queryClient.getQueryData(['post', postId])
       queryClient.setQueryData(['post', postId], (old) => ({
@@ -78,7 +99,6 @@ export function LikeButton({ postId, isLiked }) {
       return { previous }
     },
     onError: (err, _, context) => {
-      // Rollback on failure
       queryClient.setQueryData(['post', postId], context?.previous)
     },
   })
@@ -88,7 +108,7 @@ export function LikeButton({ postId, isLiked }) {
       onClick={() => mutate()}
       whileTap={{ scale: 0.9 }}
       animate={{ scale: isLiked ? [1, 1.2, 1] : 1 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 30 }}  // Snappy 200ms
+      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
     >
       {isLiked ? '❤️' : '🤍'}
     </motion.button>
@@ -96,11 +116,20 @@ export function LikeButton({ postId, isLiked }) {
 }
 ```
 
-**Why correct**: Optimistic update with rollback, snappy spring animation, no confirmation needed.
+**Correct because:**
+- ✓ `onMutate` for optimistic update (UI changes immediately)
+- ✓ `onError` rolls back on failure
+- ✓ Snappy spring animation (~200ms feel)
+- ✓ No confirmation needed
+- ✓ No loading state shown (optimistic makes it feel instant)
 
 ---
 
-## Soft Delete: DeleteButton (Optimistic + Undo)
+## Soft Delete: DeleteButton
+
+**Effect:** Soft delete (destructive + undo)
+**Physics:** Optimistic, 200ms, toast with undo
+**Why:** Undo exists, so we can be fast. Toast provides safety net.
 
 ```tsx
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -129,7 +158,7 @@ export function DeleteButton({ itemId }) {
           label: 'Undo',
           onClick: () => restoreItem(itemId)
         },
-        duration: 5000  // 5 second undo window
+        duration: 5000
       })
     },
   })
@@ -142,11 +171,21 @@ export function DeleteButton({ itemId }) {
 }
 ```
 
-**Why correct**: Optimistic (because undo exists), toast with undo action, 5 second window, soft delete not permanent.
+**Correct because:**
+- ✓ Optimistic update (item disappears immediately)
+- ✓ Toast with undo action
+- ✓ 5 second undo window
+- ✓ Soft delete, not permanent
+- ✓ Rollback on error or undo click
+- ✓ Feels fast but safe
 
 ---
 
-## Local State: ThemeToggle (Immediate, 100ms)
+## Local State: ThemeToggle
+
+**Effect:** Local state
+**Physics:** Immediate, 100ms, no confirmation
+**Why:** No server call. Users expect instant feedback.
 
 ```tsx
 import { motion } from 'framer-motion'
@@ -164,11 +203,32 @@ export function ThemeToggle() {
       <motion.div
         initial={false}
         animate={{ x: isDark ? 20 : 0 }}
-        transition={{ type: 'spring', stiffness: 700, damping: 35 }}  // Instant ~100ms
+        transition={{ type: 'spring', stiffness: 700, damping: 35 }}
       />
     </button>
   )
 }
 ```
 
-**Why correct**: No server call, instant spring animation, no loading state, accessible.
+**Correct because:**
+- ✓ No server call (useState/context only)
+- ✓ Instant spring animation (~100ms feel)
+- ✓ No loading state (nothing to load)
+- ✓ No confirmation (reversible instantly)
+- ✓ Accessible aria-label
+
+---
+
+## Adapting Patterns
+
+When generating, adapt these patterns to match discovered conventions:
+
+| If project uses... | Adapt pattern to use... |
+|-------------------|------------------------|
+| `react-spring` | `useSpring` instead of `motion` |
+| `swr` | `useSWRMutation` instead of `useMutation` |
+| CSS animations | `className` transitions instead of motion components |
+| `fetch` | Manual fetch with useState instead of query library |
+| Tailwind | Utility classes for animations |
+
+Always check the codebase first. Never assume a library exists.

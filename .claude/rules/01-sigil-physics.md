@@ -1,32 +1,63 @@
 # Sigil: Design Physics
 
-> Every UI decision traces to physics. Physics trace to effect. Effect is what the code DOES.
+You generate UI components with correct physics. Physics are determined by **effect** (what the code does), not preferences.
 
-## The Physics Table
+## Physics Table
 
 | Effect | Sync | Timing | Confirmation | Animation |
 |--------|------|--------|--------------|-----------|
-| **Financial** | Pessimistic | 800ms | Required | Deliberate ease-out |
-| **Destructive** | Pessimistic | 600ms | Required | Deliberate ease-out |
-| **Soft Delete** | Optimistic | 200ms | Toast + Undo | Snappy spring |
-| **Standard** | Optimistic | 200ms | None | Snappy spring |
-| **Navigation** | Immediate | 150ms | None | Crisp ease |
-| **Query** | Optimistic | 150ms | None | Fade in |
-| **Local State** | Immediate | 100ms | None | Instant spring |
+| Financial | Pessimistic | 800ms | Required | Deliberate ease-out |
+| Destructive | Pessimistic | 600ms | Required | Deliberate ease-out |
+| Soft Delete | Optimistic | 200ms | Toast + Undo | Snappy spring |
+| Standard | Optimistic | 200ms | None | Snappy spring |
+| Navigation | Immediate | 150ms | None | Crisp ease |
+| Query | Optimistic | 150ms | None | Fade in |
+| Local State | Immediate | 100ms | None | Instant spring |
 
-## Sync Strategies
+## Why These Physics
 
-**Pessimistic**: Server confirms before UI updates. User sees pending → success/failure. For irreversible or high-stakes operations.
+**Financial (800ms, pessimistic):** Users need time to verify amounts and mentally commit to irreversible value transfer. Faster timing creates anxiety. Server must confirm before UI updates because rollback is impossible.
 
-**Optimistic**: UI updates immediately, rolls back on failure. For reversible, low-stakes operations.
+**Destructive (600ms, pessimistic):** Permanent deletions require deliberation. The slower timing signals gravity. Confirmation prevents accidents that cannot be undone.
 
-**Immediate**: No server round-trip. Pure client state.
+**Soft Delete (200ms, optimistic):** When undo exists, we can be fast. The toast with undo provides a safety net without friction. Users feel in control.
 
-## Why This Matters
+**Standard (200ms, optimistic):** Reversible actions should feel snappy. UI updates immediately, rolls back on error. Low stakes = fast feedback.
 
-- A "claim" button at 150ms feels **reckless** (financial should be 800ms)
-- A "like" button at 800ms feels **laggy** (social should be 200ms)
-- A "delete" with no confirmation feels **dangerous**
-- A "theme toggle" with a loading spinner feels **broken**
+**Local State (100ms, immediate):** No server round-trip. Users expect instant feedback for toggles and client-only state.
 
-Physics communicate meaning. Wrong physics = wrong feel.
+## Automatic Inference
+
+Infer these from effect type without asking the user:
+- **Sync strategy** → from physics table above
+- **Timing** → from physics table above
+- **Confirmation** → from physics table above
+- **Animation library** → discover from codebase (check package.json)
+- **Data fetching** → discover from codebase (check for tanstack-query, swr)
+
+## Output Format
+
+Before generating code, show physics analysis in this exact format:
+
+```
+┌─ Physics Analysis ─────────────────────────────────────┐
+│                                                        │
+│  Component:    [ComponentName]                         │
+│  Effect:       [Effect type]                           │
+│  Detected by:  [keyword or type that triggered]        │
+│                                                        │
+│  ┌─ Applied Physics ────────────────────────────────┐  │
+│  │  Sync:         [Pessimistic/Optimistic/Immediate]│  │
+│  │  Timing:       [Xms] [description]               │  │
+│  │  Confirmation: [Required/None/Toast+Undo]        │  │
+│  │  Animation:    [curve type]                      │  │
+│  └──────────────────────────────────────────────────┘  │
+│                                                        │
+│  Protected: [checklist of verified capabilities]       │
+│                                                        │
+└────────────────────────────────────────────────────────┘
+
+Proceed with these physics? (yes / or describe what's different)
+```
+
+Wait for user confirmation before generating code.
