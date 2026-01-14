@@ -1,6 +1,6 @@
 ---
 name: "craft"
-version: "12.8.0"
+version: "13.0.0"
 description: |
   Generate UI components with unified design physics.
   Three layers: Behavioral + Animation + Material = Feel.
@@ -61,41 +61,107 @@ workflow_next: "garden"
 
 Generate UI components with unified design physics (behavioral + animation + material).
 
+<action_default>
+## Action Default
+
+CRITICAL: After user confirms analysis, generate complete working code immediately.
+
+DO:
+- Write the full component file
+- Match codebase conventions exactly
+- Include all three physics layers
+
+DO NOT:
+- Describe what you would build
+- Ask "would you like me to generate this?"
+- Provide partial implementations
+- Add comments unless explaining physics override
+</action_default>
+
+<permissions>
+## Permission Boundaries
+
+**Proactive** (do without asking):
+- Read package.json, existing components, taste.md
+- Show physics analysis
+- Detect effect from keywords/types/context
+
+**Requires confirmation** (ask first):
+- Write new component files
+- Modify existing components
+- Override physics defaults based on user input
+
+**Never** (even if asked):
+- Delete existing components without explicit request
+- Modify package.json or node_modules
+- Skip protected capability checks
+</permissions>
+
+<output_modes>
+## Output Modes
+
+Check `grimoires/sigil/taste.md` for `output_mode` preference.
+
+**Compact mode** (default after 5+ accepts):
+```
+ClaimButton | Financial | Pessimistic 800ms | Confirm: Yes
+Animation: ease-out | Material: elevated, 8px radius
+Protected: [all pass]
+
+Proceed? (y/n)
+```
+
+**Verbose mode** (default for new users):
+Full analysis box with nested sections.
+
+Auto-switch to compact after 5 consecutive ACCEPT signals.
+</output_modes>
+
 <workflow>
 ## Workflow
 
-Execute these steps in order. After confirmation, generate complete working code — don't just describe what to build.
+<step_0>
+### Step 0: Track Progress
+
+Use TodoWrite to track this workflow:
+```
+1. [ ] Discover context (libs, conventions)
+2. [ ] Detect effect and material
+3. [ ] Show physics analysis
+4. [ ] Get user confirmation
+5. [ ] Generate component
+6. [ ] Collect feedback
+7. [ ] Log taste signal
+```
+Mark each in_progress then completed as you work.
+</step_0>
 
 <step_1>
 ### Step 1: Discover Context
-
-Before generating, gather this information:
 
 **1a. Read taste log** (if exists):
 ```
 Read grimoires/sigil/taste.md
 ```
-Look for patterns with 3+ occurrences — apply these automatically and mention in analysis.
+Look for:
+- Patterns with 3+ occurrences (apply automatically)
+- `output_mode` preference (compact vs verbose)
+- Timing/animation/material overrides
 
-**1b. Discover codebase conventions**:
-```bash
-# Animation library
-grep -E "framer-motion|react-spring|@emotion" package.json
-
-# Data fetching
-grep -E "@tanstack/react-query|swr|apollo" package.json
-
-# Toast library
-grep -E "sonner|react-hot-toast|react-toastify" package.json
-
-# Styling approach
-grep -E "tailwind|styled-components|@emotion" package.json
+**1b. Discover codebase conventions** (single read):
 ```
+Read package.json
+```
+Extract from dependencies:
+- Animation: `framer-motion` | `react-spring` | CSS
+- Data: `@tanstack/react-query` | `swr` | `fetch`
+- Toast: `sonner` | `react-hot-toast` | native
+- Styling: `tailwindcss` | `styled-components` | `@emotion`
 
-**1c. Read an existing component** to match:
+**1c. Read one existing component** to match:
 - Import style (named vs default, path aliases)
 - File structure (single file vs folder)
-- Naming conventions
+- Naming conventions (PascalCase, kebab-case files)
 </step_1>
 
 <step_2>
@@ -106,7 +172,7 @@ grep -E "tailwind|styled-components|@emotion" package.json
 | Priority | Signal | Example |
 |----------|--------|---------|
 | 1. Types | Props with `Currency`, `Money`, `Wei` | Always Financial |
-| 2. Keywords | "claim", "delete", "like", "toggle" | See 02-sigil-detection.md |
+| 2. Keywords | "claim", "delete", "like", "toggle" | See lexicon |
 | 3. Context | "with undo", "for wallet" | Modifies effect |
 
 **Material Detection** (determines surface physics):
@@ -118,14 +184,22 @@ grep -E "tailwind|styled-components|@emotion" package.json
 | flat | no shadows, solid colors |
 | outlined | border only |
 | retro, pixel | grit signatures |
-| (no keyword) | Infer from effect: Financial→Elevated, Standard→Flat |
+| (no keyword) | Infer from effect |
 </step_2>
 
 <step_3>
 ### Step 3: Show Physics Analysis
 
-Display analysis in this exact format, then wait for confirmation:
+**If compact mode:**
+```
+[ComponentName] | [Effect] | [Sync] [Timing] | Confirm: [Yes/No]
+Animation: [easing] | Material: [surface], [radius]
+Protected: [pass/fail indicators]
 
+Proceed? (y/n)
+```
+
+**If verbose mode:**
 ```
 ┌─ Physics Analysis ─────────────────────────────────────┐
 │                                                        │
@@ -133,32 +207,15 @@ Display analysis in this exact format, then wait for confirmation:
 │  Effect:       [Effect type]                           │
 │  Detected by:  [keyword/type/context that triggered]   │
 │                                                        │
-│  ┌─ Behavioral ────────────────────────────────────┐   │
-│  │  Sync:         [Pessimistic/Optimistic/Immediate]│  │
-│  │  Timing:       [Xms] [why this timing]          │   │
-│  │  Confirmation: [Required/None/Toast+Undo]       │   │
-│  └──────────────────────────────────────────────────┘  │
-│                                                        │
-│  ┌─ Animation ─────────────────────────────────────┐   │
-│  │  Easing:       [ease-out/spring]                │   │
-│  │  Spring:       [stiffness, damping]             │   │
-│  │  Entrance:     [Xms] / Exit: [Xms]              │   │
-│  │  Interruptible: [Yes/No]                        │   │
-│  └──────────────────────────────────────────────────┘  │
-│                                                        │
-│  ┌─ Material ──────────────────────────────────────┐   │
-│  │  Surface:      [flat/elevated/glass/retro]      │   │
-│  │  Shadow:       [None/soft/elevated/hard]        │   │
-│  │  Border:       [None/subtle/solid]              │   │
-│  │  Radius:       [Xpx]                            │   │
-│  │  Grit:         [Clean/Subtle/Retro/Pixel]       │   │
-│  └──────────────────────────────────────────────────┘  │
+│  Behavioral    [Sync] | [Timing] | [Confirmation]      │
+│  Animation     [Easing] | [Spring values] | [Interrupt]│
+│  Material      [Surface] | [Shadow] | [Radius] | [Grit]│
 │                                                        │
 │  Codebase:     [styling] + [animation] + [data]        │
 │                                                        │
 │  Protected:                                            │
-│  [✓/✗] Cancel  [✓/✗] Error recovery  [✓/✗] 44px      │
-│  [✓/✗] Focus ring  [✓/✗] Reduced motion              │
+│  [✓/✗] Cancel  [✓/✗] Error recovery  [✓/✗] 44px       │
+│  [✓/✗] Focus ring  [✓/✗] Reduced motion               │
 │                                                        │
 └────────────────────────────────────────────────────────┘
 
@@ -167,259 +224,212 @@ Proceed? (yes / or describe what's different)
 </step_3>
 
 <step_4>
-### Step 4: Wait for Confirmation
+### Step 4: Get Confirmation
 
-Do not generate code until user confirms or corrects.
-
-- **If user corrects**: Update analysis and show again
-- **If user confirms**: Proceed immediately to generation
+Wait for user response:
+- **"yes", "y", "proceed"** → Generate immediately (Step 5)
+- **Correction provided** → Update analysis, show again
+- **Question asked** → Answer, then re-confirm
 </step_4>
 
 <step_5>
 ### Step 5: Generate Component
 
-After confirmation, generate complete working code that:
-
-- Uses discovered libraries (don't assume — check package.json)
+IMMEDIATELY generate complete working code that:
+- Uses discovered libraries only (never assume)
 - Matches existing code style exactly
 - Applies all three physics layers from analysis
-- Includes all protected capabilities (verify checklist)
+- Includes all protected capabilities
+- Has reduced motion fallback
 - Has no comments (unless explaining physics override)
 
-Generate the full component. Don't describe what to build — build it.
+Write the full component. Do not describe — build.
 </step_5>
 
 <step_6>
-### Step 6: Get Feedback
+### Step 6: Collect Feedback
 
-After generating, use AskUserQuestion to get structured feedback:
+Ask the user to reflect on feel from their end user's perspective:
 
-```
-Question: "Does this feel right?"
-Header: "Feel check"
-Options:
-  - "Yes, feels right" → proceed to log ACCEPT
-  - "Timing/behavior is off" → note for /behavior focus
-  - "Animation feels off" → note for /animate focus
-  - "Style/look is off" → note for /style focus
-  - (Other) → free text correction
-```
+> "Does this feel right? Think about your user in the moment of clicking."
 
-**If "Yes"**: Log ACCEPT, mark complete if in CRAFT.md loop.
+**Prompt creative reflection:**
+- Who is clicking this? (new user, power user, anxious customer)
+- What's the moment? (first deposit, routine action, high-stakes decision)
+- What should they feel? (trust, speed, safety, delight)
 
-**If correction**:
-1. Add to Signs in CRAFT.md (if in loop)
-2. Suggest the focused command: "Try `/behavior` to adjust timing"
-3. Regenerate with correction applied
+**If user gives feedback:**
+Listen for what layer is off:
+- "feels slow/fast" → behavioral (`/behavior`)
+- "movement feels off" → animation (`/animate`)
+- "looks wrong" → material (`/style`)
+
+Ask follow-up: "What should it feel like instead?"
+Use their language — don't force physics terminology.
+
+**Signal detection:**
+- ACCEPT: "yes", "looks good", "perfect", moves to next task
+- MODIFY: Describes what's off ("feels heavy", "too clinical", "needs more weight")
+- REJECT: "no", "wrong", "start over"
 </step_6>
 
 <step_7>
 ### Step 7: Log Taste Signal
 
-After user responds, append to `grimoires/sigil/taste.md`:
+Append to `grimoires/sigil/taste.md`:
 
-**ACCEPT** (user confirms and uses code):
+**ACCEPT** (user confirms):
 ```markdown
 ## [YYYY-MM-DD HH:MM] | ACCEPT
 Component: [name]
 Effect: [type]
-Physics: [behavioral, animation, material summary]
+Physics: [behavioral], [animation], [material]
 ---
 ```
 
-**MODIFY** (user edits generated code):
+**MODIFY** (user edits file or selects non-Yes option):
 ```markdown
 ## [YYYY-MM-DD HH:MM] | MODIFY
 Component: [name]
-Changed: [what user changed]
-Learning: [infer the preference]
+Changed: [what user indicated was off]
+Learning: [infer preference]
 ---
 ```
 
-**REJECT** (user says no or rewrites):
+**REJECT** (user says no/wrong/redo):
 ```markdown
 ## [YYYY-MM-DD HH:MM] | REJECT
 Component: [name]
-Reason: [user feedback if given]
+Reason: [user feedback]
 ---
 ```
 </step_7>
 </workflow>
 
----
+<error_recovery>
+## Error Recovery
+
+**Detection fails** (can't determine effect):
+1. Ask max 2 clarifying questions
+2. If still unclear: Default to Standard, note in analysis
+3. Format: "⚠ Defaulted to Standard (unclear input)"
+
+**Missing package.json**:
+1. Check imports in existing component files
+2. Infer libraries from import statements
+3. If no files exist: Ask user for preferences
+
+**Convention conflict** (multiple styles found):
+1. Show both patterns
+2. Ask which to follow
+3. Log preference to taste.md for future
+
+**Protected capability violation**:
+1. Stop generation
+2. Explain which capability would be violated
+3. Offer compliant alternative
+</error_recovery>
 
 <quick_reference>
 ## Detection Quick Reference
 
-| Keywords | Effect | Sync | Timing | Easing |
-|----------|--------|------|--------|--------|
-| claim, deposit, withdraw, transfer, swap, stake | Financial | Pessimistic | 800ms | ease-out (deliberate) |
-| delete, remove, destroy, revoke, burn | Destructive | Pessimistic | 600ms | ease-out (deliberate) |
-| archive, trash, soft-delete, dismiss | Soft Delete | Optimistic | 200ms | spring(500, 30) |
-| save, update, like, follow, create, bookmark | Standard | Optimistic | 200ms | spring(500, 30) |
-| toggle, switch, expand, collapse, select | Local State | Immediate | 100ms | spring(700, 35) |
-| command palette, keyboard nav, frequent hover | High-freq | Immediate | 0ms | none |
+| Keywords | Effect | Sync | Timing | Confirm |
+|----------|--------|------|--------|---------|
+| claim, deposit, withdraw, transfer, swap, stake | Financial | Pessimistic | 800ms | Yes |
+| delete, remove, destroy, revoke, burn | Destructive | Pessimistic | 600ms | Yes |
+| archive, trash, soft-delete, dismiss | Soft Delete | Optimistic | 200ms | Toast+Undo |
+| save, update, like, follow, create, bookmark | Standard | Optimistic | 200ms | No |
+| toggle, switch, expand, collapse, select | Local State | Immediate | 100ms | No |
+| command palette, keyboard nav, frequent hover | High-freq | Immediate | 0ms | No |
 
-**Type Override**: `Currency`, `Money`, `Balance`, `Wei`, `Token`, `BigInt` in props → always Financial.
-
-**Frequency Override**: If component is used 50+ times/day → reduce or remove animation regardless of effect type.
+**Type Override**: `Currency`, `Money`, `Balance`, `Wei`, `Token`, `BigInt` → always Financial
+**Frequency Override**: 50+ uses/day → reduce or remove animation
 </quick_reference>
 
----
+<when_not_to_use>
+## When NOT to Use /craft
+
+- **Single property change**: Use Edit tool directly
+- **Only styling wrong**: Use `/style` instead
+- **Only animation wrong**: Use `/animate` instead
+- **Only timing wrong**: Use `/behavior` instead
+- **Non-UI code**: Not applicable
+- **Tiny fix to existing component**: Edit directly
+
+Rule: If it's a 1-3 line change, don't use /craft.
+</when_not_to_use>
 
 <examples>
 ## Examples
 
-### Example 1: Financial Component
+### Example 1: Financial with Creative Feedback
 
 ```
 User: /craft "claim button for staking rewards"
 
-[Step 1: Discover] Found tailwind, framer-motion, @tanstack/react-query
-[Step 2: Detect] "claim" + "staking" → Financial effect
+StakingClaimButton | Financial | Pessimistic 800ms | Confirm: Yes
+Animation: ease-out 800ms | Material: elevated, 8px, soft shadow
+Protected: [✓ all pass]
 
-┌─ Physics Analysis ─────────────────────────────────────┐
-│                                                        │
-│  Component:    StakingClaimButton                      │
-│  Effect:       Financial mutation                      │
-│  Detected by:  "claim" keyword + "staking" context     │
-│                                                        │
-│  ┌─ Behavioral ────────────────────────────────────┐   │
-│  │  Sync:         Pessimistic (server confirms)    │   │
-│  │  Timing:       800ms (time to verify amount)    │   │
-│  │  Confirmation: Required (two-phase)             │   │
-│  └──────────────────────────────────────────────────┘  │
-│                                                        │
-│  ┌─ Animation ─────────────────────────────────────┐   │
-│  │  Easing:       ease-out (deliberate)            │   │
-│  │  Entrance:     300ms / Exit: 150ms              │   │
-│  │  Interruptible: No (financial)                  │   │
-│  └──────────────────────────────────────────────────┘  │
-│                                                        │
-│  ┌─ Material ──────────────────────────────────────┐   │
-│  │  Surface:      Elevated (trust through weight)  │   │
-│  │  Shadow:       soft (1 layer)                   │   │
-│  │  Border:       solid, visible                   │   │
-│  │  Radius:       8px                              │   │
-│  │  Grit:         Clean                            │   │
-│  └──────────────────────────────────────────────────┘  │
-│                                                        │
-│  Protected:                                            │
-│  ✓ Cancel  ✓ Error recovery  ✓ 44px  ✓ Focus ring   │
-│                                                        │
-└────────────────────────────────────────────────────────┘
+Proceed? (y/n)
 
-Proceed? (yes / or describe what's different)
+User: y
 
-User: yes
+[Generates complete component]
 
-[Generates component with unified physics]
+Does this feel right? Think about your user in the moment of clicking.
+
+User: feels a bit too slow, our users claim rewards multiple times a day
+
+Ah, high-frequency financial action. That changes things.
+Reducing to 600ms — still deliberate but respects their workflow.
+
+[Applies adjustment, logs MODIFY: "User prefers faster timing for routine financial actions"]
 ```
 
-### Example 2: Material-Focused Component
+### Example 2: Understanding the Persona
 
 ```
-User: /craft "glassmorphism card for wallet balance"
+User: /craft "delete account button"
 
-[Step 1: Discover] Found tailwind, framer-motion
-[Step 2: Detect] "wallet balance" → display, "glassmorphism" → material keyword
+⚠ Destructive action detected. Before I generate:
+Who is clicking this? What's their state of mind?
 
-┌─ Physics Analysis ─────────────────────────────────────┐
-│                                                        │
-│  Component:    WalletBalanceCard                       │
-│  Effect:       Display only                            │
-│  Detected by:  "balance" (read) + "glassmorphism"      │
-│                                                        │
-│  ┌─ Behavioral ────────────────────────────────────┐   │
-│  │  Sync:         None (display only)              │   │
-│  │  Timing:       0ms (static content)             │   │
-│  │  Confirmation: None                             │   │
-│  └──────────────────────────────────────────────────┘  │
-│                                                        │
-│  ┌─ Animation ─────────────────────────────────────┐   │
-│  │  Easing:       fade-in on mount                 │   │
-│  │  Entrance:     200ms / Exit: 150ms              │   │
-│  │  Interruptible: Yes                             │   │
-│  └──────────────────────────────────────────────────┘  │
-│                                                        │
-│  ┌─ Material ──────────────────────────────────────┐   │
-│  │  Surface:      Glass                            │   │
-│  │  Shadow:       lg (depth behind blur)           │   │
-│  │  Border:       1px white/20                     │   │
-│  │  Radius:       16px                             │   │
-│  │  Backdrop:     blur-xl                          │   │
-│  │  Grit:         Clean                            │   │
-│  └──────────────────────────────────────────────────┘  │
-│                                                        │
-└────────────────────────────────────────────────────────┘
+User: frustrated users who want to leave, we want to give them one last chance
 
-Proceed? (yes / or describe what's different)
+Got it — this should feel serious but not hostile.
+Adding a "We're sorry to see you go" confirmation with clear cancel.
+Timing: 600ms to give weight without feeling punitive.
 
-User: yes
+DeleteAccountButton | Destructive | Pessimistic 600ms | Confirm: Yes (soft tone)
 
-[Generates glassmorphism card with unified physics]
+Proceed?
+
+User: yes, but make the cancel button more prominent than confirm
+
+[Generates with prominent cancel, logs taste signal]
 ```
 
-### Example 3: Ambiguous Detection
+### Example 3: GTM Context Matters
 
 ```
-User: /craft "fancy button"
+User: /craft "subscribe button"
 
-┌─ Physics Analysis ─────────────────────────────────────┐
-│                                                        │
-│  ⚠ Could not detect effect from "fancy button"        │
-│                                                        │
-│  Help me understand:                                   │
-│  • What happens when clicked?                          │
-│  • Does it call a server?                              │
-│  • Can it be undone?                                   │
-│  • Does it involve money/tokens?                       │
-│                                                        │
-└────────────────────────────────────────────────────────┘
+User: actually this is for a free trial, not paid
 
-User: it submits a form to save user preferences
+That changes the physics entirely.
+Free trial = low commitment = should feel easy and fast.
 
-┌─ Physics Analysis ─────────────────────────────────────┐
-│                                                        │
-│  Component:    FancyButton                             │
-│  Effect:       Standard mutation                       │
-│  Detected by:  "save preferences" (user clarification) │
-│  ...                                                   │
-└────────────────────────────────────────────────────────┘
+SubscribeButton | Standard | Optimistic 200ms | Confirm: No
+Animation: spring(500,30) — snappy, encouraging
+Material: elevated with brand gradient — draws attention
+
+Does this match how you want users to feel about trying your product?
+
+User: yes but maybe even snappier, we want zero friction
+
+[Adjusts to 150ms with spring(600,30), logs MODIFY]
 ```
-
----
-
-## Code Style
-
-Generated code follows these rules:
-- **No comments** unless explaining a physics override
-- **No JSDoc** unless the project uses it
-- **Match imports** to existing component style
-- **Match naming** to existing conventions
-- **Use discovered libraries** only (never assume)
-
----
-
-## Automatic Inference
-
-Infer these from effect type without asking:
-- **Sync strategy** → from physics table
-- **Timing** → from physics table
-- **Confirmation** → from physics table
-- **Easing type** → from animation physics (effect → easing)
-- **Spring values** → from animation physics (effect → stiffness/damping)
-- **Entrance/Exit asymmetry** → entrances slower than exits
-- **Interruptibility** → financial/destructive = no, others = yes
-- **Animation library** → from package.json discovery
-- **Data fetching** → from package.json discovery
-- **Toast library** → from package.json discovery
-
-Animation frequency is inferred from context:
-- Command palette, keyboard nav → high frequency → no animation
-- Dropdowns, tooltips → medium frequency → fast animation
-- Modals, confirmations → low frequency → standard animation
-- Onboarding, celebrations → rare → can use longer animations
 </examples>
 
 ---
