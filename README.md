@@ -265,73 +265,72 @@ Got a feature, not a component? Use `/distill` to extract the craft-able pieces.
 
 For continuous generation, Sigil supports [Ralph-style loops](https://ghuntley.com/ralph/) — one component per loop, tune until consistent.
 
-**The Loop:**
+**Run:**
 ```bash
-while :; do cat CRAFT.md | claude-code ; done
+./ralph.sh 20 grimoires/sigil/CRAFT.md
 ```
-
-**Key principle:** One thing per loop. Trust eventual consistency.
 
 **CRAFT.md structure:**
 ```markdown
-## Queue           ← What to build (pick ONE per loop)
+## Queue           ← Components to build (picks ONE per loop)
 ## Signs           ← Instructions to prevent known failures
-## Backpressure    ← Acceptance criteria (rejects bad generations)
-## Learnings       ← Temporary observations (inform next loops)
+## Backpressure    ← Automated checks (build, types, render)
 ```
 
-**The HOTL (Human On The Loop):**
-
-Design can't be fully spec'd upfront like architecture. Feel emerges through iteration. Your job:
+**The cycle:**
 
 ```
-WATCH    → Observe /craft output for physics mistakes
-TUNE     → Add sign when Ralph fails ("financial timing: 600ms")
-THROW    → Delete Learnings when it goes off rails, re-loop
-INSCRIBE → Run /inscribe when patterns solidify (3+ times)
+1. Ralph runs Queue autonomously
+   → Picks unchecked item
+   → Invokes /craft
+   → Backpressure: build passes, no errors
+   → Marks [x], commits
+   → Repeats until Queue complete
+
+2. Loop completes — all items [x]
+
+3. HOTL reviews generated components
+   → "CTA feels too slow"
+   → "Card shadows too heavy"
+
+4. HOTL tunes CRAFT.md
+   → Reset items that felt wrong: [x] → [ ]
+   → Add Signs: "timing: 500ms", "no shadows"
+
+5. Run loop again
+   → Ralph regenerates unchecked items
+   → Reads Signs, applies corrections
+   → Overwrites existing files
+
+6. Repeat until feel is right
+
+7. /inscribe → patterns become permanent
 ```
+
+**Key insight:** Backpressure is automated (builds, types). Feel is human. You tune **after** the loop, not during. Ralph runs autonomously; you observe patterns and tune between runs.
 
 **Signs prevent failures:**
-
-When Ralph makes a mistake, you add a sign — like putting "SLIDE DOWN, DON'T JUMP" next to the slide. Future loops read the signs.
 
 ```markdown
 ## Signs
 ### Timing
-- financial should be 600ms not 800ms
+- financial: 500ms not 800ms
 
-### Animation
-- prefer springs over ease-out for interactive
+### Material
+- no shadows, flat aesthetic
+- radius: 12px
 ```
 
-**The Cycle:**
-```
-Loop 1: /craft "claim button" → 800ms feels slow
-        → HOTL adds sign: "financial: 600ms"
-        → Fail backpressure, loop
-
-Loop 2: /craft "claim button" → reads sign, uses 600ms
-        → Pass backpressure
-        → Mark [x], commit
-
-Loop 3: /craft "like button" → correct (taste.md)
-        → Mark [x], commit
-
-Loop 4: Queue empty → /inscribe → 600ms becomes permanent
-```
-
-**`/inscribe`** promotes learnings to rules:
+**`/inscribe`** promotes patterns to rules:
 ```
 /inscribe
 
-Found 3 learnings to inscribe:
-• Adjust financial timing 800ms → 600ms? (y/n)
-• Add "harvest" to financial keywords? (y/n)
+Found 3 patterns to inscribe:
+• Adjust financial timing → 500ms? (y/n)
+• Remove shadows by default? (y/n)
 
-The sigil is inscribed. Future /craft carries these marks forward.
+The sigil is inscribed. Future /craft carries these marks.
 ```
-
-Each failed loop teaches. Each `/inscribe` makes the teaching permanent.
 
 ---
 
