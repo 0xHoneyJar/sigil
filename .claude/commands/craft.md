@@ -117,51 +117,43 @@ grep -E "tailwind|styled-components|@emotion|css-modules" package.json
 | bold | increase weight/contrast |
 | retro, pixel | apply grit signatures |
 
-### Step 3: Show Analysis (Physics + Material)
+### Step 3: Show Physics Analysis
 
 Display analysis in this exact format, then wait for confirmation:
 
 ```
-┌─ Sigil Analysis ───────────────────────────────────────┐
+┌─ Physics Analysis ─────────────────────────────────────┐
 │                                                        │
 │  Component:    [ComponentName]                         │
 │  Effect:       [Effect type]                           │
 │  Detected by:  [keyword/type/context that triggered]   │
 │                                                        │
-│  ╔═ PHYSICS (behavior) ═══════════════════════════════╗
-│  ║                                                    ║
-│  ║  Sync:         [Pessimistic/Optimistic/Immediate]  ║
-│  ║  Timing:       [Xms] [why this timing]             ║
-│  ║  Confirmation: [Required/None/Toast+Undo]          ║
-│  ║                                                    ║
-│  ║  Animation:                                        ║
-│  ║  - Easing:       [ease-out/spring]                 ║
-│  ║  - Spring:       [stiffness, damping]              ║
-│  ║  - Entrance:     [Xms] / Exit: [Xms]               ║
-│  ║  - Interruptible: [Yes/No]                         ║
-│  ║                                                    ║
-│  ╚════════════════════════════════════════════════════╝
+│  ┌─ Behavioral ────────────────────────────────────┐   │
+│  │  Sync:         [Pessimistic/Optimistic/Immediate]│  │
+│  │  Timing:       [Xms] [why this timing]          │   │
+│  │  Confirmation: [Required/None/Toast+Undo]       │   │
+│  └──────────────────────────────────────────────────┘  │
 │                                                        │
-│  ╔═ MATERIAL (surface) ═══════════════════════════════╗
-│  ║                                                    ║
-│  ║  Surface:      [flat/elevated/glass/outlined/etc]  ║
-│  ║  Gradient:     [None/2-stop/brand]                 ║
-│  ║  Shadow:       [None/soft/elevated]                ║
-│  ║  Border:       [None/subtle/solid]                 ║
-│  ║  Radius:       [Xpx]                               ║
-│  ║  Grit:         [Clean/Subtle/Retro/Pixel]          ║
-│  ║                                                    ║
-│  ╚════════════════════════════════════════════════════╝
+│  ┌─ Animation ─────────────────────────────────────┐   │
+│  │  Easing:       [ease-out/spring]                │   │
+│  │  Spring:       [stiffness, damping]             │   │
+│  │  Entrance:     [Xms] / Exit: [Xms]              │   │
+│  │  Interruptible: [Yes/No]                        │   │
+│  └──────────────────────────────────────────────────┘  │
+│                                                        │
+│  ┌─ Material ──────────────────────────────────────┐   │
+│  │  Surface:      [flat/elevated/glass/retro]      │   │
+│  │  Shadow:       [None/soft/elevated/hard]        │   │
+│  │  Border:       [None/subtle/solid]              │   │
+│  │  Radius:       [Xpx]                            │   │
+│  │  Grit:         [Clean/Subtle/Retro/Pixel]       │   │
+│  └──────────────────────────────────────────────────┘  │
 │                                                        │
 │  Codebase:     [styling] + [animation] + [data]        │
-│  Template:     [pattern from 03-sigil-patterns.md]     │
 │                                                        │
 │  Protected:                                            │
-│  [✓/✗] Cancel/escape hatch                            │
-│  [✓/✗] Error recovery                                 │
-│  [✓/✗] Touch target ≥44px                            │
-│  [✓/✗] Focus ring visible                            │
-│  [✓/✗] Reduced motion support                        │
+│  [✓/✗] Cancel  [✓/✗] Error recovery  [✓/✗] 44px      │
+│  [✓/✗] Focus ring  [✓/✗] Reduced motion              │
 │                                                        │
 └────────────────────────────────────────────────────────┘
 
@@ -251,48 +243,37 @@ Reason: [user feedback if given]
 ```
 User: /craft "claim button for staking rewards"
 
-[Step 1: Discover] Found tailwind, framer-motion, @tanstack/react-query, sonner
-[Step 2: Detect] "claim" + "staking" → Financial, no material keywords → default
+[Step 1: Discover] Found tailwind, framer-motion, @tanstack/react-query
+[Step 2: Detect] "claim" + "staking" → Financial effect
 
-┌─ Sigil Analysis ───────────────────────────────────────┐
+┌─ Physics Analysis ─────────────────────────────────────┐
 │                                                        │
 │  Component:    StakingClaimButton                      │
 │  Effect:       Financial mutation                      │
 │  Detected by:  "claim" keyword + "staking" context     │
 │                                                        │
-│  ╔═ PHYSICS (behavior) ═══════════════════════════════╗
-│  ║                                                    ║
-│  ║  Sync:         Pessimistic (server confirms)       ║
-│  ║  Timing:       800ms (time to verify amount)       ║
-│  ║  Confirmation: Required (two-phase)                ║
-│  ║                                                    ║
-│  ║  Animation:                                        ║
-│  ║  - Easing:       ease-out (deliberate)             ║
-│  ║  - Entrance:     300ms / Exit: 150ms               ║
-│  ║  - Interruptible: No (financial)                   ║
-│  ║                                                    ║
-│  ╚════════════════════════════════════════════════════╝
+│  ┌─ Behavioral ────────────────────────────────────┐   │
+│  │  Sync:         Pessimistic (server confirms)    │   │
+│  │  Timing:       800ms (time to verify amount)    │   │
+│  │  Confirmation: Required (two-phase)             │   │
+│  └──────────────────────────────────────────────────┘  │
 │                                                        │
-│  ╔═ MATERIAL (surface) ═══════════════════════════════╗
-│  ║                                                    ║
-│  ║  Surface:      Elevated (financial = trustworthy)  ║
-│  ║  Gradient:     None (trust through clarity)        ║
-│  ║  Shadow:       soft (1 layer)                      ║
-│  ║  Border:       solid, visible                      ║
-│  ║  Radius:       8px                                 ║
-│  ║  Grit:         Clean                               ║
-│  ║                                                    ║
-│  ╚════════════════════════════════════════════════════╝
+│  ┌─ Animation ─────────────────────────────────────┐   │
+│  │  Easing:       ease-out (deliberate)            │   │
+│  │  Entrance:     300ms / Exit: 150ms              │   │
+│  │  Interruptible: No (financial)                  │   │
+│  └──────────────────────────────────────────────────┘  │
 │                                                        │
-│  Codebase:     tailwind + framer-motion + tanstack     │
-│  Template:     ClaimButton from 03-sigil-patterns.md   │
+│  ┌─ Material ──────────────────────────────────────┐   │
+│  │  Surface:      Elevated (trust through weight)  │   │
+│  │  Shadow:       soft (1 layer)                   │   │
+│  │  Border:       solid, visible                   │   │
+│  │  Radius:       8px                              │   │
+│  │  Grit:         Clean                            │   │
+│  └──────────────────────────────────────────────────┘  │
 │                                                        │
 │  Protected:                                            │
-│  ✓ Cancel button                                      │
-│  ✓ Error recovery                                     │
-│  ✓ Touch target ≥44px                                │
-│  ✓ Focus ring visible                                │
-│  ✓ Reduced motion support                            │
+│  ✓ Cancel  ✓ Error recovery  ✓ 44px  ✓ Focus ring   │
 │                                                        │
 └────────────────────────────────────────────────────────┘
 
@@ -300,7 +281,7 @@ Proceed? (yes / or describe what's different)
 
 User: yes
 
-[Generates component with correct physics AND material]
+[Generates component with unified physics]
 ```
 
 ### Example 2: Material-Focused Component
@@ -309,38 +290,34 @@ User: yes
 User: /craft "glassmorphism card for wallet balance"
 
 [Step 1: Discover] Found tailwind, framer-motion
-[Step 2: Detect] "wallet balance" → display (no mutation), "glassmorphism" → material
+[Step 2: Detect] "wallet balance" → display, "glassmorphism" → material keyword
 
-┌─ Sigil Analysis ───────────────────────────────────────┐
+┌─ Physics Analysis ─────────────────────────────────────┐
 │                                                        │
 │  Component:    WalletBalanceCard                       │
 │  Effect:       Display only                            │
 │  Detected by:  "balance" (read) + "glassmorphism"      │
 │                                                        │
-│  ╔═ PHYSICS (behavior) ═══════════════════════════════╗
-│  ║                                                    ║
-│  ║  Sync:         None (display only)                 ║
-│  ║  Timing:       0ms (static content)                ║
-│  ║  Confirmation: None                                ║
-│  ║                                                    ║
-│  ║  Animation:                                        ║
-│  ║  - Easing:       fade-in on mount                  ║
-│  ║  - Entrance:     200ms / Exit: 150ms               ║
-│  ║  - Interruptible: Yes                              ║
-│  ║                                                    ║
-│  ╚════════════════════════════════════════════════════╝
+│  ┌─ Behavioral ────────────────────────────────────┐   │
+│  │  Sync:         None (display only)              │   │
+│  │  Timing:       0ms (static content)             │   │
+│  │  Confirmation: None                             │   │
+│  └──────────────────────────────────────────────────┘  │
 │                                                        │
-│  ╔═ MATERIAL (surface) ═══════════════════════════════╗
-│  ║                                                    ║
-│  ║  Surface:      Glassmorphism                       ║
-│  ║  Gradient:     None                                ║
-│  ║  Shadow:       lg (depth behind blur)              ║
-│  ║  Border:       1px white/20                        ║
-│  ║  Radius:       16px                                ║
-│  ║  Backdrop:     blur-xl (24px)                      ║
-│  ║  Grit:         Clean                               ║
-│  ║                                                    ║
-│  ╚════════════════════════════════════════════════════╝
+│  ┌─ Animation ─────────────────────────────────────┐   │
+│  │  Easing:       fade-in on mount                 │   │
+│  │  Entrance:     200ms / Exit: 150ms              │   │
+│  │  Interruptible: Yes                             │   │
+│  └──────────────────────────────────────────────────┘  │
+│                                                        │
+│  ┌─ Material ──────────────────────────────────────┐   │
+│  │  Surface:      Glass                            │   │
+│  │  Shadow:       lg (depth behind blur)           │   │
+│  │  Border:       1px white/20                     │   │
+│  │  Radius:       16px                             │   │
+│  │  Backdrop:     blur-xl                          │   │
+│  │  Grit:         Clean                            │   │
+│  └──────────────────────────────────────────────────┘  │
 │                                                        │
 └────────────────────────────────────────────────────────┘
 
@@ -348,7 +325,7 @@ Proceed? (yes / or describe what's different)
 
 User: yes
 
-[Generates glassmorphism card with correct material]
+[Generates glassmorphism card with unified physics]
 ```
 
 ### Example 3: Ambiguous Detection

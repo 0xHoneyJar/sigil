@@ -1,10 +1,10 @@
-# Sigil: Material System
+# Sigil: Material Physics
 
-> Physics is behavior. Material is surface. Together they define feel.
+> Material is the third layer of design physics. Behavioral, animation, material — together they define feel.
 
-## What is Material?
+## What is Material Physics?
 
-Material describes how components *look*—their surface qualities, visual constraints, and cultural signatures. While physics determines behavior timing, material determines visual density.
+Material physics describes how components *look*—their surface qualities, visual constraints, and cultural signatures. It's not separate from physics; it IS physics. Just as behavioral physics determines timing and animation physics determines movement, material physics determines surface.
 
 ---
 
@@ -138,40 +138,27 @@ Parse descriptions for material cues:
 
 ---
 
-## Integration with Physics
+## Integration with Behavioral & Animation Physics
 
-Material and physics work together:
+Material is detected and applied alongside behavioral and animation physics in `/craft`:
 
 ```
 /craft "trustworthy claim button"
 
 Physics Analysis:
-- Sync: Pessimistic
-- Timing: 800ms
-- Confirmation: Required
-
-Material Analysis:
-- Gradient: None (trust through clarity)
-- Shadow: 1 layer, soft
-- Border: Solid, visible
-- Radius: 8px
-- Color: Green (financial)
-- Grit: Clean (0 across all)
+┌─ Behavioral ─────────────────────────────────────┐
+│  Sync: Pessimistic, Timing: 800ms, Confirm: Yes  │
+└──────────────────────────────────────────────────┘
+┌─ Animation ──────────────────────────────────────┐
+│  Easing: ease-out, Interruptible: No             │
+└──────────────────────────────────────────────────┘
+┌─ Material ───────────────────────────────────────┐
+│  Surface: Elevated, Shadow: soft, Radius: 8px    │
+│  Color: Green (financial), Grit: Clean           │
+└──────────────────────────────────────────────────┘
 ```
 
----
-
-## The /surface Command
-
-Use `/surface` to apply material treatment to existing components or generate styled variants.
-
-```
-/surface "glassmorphism card"
-/surface "retro pixel button"
-/surface "minimal outline input"
-```
-
-When physics matter, use `/craft`. When only surface matters, use `/surface`.
+All three layers are inferred from the same input and shown together.
 
 ---
 

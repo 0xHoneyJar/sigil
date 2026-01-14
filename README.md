@@ -18,42 +18,53 @@ AI generates UI without understanding *feel*. Every generation is a guess.
 - Optimistic update (social like)
 - Server confirmation (money transfer)
 
-And the *look* matters too:
+And *look* is part of feel:
 - Clean and minimal (utility)
 - Elevated with depth (importance)
 - Textured with grit (character)
 
-These aren't style choices. They're **physics** and **material**.
+These aren't style choices. They're **physics**.
 
 ---
 
-## The Two Pillars
+## Design Physics
+
+Physics is everything that determines feel.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                 │
-│   PHYSICS                         MATERIAL                      │
-│   How it BEHAVES                  How it LOOKS                  │
-│   ──────────────                  ─────────────                 │
+│   DESIGN PHYSICS                                                │
+│   ══════════════                                                │
 │                                                                 │
-│   • Sync strategy                 • Surface treatment           │
-│   • Timing                        • Gradients, shadows          │
-│   • Confirmation                  • Borders, radius             │
-│   • Animation curves              • Texture/grit                │
+│   ┌─ Behavioral ─────────────────────────────────────────────┐  │
+│   │  Sync, timing, confirmation                              │  │
+│   │  "Does clicking feel instant or deliberate?"             │  │
+│   └──────────────────────────────────────────────────────────┘  │
 │                                                                 │
-│                    ↓                                            │
-│              Together = FEEL                                    │
+│   ┌─ Animation ──────────────────────────────────────────────┐  │
+│   │  Easing, springs, curves                                 │  │
+│   │  "Does movement feel mechanical or alive?"               │  │
+│   └──────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│   ┌─ Material ───────────────────────────────────────────────┐  │
+│   │  Surface, fidelity, grit                                 │  │
+│   │  "Does it look trustworthy or playful?"                  │  │
+│   └──────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│                         ↓                                       │
+│                       FEEL                                      │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-Physics determines behavior. Material determines surface. Feel emerges from both.
+**Taste** is your accumulated preferences across all three.
 
 ---
 
-## Physics
+## Behavioral Physics
 
-Physics describe how UI *behaves*.
+How interactions respond.
 
 ```
 EFFECT              SYNC              TIMING          WHY
@@ -61,48 +72,64 @@ EFFECT              SYNC              TIMING          WHY
 
 Financial           Pessimistic       800ms           Money can't be
 (claim, withdraw)   Server confirms   Deliberate      rolled back.
-                    before UI                         Users need time
-                    updates                           to verify.
 
 Destructive         Pessimistic       600ms           Permanent actions
 (delete, revoke)    Server confirms   Deliberate      need deliberation.
-                    before UI                         Escape hatch
-                    updates                           required.
 
 Standard            Optimistic        200ms           Low stakes.
-(like, save)        UI updates        Snappy          Feels instant,
-                    immediately,                      rolls back on
-                    rolls back                        error.
+(like, save)        UI updates first  Snappy          Rolls back on error.
 
 Local               Immediate         100ms           No server.
-(toggle, expand)    No server         Instant         Pure client
-                    round-trip                        state.
+(toggle, expand)    No round-trip     Instant         Pure client state.
 ```
 
 ---
 
-## Material
+## Animation Physics
 
-Material describes how UI *looks*.
+How movement feels.
 
 ```
-SURFACE             GRADIENT    SHADOW      BORDER      GRIT
+EFFECT              EASING            SPRING          WHY
 ────────────────────────────────────────────────────────────────────
 
-Elevated            None        soft        subtle      Clean
-(cards, dialogs)    1 layer     depth       or none
+Financial           ease-out          —               Deliberate weight
+                    800ms                             communicates gravity.
 
-Glassmorphism       None        lg          white/20    Clean
-(overlays)          blur        depth       subtle
+Standard            spring            500, 30         Snappy, organic.
+                    200ms                             Feels alive.
 
-Flat                None        None        optional    Clean
-(minimal UI)        solid       flat        or none
+Local               spring            700, 35         Instant, direct.
+                    100ms                             No waiting.
 
-Retro               None        hard        solid 2px   Pixel
-(games, nostalgia)  sharp       offset      chunky
+High-frequency      none              —               Best animation is
+                    0ms                               no animation.
 ```
 
-**Fidelity Ceiling**: Never exceed—gradients ≤2 stops, shadows ≤1 layer, radius ≤16px.
+---
+
+## Material Physics
+
+How surfaces communicate.
+
+```
+SURFACE             SHADOW      BORDER      RADIUS      GRIT
+────────────────────────────────────────────────────────────────────
+
+Elevated            soft        subtle      8-12px      Clean
+(cards, dialogs)    1 layer     or none
+
+Glass               lg + blur   white/20    12-16px     Clean
+(overlays)          depth       subtle
+
+Flat                none        optional    4-8px       Clean
+(minimal)           —           or none
+
+Retro               hard        solid 2px   0px         Pixel
+(games)             offset      chunky      sharp
+```
+
+**Fidelity ceiling**: gradients ≤2 stops, shadows ≤1 layer, radius ≤16px.
 
 ---
 
@@ -111,24 +138,25 @@ Retro               None        hard        solid 2px   Pixel
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                 │
-│   What you say          What Sigil knows       What you get     │
-│   ─────────────         ──────────────         ────────────     │
+│   What you say              Sigil infers            You get     │
+│   ─────────────             ────────────            ───────     │
 │                                                                 │
-│   "claim button"   →    PHYSICS: financial   →  pessimistic     │
-│                         MATERIAL: elevated       800ms          │
-│                                                  soft shadow    │
-│                                                  confirmation   │
+│   "claim button"       →    Behavioral: financial    →  800ms   │
+│                             Animation: ease-out         confirm │
+│                             Material: elevated          shadow  │
 │                                                                 │
-│   "glassmorphism   →    PHYSICS: display     →  no sync         │
-│    card"                MATERIAL: glass          blur backdrop  │
-│                                                  subtle border  │
+│   "snappy like         →    Behavioral: standard     →  200ms   │
+│    button"                  Animation: spring           bounce  │
+│                             Material: flat              minimal │
 │                                                                 │
-│   "retro pixel     →    PHYSICS: local       →  immediate       │
-│    toggle"              MATERIAL: retro          sharp edges    │
-│                                                  grit: pixel    │
+│   "retro pixel         →    Behavioral: local        →  100ms   │
+│    toggle"                  Animation: none             sharp   │
+│                             Material: retro             grit    │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+One input. Three physics layers. Unified feel.
 
 ---
 
@@ -144,37 +172,26 @@ Adds rules to `.claude/rules/`. Your `CLAUDE.md` stays untouched.
 
 ## Usage
 
-### /craft — Physics + Material
-
 ```
-/craft "claim button"              # Financial physics, elevated material
-/craft "like button"               # Optimistic physics, flat material
-/craft "glassmorphism card"        # Display physics, glass material
-/craft "retro pixel badge"         # Local physics, pixel grit
+/craft "claim button"              # All three physics layers
+/craft "snappy like button"        # Adjectives inform physics
+/craft "glassmorphism card"        # Material keywords detected
+/craft "retro pixel badge"         # Grit signature applied
 ```
 
 Before generating, Sigil shows its analysis:
 
 ```
-┌─ Sigil Analysis ───────────────────────────────────────┐
+┌─ Physics Analysis ─────────────────────────────────────┐
 │                                                        │
 │  Component:    ClaimButton                             │
 │  Effect:       Financial mutation                      │
 │                                                        │
-│  ╔═ PHYSICS (behavior) ═══════════════════════════════╗
-│  ║  Sync:         Pessimistic (server confirms)       ║
-│  ║  Timing:       800ms (time to verify)              ║
-│  ║  Confirmation: Required (two-phase)                ║
-│  ║  Animation:    ease-out (deliberate)               ║
-│  ╚════════════════════════════════════════════════════╝
+│  Behavioral    pessimistic, 800ms, confirmation        │
+│  Animation     ease-out, deliberate, non-interruptible │
+│  Material      elevated, soft shadow, 8px radius       │
 │                                                        │
-│  ╔═ MATERIAL (surface) ═══════════════════════════════╗
-│  ║  Surface:      Elevated                            ║
-│  ║  Shadow:       soft (1 layer)                      ║
-│  ║  Border:       solid, visible                      ║
-│  ║  Radius:       8px                                 ║
-│  ║  Grit:         Clean                               ║
-│  ╚════════════════════════════════════════════════════╝
+│  Protected:    ✓ cancel  ✓ error recovery  ✓ 44px     │
 │                                                        │
 └────────────────────────────────────────────────────────┘
 
@@ -183,29 +200,20 @@ Proceed? (yes / or describe what's different)
 
 If wrong, correct it. Sigil learns from your feedback.
 
-### /surface — Material Only
-
-When you only need styling (no behavior):
-
-```
-/surface "glassmorphism card"      # Just the material treatment
-/surface "retro pixel badge"       # Just the grit signature
-```
-
 ---
 
 ## Taste
 
-Sigil learns your preferences over time.
+Your accumulated preferences across all physics layers.
 
 ```
-Session 1:  You change 800ms → 500ms
-Session 2:  You change soft shadow → no shadow
-Session 3:  You change radius 8px → 12px
-Session 4:  Sigil applies your preferences automatically
+Session 1:  You change 800ms → 500ms              (behavioral)
+Session 2:  You change ease-out → spring          (animation)
+Session 3:  You change soft shadow → none         (material)
+Session 4:  Sigil applies all three automatically
 ```
 
-Corrections weight 5x. Usage is feedback.
+Corrections weight 5x. Usage is feedback. Taste is physics personalized.
 
 ---
 
@@ -227,15 +235,15 @@ Sigil enforces these. You can override with justification.
 
 ## Philosophy
 
-**Effect is truth.** What the code *does* determines physics. What it *is* determines material.
+**Effect is truth.** What the code *does* determines behavioral physics. What it *is* determines material physics. Both determine feel.
 
-**Feel over implementation.** You think in feel ("trustworthy", "snappy", "glassmorphism"). Sigil translates to physics and material.
+**Feel over implementation.** You think in feel ("trustworthy", "snappy", "glassmorphism"). Sigil translates to physics.
 
-**Usage is feedback.** No forms. No ratings. Accept, modify, or reject. Corrections teach more than silence.
+**Taste is personal physics.** Usage is feedback. Accept, modify, or reject. Corrections teach more than silence.
 
 **Visible reasoning.** Sigil shows its analysis before generating. You can correct before wasted effort.
 
-**Look informs feel.** Physics and material are interconnected. A trustworthy button needs deliberate timing AND clear visual weight.
+**Physics is unified.** Behavioral, animation, and material aren't separate concerns—they're three layers of the same thing: how products make people feel.
 
 ---
 

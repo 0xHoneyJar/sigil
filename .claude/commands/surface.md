@@ -1,10 +1,10 @@
 ---
 name: "surface"
-version: "12.3.0"
+version: "12.4.0"
 description: |
-  Apply material treatment to components.
-  Handles visual surface: gradients, shadows, borders, color, grit.
-  Partner to /craft (physics). Together they define feel.
+  Apply material physics to components.
+  Use when you only need surface treatment (no behavioral physics).
+  For full physics (behavioral + animation + material), use /craft.
 
 arguments:
   - name: "description"
@@ -271,14 +271,13 @@ User: yes
 
 | Situation | Command |
 |-----------|---------|
-| Need physics (sync, timing, confirmation) | `/craft` |
-| Need material only (styling existing component) | `/surface` |
-| Need both behavior AND look | `/craft` (includes material) |
+| New interactive component | `/craft` (all three physics layers) |
+| Decorative/layout element | `/surface` (material physics only) |
 | Restyling existing component | `/surface` |
-| Creating new interactive element | `/craft` |
-| Creating decorative/layout element | `/surface` |
+| Component with server effects | `/craft` |
+| Pure visual treatment | `/surface` |
 
-**Rule of thumb**: If it has a click handler with server effects, use `/craft`. If it's purely visual, use `/surface`.
+**Rule of thumb**: `/craft` = behavioral + animation + material. `/surface` = material only.
 
 ---
 
