@@ -132,12 +132,22 @@ Display analysis in this exact format, then wait for confirmation:
 Proceed with this material? (yes / or describe what's different)
 ```
 
-### Step 4: Wait for Confirmation
+### Step 4: Get Feedback
 
-Do not generate code until user confirms or corrects.
+After showing analysis, use AskUserQuestion:
 
-If user corrects: Update analysis and show again.
-If user confirms: Proceed to generation.
+```
+Question: "Does this material feel right?"
+Header: "Style check"
+Options:
+  - "Yes, proceed"
+  - "Shadows feel wrong"
+  - "Colors feel wrong"
+  - "Radius/shape feels wrong"
+  - (Other)
+```
+
+If correction: Update analysis and regenerate.
 
 ### Step 5: Generate Styled Component
 

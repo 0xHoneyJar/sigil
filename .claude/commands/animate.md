@@ -34,7 +34,20 @@ Apply animation physics to a component. Easing, springs, transitions.
 Does this feel right?
 ```
 
-3. Wait for human response
+3. Use AskUserQuestion for feedback:
+
+```
+Question: "Does this animation feel right?"
+Header: "Motion check"
+Options:
+  - "Yes, proceed"
+  - "Too slow"
+  - "Too fast"
+  - "Too stiff/mechanical"
+  - "Too bouncy"
+  - (Other)
+```
+
 4. Apply changes or iterate based on feedback
 
 ## Animation Quick Reference

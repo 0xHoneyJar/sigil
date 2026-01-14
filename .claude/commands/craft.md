@@ -1,6 +1,6 @@
 ---
 name: "craft"
-version: "12.5.0"
+version: "12.8.0"
 description: |
   Generate UI components with unified design physics.
   Three layers: Behavioral + Animation + Material = Feel.
@@ -190,11 +190,27 @@ Generate the full component. Don't describe what to build — build it.
 </step_5>
 
 <step_6>
-### Step 6: After Generation
+### Step 6: Get Feedback
+
+After generating, use AskUserQuestion to get structured feedback:
 
 ```
-Component generated. Run /garden to check if it's becoming canonical.
+Question: "Does this feel right?"
+Header: "Feel check"
+Options:
+  - "Yes, feels right" → proceed to log ACCEPT
+  - "Timing/behavior is off" → note for /behavior focus
+  - "Animation feels off" → note for /animate focus
+  - "Style/look is off" → note for /style focus
+  - (Other) → free text correction
 ```
+
+**If "Yes"**: Log ACCEPT, mark complete if in CRAFT.md loop.
+
+**If correction**:
+1. Add to Signs in CRAFT.md (if in loop)
+2. Suggest the focused command: "Try `/behavior` to adjust timing"
+3. Regenerate with correction applied
 </step_6>
 
 <step_7>

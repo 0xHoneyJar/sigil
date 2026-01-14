@@ -37,7 +37,20 @@ Apply behavioral physics to a component. Timing, sync strategy, confirmation.
 Does this feel right?
 ```
 
-3. Wait for human response
+3. Use AskUserQuestion for feedback:
+
+```
+Question: "Does this behavior feel right?"
+Header: "Timing check"
+Options:
+  - "Yes, proceed"
+  - "Too slow"
+  - "Too fast"
+  - "Needs confirmation"
+  - "Should be optimistic"
+  - (Other)
+```
+
 4. Apply changes or iterate based on feedback
 
 ## Behavioral Quick Reference
