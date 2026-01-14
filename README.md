@@ -254,4 +254,4 @@ Sigil enforces these. You can override with justification.
 
 ---
 
-*v12.4.0*
+*v12.5.0*

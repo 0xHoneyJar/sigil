@@ -1,146 +1,111 @@
 # Sigil: Effect Detection
 
-Detect effect from **keywords**, **types**, and **context**. Types override keywords when present.
+Detect effect from keywords, types, and context. Types override keywords when present.
 
+<detection_priority>
+## Detection Priority
+
+1. **Types** — If props contain `Currency`, `Money`, `Balance`, `Wei`, `Token`, `BigInt` → Always Financial
+2. **Keywords** — Match against effect keyword lists below
+3. **Context** — Phrases like "with undo", "for wallet" modify the detected effect
+</detection_priority>
+
+<financial_detection>
 ## Financial Mutation
 
-**Keywords:** claim, deposit, withdraw, transfer, swap, send, pay, purchase, mint, burn, stake, unstake
+**Keywords**: claim, deposit, withdraw, transfer, swap, send, pay, purchase, mint, burn, stake, unstake
 
-**Types:** Currency, Money, Balance, Amount, Wei, Token, BigInt
+**Type Override**: Any prop with `Currency`, `Money`, `Balance`, `Wei`, `Token`, `BigInt` → Financial regardless of keyword
 
-**Context:** Wallet operations, DeFi protocols, payments, checkout
+**Context Signals**: wallet, DeFi, checkout, payment, funds
 
-**Examples:**
-```
-/craft "claim button"
-→ Effect: Financial (keyword: "claim")
-→ Physics: Pessimistic, 800ms, confirmation required
+<example>
+<input>/craft "claim button"</input>
+<detection>Effect: Financial — keyword "claim"</detection>
+<physics>Pessimistic, 800ms, confirmation required</physics>
+</example>
 
-/craft "stake rewards button"
-→ Effect: Financial (keyword: "stake")
-→ Physics: Pessimistic, 800ms, confirmation required
+<example>
+<input>/craft "update balance" with prop `amount: Currency`</input>
+<detection>Effect: Financial — type override "Currency"</detection>
+<physics>Pessimistic, 800ms, confirmation required</physics>
+<note>Even though "update" is normally Standard, the Currency type overrides.</note>
+</example>
+</financial_detection>
 
-// Type detection overrides ambiguous keywords
-function TransferButton({ amount }: { amount: Currency })
-→ Effect: Financial (type: Currency in props)
-```
-
+<destructive_detection>
 ## Destructive Mutation
 
-**Keywords:** delete, remove, destroy, revoke, terminate, close, end, burn
+**Keywords**: delete, remove, destroy, revoke, terminate, close, end
 
-**Context:** Permanent removal, no undo available, account termination
+**Context Signals**: permanent, account termination, no undo, irreversible
 
-**Examples:**
-```
-/craft "delete account button"
-→ Effect: Destructive (keyword: "delete", context: account)
-→ Physics: Pessimistic, 600ms, confirmation required
+<example>
+<input>/craft "delete account button"</input>
+<detection>Effect: Destructive — keyword "delete" + context "account"</detection>
+<physics>Pessimistic, 600ms, confirmation required</physics>
+</example>
+</destructive_detection>
 
-/craft "revoke access"
-→ Effect: Destructive (keyword: "revoke")
-→ Physics: Pessimistic, 600ms, confirmation required
-```
+<soft_delete_detection>
+## Soft Delete
 
-## Soft Delete (Destructive + Undo)
+**Keywords**: archive, hide, trash, soft-delete, dismiss
 
-**Keywords:** archive, hide, trash, soft-delete, dismiss
+**Context Signals**: "with undo", reversible, recycle bin
 
-**Context:** Reversible removal, undo available, recycle bin pattern
+<example>
+<input>/craft "delete with undo"</input>
+<detection>Effect: Soft Delete — context "with undo" overrides destructive</detection>
+<physics>Optimistic, 200ms, toast with undo action</physics>
+</example>
 
-**Examples:**
-```
-/craft "delete with undo"
-→ Effect: Soft Delete (context: "with undo")
-→ Physics: Optimistic, 200ms, toast with undo action
+<example>
+<input>/craft "archive message"</input>
+<detection>Effect: Soft Delete — keyword "archive"</detection>
+<physics>Optimistic, 200ms, toast with undo</physics>
+</example>
+</soft_delete_detection>
 
-/craft "archive message"
-→ Effect: Soft Delete (keyword: "archive")
-→ Physics: Optimistic, 200ms, toast with undo
-```
-
+<standard_detection>
 ## Standard Mutation
 
-**Keywords:** save, update, edit, create, add, like, follow, bookmark, subscribe, comment
+**Keywords**: save, update, edit, create, add, like, follow, bookmark, subscribe, comment
 
-**Context:** CRUD operations, social interactions, preferences
+**Context Signals**: CRUD operations, social interactions, preferences
 
-**Examples:**
-```
-/craft "like button"
-→ Effect: Standard (keyword: "like")
-→ Physics: Optimistic, 200ms, no confirmation
+<example>
+<input>/craft "like button"</input>
+<detection>Effect: Standard — keyword "like"</detection>
+<physics>Optimistic, 200ms, no confirmation</physics>
+</example>
+</standard_detection>
 
-/craft "save changes button"
-→ Effect: Standard (keyword: "save")
-→ Physics: Optimistic, 200ms, no confirmation
-```
-
-## Navigation
-
-**Keywords:** navigate, route, link, go, back, forward, redirect, open
-
-**Context:** URL changes, page transitions, routing
-
-**Examples:**
-```
-/craft "back button"
-→ Effect: Navigation (keyword: "back")
-→ Physics: Immediate, 150ms, no confirmation
-```
-
-## Query/Fetch
-
-**Keywords:** fetch, load, get, list, search, find, query, read, refresh
-
-**Context:** Data retrieval, no state change, read-only operations
-
-**Examples:**
-```
-/craft "search input"
-→ Effect: Query (keyword: "search")
-→ Physics: Optimistic, 150ms, skeleton/spinner loading state
-```
-
+<local_detection>
 ## Local State
 
-**Keywords:** toggle, switch, expand, collapse, select, focus, hover, show, hide
+**Keywords**: toggle, switch, expand, collapse, select, focus, show, hide
 
-**Context:** Client-only state, no server call, UI state
+**Context Signals**: client-only, no server, UI state, theme
 
-**Examples:**
-```
-/craft "dark mode toggle"
-→ Effect: Local State (keyword: "toggle", context: theme)
-→ Physics: Immediate, 100ms, no confirmation
+<example>
+<input>/craft "dark mode toggle"</input>
+<detection>Effect: Local State — keyword "toggle" + context "theme"</detection>
+<physics>Immediate, 100ms, no confirmation</physics>
+</example>
+</local_detection>
 
-/craft "expand section"
-→ Effect: Local State (keyword: "expand")
-→ Physics: Immediate, 100ms, spring animation
-```
+<ambiguity_resolution>
+## Resolving Ambiguity
 
-## Type Override Rule
+When effect is unclear, ask yourself:
 
-If you see these types in props or state, **always apply financial physics** regardless of keywords:
-- `Currency`, `Money`, `Balance`, `Wei`, `Token`, `BigInt`, `Amount`
-
-```typescript
-// Even if the keyword is "update", the type overrides
-function UpdateBalance({ newBalance }: { newBalance: Currency })
-→ Effect: Financial (type override: Currency)
-→ Physics: Pessimistic, 800ms, confirmation required
-```
-
-## Ambiguity Resolution
-
-When effect is unclear, ask yourself: **"What happens if this operation fails?"**
-
-| Question | Answer | Effect |
-|----------|--------|--------|
-| Can it be undone? | Yes → Optimistic | No → Pessimistic |
-| Does it involve money/tokens? | Yes → Always Financial | - |
-| Does it hit a server? | No → Immediate | Yes → Optimistic or Pessimistic |
-| Is there an undo button/toast? | Yes → Soft Delete | No → Hard Destructive |
+| Question | If Yes | If No |
+|----------|--------|-------|
+| Can it be undone? | Optimistic | Pessimistic |
+| Does it involve money/tokens? | Always Financial | Check other signals |
+| Does it hit a server? | Optimistic or Pessimistic | Immediate |
+| Is there an undo button/toast? | Soft Delete | Hard Destructive |
 
 If still ambiguous after this analysis, ask the user:
 ```
@@ -150,3 +115,4 @@ Could not confidently detect effect. Help me understand:
 • Can it be undone?
 • Does it involve money/tokens?
 ```
+</ambiguity_resolution>

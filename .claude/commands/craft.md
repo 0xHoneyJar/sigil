@@ -1,10 +1,10 @@
 ---
 name: "craft"
-version: "12.4.0"
+version: "12.5.0"
 description: |
-  Generate UI components with design physics AND material.
-  Physics = how it behaves. Material = how it looks. Together = feel.
-  Shows analysis before generating, learns from usage via taste.
+  Generate UI components with unified design physics.
+  Three layers: Behavioral + Animation + Material = Feel.
+  Shows analysis before generating. Learns from usage.
 
 arguments:
   - name: "description"
@@ -16,107 +16,109 @@ arguments:
       - "like button for posts"
       - "delete with undo"
       - "glassmorphism card"
-      - "retro pixel badge"
 
 context_files:
+  - path: ".claude/rules/00-sigil-core.md"
+    required: true
+    purpose: "Core instructions, priority hierarchy, action behavior"
   - path: ".claude/rules/01-sigil-physics.md"
     required: true
-    purpose: "Physics table and rationale"
+    purpose: "Behavioral physics - sync, timing, confirmation"
   - path: ".claude/rules/02-sigil-detection.md"
     required: true
-    purpose: "Effect detection rules with examples"
+    purpose: "Effect detection with examples"
   - path: ".claude/rules/03-sigil-patterns.md"
     required: true
     purpose: "Golden pattern templates"
   - path: ".claude/rules/04-sigil-protected.md"
     required: true
-    purpose: "Protected capabilities checklist"
+    purpose: "Protected capabilities (non-negotiable)"
   - path: ".claude/rules/05-sigil-animation.md"
     required: true
-    purpose: "Animation physics - easing, timing by frequency, springs"
+    purpose: "Animation physics - easing, springs, frequency"
   - path: ".claude/rules/06-sigil-taste.md"
     required: true
-    purpose: "Taste accumulation - learn from accept/modify/reject"
+    purpose: "Taste accumulation - learn from usage"
   - path: ".claude/rules/07-sigil-material.md"
     required: true
-    purpose: "Material system - fidelity, ergonomics, grit"
+    purpose: "Material physics - surface, fidelity, grit"
   - path: "grimoires/sigil/taste.md"
     required: false
-    purpose: "Accumulated taste signals (read for patterns)"
+    purpose: "Accumulated taste signals"
 
 outputs:
   - path: "src/components/$COMPONENT_NAME.tsx"
     type: "file"
-    description: "Generated component with correct physics and material"
+    description: "Generated component with unified physics"
 
 workflow_next: "garden"
 ---
 
 # /craft
 
-Generate UI components with correct physics and material.
+Generate UI components with unified design physics (behavioral + animation + material).
 
+<workflow>
 ## Workflow
 
-Execute these steps in order:
+Execute these steps in order. After confirmation, generate complete working code — don't just describe what to build.
 
+<step_1>
 ### Step 1: Discover Context
 
-Before generating anything:
+Before generating, gather this information:
 
 **1a. Read taste log** (if exists):
 ```
 Read grimoires/sigil/taste.md
 ```
-Look for patterns (3+ occurrences = apply automatically):
-- Timing adjustments (user prefers faster/slower?)
-- Animation preferences (springs vs easing?)
-- Structure preferences (always adds loading states?)
+Look for patterns with 3+ occurrences — apply these automatically and mention in analysis.
 
-**1b. Check libraries**:
+**1b. Discover codebase conventions**:
 ```bash
-# Check animation library
+# Animation library
 grep -E "framer-motion|react-spring|@emotion" package.json
 
-# Check data fetching
+# Data fetching
 grep -E "@tanstack/react-query|swr|apollo" package.json
 
-# Check toast library
+# Toast library
 grep -E "sonner|react-hot-toast|react-toastify" package.json
 
-# Check styling approach
-grep -E "tailwind|styled-components|@emotion|css-modules" package.json
+# Styling approach
+grep -E "tailwind|styled-components|@emotion" package.json
 ```
 
-**1c. Read existing component** to understand:
+**1c. Read an existing component** to match:
 - Import style (named vs default, path aliases)
 - File structure (single file vs folder)
-- Naming conventions (PascalCase, kebab-case files)
+- Naming conventions
+</step_1>
 
-### Step 2: Detect Effect Type AND Material
+<step_2>
+### Step 2: Detect Effect and Material
 
-**Physics Detection** (behavior):
+**Effect Detection** (determines behavioral + animation physics):
 
-| Priority | Check | Example |
-|----------|-------|---------|
-| 1. Types | Props with `Currency`, `Money`, `Wei`, `Balance` | Always financial |
-| 2. Keywords | "claim", "delete", "like", "toggle" | See detection rules |
-| 3. Context | "with undo", "for checkout", "wallet" | Modifies effect |
+| Priority | Signal | Example |
+|----------|--------|---------|
+| 1. Types | Props with `Currency`, `Money`, `Wei` | Always Financial |
+| 2. Keywords | "claim", "delete", "like", "toggle" | See 02-sigil-detection.md |
+| 3. Context | "with undo", "for wallet" | Modifies effect |
 
-**Material Detection** (surface):
+**Material Detection** (determines surface physics):
 
-| Keyword | Material Treatment |
-|---------|-------------------|
-| glassmorphism | blur backdrop, transparency, subtle border |
-| neumorphism | soft shadows, same-color depth |
-| flat | no shadows, solid colors |
+| Keyword | Treatment |
+|---------|-----------|
+| glassmorphism | blur backdrop, subtle border |
 | elevated | shadow, slight lift |
-| outlined | border only, transparent bg |
-| ghost | no border, no bg |
-| minimal | reduce visual elements |
-| bold | increase weight/contrast |
-| retro, pixel | apply grit signatures |
+| flat | no shadows, solid colors |
+| outlined | border only |
+| retro, pixel | grit signatures |
+| (no keyword) | Infer from effect: Financial→Elevated, Standard→Flat |
+</step_2>
 
+<step_3>
 ### Step 3: Show Physics Analysis
 
 Display analysis in this exact format, then wait for confirmation:
@@ -159,66 +161,75 @@ Display analysis in this exact format, then wait for confirmation:
 
 Proceed? (yes / or describe what's different)
 ```
+</step_3>
 
+<step_4>
 ### Step 4: Wait for Confirmation
 
 Do not generate code until user confirms or corrects.
 
-If user corrects: Update analysis and show again.
-If user confirms: Proceed to generation.
+- **If user corrects**: Update analysis and show again
+- **If user confirms**: Proceed immediately to generation
+</step_4>
 
+<step_5>
 ### Step 5: Generate Component
 
-Generate code that:
-- Uses discovered libraries (not assumed ones)
+After confirmation, generate complete working code that:
+
+- Uses discovered libraries (don't assume — check package.json)
 - Matches existing code style exactly
-- Applies physics from analysis
-- Includes all protected capabilities
+- Applies all three physics layers from analysis
+- Includes all protected capabilities (verify checklist)
 - Has no comments (unless explaining physics override)
 
-### Step 6: Suggest Next Step
+Generate the full component. Don't describe what to build — build it.
+</step_5>
 
-After generating:
+<step_6>
+### Step 6: After Generation
+
 ```
 Component generated. Run /garden to check if it's becoming canonical.
 ```
+</step_6>
 
+<step_7>
 ### Step 7: Log Taste Signal
 
-After user responds to the generated code, append to `grimoires/sigil/taste.md`:
+After user responds, append to `grimoires/sigil/taste.md`:
 
-**If user accepts** (says "yes", uses code, moves on):
+**ACCEPT** (user confirms and uses code):
 ```markdown
 ## [YYYY-MM-DD HH:MM] | ACCEPT
 Component: [name]
 Effect: [type]
-Physics: [sync, timing, animation]
-Material: [surface, gradient, shadow, grit]
+Physics: [behavioral, animation, material summary]
 ---
 ```
 
-**If user modifies** (edits the generated file):
+**MODIFY** (user edits generated code):
 ```markdown
 ## [YYYY-MM-DD HH:MM] | MODIFY
 Component: [name]
-Effect: [type]
-Physics: [what was generated]
-Material: [what was generated]
-Changed: [what user changed - physics? material? both?]
+Changed: [what user changed]
 Learning: [infer the preference]
 ---
 ```
 
-**If user rejects** (says "no", "wrong", deletes, rewrites):
+**REJECT** (user says no or rewrites):
 ```markdown
 ## [YYYY-MM-DD HH:MM] | REJECT
 Component: [name]
 Reason: [user feedback if given]
 ---
 ```
+</step_7>
+</workflow>
 
 ---
 
+<quick_reference>
 ## Detection Quick Reference
 
 | Keywords | Effect | Sync | Timing | Easing |
@@ -233,9 +244,11 @@ Reason: [user feedback if given]
 **Type Override**: `Currency`, `Money`, `Balance`, `Wei`, `Token`, `BigInt` in props → always Financial.
 
 **Frequency Override**: If component is used 50+ times/day → reduce or remove animation regardless of effect type.
+</quick_reference>
 
 ---
 
+<examples>
 ## Examples
 
 ### Example 1: Financial Component
@@ -388,6 +401,7 @@ Animation frequency is inferred from context:
 - Dropdowns, tooltips → medium frequency → fast animation
 - Modals, confirmations → low frequency → standard animation
 - Onboarding, celebrations → rare → can use longer animations
+</examples>
 
 ---
 

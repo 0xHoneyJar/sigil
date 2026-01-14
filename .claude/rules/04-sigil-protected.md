@@ -1,125 +1,81 @@
 # Sigil: Protected Capabilities
 
-These capabilities MUST always work. Verify them before generating any financial or destructive component.
+These capabilities are non-negotiable. They take priority over all other rules.
 
+<protected_rules>
 ## Non-Negotiable Capabilities
 
-| Capability | Constraint | Why |
-|------------|------------|-----|
-| **Withdraw** | Always reachable | Users must always access their funds. Never hide behind loading states or disabled conditions. |
-| **Cancel** | Always visible | Every destructive/financial flow needs an escape. Users must be able to back out at any point. |
-| **Balance** | Always accurate | Users must see their current balance. Never show stale data for financial displays. |
-| **Error Recovery** | Always available | No dead ends after failures. Every error state must have a path forward (retry, go back, contact support). |
+| Capability | Rule | Why |
+|------------|------|-----|
+| **Withdraw** | Always reachable | Users must always access their funds. Never hide behind loading states. |
+| **Cancel** | Always visible | Every flow needs an escape. Users must be able to back out at any point. |
+| **Balance** | Always accurate | Users must see their current balance. Stale data causes real financial harm. |
+| **Error Recovery** | Always available | No dead ends. Every error state must have a path forward. |
+| **Touch Target** | Minimum 44px | Apple HIG, accessibility. Smaller targets cause frustration and mistakes. |
+| **Focus Ring** | Always visible | Keyboard users need to know where they are. Non-negotiable accessibility. |
+</protected_rules>
 
-## Verification Checklist
+<verification_checklist>
+## Verification Before Generation
 
-Before generating any component, verify applicable protections:
+Run this checklist before generating any component:
 
-### For Financial Components
-```
-✓ Cancel button present and always clickable
-✓ Amount displayed clearly before confirmation
-✓ Balance shown and current
-✓ Error state has retry option
-✓ Loading state doesn't hide cancel
-✓ Disabled state explains why (if applicable)
-```
+**For Financial Components:**
+- [ ] Cancel button present and always clickable (even during loading)
+- [ ] Amount displayed clearly before confirmation
+- [ ] Balance shown and current (invalidate queries on success)
+- [ ] Error state has retry option
+- [ ] No optimistic updates (pessimistic only for money)
 
-### For Destructive Components
-```
-✓ Confirmation step required
-✓ Cancel/back option visible
-✓ Clear description of what will be deleted
-✓ Error recovery path exists
-✓ Undo option if soft delete
-```
+**For Destructive Components:**
+- [ ] Confirmation step required
+- [ ] Cancel/back option visible
+- [ ] Clear description of what will be deleted
+- [ ] Undo option if soft delete
 
-### For All Mutations
-```
-✓ Error messages are user-friendly
-✓ Loading states don't block escape
-✓ Network failure has recovery path
-```
+**For All Interactive Components:**
+- [ ] Touch target ≥44px
+- [ ] Focus ring visible on keyboard navigation
+- [ ] Error messages are user-friendly
+- [ ] Loading states don't block escape
+</verification_checklist>
 
-## Forbidden Patterns
+<forbidden_patterns>
+## Patterns That Violate Protected Capabilities
 
-These patterns violate protected capabilities. Never generate them:
+These patterns are forbidden. If you find yourself generating them, stop and reconsider:
 
-| Pattern | Why It's Forbidden |
-|---------|-------------------|
-| Cancel hidden during pending | User trapped in flow they can't escape |
-| Withdraw disabled without explanation | User can't access their funds |
-| Stale balance after mutation | User sees wrong financial state |
-| Error with no retry/back/escape | Dead end, user stuck |
-| Optimistic update for financial ops | Rollback impossible for money |
-| Confirmation skipped for destructive ops | Accidental permanent deletion |
+| Pattern | Why Forbidden | Fix |
+|---------|---------------|-----|
+| `{!isPending && <CancelButton />}` | User trapped during loading | Always show cancel |
+| `{balance}` without invalidation | Stale financial data | Invalidate queries on mutation |
+| `{isError && <p>Error</p>}` | No recovery path | Add retry/back buttons |
+| `onMutate` for financial ops | Can't roll back money | Use pessimistic sync |
+| No confirmation for delete | Accidental permanent loss | Require confirmation step |
+| Button with no focus styles | Keyboard users lost | Add `:focus-visible` ring |
+</forbidden_patterns>
 
+<override_protocol>
 ## When User Requests Violation
 
 If the user explicitly requests violating a protected capability:
 
-1. **Warn clearly:**
+1. **Explain the risk clearly:**
    ```
-   ⚠️ This would hide the cancel button during pending state.
-   This violates protected capabilities because users could be
-   trapped in a flow they can't escape.
+   This would hide the cancel button during pending state.
+   Users could be trapped in a flow they can't escape.
    ```
 
-2. **Ask for confirmation:**
+2. **Ask for explicit confirmation:**
    ```
    Are you sure you want to proceed? (yes to override)
    ```
 
-3. **If confirmed, proceed with comment:**
+3. **If confirmed, document the override:**
    ```tsx
    // OVERRIDE: Cancel hidden during pending per user request
    // This violates protected capability: escape hatch
    ```
 
-## Examples of Correct Protection
-
-### Cancel Always Visible
-```tsx
-// ✓ Correct: Cancel visible even during pending
-<div>
-  <button onClick={onCancel}>Cancel</button>
-  <button onClick={mutate} disabled={isPending}>
-    {isPending ? 'Processing...' : 'Confirm'}
-  </button>
-</div>
-
-// ✗ Wrong: Cancel hidden during pending
-{!isPending && <button onClick={onCancel}>Cancel</button>}
-```
-
-### Error Recovery Path
-```tsx
-// ✓ Correct: Error has retry and back options
-{isError && (
-  <div>
-    <p>Something went wrong: {error.message}</p>
-    <button onClick={() => mutate()}>Try Again</button>
-    <button onClick={onBack}>Go Back</button>
-  </div>
-)}
-
-// ✗ Wrong: Error with no escape
-{isError && <p>Error occurred</p>}
-```
-
-### Balance Always Current
-```tsx
-// ✓ Correct: Refetch balance after mutation
-const { mutate } = useMutation({
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['balance'] })
-  }
-})
-
-// ✗ Wrong: Balance could be stale
-const { mutate } = useMutation({
-  onSuccess: () => {
-    // no balance refresh
-  }
-})
-```
+Protected capabilities exist to prevent user harm. Override only when the user has considered the consequences.
+</override_protocol>
