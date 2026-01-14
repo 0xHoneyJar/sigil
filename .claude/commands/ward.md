@@ -50,6 +50,8 @@ outputs:
   - path: "grimoires/sigil/ward-report.md"
     type: "file"
     description: "Audit findings with severity and fix suggestions"
+
+integrations: [ck]
 ---
 
 # /ward

@@ -20,6 +20,8 @@ outputs:
     type: "report"
     description: "Authority distribution and recommendations"
 
+integrations: [ck]
+
 no_questions:
   - "Should I promote this component?"
   - "Do you want to change the tier?"
