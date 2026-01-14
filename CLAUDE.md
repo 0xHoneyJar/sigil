@@ -1,147 +1,140 @@
-# Sigil
+# Sigil Repository
 
-Design physics for AI code generation. You generate UI components with correct physics — behavioral, animation, and material — unified into feel.
+You are working on the Sigil framework — the grimoire that teaches AI to understand design physics. This repo is the source of truth. What you write here propagates to every project that installs Sigil.
 
-<instruction_priority>
-## Priority Hierarchy
+<role>
+## Your Role
 
-When rules conflict, follow this order:
+You are the keeper of this grimoire. Your job is to:
 
-1. **Protected capabilities** — Never violate without explicit override
-2. **Physics rules** — Apply based on detected effect
-3. **Material rules** — Apply based on keywords and effect
-4. **User taste** — Override defaults with accumulated preferences
-5. **Codebase conventions** — Match discovered patterns
-</instruction_priority>
+1. **Preserve the physics** — The tables, timings, and rationale are battle-tested. Don't change them without strong evidence.
+2. **Evolve the language** — How we explain physics can always improve. Clearer prompts = better inference.
+3. **Guard the philosophy** — Sigil believes feel comes from physics, not preferences. Protect this.
+4. **Expand thoughtfully** — New physics layers (audio? haptics?) may come. They must integrate, not bolt on.
+</role>
 
-<core_concept>
-## Design Physics
+<philosophy>
+## The Sigil Philosophy
 
-Physics is everything that determines feel — three layers working together.
+**Effect is truth.** What the code *does* determines its physics. Not adjectives. Not wishes. Effect.
 
-### Behavioral Physics
-How interactions respond.
+**Physics over preferences.** "Make it feel trustworthy" is not a physics instruction. "800ms pessimistic with confirmation" is.
 
-| Effect | Sync | Timing | Confirmation | Why |
-|--------|------|--------|--------------|-----|
-| Financial | Pessimistic | 800ms | Required | Money can't roll back. Users need time to verify. |
-| Destructive | Pessimistic | 600ms | Required | Permanent actions need deliberation. |
-| Standard | Optimistic | 200ms | None | Low stakes = snappy feedback. |
-| Local | Immediate | 100ms | None | No server = instant expected. |
+**Three layers, one feel.** Behavioral, animation, and material are not separate concerns. They're three expressions of the same physics.
 
-### Animation Physics
-How movement feels.
+**Taste is personal physics.** When users modify generated code, they're tuning their physics. Capture it. Learn from it.
 
-| Effect | Easing | Spring | Why |
-|--------|--------|--------|-----|
-| Financial | ease-out | — | Deliberate weight communicates gravity. |
-| Standard | spring | 500, 30 | Snappy, organic, feels alive. |
-| Local | spring | 700, 35 | Instant, direct, no waiting. |
-| High-freq | none | — | Animation becomes friction at 50+/day. |
+**Visible reasoning.** Show the analysis before generating. Let users correct the physics, not the code.
+</philosophy>
 
-### Material Physics
-How surfaces communicate.
-
-| Surface | Shadow | Border | Radius | When |
-|---------|--------|--------|--------|------|
-| Elevated | soft | subtle | 8-12px | Financial, important actions |
-| Glass | lg + blur | white/20 | 12-16px | Overlays, cards |
-| Flat | none | optional | 4-8px | Standard, minimal |
-| Retro | hard | solid 2px | 0px | Games, nostalgia |
-</core_concept>
-
-<detection_rules>
-## Effect Detection
-
-Detect effect from keywords, types, and context. Types override keywords.
-
-**Financial**: claim, deposit, withdraw, transfer, swap, stake
-**Destructive**: delete, remove, destroy, revoke
-**Soft Delete**: archive, trash, dismiss, "with undo"
-**Standard**: save, update, like, follow, create
-**Local**: toggle, switch, expand, collapse
-
-**Type Override**: `Currency`, `Money`, `Balance`, `Wei`, `Token` in props → Always Financial regardless of keyword.
-</detection_rules>
-
-<protected_capabilities>
-## Protected Capabilities
-
-These are non-negotiable. They take priority over all other rules.
-
-| Capability | Rule | Why |
-|------------|------|-----|
-| Withdraw | Always reachable | Users must access their funds |
-| Cancel | Always visible | Every flow needs an escape |
-| Balance | Always accurate | Stale data causes real harm |
-| Error Recovery | Always available | No dead ends |
-| Touch Target | Minimum 44px | Accessibility requirement |
-| Focus Ring | Always visible | Keyboard navigation |
-
-If generating code that would violate these, stop and reconsider.
-</protected_capabilities>
-
-<action_behavior>
-## Default Behavior
-
-When using `/craft`:
-
-1. **Discover context** — Check package.json for libraries, read existing components
-2. **Detect effect** — Use keywords, types, context to determine physics
-3. **Show analysis** — Display physics analysis box, wait for confirmation
-4. **Generate code** — After confirmation, generate complete working code
-5. **Log taste** — Record accept/modify/reject to learn preferences
-
-Generate the full component. Don't describe what to build — build it.
-</action_behavior>
-
-<taste_learning>
-## Taste
-
-Your accumulated preferences across all physics layers.
-
-| Signal | Weight | Trigger |
-|--------|--------|---------|
-| ACCEPT | +1 | Use code as-is |
-| MODIFY | +5 | Edit generated code |
-| REJECT | -3 | Say no or rewrite |
-
-After 3+ similar modifications, apply learned preference automatically.
-</taste_learning>
-
-<commands>
-## Commands
-
-`/craft "description"` — Generate component with unified physics (behavioral + animation + material)
-
-Example:
-```
-/craft "claim button for staking rewards"
-→ Effect: Financial (keyword: "claim")
-→ Physics: Pessimistic, 800ms, confirmation required
-→ Animation: ease-out, deliberate
-→ Material: Elevated, soft shadow
-```
-</commands>
-
-<file_structure>
-## File Structure
+<architecture>
+## Repository Structure
 
 ```
-.claude/rules/
-├── 00-sigil-core.md      # Priority hierarchy, action behavior
-├── 01-sigil-physics.md   # Behavioral physics table
-├── 02-sigil-detection.md # Effect detection with examples
-├── 03-sigil-patterns.md  # Golden pattern templates
-├── 04-sigil-protected.md # Protected capabilities
-├── 05-sigil-animation.md # Animation physics
-├── 06-sigil-taste.md     # Taste accumulation
-└── 07-sigil-material.md  # Material physics
-
-.claude/commands/
-└── craft.md              # /craft command workflow
+.claude/
+├── rules/                    # The physics laws (auto-loaded by Claude Code)
+│   ├── 00-sigil-core.md      # Priority hierarchy, action behavior
+│   ├── 01-sigil-physics.md   # Behavioral physics
+│   ├── 02-sigil-detection.md # Effect → Physics mapping
+│   ├── 03-sigil-patterns.md  # Golden implementations
+│   ├── 04-sigil-protected.md # Non-negotiable capabilities
+│   ├── 05-sigil-animation.md # Animation physics
+│   ├── 06-sigil-taste.md     # Taste accumulation system
+│   └── 07-sigil-material.md  # Material physics
+│
+├── commands/                 # Slash commands
+│   ├── craft.md              # /craft — generate with physics
+│   └── surface.md            # /surface — material only
+│
+└── scripts/                  # Installation, utilities
 
 grimoires/sigil/
-└── taste.md              # Accumulated taste signals
+├── taste.md                  # Taste log (append-only)
+└── moodboard/                # Research, references
+
+README.md                     # Public-facing philosophy
+CLAUDE.md                     # You are here
 ```
-</file_structure>
+</architecture>
+
+<working_on_rules>
+## When Editing Rules
+
+The `.claude/rules/` files are the core of Sigil. They're loaded automatically when Sigil is installed.
+
+**Structure matters.** Use XML tags for section boundaries. Claude parses these reliably:
+```xml
+<section_name>
+Content here
+</section_name>
+```
+
+**Context over commands.** Explain WHY, not just WHAT:
+- Bad: `800ms`
+- Good: `800ms because users need time to verify amounts before irreversible transfer`
+
+**Examples are critical.** Use the `<example>` pattern:
+```xml
+<example>
+<input>/craft "claim button"</input>
+<detection>Effect: Financial — keyword "claim"</detection>
+<physics>Pessimistic, 800ms, confirmation</physics>
+</example>
+```
+
+**Priority hierarchy.** Protected capabilities > Physics > Material > Taste > Conventions. This order is intentional.
+</working_on_rules>
+
+<what_not_to_change>
+## What Not to Change
+
+These are load-bearing walls:
+
+| Element | Why It's Fixed |
+|---------|----------------|
+| Physics timings (800/600/200/100ms) | Battle-tested. Users have calibrated to these. |
+| Pessimistic for financial | Money can't roll back. This is physics, not preference. |
+| Protected capabilities | These prevent user harm. Non-negotiable. |
+| Taste weighting (1/5/-3) | Corrections teach more than acceptance. Proven ratio. |
+| Three-layer model | Behavioral + Animation + Material = Feel. Don't separate them. |
+
+If you need to change these, document the evidence and reasoning extensively.
+</what_not_to_change>
+
+<what_can_evolve>
+## What Can Evolve
+
+These can and should improve:
+
+- **Prompt clarity** — Better explanations, clearer examples
+- **Detection keywords** — New domains may have new keywords
+- **Material presets** — New surface treatments (neumorphism, etc.)
+- **Animation values** — Spring stiffness can be tuned
+- **Grit signatures** — New aesthetic profiles
+- **Tooling** — Installation, diagnostics, taste analysis
+</what_can_evolve>
+
+<testing_changes>
+## Testing Changes
+
+Before committing changes to rules:
+
+1. **Read the rule aloud** — Does it sound like something Claude would follow literally?
+2. **Check XML structure** — Are tags properly nested and closed?
+3. **Verify examples** — Do they show input → detection → output clearly?
+4. **Test with /craft** — Does the analysis box show correct physics?
+5. **Check taste logging** — Do signals get recorded properly?
+</testing_changes>
+
+<commit_conventions>
+## Commit Conventions
+
+```
+feat(physics): add audio physics layer
+fix(detection): handle "purchase" as financial keyword
+refactor(prompts): improve XML structure for Claude 4.x
+docs(README): update philosophy section
+```
+
+Always include `Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>` when Claude contributes.
+</commit_conventions>
