@@ -8,26 +8,21 @@ while :; do cat CRAFT.md | claude-code ; done
 
 ---
 
-## Context
+## Deterministic Stack
 
-Read and apply every loop:
-- `.claude/rules/00-sigil-core.md` — Priority hierarchy
-- `.claude/rules/01-sigil-physics.md` — Behavioral physics
-- `.claude/rules/02-sigil-detection.md` — Effect detection
-- `.claude/rules/05-sigil-animation.md` — Animation physics
-- `.claude/rules/07-sigil-material.md` — Material physics
-- `.claude/rules/08-sigil-lexicon.md` — Keyword lookups
+Load every loop (specs):
+- `.claude/rules/sigil-*` — Physics laws
 - `grimoires/sigil/taste.md` — Accumulated preferences
 
-Read the **Learnings** section below and apply any patterns before generating.
+Read **Signs** and **Learnings** below before generating.
 
 ---
 
 ## Queue
 
 <!--
-List components to build. Ralph picks the most important ONE per loop.
-Format: description with effect, feel, and material hints
+Components to build. Pick ONE most important per loop.
+Format: description — effect hint, feel hint, material hint
 -->
 
 - [ ] claim rewards button — trustworthy, deliberate, elevated
@@ -38,99 +33,158 @@ Format: description with effect, feel, and material hints
 
 ## Task
 
-1. Study the **Queue** above and choose the most important unchecked item
-2. Run `/craft` for that ONE component with the full description
-3. After generation, verify against **Acceptance** criteria below
-4. If acceptance passes: mark item complete `[x]` and commit
-5. If acceptance fails: add learning to **Learnings** section, loop continues
-6. If you notice a pattern 3+ times in Learnings: note it for `/inscribe`
+1. Study **Queue**, choose most important unchecked item
+2. Run `/craft` for that ONE component
+3. Verify against **Backpressure** criteria
+4. Pass → mark `[x]`, commit, push
+5. Fail → add to **Learnings**, loop continues
+6. Pattern 3+ times → note "Ready for /inscribe"
 
-**IMPORTANT:** One component per loop. Do not batch. Trust eventual consistency.
+**One component per loop. Trust eventual consistency.**
 
 ---
 
-## Acceptance
+## Signs
 
-Before marking complete, verify:
+<!--
+Signs are instructions to prevent known failures.
+When Ralph makes a mistake, add a sign here.
+"SLIDE DOWN, DON'T JUMP, LOOK AROUND"
+-->
+
+### Detection
+<!-- e.g., "harvest" is financial, not standard -->
+
+### Timing
+<!-- e.g., financial should be 600ms not 800ms -->
+
+### Animation
+<!-- e.g., prefer springs over ease-out -->
+
+### Material
+<!-- e.g., always use 8px radius -->
+
+### Codebase
+<!-- e.g., use motion.div not framer-motion -->
+
+---
+
+## Backpressure
+
+Before marking complete, ALL must pass:
 
 - [ ] Physics analysis shown before generation
-- [ ] Effect correctly detected (financial/destructive/standard/local)
-- [ ] Timing matches effect (800ms financial, 200ms standard, 100ms local)
-- [ ] Animation matches frequency (springs for interactive, ease for deliberate)
-- [ ] Material matches feel adjectives
-- [ ] Protected capabilities verified (cancel visible, 44px targets)
-- [ ] Matches existing codebase conventions
+- [ ] Effect correctly detected
+- [ ] Timing matches effect
+- [ ] Animation matches frequency
+- [ ] Material matches feel
+- [ ] Protected capabilities verified
+- [ ] Matches codebase conventions
 - [ ] No TypeScript errors
-- [ ] Component renders without runtime errors
+- [ ] Renders without errors
 
-If ANY fail, do NOT mark complete. Add observation to Learnings and loop.
+**ANY failure = do NOT mark complete. Add to Learnings. Loop.**
 
 ---
 
 ## Learnings
 
 <!--
-Update this section when something goes wrong.
-Format: YYYY-MM-DD: observation → what it should be
-These accumulate and inform future loops.
-When a pattern appears 3+ times, run /inscribe to make it permanent.
+Temporary observations. These inform next loops.
+Format: YYYY-MM-DD: what went wrong → what it should be
+When pattern appears 3+ times: "Ready for /inscribe"
 -->
 
-### Keywords
-<!-- Wrong effect detected? -->
+---
 
-### Timing
-<!-- Wrong duration? -->
+## HOTL Guide
 
-### Animation
-<!-- Wrong easing/spring? -->
+You (the human) watch the loop and tune:
 
-### Material
-<!-- Wrong surface treatment? -->
+```
+WATCH   → Observe /craft output for physics mistakes
+TUNE    → Add sign when Ralph fails (prevents future failure)
+THROW   → Delete Learnings when it goes off rails, re-loop
+INSCRIBE → Run /inscribe when patterns solidify
+```
 
-### Codebase
-<!-- Wrong patterns/conventions? -->
+Design can't be spec'd upfront like architecture. Feel emerges through iteration.
+You know "trustworthy" when you see it. Your job is adding signs until Ralph sees it too.
 
 ---
 
 ## Self-Improvement
 
-When you learn something that should persist:
+When you (Claude) learn something:
 
-1. **Temporary learning** → Add to Learnings section above
-2. **Pattern appears 3+ times** → Note: "Ready for /inscribe"
-3. **After session** → Operator runs `/inscribe` to make marks permanent
-
-The sigil improves through use. Each loop that corrects a mistake makes future loops better.
-
----
-
-## Example Session
+1. **Temporary** → Add to Learnings
+2. **3+ times** → Note "Ready for /inscribe"
+3. **Codebase** → Update this file with command/pattern learnings
 
 ```
-Loop 1: /craft "claim rewards button — trustworthy, deliberate, elevated"
-        → Generated with 800ms, but user prefers 600ms
-        → Add to Learnings: "2026-01-13: financial timing 800ms → 600ms preferred"
-        → Do NOT mark complete, loop continues
-
-Loop 2: /craft "claim rewards button — trustworthy, deliberate, elevated"
-        → Read Learnings, apply 600ms
-        → Acceptance passes
-        → Mark [x] complete, git commit
-
-Loop 3: /craft "like button for posts — snappy, playful, minimal"
-        → Generated correctly first try (learned from taste.md)
-        → Mark [x] complete, git commit
-
-Loop 4: All items complete, loop ends or add more to Queue
+If you run commands multiple times before finding the correct one,
+update this file with the correct command for future loops.
 ```
 
 ---
 
-## When Done
+## Loop Lifecycle
 
-After completing the Queue:
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   Loop N                                                        │
+│   ───────                                                       │
+│   1. Load deterministic stack (specs, taste, signs)             │
+│   2. Read Learnings from previous loops                         │
+│   3. Pick ONE item from Queue                                   │
+│   4. /craft that component                                      │
+│   5. Backpressure check                                         │
+│      ├─ Pass → mark [x], commit, push                           │
+│      └─ Fail → add Learning, exit (loop restarts)               │
+│   6. Process exits                                              │
+│                                                                 │
+│   Loop N+1                                                      │
+│   ─────────                                                     │
+│   Fresh context, but reads updated CRAFT.md                     │
+│   Sees new Learnings, applies them                              │
+│   Eventually: all Queue items [x], or patterns ready            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## When Queue Empty
+
 1. Review Learnings section
-2. If patterns appear 3+ times, run `/inscribe` to make them permanent
-3. Clear completed items or archive CRAFT.md
+2. If patterns solidified → `/inscribe`
+3. Clear or archive this CRAFT.md
 4. The sigil now carries your marks forward
+
+---
+
+## Example
+
+```
+Loop 1: /craft "claim button"
+        → 800ms generated, feels too slow
+        → HOTL adds sign: "financial timing: 600ms not 800ms"
+        → Fail backpressure, add Learning, loop
+
+Loop 2: /craft "claim button"
+        → Reads sign, applies 600ms
+        → Pass backpressure
+        → Mark [x], commit, push
+
+Loop 3: /craft "like button"
+        → Correct first try (taste.md had pattern)
+        → Mark [x], commit, push
+
+Loop 4: Queue empty
+        → 3 timing adjustments in Learnings
+        → HOTL runs /inscribe
+        → 600ms becomes permanent mark
+```
+
+The sigil improves through use.

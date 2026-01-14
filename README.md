@@ -270,47 +270,68 @@ For continuous generation, Sigil supports [Ralph-style loops](https://ghuntley.c
 while :; do cat CRAFT.md | claude-code ; done
 ```
 
-**Key principle:** One thing per loop. Not a batch. Trust eventual consistency.
+**Key principle:** One thing per loop. Trust eventual consistency.
 
-**CRAFT.md** — your prompt template:
+**CRAFT.md structure:**
 ```markdown
-## Queue
-- [ ] claim rewards button — trustworthy, deliberate, elevated
-- [ ] like button for posts — snappy, playful, minimal
+## Queue           ← What to build (pick ONE per loop)
+## Signs           ← Instructions to prevent known failures
+## Backpressure    ← Acceptance criteria (rejects bad generations)
+## Learnings       ← Temporary observations (inform next loops)
+```
 
-## Task
-1. Pick most important unchecked item from Queue
-2. Run /craft for that ONE component
-3. Verify against Acceptance criteria
-4. Pass → mark [x] complete, commit
-5. Fail → add to Learnings, loop continues
+**The HOTL (Human On The Loop):**
 
-## Learnings
+Design can't be fully spec'd upfront like architecture. Feel emerges through iteration. Your job:
+
+```
+WATCH    → Observe /craft output for physics mistakes
+TUNE     → Add sign when Ralph fails ("financial timing: 600ms")
+THROW    → Delete Learnings when it goes off rails, re-loop
+INSCRIBE → Run /inscribe when patterns solidify (3+ times)
+```
+
+**Signs prevent failures:**
+
+When Ralph makes a mistake, you add a sign — like putting "SLIDE DOWN, DON'T JUMP" next to the slide. Future loops read the signs.
+
+```markdown
+## Signs
 ### Timing
-- 2026-01-13: financial 800ms → 600ms preferred
+- financial should be 600ms not 800ms
+
+### Animation
+- prefer springs over ease-out for interactive
 ```
 
 **The Cycle:**
 ```
-Loop 1: /craft "claim button" → wrong timing → add Learning → loop
-Loop 2: /craft "claim button" → reads Learning → correct → mark [x] → commit
-Loop 3: /craft "like button" → correct first try → mark [x] → commit
-Loop 4: Queue empty → run /inscribe → marks become permanent
+Loop 1: /craft "claim button" → 800ms feels slow
+        → HOTL adds sign: "financial: 600ms"
+        → Fail backpressure, loop
+
+Loop 2: /craft "claim button" → reads sign, uses 600ms
+        → Pass backpressure
+        → Mark [x], commit
+
+Loop 3: /craft "like button" → correct (taste.md)
+        → Mark [x], commit
+
+Loop 4: Queue empty → /inscribe → 600ms becomes permanent
 ```
 
-**`/inscribe`** promotes learnings to Sigil's rules:
+**`/inscribe`** promotes learnings to rules:
 ```
 /inscribe
 
 Found 3 learnings to inscribe:
-• Add "harvest" to financial keywords? (y/n)
 • Adjust financial timing 800ms → 600ms? (y/n)
-• Set default radius to 8px? (y/n)
+• Add "harvest" to financial keywords? (y/n)
 
 The sigil is inscribed. Future /craft carries these marks forward.
 ```
 
-Each failed loop teaches. Each `/inscribe` makes the teaching permanent. Eventually, the sigil generates exactly what you want without correction.
+Each failed loop teaches. Each `/inscribe` makes the teaching permanent.
 
 ---
 
@@ -344,11 +365,54 @@ Sigil enforces these. You can override with justification.
 
 ---
 
+## Loa Integration
+
+Sigil is designed to work with [Loa](https://github.com/0xHoneyJar/loa) and will be available as a construct on [Loa Constructs](https://constructs.network).
+
+**The division of labor:**
+
+| Loa (Architecture) | Sigil (Physics) |
+|-------------------|-----------------|
+| "What to build" | "How it feels" |
+| PRD → SDD → Tasks | Distill → Craft → Inscribe |
+| Plan once, execute | Loop until right |
+| Deterministic | Iterative |
+
+**The handoff:**
+
+```
+Loa workflow                     Sigil takes over
+────────────────────────────────────────────────────
+/plan-and-analyze → PRD
+/architect → SDD
+/sprint-plan → Tasks
+                    ↓
+              "implement checkout UI"
+                    ↓
+              /distill → Queue
+                    ↓
+              Ralph loop → /craft × N
+                    ↓
+              /inscribe → taste persists
+```
+
+**Why the split:**
+
+Architecture can be spec'd upfront — data models, APIs, dependencies. These are deterministic.
+
+Feel cannot be fully spec'd. You know "trustworthy" when you see it, but you can't describe it completely in advance. Feel emerges through iteration — loop, observe, tune, loop.
+
+Loa plans structure. Sigil tunes feel. They meet at the task/component boundary.
+
+---
+
 ## Links
 
 - [GitHub](https://github.com/0xHoneyJar/sigil)
 - [Issues](https://github.com/0xHoneyJar/sigil/issues)
+- [Loa Framework](https://github.com/0xHoneyJar/loa)
+- [Loa Constructs](https://constructs.network)
 
 ---
 
-*v12.6.0*
+*v12.7.0*
