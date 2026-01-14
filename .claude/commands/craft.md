@@ -1,86 +1,170 @@
 ---
 name: "craft"
-version: "11.1.0"
+version: "12.0.0"
 description: |
   Generate UI components with design physics.
-  Infers effect type from keywords and applies correct physics automatically.
+  Shows physics analysis before generating, like RAMS shows accessibility issues.
 
 arguments:
   - name: "description"
     type: "string"
     required: true
-    description: "What to build (e.g., 'claim button', 'like button', 'dark mode toggle')"
-    examples: ["claim button", "like button for posts", "delete with undo", "dark mode toggle"]
-
-agent: "crafting-components"
-agent_path: "skills/crafting-components/"
+    description: "What to build"
+    examples:
+      - "claim button"
+      - "like button for posts"
+      - "delete with undo"
+      - "dark mode toggle"
 
 context_files:
-  - path: "grimoires/sigil/constitution.yaml"
-    required: false
-    purpose: "Physics definitions and keywords"
-  - path: "examples/components/"
-    required: false
-    purpose: "Reference implementations"
+  - path: ".claude/rules/01-sigil-physics.md"
+    required: true
+    purpose: "Physics table"
+  - path: ".claude/rules/02-sigil-detection.md"
+    required: true
+    purpose: "Effect detection rules"
+  - path: ".claude/rules/03-sigil-patterns.md"
+    required: true
+    purpose: "Golden pattern examples"
+  - path: ".claude/rules/04-sigil-protected.md"
+    required: true
+    purpose: "Protected capabilities"
 
-mode:
-  default: "foreground"
+outputs:
+  - path: "src/components/$COMPONENT_NAME.tsx"
+    type: "file"
+    description: "Generated component with correct physics"
+
+no_questions:
+  - "What sync strategy do you want?"
+  - "What timing should I use?"
+  - "Do you want optimistic or pessimistic?"
+  - "Should I add confirmation?"
+  - "What animation library?"
+  - "What data fetching library?"
+
+workflow_next: "garden"
 ---
 
 # /craft
 
-Generate design-aware UI components with correct physics.
+Generate UI components with correct design physics.
+
+## How It Works
+
+1. **You describe** what you want in natural language
+2. **Sigil analyzes** and shows physics reasoning
+3. **You confirm** or correct the analysis
+4. **Sigil generates** the component
 
 ## Invocation
 
-```
-/craft "claim button"
-/craft "like button for posts"
+```bash
+/craft "claim button for rewards pool"
+/craft "like button"
 /craft "delete with undo"
 /craft "dark mode toggle"
 ```
 
-## Agent
+## Physics Analysis Output
 
-Launches `crafting-components` from `skills/crafting-components/`.
+Before generating, you'll see:
 
-See: `skills/crafting-components/SKILL.md` for full workflow details.
+```
+┌─ Physics Analysis ─────────────────────────────────────┐
+│                                                        │
+│  Component:    RewardsClaimButton                      │
+│  Effect:       Financial mutation                      │
+│  Detected by:  "claim" keyword                         │
+│                                                        │
+│  ┌─ Applied Physics ────────────────────────────────┐  │
+│  │  Sync:         Pessimistic (server confirms)     │  │
+│  │  Timing:       800ms deliberate                  │  │
+│  │  Confirmation: Required (two-phase)              │  │
+│  │  Animation:    Deliberate ease-out               │  │
+│  └──────────────────────────────────────────────────┘  │
+│                                                        │
+│  Template:     ClaimButton from 03-sigil-patterns.md   │
+│                                                        │
+│  Protected capabilities verified:                      │
+│  ✓ Cancel button present                              │
+│  ✓ Balance display available                          │
+│  ✓ Error recovery path exists                         │
+│                                                        │
+└────────────────────────────────────────────────────────┘
 
-## Physics Inference
+Proceed with these physics? (yes / or describe what's different)
+```
+
+## Correction Flow
+
+If the analysis is wrong:
+
+```
+You: "actually this is just a local UI state toggle, not financial"
+
+┌─ Physics Analysis (Corrected) ─────────────────────────┐
+│                                                        │
+│  Component:    RewardsToggle                           │
+│  Effect:       Local state (corrected from financial)  │
+│  Reason:       User override                           │
+│                                                        │
+│  ┌─ Applied Physics ────────────────────────────────┐  │
+│  │  Sync:         Immediate (no server)             │  │
+│  │  Timing:       100ms instant                     │  │
+│  │  Confirmation: None                              │  │
+│  │  Animation:    Snappy spring                     │  │
+│  └──────────────────────────────────────────────────┘  │
+│                                                        │
+└────────────────────────────────────────────────────────┘
+```
+
+## Detection Rules
 
 | Keywords | Effect | Sync | Timing |
 |----------|--------|------|--------|
-| claim, deposit, withdraw, transfer | Financial | Pessimistic | 800ms |
-| delete, remove, destroy | Destructive | Pessimistic | 600ms |
-| save, update, like, follow | Standard | Optimistic | 200ms |
-| toggle, switch, expand | Local state | Immediate | 100ms |
+| claim, deposit, withdraw, transfer, swap | Financial | Pessimistic | 800ms |
+| delete, remove, destroy, revoke | Destructive | Pessimistic | 600ms |
+| archive, trash, soft-delete | Soft Delete | Optimistic | 200ms |
+| save, update, like, follow, create | Standard | Optimistic | 200ms |
+| toggle, switch, expand, collapse | Local State | Immediate | 100ms |
 
-## Examples
+**Type Override**: If props include `Currency`, `Money`, `Balance`, `Wei` → always Financial physics.
+
+## Error Messages
+
+If detection fails:
 
 ```
-/craft "trustworthy claim button"
-→ Financial: pessimistic sync, 800ms, two-phase confirmation
-
-/craft "like button"
-→ Standard: optimistic sync, 200ms, no confirmation
-
-/craft "dark mode toggle"
-→ Local: immediate, 100ms spring animation
+┌─ Physics Analysis ─────────────────────────────────────┐
+│                                                        │
+│  ⚠ Could not detect effect from "fancy button"        │
+│                                                        │
+│  Help me understand:                                   │
+│  • What happens when clicked?                          │
+│  • Does it call a server?                              │
+│  • Can it be undone?                                   │
+│  • Does it involve money/tokens?                       │
+│                                                        │
+└────────────────────────────────────────────────────────┘
 ```
 
-## Arguments
+## What Sigil Never Asks
 
-| Argument | Description | Required |
-|----------|-------------|----------|
-| `description` | Natural language description of component | Yes |
+- "What sync strategy?" → Inferred from effect
+- "What timing?" → Determined by physics table
+- "What animation library?" → Detected from codebase
+- "What confirmation style?" → Determined by effect type
 
-## Outputs
+## Next Step
 
-Generated component code with:
-- Correct sync strategy (pessimistic/optimistic/immediate)
-- Appropriate timing and animations
-- Confirmation dialogs where required
-- Error handling and loading states
+After generating, consider running:
+
+```bash
+/garden
+```
+
+This checks if your new component is becoming canonical (Gold tier = 10+ imports, 14+ days stable).
 
 <user-request>
 $ARGUMENTS
