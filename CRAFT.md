@@ -8,40 +8,27 @@ while :; do cat CRAFT.md | claude-code ; done
 
 ---
 
-## Context
+## Instructions
 
-Read and apply:
-- `.claude/rules/00-sigil-core.md` — Priority hierarchy
-- `.claude/rules/01-sigil-physics.md` — Behavioral physics
-- `.claude/rules/02-sigil-detection.md` — Effect detection
-- `.claude/rules/05-sigil-animation.md` — Animation physics
-- `.claude/rules/07-sigil-material.md` — Material physics
-- `.claude/rules/08-sigil-lexicon.md` — Keyword lookups
-- `grimoires/sigil/taste.md` — Accumulated preferences
+For each component listed below, run `/craft` with the full description.
+Apply any learnings from the Learnings section below.
 
 ---
 
-## Task
+## Components
 
-Generate the following components:
+<!--
+Format: /craft "description with effect, feel, and material hints"
+The more specific, the better the physics detection.
+-->
 
-### 1. Toast
-```
-Description: [what it does]
-Effect hint: [financial/destructive/standard/local]
-Feel: [adjectives - trustworthy, snappy, playful, etc.]
-Material: [surface hints - glass, elevated, minimal, etc.]
-```
+/craft "claim rewards button for staking pool — trustworthy, deliberate, elevated"
 
-### 2. [Component Name]
-```
-Description: [what it does]
-Effect hint: [financial/destructive/standard/local]
-Feel: [adjectives]
-Material: [surface hints]
-```
+/craft "like button for posts — snappy, playful, minimal"
 
-<!-- Add more components as needed -->
+/craft "dark mode toggle — instant, smooth, minimal"
+
+<!-- Add more /craft commands as needed -->
 
 ---
 
@@ -87,44 +74,28 @@ Format: YYYY-MM-DD: observation → correction
 
 ---
 
-## Example (delete after customizing)
+## Example Learnings
 
-### 1. ClaimRewardsButton
-```
-Description: Claims staking rewards from a DeFi pool
-Effect hint: financial
-Feel: trustworthy, deliberate
-Material: elevated, solid
-```
+After a few iterations, your learnings might look like:
 
-### 2. QuickLikeButton
-```
-Description: Likes a post in the feed
-Effect hint: standard
-Feel: snappy, playful
-Material: minimal, flat
-```
+```markdown
+### Keywords
+- 2026-01-13: "harvest" should be financial
+- 2026-01-13: "archive" correctly detected as soft-delete ✓
 
-### 3. ThemeSwitch
-```
-Description: Toggles dark/light mode
-Effect hint: local
-Feel: instant, smooth
-Material: minimal
-```
+### Timing
+- 2026-01-13: Prefer 600ms over 800ms for financial (faster brand)
 
-### Learnings (example)
+### Animation
+- 2026-01-13: Using spring(500,25) everywhere — bouncier feel
 
-#### Keywords
-- 2026-01-13: "claim" detected as financial ✓
-- 2026-01-13: "like" detected as standard ✓
-
-#### Timing
-- 2026-01-13: Reduced financial timing to 600ms (team preference)
-
-#### Animation
-- 2026-01-13: Using spring(500,25) instead of spring(500,30) — bouncier feel
-
-#### Material
+### Material
 - 2026-01-13: All buttons use 8px radius (design system)
 - 2026-01-13: No shadows on standard buttons (minimal aesthetic)
+
+### Codebase
+- 2026-01-13: Use sonner for toasts, not react-hot-toast
+- 2026-01-13: Mutations use @tanstack/react-query
+```
+
+Run `/inscribe` to promote these learnings into Sigil's rules.
