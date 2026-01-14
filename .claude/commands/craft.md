@@ -1,9 +1,10 @@
 ---
 name: "craft"
-version: "12.2.0"
+version: "12.3.0"
 description: |
   Generate UI components with design physics.
   Shows physics analysis before generating, like RAMS shows accessibility issues.
+  Learns from usage via taste accumulation.
 
 arguments:
   - name: "description"
@@ -32,6 +33,12 @@ context_files:
   - path: ".claude/rules/05-sigil-animation.md"
     required: true
     purpose: "Animation physics - easing, timing by frequency, springs"
+  - path: ".claude/rules/06-sigil-taste.md"
+    required: true
+    purpose: "Taste accumulation - learn from accept/modify/reject"
+  - path: "grimoires/sigil/taste.md"
+    required: false
+    purpose: "Accumulated taste signals (read for patterns)"
 
 outputs:
   - path: "src/components/$COMPONENT_NAME.tsx"
@@ -49,10 +56,20 @@ Generate UI components with correct design physics.
 
 Execute these steps in order:
 
-### Step 1: Discover Codebase Conventions
+### Step 1: Discover Context
 
-Before generating anything, check what libraries exist:
+Before generating anything:
 
+**1a. Read taste log** (if exists):
+```
+Read grimoires/sigil/taste.md
+```
+Look for patterns (3+ occurrences = apply automatically):
+- Timing adjustments (user prefers faster/slower?)
+- Animation preferences (springs vs easing?)
+- Structure preferences (always adds loading states?)
+
+**1b. Check libraries**:
 ```bash
 # Check animation library
 grep -E "framer-motion|react-spring|@emotion" package.json
@@ -64,7 +81,7 @@ grep -E "@tanstack/react-query|swr|apollo" package.json
 grep -E "sonner|react-hot-toast|react-toastify" package.json
 ```
 
-Read one existing component to understand:
+**1c. Read existing component** to understand:
 - Import style (named vs default, path aliases)
 - File structure (single file vs folder)
 - Naming conventions (PascalCase, kebab-case files)
@@ -140,6 +157,38 @@ Generate code that:
 After generating:
 ```
 Component generated. Run /garden to check if it's becoming canonical.
+```
+
+### Step 7: Log Taste Signal
+
+After user responds to the generated code, append to `grimoires/sigil/taste.md`:
+
+**If user accepts** (says "yes", uses code, moves on):
+```markdown
+## [YYYY-MM-DD HH:MM] | ACCEPT
+Component: [name]
+Effect: [type]
+Physics: [sync, timing, animation]
+---
+```
+
+**If user modifies** (edits the generated file):
+```markdown
+## [YYYY-MM-DD HH:MM] | MODIFY
+Component: [name]
+Effect: [type]
+Physics: [what was generated]
+Changed: [what user changed]
+Learning: [infer the preference - timing? animation? structure?]
+---
+```
+
+**If user rejects** (says "no", "wrong", deletes, rewrites):
+```markdown
+## [YYYY-MM-DD HH:MM] | REJECT
+Component: [name]
+Reason: [user feedback if given]
+---
 ```
 
 ---
