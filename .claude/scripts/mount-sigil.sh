@@ -141,7 +141,7 @@ install_rules() {
         if [[ "$filename" =~ ^[0-9]{2}- ]] || [[ "$filename" =~ ^sigil- ]]; then
           cp "$rule_file" ".claude/rules/$filename"
           log "  Installed $filename"
-          ((count++))
+          count=$((count + 1))
         fi
       fi
     done
