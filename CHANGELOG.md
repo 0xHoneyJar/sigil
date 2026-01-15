@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-01-14 — "Session Health"
+
+### Summary
+
+v1.3.0 adds **session health monitoring** to `/craft`, detecting context drift during long sessions and recommending session clearing when physics alignment degrades.
+
+### Added
+
+- **Session drift detection** in `/craft` v1.3.0 — Monitors task transitions, reject ratio, time since accept, and effect type switches
+- **Drift thresholds** — Yellow (warning indicator) and Red (blocks with recommendation to `/clear`)
+- **Session health indicator** in analysis box — Shows `Session: ⚠ 6 targets | 25% rejects` when elevated
+- **SESSION_OVERRIDE logging** — Tracks when users continue past drift warnings
+
+### Fixed
+
+- **NVM path discovery** in `check-agent-browser.sh` — Now finds agent-browser in NVM installations
+- **Symlink detection** — Fixed `find` command to detect symlinked binaries (`-type l`)
+- **agent-browser-api.sh** — Added `_ab_find_binary()` for consistent NVM support
+
+### Technical
+
+Based on analysis of Claude Code system prompt best practices:
+- TodoWrite as external state prevents context drift
+- Immediate completion marking maintains alignment
+- Session boundaries provide natural checkpoints
+
+---
+
 ## [1.0.0] - 2025-01-14 — "SemVer Reset"
 
 ### Summary

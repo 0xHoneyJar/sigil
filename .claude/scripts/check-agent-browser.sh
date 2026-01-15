@@ -20,21 +20,66 @@ if [[ "${1:-}" == "--quiet" ]]; then
     QUIET=true
 fi
 
-# Check if agent-browser CLI is available
-if command -v agent-browser &> /dev/null; then
-    export LOA_AGENT_BROWSER_AVAILABLE=1
+# Find agent-browser binary
+# Check PATH first, then common NVM locations
+find_agent_browser() {
+    # Check if in PATH
+    if command -v agent-browser &> /dev/null; then
+        command -v agent-browser
+        return 0
+    fi
 
-    # Check if browser is installed (has chromium)
-    if agent-browser --version &> /dev/null; then
+    # Check NVM installations (common locations)
+    local nvm_dirs=(
+        "$HOME/.nvm/versions/node"
+        "$HOME/.local/share/nvm"
+        "/usr/local/nvm/versions/node"
+    )
+
+    for nvm_dir in "${nvm_dirs[@]}"; do
+        if [[ -d "$nvm_dir" ]]; then
+            # Find most recent node version with agent-browser (may be symlink)
+            local found=$(find "$nvm_dir" -maxdepth 3 -name "agent-browser" \( -type f -o -type l \) 2>/dev/null | head -1)
+            if [[ -n "$found" && -x "$found" ]]; then
+                echo "$found"
+                return 0
+            fi
+        fi
+    done
+
+    # Check common global npm locations
+    local npm_dirs=(
+        "/usr/local/bin/agent-browser"
+        "$HOME/.npm-global/bin/agent-browser"
+        "/opt/homebrew/bin/agent-browser"
+    )
+
+    for bin in "${npm_dirs[@]}"; do
+        if [[ -x "$bin" ]]; then
+            echo "$bin"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+AGENT_BROWSER_BIN=$(find_agent_browser) || AGENT_BROWSER_BIN=""
+
+if [[ -n "$AGENT_BROWSER_BIN" ]]; then
+    export LOA_AGENT_BROWSER_AVAILABLE=1
+    export LOA_AGENT_BROWSER_BIN="$AGENT_BROWSER_BIN"
+
+    # Verify it runs (agent-browser doesn't have --version, so just check help works)
+    if "$AGENT_BROWSER_BIN" --help &> /dev/null; then
         if [[ "${QUIET}" == false ]]; then
-            VERSION=$(agent-browser --version 2>/dev/null || echo "unknown")
-            echo "INSTALLED|${VERSION}"
+            echo "INSTALLED|$AGENT_BROWSER_BIN"
         else
             echo "INSTALLED"
         fi
         exit 0
     else
-        # CLI exists but may need browser install
+        # CLI exists but something is wrong
         if [[ "${QUIET}" == false ]]; then
             echo "NEEDS_SETUP|agent-browser install"
         else

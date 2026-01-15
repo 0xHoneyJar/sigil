@@ -31,9 +31,46 @@ mkdir -p "${AB_OUTPUT_DIR}" 2>/dev/null || true
 # INTERNAL HELPERS
 # ============================================================================
 
+# Find agent-browser binary (handles NVM installations)
+_ab_find_binary() {
+    # Check if already cached
+    if [[ -n "${LOA_AGENT_BROWSER_BIN:-}" && -x "${LOA_AGENT_BROWSER_BIN}" ]]; then
+        echo "${LOA_AGENT_BROWSER_BIN}"
+        return 0
+    fi
+
+    # Check if in PATH
+    if command -v agent-browser &> /dev/null; then
+        echo "agent-browser"
+        return 0
+    fi
+
+    # Check NVM installations
+    local nvm_dirs=(
+        "$HOME/.nvm/versions/node"
+        "$HOME/.local/share/nvm"
+        "/usr/local/nvm/versions/node"
+    )
+
+    for nvm_dir in "${nvm_dirs[@]}"; do
+        if [[ -d "$nvm_dir" ]]; then
+            local found=$(find "$nvm_dir" -maxdepth 3 -name "agent-browser" \( -type f -o -type l \) 2>/dev/null | head -1)
+            if [[ -n "$found" && -x "$found" ]]; then
+                echo "$found"
+                return 0
+            fi
+        fi
+    done
+
+    return 1
+}
+
+# Cache the binary path
+AB_BIN=$(_ab_find_binary 2>/dev/null) || AB_BIN=""
+
 _ab_check() {
     # Check if agent-browser is available
-    if ! command -v agent-browser &> /dev/null; then
+    if [[ -z "${AB_BIN}" ]]; then
         echo "Error: agent-browser not installed. Run: npm install -g agent-browser && agent-browser install" >&2
         return 1
     fi
@@ -43,13 +80,13 @@ _ab_exec() {
     # Execute agent-browser command with session
     # All args are passed through
     _ab_check || return 1
-    agent-browser "$@" --session "${AB_SESSION}"
+    "${AB_BIN}" "$@" --session "${AB_SESSION}"
 }
 
 _ab_exec_json() {
     # Execute agent-browser command with JSON output
     _ab_check || return 1
-    agent-browser "$@" --session "${AB_SESSION}" --json
+    "${AB_BIN}" "$@" --session "${AB_SESSION}" --json
 }
 
 # ============================================================================

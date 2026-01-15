@@ -39,7 +39,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-**Current release:** v1.0.0 (stable)
+**Current release:** v1.3.0 (stable)
 
 ### 2. Command Versions (YAML Frontmatter)
 
@@ -60,7 +60,7 @@ All Sigil-native commands should share the same MAJOR version as the framework:
 
 | Command | Version | Notes |
 |---------|---------|-------|
-| `/craft` | 1.0.0 | Core command |
+| `/craft` | 1.3.0 | Core command (session health added) |
 | `/ward` | 1.0.0 | Physics audit |
 | `/garden` | 1.0.0 | Component authority |
 | `/style` | 1.0.0 | Material physics |

@@ -1,6 +1,6 @@
 ---
 name: "craft"
-version: "1.0.0"
+version: "1.3.0"
 description: |
   Apply design physics to any UX-affecting change.
   Three layers: Behavioral + Animation + Material = Feel.
@@ -200,6 +200,81 @@ Auto-switch to compact after 5 consecutive ACCEPT signals.
 Reset to verbose after any REJECT signal.
 </output_modes>
 
+<session_health>
+## Session Health Monitoring
+
+Long sessions can accumulate context drift — bouncing between different targets, multiple rejections, or effect type mixing degrades physics alignment.
+
+### Drift Indicators
+
+Track these indicators by parsing `grimoires/sigil/taste.md` for the current session:
+
+| Indicator | Yellow | Red | How to Detect |
+|-----------|--------|-----|---------------|
+| Task transitions | 5 | 8 | Count distinct `Target:` values in session |
+| REJECT ratio | 20% | 40% | REJECTs / total signals in session |
+| Time since ACCEPT | 15 min | 30 min | Timestamp of last ACCEPT signal |
+| Effect type switches | 3 | 5 | Count distinct `Effect:` values in session |
+
+### Session Boundary
+
+A "session" starts when:
+- First `/craft` after `/clear`
+- First `/craft` of the day (date change in taste.md)
+- Explicit `## SESSION START` marker in taste.md
+
+### Behavior at Thresholds
+
+**At Yellow threshold**:
+- Show subtle indicator in analysis box: `│  Session:    ⚠ [indicator] elevated`
+- Continue normally
+
+**At Red threshold**:
+- Show warning before analysis:
+  ```
+  ⚠ Session drift detected ([specific indicator]).
+  Physics alignment may be degraded. Consider `/clear` to start fresh.
+  Continue anyway? (y/n)
+  ```
+- If user continues: proceed with analysis
+- Log drift warning to taste.md
+
+### Analysis Box with Session Health
+
+In verbose mode, add session line when indicators are elevated:
+
+```
+┌─ Craft Analysis ───────────────────────────────────────┐
+│                                                        │
+│  Target:       [what's being crafted]                  │
+│  Craft Type:   [generate/refine/configure/pattern]    │
+│  Effect:       [effect type]                           │
+│  Session:      ⚠ 6 targets | 25% rejects              │
+│                                                        │
+│  ...                                                   │
+└────────────────────────────────────────────────────────┘
+```
+
+In compact mode, prepend warning if at red:
+```
+⚠ Session drift (8 targets). Consider /clear.
+
+[Target] | [Effect] | [Craft Type]
+...
+```
+
+### Override
+
+User can override with "continue" or "y" at red threshold. Log the override:
+
+```markdown
+## [YYYY-MM-DD HH:MM] | SESSION_OVERRIDE
+Indicator: [what triggered red]
+User chose to continue despite drift warning.
+---
+```
+</session_health>
+
 <workflow>
 ## Workflow
 
@@ -208,15 +283,18 @@ Reset to verbose after any REJECT signal.
 
 Use TodoWrite to track this workflow:
 ```
-1. [ ] Discover context (libs, conventions, existing code)
-2. [ ] Detect craft type and effect
-3. [ ] Show physics analysis
-4. [ ] Get user confirmation
-5. [ ] Apply changes
-6. [ ] Collect feedback
-7. [ ] Log taste signal
+1. [ ] Check session health (drift indicators)
+2. [ ] Discover context (libs, conventions, existing code)
+3. [ ] Detect craft type and effect
+4. [ ] Show physics analysis
+5. [ ] Get user confirmation
+6. [ ] Apply changes
+7. [ ] Collect feedback
+8. [ ] Log taste signal
 ```
 Mark each in_progress then completed as you work.
+
+**Session health check first**: If drift is at red threshold, pause workflow and show warning before continuing.
 </step_0>
 
 <step_1>
@@ -238,7 +316,7 @@ Extract physics implications from frontmatter and content:
 - Skip explanatory copy in confirmations
 ```
 
-**1b. Read taste log** (if exists):
+**1b. Read taste log and check session health** (if exists):
 ```
 Read grimoires/sigil/taste.md
 ```
@@ -246,6 +324,13 @@ Look for:
 - Patterns with 3+ occurrences (apply automatically)
 - `output_mode` preference (compact vs verbose)
 - Timing/animation/material overrides
+- **Session health indicators** (see `<session_health>` section):
+  - Count distinct targets in current session
+  - Calculate REJECT ratio
+  - Check time since last ACCEPT
+  - Count effect type switches
+
+If any indicator hits **red threshold**, show drift warning before proceeding.
 
 **1c. Scan moodboard for references** (if relevant):
 ```
@@ -763,6 +848,37 @@ Apply? (y/n)
 User: y
 
 [Applies change]
+```
+
+### Example 6: Session Drift Warning
+
+```
+User: /craft "notification badge"
+
+⚠ Session drift detected (9 distinct targets, 35% reject ratio).
+Physics alignment may be degraded. Consider `/clear` to start fresh.
+Continue anyway? (y/n)
+
+User: continue
+
+┌─ Craft Analysis ───────────────────────────────────────┐
+│  Target:       NotificationBadge (new)                 │
+│  Craft Type:   Generate                                │
+│  Effect:       Local State                             │
+│  Session:      ⚠ 9 targets | 35% rejects              │
+│                                                        │
+│  Behavioral    Immediate | 100ms | No confirmation     │
+│  Animation     spring(700, 35) | snappy                │
+│  Material      Elevated | Red accent | 4px radius      │
+│                                                        │
+│  Output:       src/components/NotificationBadge.tsx    │
+└────────────────────────────────────────────────────────┘
+
+Proceed? (y/n)
+
+User: y
+
+[Generates component, logs SESSION_OVERRIDE to taste.md]
 ```
 </examples>
 
