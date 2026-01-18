@@ -1,7 +1,7 @@
 {
   "$schema": "https://constructs.network/schemas/pack-manifest.json",
   "name": "sigil",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Design physics framework for AI-generated UI components. Three-layer physics: Behavioral + Animation + Material = Feel.",
   "longDescription": "Sigil teaches Claude how to generate UI components with correct design physics. It detects effect from keywords and types, applies timing/sync/confirmation based on physics rules, and accumulates user taste preferences without configuration.",
   "author": {

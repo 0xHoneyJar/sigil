@@ -402,4 +402,4 @@ Loa plans structure. Sigil tunes feel. They meet at the component boundary.
 
 ---
 
-*v2.0.0*
+*v2.1.0*
