@@ -1,8 +1,8 @@
 # Sigil
 
-[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.5.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-green.svg)](LICENSE.md)
-[![Release](https://img.shields.io/badge/release-Craft_States-purple.svg)](CHANGELOG.md#240---2026-01-19--craft-states)
+[![Release](https://img.shields.io/badge/release-Web3_Flow_Validation-purple.svg)](CHANGELOG.md#250---2026-01-20--web3-flow-validation)
 
 > *"A sigil holds the tension — creative intuition grounded in user truth. Move fast without losing sight of what actually matters."*
 
@@ -82,6 +82,11 @@ Most tools force you to choose. Sigil holds the tension.
 │   ┌─ Voice ─────────────────────────────────────────────────┐   │
 │   │  Copy, tone, microcopy, empty states                    │   │
 │   │  "Does it sound helpful or clinical?"                   │   │
+│   └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+│   ┌─ Data ──────────────────────────────────────────────────┐   │
+│   │  Source selection, staleness, refresh strategies        │   │
+│   │  "Is the data fresh enough for this moment?"            │   │
 │   └─────────────────────────────────────────────────────────┘   │
 │                                                                 │
 │                            ↓                                    │
@@ -334,6 +339,28 @@ How products speak.
 | Empty | Guiding, not sad | Opportunity + action | "No rewards yet. Stake to earn" |
 | Confirmation | Clear stakes | What will happen | "Claim 100 HONEY to wallet?" |
 
+### Data Physics
+
+How data sources are selected (Web3/blockchain contexts).
+
+| Source | When | Staleness | Use Case |
+|--------|------|-----------|----------|
+| On-chain (RPC) | Financial display, pre-tx validation | 0 blocks | Balance before withdraw |
+| Indexed (Envio) | Historical, lists, aggregations | Minutes OK | Transaction history |
+| Cached | Repeated reads, static data | Depends | Token metadata |
+
+**Decision tree:**
+- Displaying balance before transaction? → On-chain
+- Showing historical data? → Indexed
+- Pre-populating form? → Indexed (with refresh option)
+- Confirming action? → On-chain
+
+**Staleness signals:**
+```
+"Balance: 100 HONEY" (12 blocks ago)  ← Show staleness for financial
+"Last updated: 2m ago"                 ← Acceptable for history
+```
+
 ---
 
 ## Protected Capabilities
@@ -397,22 +424,30 @@ Loa executes, Sigil applies physics to UI work
 │   ├── inscribe.md           # Graduate patterns
 │   └── ...
 │
-├── rules/                    # Physics laws (auto-loaded)
+├── rules/                    # Physics laws (on-demand via RLM)
+│   ├── index.yaml            # RLM rule index
+│   ├── rlm-core-summary.md   # Always-loaded core (~1k tokens)
 │   ├── 00-sigil-core.md      # Priority, actions
 │   ├── 01-sigil-physics.md   # Behavioral
 │   ├── 02-sigil-detection.md # Effect detection
 │   ├── 03-sigil-patterns.md  # Golden patterns
-│   ├── 04-sigil-protected.md # Non-negotiables
+│   ├── 04-sigil-protected.md # Non-negotiables (always loaded)
 │   ├── 05-sigil-animation.md # Animation
 │   ├── 06-sigil-taste.md     # Taste system
 │   ├── 07-sigil-material.md  # Material
 │   ├── 08-sigil-lexicon.md   # Keywords
-│   └── 10-16-react-*.md      # Implementation
+│   ├── 10-16-react-*.md      # Implementation
+│   ├── 19-sigil-data-physics.md    # Data source selection
+│   └── 20-sigil-web3-flows.md      # Web3 flow patterns
+│
+├── skills/                   # Specialized capabilities
+│   └── blockchain-inspector/ # On-chain state inspection
 │
 └── scripts/                  # Installation
 
 grimoires/sigil/
 ├── taste.md                  # Accumulated understanding
+├── craft-state.md            # Session state for iterative debugging
 ├── hammer-state.json         # Resume interrupted work
 ├── observations/             # User truth captures
 │   ├── user-insights.md      # Validated findings
@@ -534,4 +569,4 @@ AGPL-3.0. See [LICENSE.md](LICENSE.md).
 
 ---
 
-*v2.4.0 "Craft States"*
+*v2.5.0 "Web3 Flow Validation"*
