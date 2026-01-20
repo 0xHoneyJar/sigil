@@ -1,0 +1,13 @@
+name: synthesizing-taste
+description: Analyze accumulated taste signals and propose rule changes
+version: 1.0.0
+triggers:
+  - /taste-synthesize
+  - synthesis
+  - patterns
+  - feedback analysis
+files:
+  - SKILL.md
+dependencies:
+  - crafting-physics  # For taste.md schema
+  - validating-physics  # For /inscribe integration
