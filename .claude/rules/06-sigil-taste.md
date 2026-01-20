@@ -228,3 +228,58 @@ learning:
   inference: "User prefers spring animations (no context available)"
 ---
 ```
+
+## DX Physics Signals
+
+DX Physics generates test configurations for blockchain indexers. Track acceptance and modifications.
+
+### Schema Extension
+
+```yaml
+---
+timestamp: "2026-01-19T14:32:00Z"
+signal: ACCEPT | MODIFY | REJECT
+source: cli
+component:
+  name: "DX Physics - Test Config"
+  effect: "DX"
+  craft_type: "generate"
+dx_physics:
+  framework: "envio"
+  event: "Staked"
+  block_range:
+    start: 15899050
+    end: 15899150
+  sync_time_actual: "28s"
+  events_indexed: 7
+learning:
+  inference: "100-block range sufficient for Staked"
+---
+```
+
+### DX-Specific Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `dx_physics.framework` | string | "envio", "subgraph", "ponder" |
+| `dx_physics.event` | string | Target event name |
+| `dx_physics.block_range` | object | { start, end } block numbers |
+| `dx_physics.sync_time_actual` | string | Actual sync duration |
+| `dx_physics.events_indexed` | number | Events found in range |
+
+### Signal Detection
+
+| User Action | Signal | Learning |
+|-------------|--------|----------|
+| Accepts generated config | ACCEPT | Block range was appropriate |
+| Modifies block range | MODIFY | User prefers different range size |
+| Skips DX Physics | REJECT | User doesn't want auto-config |
+| Modifies events list | MODIFY | User wants different events |
+
+### Pattern Detection
+
+After 3+ DX Physics signals for same event type:
+- Apply learned block range preferences
+- Note in analysis: "Adjusted range based on taste log"
+
+Example: If user consistently expands 100-block ranges to 500, future configs use 500 by default.
