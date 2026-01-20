@@ -7,6 +7,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.0] - 2026-01-19 — "Feedback Loops"
+
+### Summary
+
+v2.2.0 introduces the **Sigil Feedback Loops System** — a comprehensive framework for capturing user feedback signals from multiple sources (CLI, browser extension, product widgets). This release adds real-time physics observation, diagnostic questioning, and taste synthesis capabilities.
+
+### Added
+
+- **`/observe` command** — Capture user research observations during testing sessions
+  - Structured observation schema with physics context
+  - Supports qualitative feedback on component feel
+  - Integrates with taste.md logging
+
+- **`/taste-synthesize` command** — Analyze accumulated taste signals and extract patterns
+  - Identifies recurring timing preferences
+  - Detects animation style patterns
+  - Generates recommendations for physics defaults
+
+- **`/ward-all` command** — Comprehensive physics audit across all crafted components
+  - Batch validation of physics compliance
+  - Protected capability verification
+  - Performance pattern detection
+
+- **Sigil Toolbar browser extension** (`packages/sigil-toolbar/`)
+  - Real-time physics detection on any webpage
+  - Animation timing inspector
+  - Protected capability auditor
+  - One-click feedback submission
+  - Screenshot annotation with physics overlay
+  - Linear integration for issue tracking
+
+- **New skills**
+  - `observing-users` — Structured user research capture
+  - `synthesizing-taste` — Pattern extraction from taste signals
+
+- **Enhanced taste signal schema**
+  - `source` field: `cli`, `toolbar`, `product`
+  - `diagnostic` block for user context (user_type, goal, expected_feel)
+  - `learning` block for inferred recommendations
+
+- **Interactive diagnostics** (Sprint 1)
+  - Optional questions after MODIFY/REJECT signals
+  - Captures user intent and expected feel
+  - Contextualizes taste learnings
+
+- **Back pressure gates** (Sprint 3)
+  - Prevents taste signal overflow
+  - Throttles rapid feedback submissions
+  - Quality over quantity enforcement
+
+### Changed
+
+- **`06-sigil-taste.md`** — Extended signal schema with diagnostic context and source tracking
+- **`crafting-physics/SKILL.md`** — Added feedback collection standard and diagnostic flow
+
+### Technical
+
+The Feedback Loops system implements a three-source model:
+- **CLI** (`/craft`) — Developer-time feedback during generation
+- **Toolbar** — QA/design-time feedback during review
+- **Product** — User-time feedback in production (future)
+
+All sources write to the same `taste.md` format, enabling unified pattern synthesis.
+
+---
+
 ## [1.4.0] - 2026-01-14 — "Visual Verification"
 
 ### Summary
@@ -1053,6 +1119,7 @@ Sigil 0.2 can coexist with Loa on the same repository:
 - Design context capture commands
 - Basic moodboard and rules structure
 
+[2.2.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v2.2.0
 [5.0.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v5.0.0
 [4.1.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v4.1.0
 [4.0.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v4.0.0

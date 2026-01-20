@@ -1,33 +1,6 @@
 {
-  "framework_version": "0.13.0",
-  "schema_version": 2,
-  "last_sync": null,
-  "zones": {
-    "system": ".claude",
-    "state": ["grimoires", ".beads", ".ck"],
-    "app": ["src", "lib", "app"]
-  },
-  "migrations_applied": [],
-  "integrity": {
-    "enforcement": "strict",
-    "last_verified": null
-  },
-  "dependencies": {
-    "ck": {
-      "version": ">=0.7.0",
-      "optional": true,
-      "install": "cargo install ck-search",
-      "purpose": "Semantic code search for enhanced agent precision"
-    },
-    "bd": {
-      "version": "any",
-      "optional": true,
-      "install": "See https://github.com/steveyegge/beads",
-      "purpose": "Task graph tracking for sprint management"
-    }
-  },
-  "binary_fingerprints": {
-    "ck": "",
-    "comment": "SHA-256 fingerprints updated post-install for binary integrity verification"
-  }
+  "version": "2.2.0",
+  "mounted_at": "2026-01-19T18:30:00Z",
+  "updated_at": "2026-01-20T03:30:00Z",
+  "loa_home": "/Users/zksoju/Documents/GitHub/sigil"
 }
