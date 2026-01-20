@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-AGPL--3.0-green.svg)](LICENSE.md)
 [![Release](https://img.shields.io/badge/release-Craft_States-purple.svg)](CHANGELOG.md#240---2026-01-19--craft-states)
 
-> *"A sigil is a symbol that holds intention. You speak a desire, condense it into a mark, and the mark carries the meaning forward."*
+> *"A sigil remembers what your users need to feel — and carries that truth into everything you build."*
 
 **Taste for building products.** Sigil teaches AI to understand what users need to feel, then translates that into physics — timing, motion, surface, voice. Built as a [Loa Construct](https://github.com/0xHoneyJar/loa).
 
