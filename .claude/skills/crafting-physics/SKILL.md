@@ -51,6 +51,49 @@ Extract:
 2. Keywords (`claim`, `delete`, `like`, `toggle`) → See lexicon
 3. Context (`with undo`, `for wallet`) → Modifies effect
 
+### Step 2b: Pre-Detect Gate (Back Pressure)
+
+Before proceeding to analysis, run the Pre-Detect Gate:
+
+**Gate Logic**:
+```
+1. Effect Confidence Check:
+   - IF effect detection is ambiguous (no clear keyword/type/context match):
+     → Ask MAX 2 clarifying questions:
+       "What happens when the user clicks this?"
+       "Does this action call a server?"
+     → If still unclear after 2 questions, default to Standard effect with warning
+
+2. Taste Learning Check:
+   - Read taste.md for last 30 days
+   - Count MODIFY signals for similar effect type
+   - IF count >= 3 with same change pattern:
+     → Apply learned preference automatically
+     → Note in analysis: "Adjusted [X] per taste.md (N prior modifications)"
+```
+
+**Ambiguous Effect Resolution**:
+```
+┌─ Clarifying Question ──────────────────────────────────────┐
+│                                                            │
+│  The effect for "refresh balance" is ambiguous.            │
+│                                                            │
+│  Does this action:                                         │
+│  □ Just display current data (no server mutation)          │
+│  □ Trigger a server refresh/sync                           │
+│  □ Move or transfer funds                                  │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Gate Outcomes**:
+| Scenario | Action |
+|----------|--------|
+| Confident effect | Proceed to Step 3 |
+| Ambiguous effect | Ask clarifying question (max 2) |
+| Taste pattern found (3+) | Apply learned values, note in analysis |
+| Still unclear after questions | Default to Standard with ⚠️ warning |
+
 ### Step 3: Show Physics Analysis
 
 ```
@@ -75,6 +118,55 @@ Extract:
 Proceed? (yes / or describe what's different)
 ```
 
+### Step 3b: Pre-Generate Gate (Conflict Detection)
+
+Before generating code, check for conflicts:
+
+**Gate Logic**:
+```
+1. Recent Rejection Check:
+   - Search taste.md for REJECT signals in last 7 days
+   - IF similar component/effect found with REJECT:
+     → Show warning with rejection reason
+     → Ask: "Continue anyway? (yes/no)"
+
+2. Protected Capability Check (Financial/Destructive only):
+   - Verify analysis includes all required protected capabilities
+   - IF Financial: Must have cancel button, balance display prep, error recovery
+   - IF Destructive: Must have confirmation, cancel button, clear warning text
+   - IF missing: Add to analysis checklist
+```
+
+**Conflict Warning**:
+```
+┌─ Warning: Recent Rejection ────────────────────────────────┐
+│                                                            │
+│  ⚠️ A similar component was REJECTED 3 days ago:           │
+│                                                            │
+│  Component: ClaimButton (Financial)                        │
+│  Reason: "confirmation dialog felt too aggressive"         │
+│                                                            │
+│  Recommendation: Consider softer confirmation UX           │
+│                                                            │
+│  Continue with generation? (yes/no)                        │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Protected Capability Checklist** (shown for Financial/Destructive):
+```
+┌─ Protected Capabilities Required ──────────────────────────┐
+│                                                            │
+│  For Financial effect, ensure:                             │
+│  □ Cancel/escape button always visible (even during load)  │
+│  □ Amount clearly displayed before confirmation            │
+│  □ Error state has recovery path                           │
+│  □ Touch targets ≥ 44px                                    │
+│  □ Focus ring visible on all interactive elements          │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+```
+
 ### Step 4: Get Confirmation
 
 Wait for user response:
@@ -89,6 +181,80 @@ IMMEDIATELY apply changes based on craft type:
 - **Configure**: Edit config file with physics-informed values
 - **Pattern**: Write hook or utility with physics baked in
 - **Polish**: Apply batch edits across identified files
+
+### Step 5b: Post-Generate Gate (Validation)
+
+After generating code but BEFORE showing to user, validate:
+
+**Validation Checks**:
+
+| Check | Severity | Action |
+|-------|----------|--------|
+| Touch target < 44px | Auto-fix | Add `min-h-[44px] min-w-[44px]` padding |
+| Missing focus ring | Auto-fix | Add `focus:ring-2 focus:ring-offset-2` |
+| Missing cancel button (Financial/Destructive) | Warning | Surface in validation box |
+| Optimistic sync for Financial | **BLOCK** | Refuse to generate, explain why |
+| Missing confirmation (Destructive) | Warning | Surface in validation box |
+| Hidden cancel during loading | **BLOCK** | Refuse to generate, explain why |
+
+**Auto-Fix Examples**:
+
+Touch target fix:
+```tsx
+// Before (detected: 32px)
+<button className="px-2 py-1">Claim</button>
+
+// After (auto-fixed to 44px)
+<button className="px-4 py-3 min-h-[44px] min-w-[44px]">Claim</button>
+```
+
+Focus ring fix:
+```tsx
+// Before (no focus ring)
+<button className="bg-blue-500 text-white">Claim</button>
+
+// After (auto-fixed)
+<button className="bg-blue-500 text-white focus:ring-2 focus:ring-blue-400 focus:ring-offset-2">Claim</button>
+```
+
+**Validation Box** (shown after generation):
+```
+┌─ Post-Generate Validation ─────────────────────────────────┐
+│                                                            │
+│  ✓ Touch targets: All ≥ 44px                               │
+│  ✓ Focus rings: Present on all interactive elements        │
+│  ✓ Cancel button: Present and always visible               │
+│  ✓ Sync strategy: Pessimistic (correct for Financial)      │
+│                                                            │
+│  Auto-fixes applied:                                       │
+│  • Added min-h-[44px] to confirm button                    │
+│  • Added focus:ring-2 to cancel button                     │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+```
+
+**Block Scenarios**:
+
+If a BLOCK condition is detected, refuse to generate and explain:
+
+```
+┌─ Generation Blocked ───────────────────────────────────────┐
+│                                                            │
+│  ❌ Cannot generate this component as specified:           │
+│                                                            │
+│  Violation: Optimistic sync for Financial effect           │
+│                                                            │
+│  Financial operations MUST use pessimistic sync because:   │
+│  • Money transfers cannot be rolled back                   │
+│  • Users need to see server confirmation                   │
+│  • Optimistic updates create false confidence              │
+│                                                            │
+│  To proceed:                                               │
+│  1. Confirm this is actually Financial (if not, clarify)   │
+│  2. Or request pessimistic sync explicitly                 │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+```
 
 ### Step 6: Collect Feedback
 

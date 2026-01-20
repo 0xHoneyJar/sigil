@@ -182,3 +182,43 @@ When URL provided, use agent-browser:
 - Generating new code → `/craft`
 - Single known issue → Edit
 - Security audit → `/audit`
+
+---
+
+## Batch Validation: /ward-all
+
+For validating all components in the codebase at once, use `/ward-all`:
+
+```
+/ward-all              # Scan default path (src/components)
+/ward-all --path src   # Scan custom path
+/ward-all --fix        # Auto-fix issues where possible
+/ward-all --report     # Generate detailed report file
+```
+
+**Auto-fix capabilities**:
+| Check | Auto-fixable |
+|-------|--------------|
+| Touch target < 44px | ✓ Yes |
+| Missing focus ring | ✓ Yes |
+| Missing physics attribute | ✓ Yes |
+| Optimistic for Financial | ✗ No (requires manual review) |
+| Missing confirmation | ✗ No (requires manual review) |
+
+See `/ward-all` command documentation for full details.
+
+---
+
+## CI Integration
+
+Add to CI pipeline for continuous physics validation:
+
+```yaml
+- name: Physics Validation
+  run: /ward-all --severity error
+```
+
+Exit codes:
+- 0: All checks pass
+- 1: Errors found
+- 2: Scan failed
