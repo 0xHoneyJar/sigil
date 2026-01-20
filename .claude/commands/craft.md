@@ -74,6 +74,12 @@ context_files:
   - path: "grimoires/sigil/observations/"
     required: false
     purpose: "User behavior observations - diagnostics, insights, physics implications"
+  - path: "grimoires/loa/context/domain/"
+    required: false
+    purpose: "Domain knowledge from /understand or complexity detection"
+  - path: "grimoires/loa/context/ecosystem/"
+    required: false
+    purpose: "Multi-repo relationships and contract mappings"
 
 outputs:
   dynamic: true
