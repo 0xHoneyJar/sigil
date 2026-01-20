@@ -1,31 +1,31 @@
 ---
 name: "craft"
-version: "2.0.0"
+version: "2.1.0"
 agent: "crafting-physics"
 description: |
-  Apply design physics to any UX-affecting change.
-  Three layers: Behavioral + Animation + Material = Feel.
+  The universal entry point for product work.
 
-  Crafting is not limited to component generation.
-  It applies to anything that affects what users experience:
-  - New components
-  - Existing code refinement
-  - Configuration and theming
-  - Data patterns and hooks
-  - Polish passes and fine-tuning
+  /craft adapts to whatever you bring:
+  - UI work → Apply design physics (Behavioral + Animation + Material + Voice)
+  - Debug work → Investigate, diagnose, fix
+  - Explore work → Research, understand, map
+  - Full features → Orchestrate Loa commands (Hammer mode)
+
+  Trust your intuition. If you invoked /craft, there's work to do.
 
 arguments:
   - name: "description"
     type: "string"
     required: true
-    description: "What to craft — new, refine, or polish"
+    description: "What you're working on — any product work"
     examples:
       - "claim button"
       - "improve light mode readability"
-      - "refine these lines to be easier to read"
-      - "optimize the loading state for this data flow"
-      - "polish the hover states across the nav"
-      - "glassmorphism card with spring animation"
+      - "fix the deployment issue"
+      - "why is the auth flow failing"
+      - "build rewards claiming feature"
+      - "investigate slow page load"
+      - "debug the docs deployment"
   - name: "url"
     type: "string"
     required: false
@@ -90,28 +90,34 @@ workflow_next: "garden"
 
 # /craft
 
-Apply design physics to any UX-affecting change.
+The universal entry point for product work.
 
 <philosophy>
 ## The Craft Philosophy
 
-**Crafting is applying physics to create feel.**
+**Craft adapts to the work, not the other way around.**
 
-Feel emerges from the interplay of three layers:
+If you invoked `/craft`, you have work to do. This command trusts your intuition and adapts to whatever you bring:
+
+| Mode | When Detected | What Happens |
+|------|---------------|--------------|
+| **Chisel** | UI work, physics keywords | Apply design physics (fast, focused) |
+| **Hammer** | Multi-component features | Orchestrate Loa commands (PRD → SDD → Sprint) |
+| **Debug** | Fix, broken, failing, error | Investigate, diagnose, resolve |
+| **Explore** | Investigate, understand, research | Research, map, discover |
+
+**For UI work, feel emerges from four layers:**
 - **Behavioral** — How things respond (sync, timing, confirmation)
 - **Animation** — How things move (easing, springs, frequency)
 - **Material** — How things look (surface, fidelity, grit)
+- **Voice** — How things speak (copy, tone, microcopy)
 
-These layers aren't separate concerns. They're three expressions of the same physics. A financial action must be behaviorally pessimistic (800ms, confirmation), animated deliberately (ease-out, non-interruptible), and materially trustworthy (elevated, clear). Change one layer and the others must adjust.
+**For non-UI work, craft still applies:**
+- Debug work gets systematic investigation
+- Explore work gets thorough research
+- The goal is always: help you make progress on product work
 
-**Craft applies everywhere feel matters:**
-| Craft Type | Example | Physics Applied |
-|------------|---------|-----------------|
-| New component | "claim button" | All three layers, new file |
-| Refinement | "make this feel snappier" | Adjust timing/animation |
-| Configuration | "improve light mode" | Material physics to theme |
-| Data patterns | "optimize loading UX" | Behavioral physics to data flow |
-| Polish | "refine hover states" | Animation + material to existing |
+**Never reject. Always adapt.**
 </philosophy>
 
 <action_default>
@@ -316,9 +322,16 @@ Mark each in_progress then completed as you work.
 </step_0>
 
 <step_0_5>
-### Step 0.5: Scope Detection (Hammer vs Chisel)
+### Step 0.5: Mode Detection
 
-Before discovering context, determine if this work requires full-stack orchestration (hammer) or fine-grained crafting (chisel).
+Before discovering context, determine what kind of work this is. /craft adapts to four modes:
+
+| Mode | Purpose | Output |
+|------|---------|--------|
+| **Chisel** | Fine-grained UI work | Design physics applied |
+| **Hammer** | Full-stack features | Loa orchestration |
+| **Debug** | Investigation & fixes | Root cause + solution |
+| **Explore** | Research & understanding | Insights + recommendations |
 
 **Check for existing hammer state first:**
 ```
@@ -327,14 +340,36 @@ If grimoires/sigil/hammer-state.json exists AND active == true:
   Options:
     1. Resume from current phase
     2. Abandon and start fresh
-    3. Switch to chisel mode for quick work
+    3. Switch to another mode
 ```
 
 **Check for flag overrides:**
-- `--hammer` flag → Force hammer mode, skip detection
-- `--chisel` flag → Force chisel mode, skip detection
+- `--hammer` flag → Force hammer mode
+- `--chisel` flag → Force chisel mode
+- `--debug` flag → Force debug mode
+- `--explore` flag → Force explore mode
 
-**Scan for hammer signals** (+1 each):
+**Mode Detection Algorithm:**
+
+1. **Scan for Debug signals** (check first — highest specificity):
+| Signal Type | Patterns |
+|-------------|----------|
+| Keywords | "fix", "broken", "failing", "error", "issue", "bug", "debug", "not working", "crash", "undefined" |
+| Error context | Stack traces, error messages in input |
+| Deployment | "deploy", "deployment", "build failed", "CI", "pipeline" |
+
+If 2+ debug signals detected → **DEBUG mode**
+
+2. **Scan for Explore signals** (check second):
+| Signal Type | Patterns |
+|-------------|----------|
+| Keywords | "investigate", "understand", "research", "why", "how does", "explore", "map", "discover" |
+| Questions | Input ends with "?" |
+| Context seeking | "what is", "where is", "how is", "explain" |
+
+If 2+ explore signals detected → **EXPLORE mode**
+
+3. **Scan for Hammer signals** (+1 each):
 | Signal Type | Patterns |
 |-------------|----------|
 | Keywords | "feature", "system", "flow", "pipeline", "integrate", "build", "implement", "create" |
@@ -343,26 +378,61 @@ If grimoires/sigil/hammer-state.json exists AND active == true:
 | Indexer refs | `/\b(indexer|index|sync|historical|events)\b/i` |
 | Multi-component | "feature", "flow", scope > 5 words |
 
-**Scan for chisel signals** (-1 each):
+4. **Scan for Chisel signals** (-1 each):
 | Signal Type | Patterns |
 |-------------|----------|
-| Keywords | "button", "modal", "animation", "hover", "style", "improve", "fix", "polish", "adjust", "tweak", "refine" |
+| Keywords | "button", "modal", "animation", "hover", "style", "improve", "polish", "adjust", "tweak", "refine" |
 | Single component | Single noun target, existing file reference |
 | Physics-only | "timing", "motion", "color", "spacing" |
 
-**Scoring:**
+**Scoring (for Hammer vs Chisel):**
 - Each hammer signal: +1
 - Each chisel signal: -1
 - Score >= 2: **HAMMER mode**
 - Score < 2: **CHISEL mode**
 
+**If DEBUG detected:**
+
+```
+┌─ Mode: DEBUG ─────────────────────────────────────────────┐
+│                                                           │
+│  Detected: [list debug signals]                           │
+│                                                           │
+│  I'll investigate systematically:                         │
+│  1. Reproduce the issue                                   │
+│  2. Identify root cause                                   │
+│  3. Propose fix                                           │
+│  4. Verify resolution                                     │
+│                                                           │
+│  [Proceed] [Switch to Chisel] [Switch to Explore]         │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+```
+
+**If EXPLORE detected:**
+
+```
+┌─ Mode: EXPLORE ───────────────────────────────────────────┐
+│                                                           │
+│  Detected: [list explore signals]                         │
+│                                                           │
+│  I'll research thoroughly:                                │
+│  1. Map the relevant code/systems                         │
+│  2. Understand the architecture                           │
+│  3. Document findings                                     │
+│  4. Provide recommendations                               │
+│                                                           │
+│  [Proceed] [Switch to Debug] [Switch to Chisel]           │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+```
+
 **If HAMMER detected:**
 
 ```
-┌─ Scope Detection ─────────────────────────────────────────┐
+┌─ Mode: HAMMER ────────────────────────────────────────────┐
 │                                                           │
-│  This looks like HAMMER work:                             │
-│  • [list detected hammer signals]                         │
+│  Detected: [list hammer signals]                          │
 │                                                           │
 │  Full-stack implementation requires architecture.         │
 │  I'll run the complete sequence:                          │
@@ -373,23 +443,14 @@ If grimoires/sigil/hammer-state.json exists AND active == true:
 │  4. Review plan                                           │
 │  5. /run sprint-plan → Implementation                     │
 │                                                           │
-│  [Proceed with Hammer] [Chisel anyway (UI only)]          │
+│  [Proceed] [Switch to Chisel]                             │
 │                                                           │
 └───────────────────────────────────────────────────────────┘
 ```
 
-**If user chooses "Proceed with Hammer":**
-- Branch to Hammer Orchestrator (Step H1)
-- Skip regular craft workflow
-
-**If user chooses "Chisel anyway":**
-- Log decision to taste.md with warning
-- Continue with regular craft workflow (Step 1)
-- Note: "⚠ Proceeding chisel-only. Supporting infrastructure not included."
-
 **If CHISEL detected:**
 - Proceed directly to Step 1 (no prompt needed)
-- Optional: Show brief note if close to threshold (score = 1)
+- Optional: Show brief note if close to threshold
 </step_0_5>
 
 <hammer_workflow>
@@ -677,6 +738,218 @@ Display complete plan summary:
 ```
 </hammer_error_handling>
 </hammer_workflow>
+
+<debug_workflow>
+## Debug Workflow
+
+When user confirms debug mode, execute systematic investigation.
+
+<step_d1>
+### Step D1: Understand the Problem
+
+1. **Parse the error/issue description:**
+   - Extract error messages, stack traces
+   - Identify affected files/components
+   - Note reproduction steps if provided
+
+2. **Gather context:**
+   ```
+   Read relevant error logs
+   Read mentioned files
+   Check recent changes (git diff, git log)
+   ```
+
+3. **Show understanding:**
+   ```
+   ┌─ Debug Analysis ───────────────────────────────────────────┐
+   │                                                            │
+   │  Issue: [description]                                      │
+   │  Affected: [files/components]                              │
+   │  Error: [key error message if present]                     │
+   │                                                            │
+   │  Hypothesis: [initial theory based on signals]             │
+   │                                                            │
+   │  Investigation plan:                                       │
+   │  1. [first thing to check]                                 │
+   │  2. [second thing to check]                                │
+   │  3. [third thing to check]                                 │
+   │                                                            │
+   │  Proceed with investigation? (y/n)                         │
+   │                                                            │
+   └────────────────────────────────────────────────────────────┘
+   ```
+</step_d1>
+
+<step_d2>
+### Step D2: Investigate
+
+1. **Follow the investigation plan:**
+   - Check each item systematically
+   - Document findings as you go
+   - Update hypothesis if evidence contradicts
+
+2. **Root cause identification:**
+   - Trace the issue to its source
+   - Verify with evidence (logs, code, tests)
+   - Consider edge cases
+
+3. **Show findings:**
+   ```
+   ┌─ Root Cause Found ─────────────────────────────────────────┐
+   │                                                            │
+   │  Root cause: [description]                                 │
+   │  Location: [file:line]                                     │
+   │  Evidence: [what confirmed this]                           │
+   │                                                            │
+   │  Proposed fix:                                             │
+   │  [description of fix]                                      │
+   │                                                            │
+   │  Apply fix? (y/n)                                          │
+   │                                                            │
+   └────────────────────────────────────────────────────────────┘
+   ```
+</step_d2>
+
+<step_d3>
+### Step D3: Fix and Verify
+
+1. **Apply the fix:**
+   - Make minimal, targeted changes
+   - Preserve existing behavior where possible
+   - Add guards against recurrence if appropriate
+
+2. **Verify resolution:**
+   - Run relevant tests if available
+   - Manually verify if needed
+   - Check for side effects
+
+3. **Log to taste.md:**
+   ```markdown
+   ## [YYYY-MM-DD HH:MM] | DEBUG_RESOLVED
+   Issue: [description]
+   Root cause: [cause]
+   Fix: [what was changed]
+   Files: [files modified]
+   ---
+   ```
+</step_d3>
+
+<debug_error_handling>
+### Debug Error Handling
+
+| Situation | Recovery |
+|-----------|----------|
+| Can't reproduce | Ask for more details, check environment differences |
+| Multiple possible causes | Investigate each, prioritize by likelihood |
+| Fix doesn't work | Re-analyze, check assumptions |
+| Out of scope | Suggest escalation, document findings |
+
+**If stuck:**
+```
+┌─ Investigation Blocked ───────────────────────────────────────┐
+│                                                               │
+│  I've checked [what was checked] but can't identify the root  │
+│  cause. The issue might require:                              │
+│                                                               │
+│  • More context about [specific thing]                        │
+│  • Access to [logs/systems not available]                     │
+│  • Domain expertise in [area]                                 │
+│                                                               │
+│  What I've learned so far:                                    │
+│  [summary of findings]                                        │
+│                                                               │
+│  [Provide more context] [Try different approach] [Stop here]  │
+│                                                               │
+└───────────────────────────────────────────────────────────────┘
+```
+</debug_error_handling>
+</debug_workflow>
+
+<explore_workflow>
+## Explore Workflow
+
+When user confirms explore mode, execute thorough research.
+
+<step_e1>
+### Step E1: Frame the Question
+
+1. **Parse the exploration request:**
+   - What is the user trying to understand?
+   - What scope? (specific file, system, architecture)
+   - What's the end goal?
+
+2. **Show exploration plan:**
+   ```
+   ┌─ Explore Analysis ─────────────────────────────────────────┐
+   │                                                            │
+   │  Question: [what user wants to understand]                 │
+   │  Scope: [what will be explored]                            │
+   │                                                            │
+   │  Exploration plan:                                         │
+   │  1. [first area to explore]                                │
+   │  2. [second area to explore]                               │
+   │  3. [third area to explore]                                │
+   │                                                            │
+   │  Proceed? (y/n)                                            │
+   │                                                            │
+   └────────────────────────────────────────────────────────────┘
+   ```
+</step_e1>
+
+<step_e2>
+### Step E2: Research
+
+1. **Map the territory:**
+   - Read relevant files
+   - Trace dependencies
+   - Identify patterns and relationships
+
+2. **Document as you go:**
+   - Key files and their purposes
+   - Important functions/classes
+   - Data flows and relationships
+
+3. **Use Explore agent if needed:**
+   - For large codebases, spawn Explore subagent
+   - Aggregate findings
+</step_e2>
+
+<step_e3>
+### Step E3: Synthesize and Report
+
+1. **Present findings:**
+   ```
+   ┌─ Exploration Complete ─────────────────────────────────────┐
+   │                                                            │
+   │  Question: [original question]                             │
+   │                                                            │
+   │  Summary:                                                  │
+   │  [concise answer to the question]                          │
+   │                                                            │
+   │  Key findings:                                             │
+   │  • [finding 1 with file:line reference]                    │
+   │  • [finding 2 with file:line reference]                    │
+   │  • [finding 3 with file:line reference]                    │
+   │                                                            │
+   │  Architecture notes:                                       │
+   │  [relevant architectural context]                          │
+   │                                                            │
+   │  Recommendations:                                          │
+   │  [if applicable, suggestions for next steps]               │
+   │                                                            │
+   └────────────────────────────────────────────────────────────┘
+   ```
+
+2. **Log to taste.md:**
+   ```markdown
+   ## [YYYY-MM-DD HH:MM] | EXPLORE_COMPLETE
+   Question: [what was explored]
+   Summary: [key insight]
+   Files reviewed: [count]
+   ---
+   ```
+</step_e3>
+</explore_workflow>
 
 <step_1>
 ### Step 1: Discover Context
@@ -1152,17 +1425,25 @@ Use `@` syntax to explicitly reference context files:
 | retro, pixel | grit signatures |
 </quick_reference>
 
-<when_not_to_use>
-## When NOT to Use /craft
+<mode_hints>
+## Mode Hints
 
-- **1-3 line change**: Use Edit tool directly
-- **Only animation wrong**: Use `/animate` instead (faster)
-- **Only styling wrong**: Use `/style` instead (faster)
-- **Only timing wrong**: Use `/behavior` instead (faster)
-- **Non-UX code**: Backend logic, tests, etc. — physics don't apply
+/craft adapts to your work. Here's how to get the most from each mode:
 
-**Rule:** If it doesn't affect what users feel, don't use /craft.
-</when_not_to_use>
+| If you need... | Mode | Hint |
+|----------------|------|------|
+| Quick UI polish | Chisel | Single component, physics keywords |
+| Full feature | Hammer | Say "build", "implement", "feature" |
+| Fix an issue | Debug | Say "fix", "broken", "failing", "error" |
+| Understand code | Explore | Say "why", "how does", "investigate" |
+
+**Specialized commands still exist** for focused work:
+- `/animate` — Animation physics only
+- `/style` — Material physics only
+- `/behavior` — Behavioral physics only
+
+But `/craft` will never reject your work. If you invoke it, there's work to do.
+</mode_hints>
 
 <examples>
 ## Examples
@@ -1559,6 +1840,177 @@ User: 1
 [Invoking /sprint-plan...]
 
 ... [continues from where it left off] ...
+```
+
+### Example 12: Debug Mode — Deployment Issue
+
+```
+User: /craft "fix the docs deployment, build is failing"
+
+[Mode Detection: DEBUG]
+• "fix" — debug keyword
+• "failing" — debug keyword
+• "deployment" — deployment context
+
+┌─ Mode: DEBUG ─────────────────────────────────────────────┐
+│                                                           │
+│  Detected: fix, failing, deployment                       │
+│                                                           │
+│  I'll investigate systematically:                         │
+│  1. Reproduce the issue                                   │
+│  2. Identify root cause                                   │
+│  3. Propose fix                                           │
+│  4. Verify resolution                                     │
+│                                                           │
+│  [Proceed] [Switch to Chisel] [Switch to Explore]         │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+
+User: Proceed
+
+┌─ Debug Analysis ───────────────────────────────────────────┐
+│                                                            │
+│  Issue: Docs deployment build failing                      │
+│  Affected: Build pipeline, docs site                       │
+│  Error: (checking build logs...)                           │
+│                                                            │
+│  Hypothesis: Configuration or dependency issue             │
+│                                                            │
+│  Investigation plan:                                       │
+│  1. Check recent commits to docs config                    │
+│  2. Review build logs for specific error                   │
+│  3. Verify dependencies are up to date                     │
+│                                                            │
+│  Proceed with investigation? (y/n)                         │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+
+User: y
+
+[Reading build logs...]
+[Checking vocs.config.ts...]
+[Checking package.json...]
+
+┌─ Root Cause Found ─────────────────────────────────────────┐
+│                                                            │
+│  Root cause: Invalid sidebar configuration                 │
+│  Location: vocs.config.ts:47                               │
+│  Evidence: Build error "Cannot read property of undefined" │
+│                                                            │
+│  Proposed fix:                                             │
+│  Add null check for sidebar items                          │
+│                                                            │
+│  Apply fix? (y/n)                                          │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+
+User: y
+
+[Applies fix, verifies build passes]
+[Logs DEBUG_RESOLVED to taste.md]
+```
+
+### Example 13: Explore Mode — Understanding Architecture
+
+```
+User: /craft "how does the auth flow work in this app?"
+
+[Mode Detection: EXPLORE]
+• "how does" — explore keyword
+• "?" — question format
+
+┌─ Mode: EXPLORE ───────────────────────────────────────────┐
+│                                                           │
+│  Detected: how does, question                             │
+│                                                           │
+│  I'll research thoroughly:                                │
+│  1. Map the relevant code/systems                         │
+│  2. Understand the architecture                           │
+│  3. Document findings                                     │
+│  4. Provide recommendations                               │
+│                                                           │
+│  [Proceed] [Switch to Debug] [Switch to Chisel]           │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+
+User: Proceed
+
+┌─ Explore Analysis ─────────────────────────────────────────┐
+│                                                            │
+│  Question: How does the auth flow work?                    │
+│  Scope: Authentication system                              │
+│                                                            │
+│  Exploration plan:                                         │
+│  1. Find auth-related files and entry points               │
+│  2. Trace login/logout flow                                │
+│  3. Identify session management approach                   │
+│                                                            │
+│  Proceed? (y/n)                                            │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+
+User: y
+
+[Spawning Explore agent...]
+[Mapping auth system...]
+
+┌─ Exploration Complete ─────────────────────────────────────┐
+│                                                            │
+│  Question: How does the auth flow work?                    │
+│                                                            │
+│  Summary:                                                  │
+│  The app uses NextAuth.js with JWT tokens stored in        │
+│  httpOnly cookies. Sessions are validated server-side.     │
+│                                                            │
+│  Key findings:                                             │
+│  • src/lib/auth.ts:12 — NextAuth configuration             │
+│  • src/middleware.ts:8 — Route protection logic            │
+│  • src/hooks/useAuth.ts:3 — Client-side auth hook          │
+│                                                            │
+│  Architecture notes:                                       │
+│  JWT + server validation provides good security.           │
+│  Protected routes defined in middleware matcher.           │
+│                                                            │
+│  Recommendations:                                          │
+│  Consider adding refresh token rotation for long sessions. │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+
+[Logs EXPLORE_COMPLETE to taste.md]
+```
+
+### Example 14: Debug Mode — Can't Identify Root Cause
+
+```
+User: /craft "debug the intermittent crash on mobile"
+
+[Mode Detection: DEBUG]
+
+... [investigation proceeds] ...
+
+┌─ Investigation Blocked ───────────────────────────────────────┐
+│                                                               │
+│  I've checked crash logs, recent changes, and device-specific │
+│  code but can't identify the root cause. The issue might      │
+│  require:                                                     │
+│                                                               │
+│  • More context about reproduction steps                      │
+│  • Access to device-specific crash reports                    │
+│  • Real device testing (not simulator)                        │
+│                                                               │
+│  What I've learned so far:                                    │
+│  - Crash only occurs on iOS 16+                               │
+│  - Related to animation timing                                │
+│  - Memory pressure may be a factor                            │
+│                                                               │
+│  [Provide more context] [Try different approach] [Stop here]  │
+│                                                               │
+└───────────────────────────────────────────────────────────────┘
+
+User: The crash happens when scrolling fast through a long list
+
+[Updates hypothesis with new information...]
+[Continues investigation...]
 ```
 </examples>
 
