@@ -6,7 +6,7 @@
 
 > *"A sigil holds the tension — creative intuition grounded in user truth. Move fast without losing sight of what actually matters."*
 
-**Taste for building products.** Sigil teaches AI to understand what users need to feel, then translates that into physics — timing, motion, surface, voice. Built as a [Loa Construct](https://github.com/0xHoneyJar/loa).
+**Creative speed, grounded in truth.** Sigil lets you iterate fast on feel while staying anchored to what users actually need. It's taste for building products — the balance between intuition and evidence, between shipping and strategy. Built as a [Loa Construct](https://github.com/0xHoneyJar/loa).
 
 ```bash
 # Install via Loa Constructs
@@ -18,29 +18,51 @@ loa install sigil
 
 ---
 
-## The Model
+## The Tension
 
-Everything starts with **User Truth** — who your users are, what moment they're in, what they need to feel. Physics is how you create that feel.
+Building products lives in tension:
+
+**Creative intuition** — You know good feel when you see it. "Too corporate." "Feels heavy." "Not quite right." This instinct is real and valuable.
+
+**User truth** — But intuition without grounding is guessing. What do users actually need? What moment are they in? What problem are we really solving?
+
+**Speed** — Ship fast, learn fast, iterate. Don't overthink.
+
+**Strategy** — But shipping the wrong thing fast is waste. Some work needs architecture first.
+
+Most tools force you to choose. Sigil holds the tension.
+
+---
+
+## The Model
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                 │
-│   USER TRUTH                                                    │
-│   ══════════                                                    │
+│   USER TRUTH (the ground)                                       │
+│   ═══════════════════════                                       │
 │   Who is the user?     Power user, casual, first-time, mobile   │
 │   What's the moment?   High stakes, routine, discovery, error   │
 │   What should they     Trust, speed, delight, safety, control   │
 │   feel?                                                         │
 │                                                                 │
-│                            ↓                                    │
-│                                                                 │
-│                          FEEL                                   │
-│                    (the goal, not the input)                    │
+│   You don't always know. That's okay. Sigil helps you discover  │
+│   through iteration — but always asks the questions.            │
 │                                                                 │
 │                            ↓                                    │
 │                                                                 │
-│   PHYSICS (tools to create feel)                                │
+│   CREATIVE INTUITION (the spark)                                │
 │   ══════════════════════════════                                │
+│   "Feels too corporate"    "Needs more weight"                  │
+│   "Snappier"               "Something's off"                    │
+│                                                                 │
+│   Your instinct matters. Sigil translates vague feel into       │
+│   concrete physics — then remembers what worked.                │
+│                                                                 │
+│                            ↓                                    │
+│                                                                 │
+│   PHYSICS (the tools)                                           │
+│   ═══════════════════                                           │
 │                                                                 │
 │   ┌─ Behavioral ────────────────────────────────────────────┐   │
 │   │  Sync, timing, confirmation                             │   │
@@ -64,165 +86,161 @@ Everything starts with **User Truth** — who your users are, what moment they'r
 │                                                                 │
 │                            ↓                                    │
 │                                                                 │
-│                         TASTE                                   │
-│              (accumulated understanding of                      │
-│               your users + physics that work)                   │
+│   TASTE (the memory)                                            │
+│   ══════════════════                                            │
+│   Accumulated understanding: what your users need +             │
+│   what physics create that feel. Grows with every iteration.    │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Taste** isn't just your preferences — it's your accumulated understanding of your users and what makes them feel right. Physics are the tools. User truth is the foundation.
+**Taste** isn't just preferences — it's your accumulated understanding of your users and what makes them feel right. The more you iterate, the more grounded your intuition becomes.
+
+---
+
+## Speed vs Strategy
+
+Not every task is the same. Sometimes you need to move fast. Sometimes you need to think first.
+
+```
+/craft "claim button"           → CHISEL: Move fast, iterate on feel
+/craft "build rewards feature"  → HAMMER: Think first, then build
+```
+
+**Chisel mode** — Creative speed. You have intuition about what's needed. Craft it, see how it feels, adjust. The feedback loop keeps you grounded.
+
+**Hammer mode** — Strategic grounding. The work is bigger than a component. Sigil invokes Loa to plan architecture first, then applies physics during implementation.
+
+This isn't a tradeoff — it's choosing the right tool:
+
+| Mode | When | Speed | Grounding |
+|------|------|-------|-----------|
+| Chisel | Component, polish, iteration | Fast | Feedback loop |
+| Hammer | Feature, system, architecture | Measured | Upfront planning |
+
+**Scope detection** chooses automatically:
+- Hammer signals: "feature", "system", "flow", "build", "implement"
+- Chisel signals: "button", "modal", "animation", "improve", "polish"
+
+Force with `--hammer` or `--chisel` when you know what you need.
 
 ---
 
 ## The Feedback Loop
 
-Sigil learns through a continuous cycle. Each command feeds into the next.
+This is how you move fast without losing the truth. Each iteration grounds your intuition.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                                                                          │
 │   UNDERSTAND                    CRAFT                      VALIDATE      │
-│   ───────────                   ─────                      ────────      │
+│   (ground yourself)            (trust intuition)          (check truth) │
 │                                                                          │
 │   /observe         ──→         /craft          ──→         /ward         │
 │   /understand                  /style                      /garden       │
-│                                /animate                    /review       │
-│   Capture user                 /behavior                                 │
-│   truth, context,              /distill                    Audit against │
-│   domain knowledge                                         physics,      │
-│                                Generate with               check feel    │
+│                                /animate                                  │
+│   What do users                /behavior                   Does it       │
+│   actually need?                                           actually      │
+│                                Create with                 work?         │
 │         │                      physics                                   │
 │         │                                                       │        │
 │         │                          │                            │        │
 │         │                          ▼                            │        │
 │         │                                                       │        │
 │         │                    USER FEEDBACK                      │        │
-│         │                    "Does this feel right?"            │        │
+│         │               "Does this feel right?"                 │        │
 │         │                                                       │        │
-│         │                      ┌─────┐                          │        │
-│         │                      │     │                          │        │
-│         │              ┌───────┴─────┴───────┐                  │        │
-│         │              │                     │                  │        │
-│         │              ▼                     ▼                  │        │
-│         │                                                       │        │
-│         │         ACCEPT (+1)          MODIFY (+5)              │        │
-│         │         "yes, ship it"       "feels heavy"            │        │
-│         │              │               "too clinical"           │        │
-│         │              │               "timing is off"          │        │
-│         │              │                     │                  │        │
-│         │              │                     │                  │        │
-│         │              ▼                     ▼                  │        │
-│         │                                                       │        │
-│         │                      TASTE                            │        │
-│         │              grimoires/sigil/taste.md                 │        │
-│         │              (accumulated learning)                   │        │
 │         │                          │                            │        │
+│         │              ┌───────────┴───────────┐                │        │
+│         │              │                       │                │        │
+│         │              ▼                       ▼                │        │
+│         │                                                       │        │
+│         │         ACCEPT (+1)            MODIFY (+5)            │        │
+│         │         Ship it                "feels heavy"          │        │
+│         │              │                 "too clinical"         │        │
+│         │              │                 "timing off"           │        │
+│         │              │                       │                │        │
+│         │              ▼                       ▼                │        │
+│         │                                                       │        │
+│         │                       TASTE                           │        │
+│         │           (accumulated understanding)                 │        │
 │         │                          │                            │        │
 │         │                          ▼                            │        │
 │         │                                                       │        │
 │         │                     /inscribe                         │        │
-│         │              (graduate to permanent rules)            │        │
-│         │                          │                            │        │
+│         │           (graduate to permanent rules)               │        │
 │         │                          │                            │        │
 │         └──────────────────────────┴────────────────────────────┘        │
 │                                                                          │
-│                           CONTINUOUS REFINEMENT                          │
+│              Each loop: faster intuition, better grounding               │
 │                                                                          │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-### The Commands
+**The loop makes you faster AND more grounded.** Early iterations might miss. But taste accumulates. After 3+ similar signals, Sigil applies patterns automatically. Your intuition becomes trained intuition.
+
+### Signal Weights
+
+| Signal | Weight | What It Teaches |
+|--------|--------|-----------------|
+| ACCEPT | +1 | "This felt right" |
+| MODIFY | +5 | "This is what right actually looks like" |
+| REJECT | -3 | "This felt wrong" |
+
+Corrections weight 5x because they're specific. Silence is ambiguous.
+
+---
+
+## Commands
+
+### By Phase
 
 | Phase | Command | Purpose |
 |-------|---------|---------|
-| **Understand** | `/observe` | Capture user insights, behavior patterns, context |
+| **Understand** | `/observe` | Capture user insights — what do they actually need? |
 | | `/understand` | Research domain before crafting |
-| **Craft** | `/craft` | Apply physics to any UX change — primary entry point |
+| **Craft** | `/craft` | Apply physics — primary entry point |
 | | `/style` | Material only (looks wrong) |
 | | `/animate` | Animation only (movement off) |
 | | `/behavior` | Behavioral only (timing wrong) |
 | | `/distill` | Break feature into craft-able components |
-| **Validate** | `/ward` | Audit codebase against physics |
+| **Validate** | `/ward` | Audit against physics — does it actually work? |
 | | `/garden` | Component authority report |
-| | `/review-sprint` | Validate against acceptance criteria |
-| **Learn** | `/inscribe` | Graduate taste patterns to permanent rules |
+| **Learn** | `/inscribe` | Graduate patterns to permanent rules |
 
-### The Signal Weights
+### By Speed
 
-Every interaction teaches:
-
-| Signal | Weight | Trigger | What It Captures |
-|--------|--------|---------|------------------|
-| ACCEPT | +1 | User ships code as-is | "This felt right" |
-| MODIFY | +5 | User edits generated code | "This is what right looks like" |
-| REJECT | -3 | User says no, rewrites | "This felt wrong" |
-
-Modifications weight 5x because corrections teach more than silence. After 3+ similar signals, Sigil applies the pattern automatically.
-
----
-
-## Prerequisites
-
-| Tool | Required | Purpose | Install |
-|------|----------|---------|---------|
-| [Claude Code](https://claude.ai/code) | Yes | AI runtime | `npm install -g @anthropic-ai/claude-code` |
-| [Loa](https://github.com/0xHoneyJar/loa) | Yes | Architecture framework | See Loa docs |
-| [agent-browser](https://github.com/anthropics/agent-browser) | No | Visual validation | `npm install -g agent-browser` |
-
----
-
-## Quick Start
-
-### Via Loa Construct Registry (Recommended)
-
-```bash
-loa install sigil
-```
-
-Or add to your `.claude/constructs.yaml`:
-
-```yaml
-constructs:
-  - name: sigil
-    version: "^2.0.0"
-```
-
-### Manual Installation
-
-```bash
-git clone https://github.com/0xHoneyJar/sigil.git
-cd sigil && ./.claude/scripts/constructs-install.sh
-```
+| Speed | Commands | When |
+|-------|----------|------|
+| **Fast iteration** | `/craft`, `/style`, `/animate`, `/behavior` | You have intuition, test it |
+| **Strategic pause** | `/observe`, `/understand`, `/distill` | Step back, get grounded |
+| **Validation** | `/ward`, `/garden` | Check if reality matches intent |
 
 ---
 
 ## Usage
 
 ```bash
-# Craft with physics
-/craft "claim button"                    # Chisel mode (component)
-/craft "build rewards feature"           # Hammer mode (full architecture)
+# Fast iteration (chisel)
+/craft "claim button"                    # Trust intuition, craft it
+/style "warmer, less corporate"          # Adjust feel
+/animate "snappier"                      # Tune movement
 
-# Layer-specific adjustments
-/style "warmer, less corporate"          # Material only
-/animate "snappier"                      # Animation only
-/behavior "needs more deliberation"      # Behavioral only
+# Strategic grounding (hammer)
+/craft "build rewards feature"           # Triggers planning first
+/observe                                 # What do users actually need?
+/understand "DeFi claiming patterns"     # Research before building
 
-# Understand your users
-/observe                                 # Capture user insights
-/understand "DeFi claiming patterns"     # Research domain
+# Validation
+/ward                                    # Does it actually work?
+/ward http://localhost:3000              # Visual check
+/garden                                  # Component health
 
-# Validate
-/ward                                    # Audit full codebase
-/ward http://localhost:3000              # Visual validation
-/garden                                  # Component authority
-
-# Learn
-/inscribe                                # Graduate patterns to rules
+# Learning
+/inscribe                                # Make patterns permanent
 ```
 
-Before generating, Sigil asks about **user truth**:
+Before generating, Sigil asks about **user truth** (grounding):
 
 ```
 ┌─ User Truth ───────────────────────────────────────┐
@@ -239,7 +257,7 @@ Before generating, Sigil asks about **user truth**:
 └────────────────────────────────────────────────────┘
 ```
 
-Then shows physics analysis:
+Then shows physics analysis (creative translation):
 
 ```
 ┌─ Physics Analysis ─────────────────────────────────┐
@@ -260,37 +278,7 @@ Then shows physics analysis:
 Does this feel right for your user?
 ```
 
-Your answer — even vague ("feels heavy", "too clinical") — trains the system.
-
----
-
-## The Craft-First Workflow
-
-`/craft` is the primary entry point. Sometimes you need a button. Sometimes you need an entire feature. Sigil detects the difference:
-
-```
-/craft "claim button"           → Chisel mode (fine-grained physics)
-/craft "build rewards feature"  → Hammer mode (full architecture)
-```
-
-**Scope Detection:**
-- Hammer signals: "feature", "system", "flow", "build", "implement"
-- Chisel signals: "button", "modal", "animation", "improve", "polish"
-- Score ≥2 hammer signals → Hammer mode
-
-**Hammer mode** orchestrates Loa for complete features:
-
-```
-/craft "build rewards feature"
-  → Scope detection: HAMMER
-  → /plan-and-analyze (seeded with observations, taste)
-  → /architect
-  → /sprint-plan
-  → Review plan
-  → /run sprint-plan → Complete feature with physics
-```
-
-Force mode: `--hammer` or `--chisel`
+Your answer — even vague ("feels heavy", "too clinical") — trains the system. Creative input, grounded output.
 
 ---
 
@@ -342,21 +330,15 @@ How products speak.
 | Action | Direct, confident | Verb + object | "Claim rewards" |
 | Loading | Reassuring, active | Present participle | "Claiming..." |
 | Success | Celebratory, brief | Past tense + next | "Claimed! View balance" |
-| Error | Helpful, not alarming | What happened + fix | "Couldn't claim. Retry?" |
+| Error | Helpful, not alarming | What + fix | "Couldn't claim. Retry?" |
 | Empty | Guiding, not sad | Opportunity + action | "No rewards yet. Stake to earn" |
 | Confirmation | Clear stakes | What will happen | "Claim 100 HONEY to wallet?" |
-
-**Voice constraints:**
-- Buttons: 1-3 words (action-oriented)
-- Errors: What + Why + Fix
-- Empty states: Explain + Guide
-- Confirmations: Stakes + Escape
 
 ---
 
 ## Protected Capabilities
 
-Non-negotiable. Sigil enforces these:
+Some things aren't creative choices. They're user safety. Non-negotiable:
 
 | Capability | Rule |
 |------------|------|
@@ -367,7 +349,7 @@ Non-negotiable. Sigil enforces these:
 | Focus ring | Always visible |
 | Error recovery | Always possible |
 
-Override requires explicit justification.
+Override requires explicit justification. This is grounding you can't skip.
 
 ---
 
@@ -375,20 +357,20 @@ Override requires explicit justification.
 
 Sigil is a **Loa Construct** — extends Loa without modifying it.
 
-| Loa (Architecture) | Sigil (Physics) |
-|-------------------|-----------------|
+| Loa (Architecture) | Sigil (Feel) |
+|-------------------|--------------|
 | "What to build" | "How it feels" |
+| Strategy | Creative execution |
 | PRD → SDD → Sprint | Understand → Craft → Validate |
-| Spec'd upfront | Emerges through iteration |
 
-**Key principle:** Sigil **invokes** Loa commands — never modifies them. Context flows from Sigil (observations, taste) into Loa (planning), then Sigil applies physics during implementation.
+**Hammer mode** bridges them: when work needs architecture, Sigil invokes Loa for strategic grounding, then applies physics during implementation.
 
 ```
-/craft detects HAMMER
+/craft detects HAMMER (needs strategy)
      │
      ▼
 Sigil invokes Loa:
-• /plan-and-analyze (seeded with user observations, taste)
+• /plan-and-analyze (seeded with user observations)
 • /architect
 • /sprint-plan
      │
@@ -396,7 +378,7 @@ Sigil invokes Loa:
 User reviews plan → /run sprint-plan
      │
      ▼
-Loa executes tasks, Sigil applies physics to UI work
+Loa executes, Sigil applies physics to UI work
 ```
 
 ---
@@ -405,7 +387,7 @@ Loa executes tasks, Sigil applies physics to UI work
 
 ```
 .claude/
-├── commands/                 # Slash commands (47 total)
+├── commands/                 # 47 commands
 │   ├── craft.md              # Primary entry point (v2.0.0)
 │   ├── ward.md               # Physics audit
 │   ├── observe.md            # Capture user truth
@@ -430,7 +412,7 @@ Loa executes tasks, Sigil applies physics to UI work
 └── scripts/                  # Installation
 
 grimoires/sigil/
-├── taste.md                  # Accumulated learning
+├── taste.md                  # Accumulated understanding
 ├── hammer-state.json         # Resume interrupted work
 ├── observations/             # User truth captures
 │   ├── user-insights.md      # Validated findings
@@ -445,7 +427,7 @@ grimoires/sigil/
 
 ### Taste File
 
-`grimoires/sigil/taste.md` — your accumulated understanding:
+`grimoires/sigil/taste.md` — accumulated understanding:
 
 ```yaml
 ---
@@ -458,9 +440,6 @@ diagnostic:
   user_type: "mobile"
   goal: "claim rewards while commuting"
   expected_feel: "snappy"
-physics:
-  behavioral:
-    timing: "800ms"
 change:
   from: "800ms"
   to: "500ms"
@@ -487,17 +466,56 @@ learning:
 
 ---
 
+## Prerequisites
+
+| Tool | Required | Purpose | Install |
+|------|----------|---------|---------|
+| [Claude Code](https://claude.ai/code) | Yes | AI runtime | `npm install -g @anthropic-ai/claude-code` |
+| [Loa](https://github.com/0xHoneyJar/loa) | Yes | Architecture framework | See Loa docs |
+| [agent-browser](https://github.com/anthropics/agent-browser) | No | Visual validation | `npm install -g agent-browser` |
+
+---
+
+## Quick Start
+
+### Via Loa Construct Registry (Recommended)
+
+```bash
+loa install sigil
+```
+
+Or add to your `.claude/constructs.yaml`:
+
+```yaml
+constructs:
+  - name: sigil
+    version: "^2.0.0"
+```
+
+### Manual Installation
+
+```bash
+git clone https://github.com/0xHoneyJar/sigil.git
+cd sigil && ./.claude/scripts/constructs-install.sh
+```
+
+---
+
 ## Why "Sigil"?
 
-A sigil is a symbol that holds intention. You speak a desire, condense it into a mark, and the mark carries the meaning forward.
+A sigil holds intention — but intention grounded in truth.
 
-Sigil captures product intention as physics:
+Traditional product development forces a choice: move fast and guess, or slow down and research. Creative intuition vs. user evidence. Speed vs. strategy.
 
-- **User truth is foundation.** Who, moment, feeling needed.
-- **Feel is the goal.** Not features, not pixels — feel.
-- **Physics are tools.** Behavioral, animation, material, voice.
-- **Taste is memory.** Accumulated understanding of your users.
-- **Feedback refines everything.** Understand → Craft → Validate → Learn → Repeat.
+Sigil holds the tension:
+
+- **Ground yourself** in user truth — who they are, what they need
+- **Trust your intuition** — "feels heavy" is valid input
+- **Move fast** with chisel mode — iterate, adjust, ship
+- **Think first** with hammer mode — when the work needs architecture
+- **Stay grounded** through the feedback loop — every iteration teaches
+
+The sigil remembers. Your taste accumulates. Creative intuition becomes trained intuition — fast AND grounded.
 
 ---
 
