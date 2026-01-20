@@ -237,3 +237,38 @@ Check fork block number. By default uses `latest`. Specify block in web3.yaml fo
 ### viem publicClient reads fail
 
 Fetch interception must be enabled. Check that RPC URL patterns include your provider.
+
+### Smoke test failing
+
+Run the smoke test to diagnose issues:
+
+```bash
+.claude/skills/web3-testing/fixtures/smoke-test.sh
+```
+
+### Fixture app not showing mocked data
+
+1. Verify injection script is loaded: Check console for `[Sigil] Web3 mock injected`
+2. Verify wagmi detected provider: `useAccount()` should return the mock address
+3. Check browser console for errors
+
+## Fixture App
+
+A minimal wagmi v2 app is included for testing:
+
+```bash
+cd .claude/skills/web3-testing/fixtures/wagmi-app
+npm install
+npm run dev
+# Opens http://localhost:5173
+```
+
+Test commands against it:
+
+```bash
+/ward http://localhost:5173 connected
+/ward http://localhost:5173 whale fork
+/test-flow http://localhost:5173 connect
+```
+
+See `fixtures/wagmi-app/README.md` for component reference.
