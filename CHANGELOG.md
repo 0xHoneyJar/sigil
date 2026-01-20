@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.0] - Unreleased
+
+### Summary
+
+v2.3.0 consolidates the **Web3 Testing** and **Observations System** features into a unified release. This version is currently in development on the `develop` branch for dogfooding before release to `main`.
+
+### Added
+
+- **Web3 Testing Skill** (`.claude/skills/web3-testing/`)
+  - Three-layer wagmi/viem mocking architecture (state store, EIP-1193 provider, fetch interception)
+  - 18 built-in scenarios: disconnected, connected, whale, empty, pending, success, error, chain variants
+  - 8 built-in flows: connect, claim, switch, error, stake, disconnect, insufficient
+  - Fork mode support via Tenderly and Anvil
+  - Mock mode for full offline testing
+
+- **`/snapshot` command** — Capture screenshots with Web3 state injection
+  - Syntax: `/snapshot <url> [scenario] [before|after|fork]`
+  - Automatic state injection before page load
+  - Fork mode with Tenderly/Anvil integration
+
+- **`/test-flow` command** — Execute multi-step Web3 user journeys
+  - Syntax: `/test-flow <url> <flow> [fork]`
+  - Step-by-step execution with state transitions
+  - Screenshot capture at key moments
+  - Physics validation at each step
+
+- **`/ward` Web3 extension** — Visual testing with wallet states
+  - UNIX philosophy syntax: `/ward <url> <scenario> [fork]`
+  - Scenario presence implies web3 mode
+  - Integrated physics validation
+
+- **`/observe` command** — User research observation capture
+  - Structured observation schema with physics context
+  - Qualitative feedback on component feel
+  - Integration with taste.md logging
+
+- **`/taste-synthesize` command** — Pattern extraction from accumulated taste signals
+
+- **Wagmi v2 fixture app** for smoke testing
+
+### Technical
+
+- Fork provider auto-detection (Tenderly → Anvil → Hardhat → local)
+- PR attachment workflow for CI integration
+- Complete injection script for wagmi v2 + viem v2 compatibility
+
+---
+
 ## [2.2.0] - 2026-01-19 — "Feedback Loops"
 
 ### Summary

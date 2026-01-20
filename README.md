@@ -1,8 +1,8 @@
 # Sigil
 
-[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.3.0--dev-orange.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-green.svg)](LICENSE.md)
-[![Release](https://img.shields.io/badge/release-Feedback%20Loops-purple.svg)](CHANGELOG.md#220---2026-01-19--feedback-loops)
+[![Release](https://img.shields.io/badge/release-Develop-purple.svg)](CHANGELOG.md#230---unreleased)
 
 > *"A sigil is a symbol that holds intention. You speak a desire, condense it into a mark, and the mark carries the meaning forward."*
 
