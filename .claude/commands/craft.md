@@ -793,7 +793,12 @@ When user confirms debug mode, execute systematic investigation.
    - Verify with evidence (logs, code, tests)
    - Consider edge cases
 
-3. **Show findings:**
+3. **Check for escalation triggers** (see `<escalation_protocol>`):
+   - If > 5 files touched, or 2+ systems involved → Show Scope Check
+   - If root cause is architectural → Suggest escalation to Hammer
+   - If investigation depth > 3 "why" levels → Checkpoint findings
+
+4. **Show findings:**
    ```
    ┌─ Root Cause Found ─────────────────────────────────────────┐
    │                                                            │
@@ -909,7 +914,12 @@ When user confirms explore mode, execute thorough research.
    - Important functions/classes
    - Data flows and relationships
 
-3. **Use Explore agent if needed:**
+3. **Check for escalation triggers** (see `<escalation_protocol>`):
+   - If exploration reveals missing infrastructure → Show Scope Check
+   - If 2+ domain boundaries crossed → Suggest escalation to Hammer
+   - If findings require architectural changes → Checkpoint and escalate
+
+4. **Use Explore agent if needed:**
    - For large codebases, spawn Explore subagent
    - Aggregate findings
 </step_e2>
@@ -950,6 +960,135 @@ When user confirms explore mode, execute thorough research.
    ```
 </step_e3>
 </explore_workflow>
+
+<escalation_protocol>
+## Escalation Protocol
+
+Debug and Explore modes can discover that work requires architecture. This protocol prevents context rot by detecting escalation early and preserving findings.
+
+### Escalation Triggers
+
+During Debug or Explore, watch for these signals:
+
+| Signal | Threshold | Indicates |
+|--------|-----------|-----------|
+| **Files touched** | > 5 files in investigation | Cross-cutting concern |
+| **Domain boundaries** | 2+ systems involved | Integration work |
+| **Missing infrastructure** | API/indexer/contract needed | Full-stack work |
+| **Root cause is architectural** | Design flaw, not bug | Needs redesign |
+| **Investigation depth** | 3+ levels of "why" | Systemic issue |
+
+### Mid-Investigation Check
+
+After Step D2 (Investigate) or Step E2 (Research), evaluate:
+
+```
+┌─ Scope Check ──────────────────────────────────────────────────┐
+│                                                                │
+│  Investigation scope has grown:                                │
+│  • Files examined: [count]                                     │
+│  • Systems involved: [list]                                    │
+│  • Root cause type: [bug | design | architecture]              │
+│                                                                │
+│  This may require Hammer mode (full architecture).             │
+│                                                                │
+│  Options:                                                      │
+│  1. Continue debugging (local fix)                             │
+│  2. Escalate to Hammer (preserve findings, plan architecture)  │
+│  3. Document and stop (hand off to human)                      │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### Delta-Synthesis (Preserve Findings)
+
+When escalating or at investigation milestones, checkpoint findings to `grimoires/sigil/craft-state.md`:
+
+```markdown
+## [YYYY-MM-DD HH:MM] | INVESTIGATION_CHECKPOINT
+
+### Context
+Mode: Debug | Explore
+Original request: [user's request]
+
+### Findings So Far
+- [Finding 1 with file:line evidence]
+- [Finding 2 with file:line evidence]
+- [Finding 3 with file:line evidence]
+
+### Hypothesis
+[Current understanding of the issue/system]
+
+### Escalation Reason
+[Why this needs architecture vs. local fix]
+
+### Recommended Next Mode
+Hammer | Continue Debug | Continue Explore
+
+### Seed Context for Next Mode
+[Key information to pass forward]
+---
+```
+
+### Escalation Handoff
+
+When user chooses to escalate:
+
+1. **Checkpoint findings** to `grimoires/sigil/craft-state.md`
+2. **Log to taste.md**: `DEBUG_ESCALATED` or `EXPLORE_ESCALATED`
+3. **Show handoff summary**:
+   ```
+   ┌─ Escalating to Hammer Mode ─────────────────────────────────┐
+   │                                                             │
+   │  Findings preserved: grimoires/sigil/craft-state.md        │
+   │                                                             │
+   │  Key discoveries:                                           │
+   │  • [discovery 1]                                            │
+   │  • [discovery 2]                                            │
+   │                                                             │
+   │  These findings will seed /plan-and-analyze.               │
+   │                                                             │
+   │  Proceed with Hammer sequence? (y/n)                        │
+   │                                                             │
+   └─────────────────────────────────────────────────────────────┘
+   ```
+4. **Seed Hammer**: Pass findings to `/plan-and-analyze` context
+
+### Lightweight Identifiers
+
+To preserve context across escalation, use lightweight identifiers (not full content):
+
+```
+# Instead of copying 500 lines of code:
+${PROJECT_ROOT}/src/auth/middleware.ts:45-89 (session validation)
+${PROJECT_ROOT}/src/api/routes.ts:120 (route protection)
+
+# Instead of full error traces:
+Error: "Cannot read property 'user' of undefined" at middleware.ts:52
+```
+
+This allows findings to survive `/clear` and seed the next mode with minimal tokens.
+
+### Recovery After Escalation
+
+When starting Hammer mode after escalation:
+
+1. Check for `grimoires/sigil/craft-state.md`
+2. If exists with recent checkpoint (< 1 hour):
+   ```
+   ┌─ Previous Investigation Found ──────────────────────────────┐
+   │                                                             │
+   │  Found checkpoint from Debug/Explore mode:                  │
+   │  • Original issue: [description]                            │
+   │  • Key findings: [count]                                    │
+   │  • Recommended: Hammer mode                                 │
+   │                                                             │
+   │  Use these findings to seed PRD? (y/n)                      │
+   │                                                             │
+   └─────────────────────────────────────────────────────────────┘
+   ```
+3. Seed `/plan-and-analyze` with checkpoint context
+</escalation_protocol>
 
 <step_1>
 ### Step 1: Discover Context
@@ -2012,6 +2151,118 @@ User: The crash happens when scrolling fast through a long list
 [Updates hypothesis with new information...]
 [Continues investigation...]
 ```
+
+### Example 15: Debug → Hammer Escalation (Context Preservation)
+
+```
+User: /craft "fix the rewards not showing up"
+
+[Mode Detection: DEBUG]
+
+┌─ Debug Analysis ───────────────────────────────────────────┐
+│                                                            │
+│  Issue: Rewards not displaying                             │
+│  Affected: RewardsList component                           │
+│                                                            │
+│  Investigation plan:                                       │
+│  1. Check RewardsList component                            │
+│  2. Trace data fetching                                    │
+│  3. Verify API endpoint                                    │
+│                                                            │
+└────────────────────────────────────────────────────────────┘
+
+User: y
+
+[Investigating...]
+[Reading RewardsList.tsx - no issues found]
+[Tracing to useRewards hook - calls /api/rewards]
+[Checking /api/rewards - endpoint doesn't exist]
+[Checking indexer - RewardsClaimed event not indexed]
+[Checking contract - event exists but no handler]
+
+┌─ Scope Check ──────────────────────────────────────────────────┐
+│                                                                │
+│  Investigation scope has grown:                                │
+│  • Files examined: 7                                           │
+│  • Systems involved: Frontend, API, Indexer, Contract          │
+│  • Root cause type: ARCHITECTURE (missing infrastructure)      │
+│                                                                │
+│  The rewards feature is incomplete:                            │
+│  - Contract emits RewardsClaimed event ✓                       │
+│  - Indexer handler: MISSING                                    │
+│  - API endpoint: MISSING                                       │
+│  - Frontend hook: calls non-existent API                       │
+│                                                                │
+│  This requires Hammer mode (full-stack implementation).        │
+│                                                                │
+│  Options:                                                      │
+│  1. Continue debugging (won't help — infrastructure missing)   │
+│  2. Escalate to Hammer (preserve findings, plan architecture)  │
+│  3. Document and stop (hand off to human)                      │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+
+User: 2
+
+[Checkpointing findings to grimoires/sigil/craft-state.md...]
+
+## 2026-01-19 14:32 | INVESTIGATION_CHECKPOINT
+
+### Context
+Mode: Debug
+Original request: "fix the rewards not showing up"
+
+### Findings So Far
+- ${PROJECT_ROOT}/src/components/RewardsList.tsx:45 — Component OK
+- ${PROJECT_ROOT}/src/hooks/useRewards.ts:12 — Calls /api/rewards (404)
+- ${PROJECT_ROOT}/contracts/Rewards.sol:89 — RewardsClaimed event exists
+- MISSING: Indexer handler for RewardsClaimed
+- MISSING: API endpoint GET /api/rewards/:address
+
+### Hypothesis
+Rewards feature was partially implemented. Frontend exists but
+backend infrastructure (indexer + API) was never built.
+
+### Escalation Reason
+Missing infrastructure — not a bug, needs full-stack implementation.
+
+### Recommended Next Mode
+Hammer
+
+### Seed Context for Next Mode
+- Need RewardsClaimed indexer handler
+- Need GET /rewards/:address endpoint
+- Frontend useRewards hook ready to consume
+---
+
+[Logged DEBUG_ESCALATED to taste.md]
+
+┌─ Escalating to Hammer Mode ─────────────────────────────────┐
+│                                                             │
+│  Findings preserved: grimoires/sigil/craft-state.md        │
+│                                                             │
+│  Key discoveries:                                           │
+│  • Frontend exists, backend missing                         │
+│  • Need: Indexer handler + API endpoint                     │
+│  • Contract event already deployed                          │
+│                                                             │
+│  These findings will seed /plan-and-analyze.               │
+│                                                             │
+│  Proceed with Hammer sequence? (y/n)                        │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
+User: y
+
+[Seeding /plan-and-analyze with checkpoint context...]
+[Invoking /plan-and-analyze...]
+
+... [Hammer sequence continues with investigation findings pre-loaded] ...
+```
+
+This example shows how Debug mode detects that a "bug" is actually missing
+infrastructure, checkpoints findings before context is exhausted, and
+hands off cleanly to Hammer mode with full context preserved.
 </examples>
 
 ---
