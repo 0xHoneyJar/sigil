@@ -27,6 +27,8 @@ SIGIL_BRANCH="${SIGIL_BRANCH:-main}"
 VERSION_FILE=".sigil-version.json"
 SIGIL_VERSION="13.0.0"
 AUTO_YES=false
+FORCE_GIT=false
+CONSTRUCTS_SCRIPT=".claude/scripts/constructs-install.sh"
 
 # === Argument Parsing ===
 while [[ $# -gt 0 ]]; do
@@ -39,6 +41,10 @@ while [[ $# -gt 0 ]]; do
       SIGIL_HOME="$2"
       shift 2
       ;;
+    --git)
+      FORCE_GIT=true
+      shift
+      ;;
     -y|--yes)
       AUTO_YES=true
       shift
@@ -46,11 +52,16 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       echo "Usage: mount-sigil.sh [OPTIONS]"
       echo ""
-      echo "Mount Sigil v12 — Design Physics for AI Code Generation"
+      echo "Mount Sigil v13 — Design Physics for AI Code Generation"
+      echo ""
+      echo "Installation Priority:"
+      echo "  1. Loa Constructs (if API key available and pack published)"
+      echo "  2. Git-based installation (fallback)"
       echo ""
       echo "Options:"
-      echo "  --branch <name>   Sigil branch to use (default: main)"
+      echo "  --branch <name>   Sigil branch to use for git install (default: main)"
       echo "  --home <path>     Sigil home directory (default: ~/.sigil/sigil)"
+      echo "  --git             Force git-based installation (skip constructs)"
       echo "  -y, --yes         Auto-confirm updates (for piped installation)"
       echo "  -h, --help        Show this help message"
       echo ""
@@ -63,7 +74,13 @@ while [[ $# -gt 0 ]]; do
       echo ""
       echo "Examples:"
       echo "  curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash"
-      echo "  curl ... | bash -s -- -y    # Auto-confirm updates"
+      echo "  curl ... | bash -s -- -y         # Auto-confirm updates"
+      echo "  curl ... | bash -s -- --git      # Force git installation"
+      echo ""
+      echo "To use Loa Constructs:"
+      echo "  1. Set LOA_CONSTRUCTS_API_KEY environment variable"
+      echo "  2. Or create ~/.loa/credentials.json with {\"api_key\": \"your-key\"}"
+      echo "  3. Run: constructs-install.sh pack sigil"
       exit 0
       ;;
     *)
@@ -73,12 +90,109 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# === Get API Key ===
+get_api_key() {
+  # Check environment variable first
+  if [[ -n "${LOA_CONSTRUCTS_API_KEY:-}" ]]; then
+    echo "$LOA_CONSTRUCTS_API_KEY"
+    return 0
+  fi
+
+  # Check credentials file
+  local creds_file="${HOME}/.loa/credentials.json"
+  if [[ -f "$creds_file" ]]; then
+    local key
+    key=$(jq -r '.api_key // empty' "$creds_file" 2>/dev/null)
+    if [[ -n "$key" ]]; then
+      echo "$key"
+      return 0
+    fi
+  fi
+
+  # Alternative credentials location
+  local alt_creds="${HOME}/.loa-constructs/credentials.json"
+  if [[ -f "$alt_creds" ]]; then
+    local key
+    key=$(jq -r '.api_key // .apiKey // empty' "$alt_creds" 2>/dev/null)
+    if [[ -n "$key" ]]; then
+      echo "$key"
+      return 0
+    fi
+  fi
+
+  echo ""
+}
+
+# === Try Loa Constructs Installation ===
+try_constructs_install() {
+  if [[ "$FORCE_GIT" == "true" ]]; then
+    info "Skipping Loa Constructs (--git flag)"
+    return 1
+  fi
+
+  # Check if constructs script exists
+  if [[ ! -x "$CONSTRUCTS_SCRIPT" ]]; then
+    info "Loa Constructs script not found, using git installation"
+    return 1
+  fi
+
+  # Check for API key
+  local api_key
+  api_key=$(get_api_key)
+  if [[ -z "$api_key" ]]; then
+    info "No Loa Constructs API key found, using git installation"
+    info "  To use constructs: Set LOA_CONSTRUCTS_API_KEY or run /skill-login"
+    return 1
+  fi
+
+  step "Attempting Loa Constructs installation..."
+
+  # Try to install via constructs
+  if LOA_CONSTRUCTS_API_KEY="$api_key" "$CONSTRUCTS_SCRIPT" pack sigil 2>/dev/null; then
+    log "Sigil installed via Loa Constructs!"
+    init_state_zone_only
+    return 0
+  else
+    warn "Constructs installation failed, falling back to git"
+    return 1
+  fi
+}
+
+# === Initialize State Zone Only (for constructs install) ===
+init_state_zone_only() {
+  step "Initializing State Zone..."
+
+  mkdir -p grimoires/sigil/{context,moodboard}
+
+  if [[ ! -f "grimoires/sigil/taste.md" ]]; then
+    cat > "grimoires/sigil/taste.md" << 'EOF'
+# Sigil Taste Log
+
+Accumulated preferences across physics layers.
+
+---
+
+EOF
+    log "  Created taste.md"
+  else
+    log "  taste.md already exists (preserved)"
+  fi
+}
+
 # === Pre-flight Checks ===
 preflight() {
   log "Running pre-flight checks..."
 
   if ! git rev-parse --git-dir > /dev/null 2>&1; then
     err "Not a git repository. Initialize with 'git init' first."
+  fi
+
+  # Check for constructs-based installation first
+  if [[ -d ".claude/constructs/packs/sigil" ]]; then
+    local existing=$(jq -r '.version // "unknown"' .claude/constructs/packs/sigil/manifest.json 2>/dev/null || echo "unknown")
+    log "Sigil already installed via Loa Constructs (v$existing)"
+    info "To update: constructs-install.sh pack sigil"
+    exit 0
   fi
 
   if [[ -f "$VERSION_FILE" ]]; then
@@ -301,10 +415,45 @@ main() {
   log "  Sigil v13.0.0"
   log "  Design Physics + React Implementation Rules"
   log "======================================================================="
+  if [[ "$FORCE_GIT" == "true" ]]; then
+    log "  Mode: Git-based installation (forced)"
+  else
+    log "  Mode: Loa Constructs preferred, git fallback"
+  fi
   log "  Branch: $SIGIL_BRANCH"
   echo ""
 
   preflight
+
+  # Try Loa Constructs first (preferred path)
+  if try_constructs_install; then
+    echo ""
+    log "======================================================================="
+    log "  Sigil Successfully Installed via Loa Constructs!"
+    log "======================================================================="
+    echo ""
+    info "What was installed:"
+    info "  .claude/constructs/packs/sigil/ -> Sigil pack from registry"
+    info "  .claude/commands/               -> Symlinked from pack"
+    info "  .claude/constructs/skills/sigil/ -> Symlinked from pack"
+    info "  grimoires/sigil/taste.md        -> Taste accumulation"
+    echo ""
+    info "Commands:"
+    info "  /craft \"claim button\"         -> Full physics (behavioral + animation + material)"
+    info "  /style \"glassmorphism card\"   -> Material physics only"
+    info "  /animate \"bouncy modal\"       -> Animation physics only"
+    info "  /behavior \"optimistic save\"   -> Behavioral physics only"
+    echo ""
+    info "Updates:"
+    info "  constructs-install.sh pack sigil -> Update to latest version"
+    echo ""
+    info "Sigil learns from your corrections. Use it, and it becomes yours."
+    echo ""
+    exit 0
+  fi
+
+  # Fallback to git-based installation
+  log "Using git-based installation..."
   setup_sigil_home
   install_rules
   install_commands
@@ -316,7 +465,7 @@ main() {
 
   echo ""
   log "======================================================================="
-  log "  Sigil Successfully Mounted!"
+  log "  Sigil Successfully Mounted! (git-based)"
   log "======================================================================="
   echo ""
   info "What was installed:"
@@ -341,6 +490,10 @@ main() {
   info "Physics + Implementation:"
   info "  Sigil detects effect -> applies physics -> uses React best practices"
   info "  45 Vercel Labs rules ensure correct React patterns automatically"
+  echo ""
+  info "Upgrade to Loa Constructs:"
+  info "  1. Set LOA_CONSTRUCTS_API_KEY or run /skill-login"
+  info "  2. Run: constructs-install.sh pack sigil"
   echo ""
   info "Sigil learns from your corrections. Use it, and it becomes yours."
   echo ""

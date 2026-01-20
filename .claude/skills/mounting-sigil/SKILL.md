@@ -14,6 +14,23 @@ Mounting installs the physics rules. Crafting generates components with correct 
 
 ---
 
+## Installation Priority
+
+Sigil supports two installation paths, tried in order:
+
+| Priority | Method | When Used |
+|----------|--------|-----------|
+| 1 | **Loa Constructs** | When API key available and pack is published |
+| 2 | **Git-based** | Fallback when constructs unavailable |
+
+The constructs path provides:
+- License-based updates
+- Offline grace periods
+- Version pinning
+- Enterprise support
+
+---
+
 ## Pre-Mount Checks
 
 ### 1. Verify Git Repository
@@ -29,6 +46,15 @@ echo "✓ Git repository detected"
 ### 2. Check for Existing Mount
 
 ```bash
+# Check constructs-based installation first
+if [[ -d ".claude/constructs/packs/sigil" ]]; then
+  VERSION=$(jq -r '.version // "unknown"' .claude/constructs/packs/sigil/manifest.json 2>/dev/null)
+  echo "✓ Sigil installed via Loa Constructs (v$VERSION)"
+  echo "Use 'constructs-install.sh pack sigil' to update"
+  exit 0
+fi
+
+# Check git-based installation
 if [[ -f ".sigil-version.json" ]]; then
   VERSION=$(jq -r '.version' .sigil-version.json 2>/dev/null)
   echo "⚠️ Sigil already mounted (v$VERSION)"
@@ -50,7 +76,57 @@ fi
 
 ## Mount Process
 
-### Step 1: Configure Upstream Remote
+### Step 0: Try Loa Constructs First (Preferred)
+
+```bash
+# Check if constructs-install.sh exists and API key is available
+CONSTRUCTS_SCRIPT=".claude/scripts/constructs-install.sh"
+API_KEY="${LOA_CONSTRUCTS_API_KEY:-}"
+
+# Try credentials file if env var not set
+if [[ -z "$API_KEY" ]] && [[ -f "$HOME/.loa/credentials.json" ]]; then
+  API_KEY=$(jq -r '.api_key // empty' "$HOME/.loa/credentials.json" 2>/dev/null)
+fi
+
+if [[ -x "$CONSTRUCTS_SCRIPT" ]] && [[ -n "$API_KEY" ]]; then
+  echo "Attempting Loa Constructs installation..."
+
+  if "$CONSTRUCTS_SCRIPT" pack sigil; then
+    echo "✓ Sigil installed via Loa Constructs"
+
+    # Initialize State Zone (not included in pack)
+    mkdir -p grimoires/sigil/{context,moodboard}
+    if [[ ! -f "grimoires/sigil/taste.md" ]]; then
+      cat > grimoires/sigil/taste.md << 'EOF'
+# Sigil Taste Log
+
+> Accumulated taste signals from usage. Usage IS feedback.
+
+## Signal Types
+
+| Signal | Weight | Trigger |
+|--------|--------|---------|
+| ACCEPT | +1 | User uses generated code without changes |
+| MODIFY | +5 | User edits generated code (diff reveals preference) |
+| REJECT | -3 | User says no, deletes, or rewrites |
+
+---
+
+## Signals
+
+EOF
+    fi
+    exit 0
+  else
+    echo "⚠️ Constructs installation failed, falling back to git-based mount"
+  fi
+else
+  echo "ℹ️ Loa Constructs not configured, using git-based mount"
+  echo "  To use constructs: Set LOA_CONSTRUCTS_API_KEY or run /skill-login"
+fi
+```
+
+### Step 1: Configure Upstream Remote (Git Fallback)
 
 ```bash
 SIGIL_REMOTE_URL="${SIGIL_UPSTREAM:-https://github.com/0xHoneyJar/sigil.git}"
@@ -144,6 +220,7 @@ cat > .sigil-version.json << EOF
   "version": "2.0.0",
   "mounted_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "updated_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "installation_method": "git",
   "physics_layers": ["behavioral", "animation", "material"],
   "skills": 11,
   "commands": 12,
