@@ -23,6 +23,18 @@ Taste signals contain user preferences encoded as feedback. Synthesis extracts p
 
 ---
 
+## Data Sources
+
+| Source | File | What it captures |
+|--------|------|------------------|
+| `/craft` signals | `grimoires/sigil/taste.md` | Developer physics preferences |
+| `/observe` diagnostics | `grimoires/sigil/observations/*.md` | Actual user behavior and gaps |
+| Toolbar feedback | `grimoires/sigil/taste.md` | End-user in-product preferences |
+
+**Cross-reference**: When synthesizing, correlate taste signals with observations to validate whether developer preferences align with actual user needs.
+
+---
+
 ## Workflow
 
 ### Step 1: Load Signals
@@ -426,13 +438,63 @@ Would you like to inscribe pattern 2? (yes/no)
 When /craft runs Step 1a (Discover Context), it checks:
 1. `grimoires/sigil/taste.md` for recent patterns
 2. `grimoires/sigil/inscribed-patterns.yaml` for applied rules
+3. `grimoires/sigil/observations/*.md` for user context (NEW)
 
 Applied patterns automatically affect physics analysis.
 
 ---
 
+## Integration with /observe
+
+Observations provide user-grounded validation for taste patterns:
+
+### Cross-Validation
+
+When a taste pattern emerges:
+1. Search `observations/*.md` for related user feedback
+2. Check if pattern aligns with observed user behavior
+3. Elevate confidence if observation confirms pattern
+
+**Example**:
+```
+Taste Pattern: Financial timing 800ms → 500ms (6 signals)
+Observation Match: papa_flavio-diagnostic.md
+  - User type: Decision-maker
+  - Goal: "quickly check accumulation for burn decisions"
+  - Gap type: Feature
+
+Cross-validation: ✓ CONFIRMS faster timing need
+Confidence: MEDIUM → HIGH (observation-backed)
+```
+
+### Observation-Derived Patterns
+
+Some patterns emerge from observations before taste signals:
+
+| Observation Pattern | Implied Physics | Action |
+|---------------------|-----------------|--------|
+| 3+ users with "quickly" in goal | Timing may be too slow | Watch for MODIFY signals |
+| 3+ Decision-makers in user type | May need faster Financial | Consider preemptive rule |
+| 3+ Trust-checkers | Need confidence signals | Add timestamps/confirmations |
+
+### User Insights Synthesis
+
+When running synthesis, also generate `user-insights.md` updates:
+
+```markdown
+## Synthesis-Derived Insights
+
+| Pattern | User Evidence | Recommendation |
+|---------|---------------|----------------|
+| Mobile users prefer 500ms | 4 MODIFY + papa_flavio observation | Add mobile modifier |
+| Power users skip confirmations | 3 "quickly" goals in diagnostics | Consider bypass option |
+```
+
+---
+
 ## Related
 
-- `/craft` - Generation with physics (reads taste patterns)
+- `/craft` - Generation with physics (reads taste patterns + observations)
+- `/observe` - Capture user feedback as structured diagnostics
 - `/inscribe` - Apply learned patterns to rules
 - `/ward` - Validation (checks pattern compliance)
