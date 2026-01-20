@@ -331,6 +331,43 @@ Mark each in_progress then completed as you work.
 **Session health check first**: If drift is at red threshold, pause workflow and show warning before continuing.
 </step_0>
 
+<step_0_4>
+### Step 0.4: PRD Existence Check
+
+Before mode detection, check if a recent PRD exists that should continue through the Loa flow.
+
+**Check for recent PRD:**
+```
+Glob: grimoires/loa/prd*.md
+For each file found:
+  - Parse first H1 heading as title
+  - Check file modification time (recent = < 24h)
+```
+
+**If recent PRD found:**
+```
+┌─ PRD Detected ────────────────────────────────────────────┐
+│                                                           │
+│  Found: {filename} ({age})                                │
+│  Topic: {title from first H1}                             │
+│                                                           │
+│  Options:                                                 │
+│  1. Continue to /architect → Design (SDD)                 │
+│  2. Implement directly (skip architecture)                │
+│  3. Start fresh (ignore existing PRD)                     │
+│                                                           │
+└───────────────────────────────────────────────────────────┘
+```
+
+**Routing:**
+- Option 1: Invoke `Skill tool` with `skill: "architect"`
+- Option 2: Skip to Step 1 (context discovery, Chisel path)
+- Option 3: Continue to Step 0.5 (mode detection)
+
+**If no recent PRD:**
+- Continue to Step 0.5 (mode detection)
+</step_0_4>
+
 <step_0_5>
 ### Step 0.5: Mode Detection
 
@@ -387,6 +424,9 @@ If 2+ explore signals detected → **EXPLORE mode**
 | API refs | `/\b(endpoint|api|GET|POST|fetch.*backend)\b/i` |
 | Indexer refs | `/\b(indexer|index|sync|historical|events)\b/i` |
 | Multi-component | "feature", "flow", scope > 5 words |
+| Framework refs | `/\b(command|skill|workflow|integration|protocol|rule)\b/i` |
+| Grimoire refs | `/\b(grimoire|experiments|observations|taste|moodboard)\b/i` |
+| Multi-file hints | "structure", "across", "throughout", "system-wide" |
 
 4. **Scan for Chisel signals** (-1 each):
 | Signal Type | Patterns |
@@ -1160,6 +1200,17 @@ Extract from experiment file:
 - **Observations** — Linked user diagnostics with quotes and user types
 - **Success criteria** — How we'll measure if this works
 - **What we're changing** — Components and physics adjustments
+- **PRD reference** — If exists in References section
+
+**If experiment has PRD reference:**
+```
+Check if corresponding SDD exists (e.g., grimoires/loa/sdd-{name}.md)
+If no SDD:
+  Suggest: "This experiment has a PRD but no SDD. Run /architect first?"
+  Options:
+    1. Run /architect to create SDD
+    2. Proceed without SDD (skip architecture)
+```
 
 **Experiment Context Effects:**
 - Include experiment hypothesis in analysis box

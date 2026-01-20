@@ -27,6 +27,7 @@ Observation → Hypothesis → Experiment → Craft → Monitor → Conclude
 | ID | Name | Status | Observations | Started |
 |----|------|--------|--------------|---------|
 | [EXP-001](EXP-001-rewards-visibility.md) | Rewards Visibility for Trust-Checkers | 💡 idea | alice | - |
+| [EXP-002](EXP-002-hammer-detection.md) | Improved Hammer Detection for Framework Changes | 🏃 in_progress | zksoju | 2026-01-19 |
 
 ---
 
@@ -39,7 +40,7 @@ Observation → Hypothesis → Experiment → Craft → Monitor → Conclude
 *Experiments being evaluated for priority*
 
 ### 🏃 In Progress
-*Actively running experiments*
+- **EXP-002**: Improved Hammer Detection for Framework Changes (Implementation complete, monitoring for evaluation)
 
 ### ✅ Recently Concluded
 *Experiments with outcomes decided*
