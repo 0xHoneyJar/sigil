@@ -31,6 +31,31 @@ arguments:
     examples:
       - "http://localhost:3000"
       - "https://staging.example.com"
+  - name: "scenario"
+    type: "string"
+    required: false
+    description: "Web3 scenario (presence enables web3 mode)"
+    examples:
+      - "connected"
+      - "whale"
+      - "disconnected"
+      - "empty"
+      - "pending"
+      - "error"
+      - "arbitrum"
+      - "base"
+    notes: |
+      When a scenario is provided, web3 mode is automatically enabled.
+      The injection script mocks wallet state for wagmi/viem dApps.
+      Custom scenarios can be defined in grimoires/sigil/web3.yaml.
+  - name: "mode"
+    type: "string"
+    required: false
+    description: "Web3 execution mode"
+    default: "mock"
+    options:
+      - "mock"   # Full mocking, no network (default)
+      - "fork"   # Real contract state from forked chain
 
 context_files:
   - path: ".claude/rules/00-sigil-core.md"
@@ -264,6 +289,63 @@ agent-browser screenshot          # Capture to verify visible focus ring
 Visual checks silently enhance findings when available. If browser unavailable, skip without error.
 
 See `.claude/skills/agent-browser/SKILL.md` for full command reference.
+
+**2h. Web3 Visual Check (if URL + scenario provided):**
+
+When both a URL and a Web3 scenario are provided, enable Web3 mode:
+
+1. **Load Scenario**:
+   - Check built-in scenarios in `.claude/skills/web3-testing/resources/scenarios.yaml`
+   - Check custom scenarios in `grimoires/sigil/web3.yaml`
+   - Fall back to `connected` if scenario not found
+
+2. **Generate Injection Script**:
+   - Load template from `.claude/skills/web3-testing/resources/injection-script.js`
+   - Replace `__SIGIL_MOCK_STATE_PLACEHOLDER__` with scenario state
+   - If fork mode: Replace `__SIGIL_FORK_RPC_URL_PLACEHOLDER__` with fork RPC URL
+   - If mock mode: Set to `null`
+
+3. **Initialize Fork (if fork mode)**:
+   - Detect fork provider: `./resources/fork-detector.sh`
+   - If Tenderly: `./resources/tenderly-fork.sh create`
+   - If Anvil: `./resources/anvil-fork.sh start`
+   - Store fork RPC URL for injection
+
+4. **Inject and Navigate**:
+   ```bash
+   # Use evaluateOnNewDocument for pre-hydration injection
+   agent-browser open <url> --evaluate-on-new-document <injection-script>
+   agent-browser wait --load networkidle
+   ```
+
+5. **Run Standard Visual Checks** (touch targets, focus rings, screenshot)
+
+6. **Report Web3 Context**:
+   ```
+   ├─ Web3 Context ────────────────────────────────────────────┤
+   │                                                           │
+   │  Scenario: whale                                          │
+   │  Mode: fork (Tenderly)                                    │
+   │  Address: 0xf39F...2266                                   │
+   │  Balance: 1000 ETH                                        │
+   │  Chain: 1 (mainnet)                                       │
+   │                                                           │
+   ```
+
+**UNIX Philosophy Syntax:**
+
+Web3 mode is enabled implicitly when a scenario is provided:
+
+```bash
+# Mock mode (scenario implies web3)
+/ward http://localhost:3000 connected
+
+# Fork mode (explicit third arg)
+/ward http://localhost:3000 whale fork
+
+# Still works without web3
+/ward http://localhost:3000
+```
 </step_2>
 
 <step_3>

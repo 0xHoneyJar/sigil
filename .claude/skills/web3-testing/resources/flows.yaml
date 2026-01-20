@@ -1,0 +1,314 @@
+# Sigil Web3 Testing - Built-in Flows
+#
+# Flow definitions for common Web3 user journeys.
+# Each flow is a sequence of steps with state transitions.
+#
+# Step Types:
+#   inject   - Initial state injection (before page load)
+#   update   - Runtime state update (triggers wagmi events)
+#   click    - Click element by selector
+#   fill     - Fill input field
+#   navigate - Navigate to path (relative to base URL)
+#   wait     - Wait for duration (ms) or selector
+#   screenshot - Capture screenshot with name
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Connect Wallet Flow
+# ═══════════════════════════════════════════════════════════════════════════
+
+connect:
+  name: "Connect Wallet"
+  description: "Simulate wallet connection flow with proper event emission"
+  steps:
+    - action: inject
+      comment: "Start with provider installed but disconnected"
+      state:
+        connected: false
+        address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+        chainId: 1
+        balances:
+          ETH: "10.0"
+
+    - action: screenshot
+      name: "01-disconnected"
+
+    - action: click
+      selector: "[data-testid='connect-button'], button:has-text('Connect'), [data-testid='connect-wallet']"
+      comment: "Click connect button"
+
+    - action: update
+      comment: "Triggers accountsChanged event → wagmi re-renders"
+      state:
+        connected: true
+
+    - action: wait
+      duration: 300
+      comment: "Allow React re-render"
+
+    - action: screenshot
+      name: "02-connected"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Claim Rewards Flow
+# ═══════════════════════════════════════════════════════════════════════════
+
+claim:
+  name: "Claim Rewards"
+  description: "Full claim flow with confirmation and transaction lifecycle"
+  steps:
+    - action: inject
+      state:
+        connected: true
+        address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+        chainId: 1
+        balances:
+          ETH: "10.0"
+        contractReads:
+          "0x70a08231": "100000000000000000000"  # 100 tokens claimable
+          balanceOf: "100000000000000000000"
+          claimableAmount: "100000000000000000000"
+        transactionState: "idle"
+
+    - action: navigate
+      path: "/claim"
+
+    - action: screenshot
+      name: "01-claim-page"
+
+    - action: click
+      selector: "[data-testid='claim-button'], button:has-text('Claim')"
+
+    - action: screenshot
+      name: "02-confirmation"
+
+    - action: click
+      selector: "[data-testid='confirm-button'], button:has-text('Confirm')"
+
+    - action: update
+      state:
+        transactionState: "pending"
+        transactionHash: "0xabc123def456789abc123def456789abc123def456789abc123def456789abc1"
+
+    - action: screenshot
+      name: "03-pending"
+
+    - action: wait
+      duration: 1500
+
+    - action: update
+      state:
+        transactionState: "success"
+        balances:
+          ETH: "10.05"  # Gained from claim
+        contractReads:
+          "0x70a08231": "0"
+          balanceOf: "0"
+          claimableAmount: "0"
+
+    - action: screenshot
+      name: "04-success"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Switch Chain Flow
+# ═══════════════════════════════════════════════════════════════════════════
+
+switch:
+  name: "Switch Chain"
+  description: "Test chain switching flow"
+  steps:
+    - action: inject
+      state:
+        connected: true
+        address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+        chainId: 1
+        balances:
+          ETH: "10.0"
+
+    - action: screenshot
+      name: "01-mainnet"
+
+    - action: click
+      selector: "[data-testid='chain-selector'], [data-testid='network-selector'], button:has-text('Ethereum')"
+
+    - action: click
+      selector: "[data-testid='chain-arbitrum'], button:has-text('Arbitrum'), [data-value='42161']"
+
+    - action: update
+      comment: "Triggers chainChanged event"
+      state:
+        chainId: 42161
+        balances:
+          ETH: "5.0"
+          ARB: "10000.0"
+
+    - action: wait
+      duration: 300
+
+    - action: screenshot
+      name: "02-arbitrum"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Error Recovery Flow
+# ═══════════════════════════════════════════════════════════════════════════
+
+error:
+  name: "Transaction Error"
+  description: "Test error handling and recovery UI"
+  steps:
+    - action: inject
+      preset: "connected"
+
+    - action: navigate
+      path: "/send"
+
+    - action: fill
+      selector: "[data-testid='amount-input'], input[name='amount']"
+      value: "1.0"
+
+    - action: click
+      selector: "[data-testid='send-button'], button:has-text('Send')"
+
+    - action: update
+      state:
+        transactionState: "error"
+        transactionError: "User rejected the request"
+
+    - action: screenshot
+      name: "01-error-state"
+
+    - action: click
+      selector: "[data-testid='retry-button'], button:has-text('Retry'), button:has-text('Try Again')"
+
+    - action: update
+      state:
+        transactionState: "idle"
+
+    - action: screenshot
+      name: "02-recovered"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Approve & Stake Flow
+# ═══════════════════════════════════════════════════════════════════════════
+
+stake:
+  name: "Approve and Stake"
+  description: "Full approve → stake flow with two transactions"
+  steps:
+    - action: inject
+      state:
+        connected: true
+        address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+        chainId: 1
+        balances:
+          ETH: "10.0"
+        contractReads:
+          allowance: "0"  # No approval yet
+          balanceOf: "1000000000000000000000"  # 1000 tokens to stake
+
+    - action: navigate
+      path: "/stake"
+
+    - action: screenshot
+      name: "01-stake-page"
+
+    - action: fill
+      selector: "[data-testid='stake-input'], input[name='amount']"
+      value: "500"
+
+    - action: click
+      selector: "[data-testid='approve-button'], button:has-text('Approve')"
+
+    - action: update
+      state:
+        transactionState: "pending"
+
+    - action: screenshot
+      name: "02-approving"
+
+    - action: update
+      state:
+        transactionState: "idle"
+        contractReads:
+          allowance: "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+          balanceOf: "1000000000000000000000"
+
+    - action: wait
+      duration: 500
+
+    - action: screenshot
+      name: "03-approved"
+
+    - action: click
+      selector: "[data-testid='stake-button'], button:has-text('Stake')"
+
+    - action: update
+      state:
+        transactionState: "pending"
+
+    - action: screenshot
+      name: "04-staking"
+
+    - action: update
+      state:
+        transactionState: "success"
+        contractReads:
+          allowance: "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+          balanceOf: "500000000000000000000"  # 500 remaining
+          stakedBalance: "500000000000000000000"  # 500 staked
+
+    - action: screenshot
+      name: "05-staked"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Disconnect Wallet Flow
+# ═══════════════════════════════════════════════════════════════════════════
+
+disconnect:
+  name: "Disconnect Wallet"
+  description: "Test wallet disconnection flow"
+  steps:
+    - action: inject
+      preset: "connected"
+
+    - action: screenshot
+      name: "01-connected"
+
+    - action: click
+      selector: "[data-testid='account-button'], [data-testid='wallet-button']"
+
+    - action: click
+      selector: "[data-testid='disconnect-button'], button:has-text('Disconnect')"
+
+    - action: update
+      state:
+        connected: false
+
+    - action: wait
+      duration: 300
+
+    - action: screenshot
+      name: "02-disconnected"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Insufficient Balance Flow
+# ═══════════════════════════════════════════════════════════════════════════
+
+insufficient:
+  name: "Insufficient Balance"
+  description: "Test UI when user has insufficient balance"
+  steps:
+    - action: inject
+      preset: "empty"  # 0.001 ETH
+
+    - action: navigate
+      path: "/send"
+
+    - action: screenshot
+      name: "01-empty-wallet"
+
+    - action: fill
+      selector: "[data-testid='amount-input'], input[name='amount']"
+      value: "1.0"
+
+    - action: screenshot
+      name: "02-insufficient-warning"
