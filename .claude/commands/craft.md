@@ -33,6 +33,13 @@ arguments:
     examples:
       - "http://localhost:3000"
       - "http://localhost:3000/component-preview"
+  - name: "--experiment"
+    type: "string"
+    required: false
+    description: "Link this craft session to an experiment (e.g., --experiment EXP-001)"
+    examples:
+      - "--experiment EXP-001"
+      - "--experiment EXP-002-claim-flow"
 
 context_files:
   - path: ".claude/rules/00-sigil-core.md"
@@ -74,6 +81,9 @@ context_files:
   - path: "grimoires/sigil/observations/"
     required: false
     purpose: "User behavior observations - diagnostics, insights, physics implications"
+  - path: "grimoires/sigil/experiments/"
+    required: false
+    purpose: "Active experiments - hypothesis, success criteria, linked observations"
   - path: "grimoires/loa/context/domain/"
     required: false
     purpose: "Domain knowledge from /understand or complexity detection"
@@ -1141,6 +1151,26 @@ For each diagnostic file with matching `related_components`:
 - Proceed without observation context
 - Observation section omitted from analysis box
 
+**1a-exp. Check for experiment context** (if `--experiment` flag provided):
+```
+Read grimoires/sigil/experiments/{experiment-id}.md
+```
+Extract from experiment file:
+- **Hypothesis** — What we're testing and why
+- **Observations** — Linked user diagnostics with quotes and user types
+- **Success criteria** — How we'll measure if this works
+- **What we're changing** — Components and physics adjustments
+
+**Experiment Context Effects:**
+- Include experiment hypothesis in analysis box
+- Show linked observations from experiment (already validated)
+- Apply physics adjustments specified in "What We're Changing"
+- Link resulting taste signal to experiment
+
+**If experiment not found:**
+- Warn: "⚠ Experiment {id} not found in grimoires/sigil/experiments/"
+- Offer: Continue without experiment link, or specify correct ID
+
 **1b. Read taste log and check session health** (if exists):
 ```
 Read grimoires/sigil/taste.md
@@ -1245,6 +1275,11 @@ Show analysis appropriate to craft type:
 │  Craft Type:   Generate                                │
 │  Effect:       Financial mutation                      │
 │                                                        │
+│  Experiment:   (if --experiment flag provided)         │
+│                EXP-001: Rewards Visibility             │
+│                Hypothesis: Show delta → confidence     │
+│                Addressing: alice (trust-checker)       │
+│                                                        │
 │  Observations: (if matching diagnostics found)         │
 │                papa_flavio: "need to know rewards..."  │
 │                → User type: decision-maker             │
@@ -1265,6 +1300,12 @@ Show analysis appropriate to craft type:
 │  Protected:    [✓] All capabilities included          │
 └────────────────────────────────────────────────────────┘
 ```
+
+**Experiment Section Rules:**
+- Only show if `--experiment` flag provided and experiment exists
+- Show: experiment ID, name, abbreviated hypothesis
+- Show: primary user being addressed (from experiment's observations)
+- Experiment takes priority over generic observation matching
 
 **Observations Section Rules:**
 - Only show if matching diagnostics exist for the craft target
@@ -1439,6 +1480,7 @@ Target: [what was crafted]
 Craft Type: [generate/refine/configure/pattern/polish]
 Effect: [if applicable]
 Physics: [key values applied]
+Experiment: [if --experiment flag used, link experiment ID]
 ---
 ```
 
@@ -1449,6 +1491,7 @@ Target: [what was crafted]
 Craft Type: [type]
 Changed: [what user indicated was off]
 Learning: [infer preference for future]
+Experiment: [if --experiment flag used, link experiment ID]
 ---
 ```
 
@@ -1458,8 +1501,20 @@ Learning: [infer preference for future]
 Target: [what was crafted]
 Craft Type: [type]
 Reason: [user feedback]
+Experiment: [if --experiment flag used, link experiment ID]
 ---
 ```
+
+**7b. Update Experiment (if --experiment flag used):**
+
+When crafting with `--experiment`, also update the experiment file:
+
+1. Add entry to "Craft Sessions" table:
+```markdown
+| [date] | [component] | [session-timestamp] | [signal] |
+```
+
+2. If REJECT: Note in experiment that the craft attempt failed — may inform hypothesis
 </step_7>
 </workflow>
 
@@ -2263,6 +2318,57 @@ User: y
 This example shows how Debug mode detects that a "bug" is actually missing
 infrastructure, checkpoints findings before context is exhausted, and
 hands off cleanly to Hammer mode with full context preserved.
+
+### Example 16: Craft with Experiment Context
+
+```
+User: /craft "RewardsDisplay" --experiment EXP-001
+
+[Reading experiment EXP-001-rewards-visibility.md...]
+
+┌─ Craft Analysis ───────────────────────────────────────┐
+│  Target:       RewardsDisplay (new)                    │
+│  Craft Type:   Generate                                │
+│  Effect:       Query (data display)                    │
+│                                                        │
+│  Experiment:   EXP-001: Rewards Visibility             │
+│                Hypothesis: Delta display → confidence  │
+│                Addressing: alice (trust-checker)       │
+│                                                        │
+│  From experiment "What We're Changing":                │
+│  • Add "+X since last" delta indicator                 │
+│  • Add trend arrow (↑/↓/→)                             │
+│  • Subtle pulse on value increase                      │
+│                                                        │
+│  Behavioral    Optimistic | 150ms | No confirmation    │
+│  Animation     spring(500) | pulse on change           │
+│  Material      Elevated | Soft shadow | 8px radius     │
+│                                                        │
+│  Output:       src/components/RewardsDisplay.tsx       │
+│  Protected:    [✓] Balance always accurate            │
+└────────────────────────────────────────────────────────┘
+
+Proceed? (y/n)
+
+User: y
+
+[Generates component with delta indicator, trend arrow, pulse animation]
+
+Does this feel right for your trust-checker users?
+
+User: looks good, the trend arrow is helpful
+
+[Logs ACCEPT with Experiment: EXP-001]
+[Updates EXP-001-rewards-visibility.md Craft Sessions table:]
+
+| Date | Component | Session ID | Signal |
+|------|-----------|------------|--------|
+| 2026-01-19 | RewardsDisplay | 2026-01-19T14:32:00Z | ACCEPT |
+```
+
+This example shows how experiment context informs the craft — the physics
+adjustments from "What We're Changing" are applied, and the craft session
+is linked back to the experiment for tracking.
 </examples>
 
 ---

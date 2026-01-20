@@ -129,8 +129,20 @@ Creates `grimoires/sigil/observations/{username}-diagnostic.md`:
 
 1. Get answers to diagnostic questions
 2. Classify gap type
-3. If UI work needed → `/craft` with full context
-4. Update `user-insights.md` with confirmed findings
+3. Mark diagnostic as `status: validated`
+4. Create experiment → `/observe` prompts for EXP-XXX creation
+5. If UI work needed → `/craft --experiment EXP-XXX`
+6. Update `user-insights.md` with confirmed findings
+
+---
+
+## Experiment Link (after validation)
+
+*Filled in when experiment is created from this observation*
+
+| Experiment | Status | Outcome |
+|------------|--------|---------|
+| *none yet* | | |
 ```
 
 ---
@@ -182,9 +194,78 @@ When running `/craft`, check observations for:
 
 ---
 
+## Experiment Integration
+
+When a diagnostic reaches **validated** status, prompt to create an experiment:
+
+### Validation Criteria
+
+A diagnostic is validated when:
+- Level 3 diagnostic questions have been answered
+- Gap type has been classified (bug, discoverability, feature)
+- Hypothesis has been confirmed with evidence
+
+### Post-Validation Flow
+
+```
+Diagnostic VALIDATED
+        ↓
+┌─────────────────────────────────────────────────────────┐
+│  This observation is validated.                          │
+│                                                          │
+│  Gap type: {discoverability | feature | bug}             │
+│  Key insight: "{user's key quote}"                       │
+│                                                          │
+│  Create experiment to address this?                      │
+│  [Yes, create EXP-XXX] [No, just track]                 │
+└─────────────────────────────────────────────────────────┘
+```
+
+### If "Yes, create experiment":
+
+1. Generate next experiment ID (EXP-XXX)
+2. Create `experiments/EXP-XXX-{slug}.md` from template
+3. Pre-fill:
+   - Observation link to this diagnostic
+   - Gap type from classification
+   - User type from profile
+   - Suggested hypothesis based on gap
+4. Update `experiments/laboratory.md` index
+5. Set experiment status: 💡 idea
+
+### Experiment File Location
+
+```
+grimoires/sigil/
+├── observations/
+│   └── {user}-diagnostic.md     # ← You are here (validated)
+│
+└── experiments/
+    └── EXP-XXX-{feature}.md     # ← Created from observation
+```
+
+### Example: Observation → Experiment
+
+```markdown
+# In alice-diagnostic.md (after validation)
+
+## Status: VALIDATED
+
+Gap type: Discoverability
+Key insight: "I try to remember the number from before but I forget"
+
+## Experiment Created
+
+→ EXP-001: Rewards Visibility for Trust-Checkers
+  Link: experiments/EXP-001-rewards-visibility.md
+```
+
+---
+
 ## Related Commands
 
 - `/craft` - Generate components (reads observations for context)
+- `/craft --experiment EXP-XXX` - Generate components for specific experiment
 - `/taste-synthesize` - Analyze taste patterns
 - `/plan-and-analyze` - Full PRD discovery (includes user research phase)
 
