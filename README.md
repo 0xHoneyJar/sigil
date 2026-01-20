@@ -1,21 +1,17 @@
 # Sigil
 
-Design physics for AI code generation.
+[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](CHANGELOG.md)
+[![License](https://img.shields.io/badge/license-AGPL--3.0-green.svg)](LICENSE.md)
+[![Release](https://img.shields.io/badge/release-Feedback%20Loops-purple.svg)](CHANGELOG.md#220---2026-01-19--feedback-loops)
+
+> *"A sigil is a symbol that holds intention. You speak a desire, condense it into a mark, and the mark carries the meaning forward."*
+
+**Design physics for AI code generation.** Sigil teaches AI to understand feel — timing, motion, surface — so generated UI matches your intent. Built to work alongside [Loa](https://github.com/0xHoneyJar/loa).
 
 ```
 $ curl -fsSL https://sigil.dev/install | bash
 > /craft "claim button"
 ```
-
----
-
-## Why "Sigil"
-
-A sigil is a symbol that holds intention. You speak a desire, condense it into a mark, and the mark carries the meaning forward.
-
-That's what this does. You speak in feel — "trustworthy", "snappy", "glassy". Sigil condenses it into physics — timing, easing, surface. The physics carry the feel into code.
-
-Use it, and it learns. Accept a generation, and the sigil remembers. Modify it, and the sigil adapts. Over time, your sigil becomes yours — a condensed symbol of your taste that generates physics matching your intent.
 
 ---
 
@@ -402,4 +398,18 @@ Loa plans structure. Sigil tunes feel. They meet at the component boundary.
 
 ---
 
-*v2.1.0*
+## What's New in v2.2.0
+
+This release introduces the **Sigil Feedback Loops System**:
+
+- ✨ **`/observe`** — Capture user research observations during testing
+- ✨ **`/taste-synthesize`** — Analyze taste signals and extract patterns
+- ✨ **`/ward-all`** — Comprehensive physics audit across all components
+- 🔧 **Sigil Toolbar** — Browser extension for real-time physics detection
+- 📊 **Enhanced taste schema** — Diagnostics, source tracking, learning inference
+
+See [CHANGELOG.md](CHANGELOG.md) for full release notes.
+
+---
+
+*v2.2.0 "Feedback Loops"*
