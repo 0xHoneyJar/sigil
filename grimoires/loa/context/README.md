@@ -1,36 +1,45 @@
-# Context Directory
+# Shared Context Store
 
-This directory is for user-provided context that feeds into the PRD discovery process (`/plan-and-analyze`).
+Bridge between Sigil (design physics) and Loa (architecture). This directory stores context gathered during complexity detection and handoff protocols.
 
-## What to Put Here
+## Structure
 
-- Product briefs, specs, or requirements documents
-- Market research or competitive analysis
-- Technical constraints or architecture notes
-- Stakeholder feedback or user research
-- Any documents that inform what you want to build
+```
+context/
+├── .context-config.yaml    # TTL and permission settings
+├── indexer/                 # DX Physics: block range caches
+│   └── {chainId}/
+│       └── {contract}-{event}.json
+├── ecosystem/               # Multi-repo relationships
+│   └── repos.yaml
+├── domain/                  # Contract/system documentation
+│   └── {topic}.md
+└── sessions/                # Temporary handoff state
+    └── {date}-{id}.json
+```
 
-## Important: Files Are Not Tracked
+## Purpose
 
-**All files in this directory (except this README) are gitignored.**
+When Sigil detects complexity (indexer work, multi-repo references, unknown contracts), it gathers context via appropriate handlers and stores results here. This context is then available for:
 
-This is intentional because:
-1. Context files are user-specific and project-specific
-2. They may contain sensitive business information
-3. Loa is a template - your context shouldn't pollute the framework
+- `/craft` — enriched physics with domain knowledge
+- `/implement` — block ranges for fast testing
+- Loa commands — ecosystem awareness
 
-## How It Works
+## TTL
 
-When you run `/plan-and-analyze`, the discovering-requirements agent will:
-1. Read all files in this directory
-2. Use them as input for generating your PRD
-3. Ask clarifying questions based on what it finds
+| Context Type | Expiration |
+|--------------|------------|
+| indexer      | 24 hours   |
+| ecosystem    | 7 days     |
+| domain       | 30 days    |
+| sessions     | 1 hour     |
 
-## Supported Formats
+## Write Permissions
 
-- Markdown (`.md`)
-- Text files (`.txt`)
-- PDFs (`.pdf`)
-- Images (`.png`, `.jpg`) - for mockups or diagrams
+| Framework | Allowed Paths |
+|-----------|---------------|
+| Sigil     | indexer/**, sessions/** |
+| Loa       | domain/**, ecosystem/**, sessions/** |
 
-Place your context files here, then run `/plan-and-analyze` to begin discovery.
+Conflict resolution: last-write-wins with audit trail.

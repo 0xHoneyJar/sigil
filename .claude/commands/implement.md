@@ -112,12 +112,15 @@ See: `skills/implementing-tasks/SKILL.md` for full workflow details.
 
 1. **Pre-flight**: Validate sprint ID, check setup, verify prerequisites
 2. **Directory Setup**: Create `grimoires/loa/a2a/{sprint_id}/` if needed
-3. **Feedback Check**: Audit feedback (priority 1) → Engineer feedback (priority 2)
-4. **Context Loading**: Read PRD, SDD, sprint plan for requirements
-5. **Implementation**: Execute tasks with production-quality code and tests
-6. **Report Generation**: Create `reviewer.md` with full implementation details
-7. **Index Update**: Update `grimoires/loa/a2a/index.md` with sprint status
-8. **Analytics**: Update usage metrics (THJ users only)
+3. **Complexity Detection (Phase 0.5)**: Check for indexer work, multi-repo refs, unknown contracts
+   - If triggers found → gather context via handlers → store in `grimoires/loa/context/`
+   - See `.claude/rules/18-sigil-complexity.md` for details
+4. **Feedback Check**: Audit feedback (priority 1) → Engineer feedback (priority 2)
+5. **Context Loading**: Read PRD, SDD, sprint plan for requirements + enriched context
+6. **Implementation**: Execute tasks with production-quality code and tests
+7. **Report Generation**: Create `reviewer.md` with full implementation details
+8. **Index Update**: Update `grimoires/loa/a2a/index.md` with sprint status
+9. **Analytics**: Update usage metrics (THJ users only)
 
 ## Arguments
 
