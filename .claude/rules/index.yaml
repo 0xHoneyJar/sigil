@@ -75,6 +75,8 @@ rules:
     always_check: true
 
   # Data Physics (NEW - Web3)
+  # NOTE: Requires web3-specific signals to avoid false positives
+  # Generic signals like "??" or "useQuery" removed - too broad
   - file: "19-sigil-data-physics.md"
     triggers:
       keywords:
@@ -82,14 +84,15 @@ rules:
         - "indexed"
         - "on-chain"
         - "web3"
-        - "??"
-        - "fallback"
-        - "stale"
+        - "stale data"
+        - "indexer"
       hooks:
         - "useReadContract"
         - "useWriteContract"
-        - "useQuery"
         - "useContractRead"
+        - "useWaitForTransactionReceipt"
+      # Require at least one web3-specific hook OR keyword
+      # useQuery alone is not sufficient (generic React Query)
     tokens: 800
     priority: 1
 

@@ -402,7 +402,10 @@ Load additional rules based on detected patterns. This reduces context from ~10k
 4. Sort load_queue by priority (1 = highest)
 
 5. Load rules until token budget (~4000) reached:
-   loaded_tokens = 1000  # rlm-core-summary.md already loaded
+   # Base: always-loaded rules (from index.yaml)
+   loaded_tokens = 1000  # rlm-core-summary.md
+   loaded_tokens += 800  # 04-sigil-protected.md (required)
+   # Total base: ~1800 tokens, leaving ~2200 for triggered rules
 
    For each rule in sorted load_queue:
      If loaded_tokens + rule.tokens <= 4000:
@@ -413,8 +416,10 @@ Load additional rules based on detected patterns. This reduces context from ~10k
        Stop loading (budget exceeded)
 
 6. If iteration > 1 (continuation session):
-   Skip rules in index.yaml's skip_on_continuation list
-   (These were already applied in previous iteration)
+   Check craft-state.md for rules_loaded from previous iteration
+   For each rule in skip_on_continuation:
+     ONLY skip if rule appears in previous rules_loaded
+     (Don't skip if scope changed or rule never loaded)
 ```
 
 **Show RLM Loading (verbose mode):**
