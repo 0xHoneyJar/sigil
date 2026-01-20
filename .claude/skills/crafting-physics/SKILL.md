@@ -100,18 +100,345 @@ Ask user to reflect on feel:
 - MODIFY: Describes what's off ("too slow", "needs more contrast")
 - REJECT: "no", "wrong", "start over"
 
+### Step 6b: Diagnostic Mode (for MODIFY/REJECT signals)
+
+When a MODIFY or REJECT signal is detected, enter diagnostic mode to capture context that helps the system learn:
+
+```
+┌─ Diagnostic Questions ─────────────────────────────────────────┐
+│                                                                │
+│  Help Sigil learn from this feedback (skip anytime):           │
+│                                                                │
+│  1. Who is your user?                                          │
+│     □ power-user  □ casual  □ mobile  □ first-time  □ other   │
+│                                                                │
+│  2. What were they trying to accomplish?                       │
+│     [free text: e.g., "quickly check their balance"]           │
+│                                                                │
+│  3. What should this interaction feel like?                    │
+│     □ instant  □ snappy  □ deliberate  □ trustworthy  □ other │
+│                                                                │
+│  (Press Enter to skip diagnostics)                             │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+```
+
+**Diagnostic Flow**:
+
+1. **On MODIFY/REJECT detection**, prompt with diagnostic questions
+2. **Parse responses** into DiagnosticContext:
+   ```typescript
+   interface DiagnosticContext {
+     user_type: 'power-user' | 'casual' | 'mobile' | 'first-time' | string;
+     goal: string;           // Free-text description
+     expected_feel: 'instant' | 'snappy' | 'deliberate' | 'trustworthy' | string;
+     skipped: boolean;       // True if user pressed Enter to skip
+   }
+   ```
+3. **If user skips** (presses Enter without answering):
+   - Set `skipped: true` in DiagnosticContext
+   - Log signal with `diagnostic.skipped: true`
+   - Do NOT ask follow-up questions
+4. **Pass DiagnosticContext to Step 7** for enhanced logging
+
+**Skip Behavior**:
+- Skip option is always clearly available
+- Skipping is not a failure — it just means less learning data
+- Never block the user from completing their task
+
 ### Step 7: Log Taste Signal
 
-Append to `grimoires/sigil/taste.md`:
+Append to `grimoires/sigil/taste.md` using the enhanced format with YAML frontmatter:
 
 ```markdown
-## [YYYY-MM-DD HH:MM] | [SIGNAL]
-Target: [what was crafted]
-Craft Type: [type]
-Effect: [if applicable]
-Physics: [key values applied]
-[If MODIFY: Changed: ..., Learning: ...]
 ---
+timestamp: "YYYY-MM-DDTHH:MM:SSZ"
+signal: ACCEPT | MODIFY | REJECT
+source: cli
+component:
+  name: "ComponentName"
+  effect: "Financial | Destructive | Standard | Local"
+  craft_type: "generate | refine | configure | pattern | polish"
+physics:
+  behavioral:
+    sync: "pessimistic | optimistic | immediate"
+    timing: "800ms | 600ms | 200ms | 100ms"
+    confirmation: "required | toast | none"
+  animation:
+    easing: "ease-out | spring(stiffness, damping)"
+    duration: "300ms"
+  material:
+    surface: "elevated | flat | glass"
+    shadow: "soft | none"
+    radius: "8px"
+diagnostic:
+  user_type: "power-user | casual | mobile | first-time"
+  goal: "Free text description of user goal"
+  expected_feel: "instant | snappy | deliberate | trustworthy"
+  skipped: false
+change:
+  from: "Original value (for MODIFY)"
+  to: "New value (for MODIFY)"
+learning:
+  inference: "Inferred preference from this signal"
+  recommendation: "Suggested rule adjustment"
+rejection_reason: "User's stated reason (for REJECT)"
+---
+```
+
+**Signal-specific fields**:
+
+| Signal | Required Fields | Optional Fields |
+|--------|-----------------|-----------------|
+| ACCEPT | timestamp, signal, source, component, physics | diagnostic (if provided) |
+| MODIFY | timestamp, signal, source, component, physics, change, learning | diagnostic |
+| REJECT | timestamp, signal, source, component, physics, rejection_reason | diagnostic |
+
+**Diagnostic Fields** (from Step 6b):
+- Only present if user answered diagnostic questions
+- If user skipped: include `diagnostic.skipped: true` only
+- If user provided partial answers: include whatever was provided
+
+---
+
+## Taste Parser Specification
+
+When reading `grimoires/sigil/taste.md` in Step 1a, parse signals using this approach:
+
+### Parsing Algorithm
+
+```
+1. Split file content by "---\n---" to separate signal entries
+2. For each entry:
+   a. Extract YAML frontmatter between "---" delimiters
+   b. Parse YAML into TasteSignal object
+   c. Handle malformed YAML gracefully (skip entry, log warning)
+3. Return array of TasteSignal objects
+```
+
+### TasteSignal Interface
+
+```typescript
+interface TasteSignal {
+  timestamp: string;                    // ISO 8601 format
+  signal: 'ACCEPT' | 'MODIFY' | 'REJECT';
+  source: 'cli' | 'toolbar' | 'product';
+  component: {
+    name: string;
+    effect: 'Financial' | 'Destructive' | 'Standard' | 'Local' | 'Soft Delete';
+    craft_type?: 'generate' | 'refine' | 'configure' | 'pattern' | 'polish';
+  };
+  physics: {
+    behavioral?: {
+      sync?: 'pessimistic' | 'optimistic' | 'immediate';
+      timing?: string;          // e.g., "800ms"
+      confirmation?: 'required' | 'toast' | 'none';
+    };
+    animation?: {
+      easing?: string;          // e.g., "ease-out" or "spring(400, 25)"
+      duration?: string;
+    };
+    material?: {
+      surface?: string;
+      shadow?: string;
+      radius?: string;
+    };
+  };
+  diagnostic?: DiagnosticContext;
+  change?: {
+    from: string;
+    to: string;
+  };
+  learning?: {
+    inference: string;
+    recommendation?: string;
+  };
+  rejection_reason?: string;
+}
+
+interface DiagnosticContext {
+  user_type?: 'power-user' | 'casual' | 'mobile' | 'first-time' | string;
+  goal?: string;
+  expected_feel?: 'instant' | 'snappy' | 'deliberate' | 'trustworthy' | string;
+  skipped: boolean;
+}
+```
+
+### Pattern Detection
+
+When analyzing taste.md for patterns:
+
+```
+1. Filter signals by timeframe (default: 30 days)
+2. Group MODIFY signals by:
+   - component.effect (e.g., "Financial")
+   - change field (e.g., "timing: 800ms → 500ms")
+3. Count occurrences of each change pattern
+4. If count >= 3, flag as learned preference
+5. Return learned preferences for application in Step 3
+```
+
+### Example: Reading Learned Preferences
+
+```
+Analyzing taste.md...
+Found 12 signals in last 30 days:
+- 5 ACCEPT, 6 MODIFY, 1 REJECT
+
+Learned preferences detected:
+- Financial timing: 500ms (3 MODIFY signals)
+- Financial animation: spring(400, 25) (3 MODIFY signals)
+
+Will apply: 500ms + spring for Financial effects
+```
+
+### Graceful Handling
+
+| Scenario | Behavior |
+|----------|----------|
+| taste.md doesn't exist | Use physics defaults, no warning |
+| taste.md is empty | Use physics defaults, no warning |
+| Malformed YAML entry | Skip entry, continue parsing, log warning |
+| Missing required field | Skip entry, continue parsing |
+| Unknown field | Ignore field, parse rest of entry |
+
+---
+
+## Learning Inference Logic
+
+When logging a MODIFY or REJECT signal with diagnostic context, generate learning inferences automatically.
+
+### Inference Rules
+
+Apply these rules to generate the `learning.inference` and `learning.recommendation` fields:
+
+```
+Rule 1: Effect Misclassification
+IF diagnostic.expected_feel differs from physics tier by > 1 level:
+  THEN inference: "Effect may be misclassified: user expects [expected_feel] but physics is [current_tier]"
+  THEN recommendation: "Consider reclassifying this component's effect"
+
+Tier mapping:
+- instant → Local (100ms)
+- snappy → Standard (200ms)
+- deliberate → Destructive (600ms)
+- trustworthy → Financial (800ms)
+
+Example:
+  expected_feel: "snappy", physics.timing: "800ms"
+  → inference: "Effect may be misclassified: user expects snappy (200ms) but physics is 800ms"
+```
+
+```
+Rule 2: Mobile User Timing
+IF diagnostic.user_type == "mobile" AND physics.timing > 500ms:
+  THEN inference: "Mobile users prefer faster timing"
+  THEN recommendation: "Consider mobile-specific physics (faster timing)"
+
+Example:
+  user_type: "mobile", timing: "800ms"
+  → inference: "Mobile users prefer faster timing"
+  → recommendation: "Consider adding mobile modifier to Financial physics"
+```
+
+```
+Rule 3: Power User Frequency
+IF diagnostic.user_type == "power-user"
+   AND (diagnostic.goal contains "repeat" OR "quickly" OR "batch" OR "multiple"):
+  THEN inference: "Power user performing repetitive action"
+  THEN recommendation: "Consider frequency-based confirmation bypass for trusted users"
+
+Example:
+  user_type: "power-user", goal: "quickly approve multiple transactions"
+  → inference: "Power user performing repetitive action"
+  → recommendation: "Consider frequency-based confirmation bypass"
+```
+
+```
+Rule 4: Status Check Misclassification
+IF diagnostic.goal contains ("checking" OR "status" OR "viewing" OR "monitoring"):
+  THEN inference: "This may be a status check (Local physics) not a mutation"
+  THEN recommendation: "Verify if this action mutates state or just reads it"
+
+Example:
+  goal: "checking if rewards are available"
+  → inference: "This may be a status check (Local physics) not a mutation"
+```
+
+```
+Rule 5: Trust Mismatch
+IF diagnostic.expected_feel == "trustworthy"
+   AND physics.behavioral.confirmation != "required":
+  THEN inference: "User expects trust signals but confirmation is not required"
+  THEN recommendation: "Add confirmation for trustworthy feel, even for non-financial"
+
+Example:
+  expected_feel: "trustworthy", confirmation: "none"
+  → inference: "User expects trust signals but confirmation is not required"
+```
+
+```
+Rule 6: Timing Change Pattern
+IF change.from contains timing AND change.to contains timing:
+  Parse both timings and calculate delta
+  IF delta > 200ms:
+    THEN inference: "Significant timing preference: [from] → [to]"
+    THEN recommendation: "Consider adjusting base timing for [effect] effects"
+
+Example:
+  change.from: "800ms", change.to: "400ms"
+  → inference: "Significant timing preference: 800ms → 400ms (400ms faster)"
+  → recommendation: "Consider adjusting base timing for Financial effects"
+```
+
+```
+Rule 7: Animation Preference
+IF change involves animation (easing, spring, duration):
+  THEN inference: "Animation preference detected: [from] → [to]"
+  IF change.to contains "spring":
+    THEN recommendation: "User prefers spring-based animations for tactile feedback"
+  ELSE IF change.to contains "ease-in-out":
+    THEN recommendation: "User prefers smooth transitions"
+
+Example:
+  change.from: "ease-out", change.to: "spring(400, 25)"
+  → inference: "Animation preference: ease-out → spring(400, 25)"
+  → recommendation: "User prefers spring-based animations for tactile feedback"
+```
+
+### Applying Multiple Rules
+
+When multiple rules match, include all inferences:
+
+```yaml
+learning:
+  inference: |
+    1. Mobile users prefer faster timing
+    2. Significant timing preference: 800ms → 500ms (300ms faster)
+  recommendation: |
+    Consider mobile-specific physics modifier AND
+    Adjust base timing for Financial effects
+```
+
+### Inference in Analysis Box
+
+When taste patterns are applied in Step 3, show them:
+
+```
+┌─ Craft Analysis ───────────────────────────────────────┐
+│                                                        │
+│  Target:       ClaimButton                             │
+│  Effect:       Financial                               │
+│                                                        │
+│  Behavioral    Pessimistic | 500ms* | Required         │
+│  Animation     spring(400, 25)*                        │
+│  Material      Elevated | Soft | 8px                   │
+│                                                        │
+│  * Adjusted per taste.md (3 prior modifications)       │
+│    - Timing: 800ms → 500ms (mobile user pattern)       │
+│    - Easing: ease-out → spring (tactile preference)    │
+│                                                        │
+└────────────────────────────────────────────────────────┘
 ```
 
 ---
