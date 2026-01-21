@@ -19,11 +19,14 @@
 //! - `anchor physics` - Show physics rules
 //! - `anchor vocabulary` - Show vocabulary/lexicon
 //! - `anchor resolve` - Resolve effect type from keywords
+//! - `anchor validate` - Validate a grounding statement
+//! - `anchor warden` - Adversarial warden for drift/deceptive detection
 
 use clap::{Parser, Subcommand};
 use sigil_anchor_core::{
-    get_default_physics, CheckpointManager, ForkManager, Network, PhysicsLoader, RpcClient,
-    SessionManager, SessionStatus, SnapshotManager, Vocabulary, VocabularyLoader, Zone, VERSION,
+    get_default_physics, get_warden, parse_grounding_statement, validate_grounding,
+    CheckpointManager, ForkManager, LearnedRule, Network, PhysicsLoader, RpcClient, SessionManager,
+    SessionStatus, SnapshotManager, ValidationStatus, Vocabulary, VocabularyLoader, Zone, VERSION,
 };
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -261,6 +264,52 @@ enum Commands {
         /// Optional type hint (e.g., Currency, Password)
         #[arg(short, long)]
         type_hint: Option<String>,
+    },
+
+    /// Validate a grounding statement
+    Validate {
+        /// Path to file containing grounding statement
+        #[arg(short, long)]
+        file: Option<PathBuf>,
+
+        /// Grounding statement text (alternative to --file)
+        #[arg(short, long)]
+        text: Option<String>,
+
+        /// Output as JSON
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Adversarial warden - check statements with learned rules
+    Warden {
+        /// Path to file containing grounding statement
+        #[arg(short, long)]
+        file: Option<PathBuf>,
+
+        /// Grounding statement text (alternative to --file)
+        #[arg(short, long)]
+        text: Option<String>,
+
+        /// Show zone hierarchy
+        #[arg(long)]
+        hierarchy: bool,
+
+        /// Add a learned rule (format: "pattern:zone:reason")
+        #[arg(long)]
+        add_rule: Option<String>,
+
+        /// List current learned rules
+        #[arg(long)]
+        list_rules: bool,
+
+        /// Clear all learned rules
+        #[arg(long)]
+        clear_rules: bool,
+
+        /// Output as JSON
+        #[arg(long)]
+        json: bool,
     },
 }
 
@@ -1165,6 +1214,351 @@ async fn main() {
                     println!("Try adding more specific keywords or a type hint.");
                 }
             }
+        }
+
+        Some(Commands::Validate { file, text, json }) => {
+            // Get statement text from file or --text
+            let statement_text = if let Some(ref path) = file {
+                match tokio::fs::read_to_string(path).await {
+                    Ok(content) => content,
+                    Err(e) => {
+                        eprintln!("Error reading file {:?}: {}", path, e);
+                        std::process::exit(6);
+                    }
+                }
+            } else if let Some(ref t) = text {
+                t.clone()
+            } else {
+                eprintln!("Error: Must provide --file or --text");
+                std::process::exit(6);
+            };
+
+            // Parse the grounding statement
+            let statement = match parse_grounding_statement(&statement_text) {
+                Ok(s) => s,
+                Err(e) => {
+                    if json {
+                        let output = serde_json::json!({
+                            "status": "schema_error",
+                            "error": e.to_string()
+                        });
+                        println!("{}", serde_json::to_string_pretty(&output).unwrap());
+                    } else {
+                        eprintln!("Parse error: {}", e);
+                    }
+                    std::process::exit(6); // SCHEMA error
+                }
+            };
+
+            // Validate with defaults
+            let vocabulary = Vocabulary::defaults();
+            let physics = get_default_physics();
+            let result = validate_grounding(&statement, &vocabulary, &physics);
+
+            // Determine exit code
+            let exit_code = match result.status {
+                ValidationStatus::Valid => 0,
+                ValidationStatus::Drift => 1,
+                ValidationStatus::Deceptive => 2,
+                ValidationStatus::SchemaError => 6,
+            };
+
+            if json {
+                let output = serde_json::json!({
+                    "status": format!("{:?}", result.status).to_lowercase(),
+                    "component": statement.component,
+                    "cited_zone": statement.cited_zone.to_string(),
+                    "required_zone": result.required_zone.to_string(),
+                    "checks": result.checks.iter().map(|c| serde_json::json!({
+                        "name": c.name,
+                        "passed": c.passed,
+                        "reason": c.reason
+                    })).collect::<Vec<_>>(),
+                    "corrections": result.corrections.iter().map(|c| serde_json::json!({
+                        "field": c.field,
+                        "current": c.current,
+                        "suggested": c.suggested,
+                        "reason": c.reason
+                    })).collect::<Vec<_>>()
+                });
+                println!("{}", serde_json::to_string_pretty(&output).unwrap());
+            } else {
+                println!("Validation Result: {:?}", result.status);
+                println!();
+                println!("Component: {}", statement.component);
+                println!("Cited zone: {}", statement.cited_zone);
+                println!("Required zone: {}", result.required_zone);
+                println!();
+                println!("Checks:");
+                for check in &result.checks {
+                    let status = if check.passed { "✓" } else { "✗" };
+                    println!("  {} {}: {}", status, check.name, check.reason);
+                }
+
+                if !result.corrections.is_empty() {
+                    println!();
+                    println!("Corrections needed:");
+                    for correction in &result.corrections {
+                        println!(
+                            "  {}: {} (current: {}, suggested: {})",
+                            correction.field,
+                            correction.reason,
+                            correction.current,
+                            correction.suggested
+                        );
+                    }
+                }
+            }
+
+            std::process::exit(exit_code);
+        }
+
+        Some(Commands::Warden {
+            file,
+            text,
+            hierarchy,
+            add_rule,
+            list_rules,
+            clear_rules,
+            json,
+        }) => {
+            // Handle hierarchy display
+            if hierarchy {
+                let hierarchy_desc = Zone::hierarchy_description();
+                if json {
+                    let zones: Vec<_> = Zone::HIERARCHY
+                        .iter()
+                        .enumerate()
+                        .map(|(i, z)| {
+                            serde_json::json!({
+                                "zone": z.to_string(),
+                                "rank": i,
+                                "restrictiveness": if i == 0 {
+                                    "most restrictive"
+                                } else if i == Zone::HIERARCHY.len() - 1 {
+                                    "least restrictive"
+                                } else {
+                                    "intermediate"
+                                }
+                            })
+                        })
+                        .collect();
+                    let output = serde_json::json!({
+                        "hierarchy": zones,
+                        "description": hierarchy_desc
+                    });
+                    println!("{}", serde_json::to_string_pretty(&output).unwrap());
+                } else {
+                    println!("Zone Hierarchy (most to least restrictive):");
+                    println!("  {}", hierarchy_desc);
+                }
+                return;
+            }
+
+            // Handle rule management
+            let warden = get_warden();
+
+            if clear_rules {
+                let mut w = warden.write().await;
+                w.clear_learned_rules();
+                println!("All learned rules cleared.");
+                return;
+            }
+
+            if let Some(ref rule_spec) = add_rule {
+                // Parse rule: "pattern:zone:reason"
+                let parts: Vec<&str> = rule_spec.splitn(3, ':').collect();
+                if parts.len() != 3 {
+                    eprintln!("Invalid rule format. Use: pattern:zone:reason");
+                    std::process::exit(6);
+                }
+
+                let pattern = parts[0].to_string();
+                let zone = match Zone::from_str(parts[1]) {
+                    Ok(z) => z,
+                    Err(e) => {
+                        eprintln!("Invalid zone '{}': {}", parts[1], e);
+                        std::process::exit(6);
+                    }
+                };
+                let reason = parts[2].to_string();
+
+                let rule = LearnedRule {
+                    id: format!(
+                        "rule-{}",
+                        std::time::SystemTime::now()
+                            .duration_since(std::time::UNIX_EPOCH)
+                            .unwrap()
+                            .as_nanos()
+                    ),
+                    pattern,
+                    required_zone: zone,
+                    reason,
+                    is_strict: false,
+                };
+
+                let mut w = warden.write().await;
+                w.add_learned_rule(rule.clone());
+                println!(
+                    "Added learned rule: {} -> {} ({})",
+                    rule.pattern, rule.required_zone, rule.reason
+                );
+                return;
+            }
+
+            if list_rules {
+                let w = warden.read().await;
+                let rules = w.get_learned_rules();
+
+                if json {
+                    let rules_json: Vec<_> = rules
+                        .iter()
+                        .map(|r| {
+                            serde_json::json!({
+                                "id": r.id,
+                                "pattern": r.pattern,
+                                "required_zone": r.required_zone.to_string(),
+                                "reason": r.reason,
+                                "is_strict": r.is_strict
+                            })
+                        })
+                        .collect();
+                    println!("{}", serde_json::to_string_pretty(&rules_json).unwrap());
+                } else if rules.is_empty() {
+                    println!("No learned rules.");
+                } else {
+                    println!("Learned rules:");
+                    for rule in rules {
+                        println!(
+                            "  {} -> {} ({})",
+                            rule.pattern, rule.required_zone, rule.reason
+                        );
+                    }
+                }
+                return;
+            }
+
+            // Validate a statement with adversarial checks
+            let statement_text = if let Some(ref path) = file {
+                match tokio::fs::read_to_string(path).await {
+                    Ok(content) => content,
+                    Err(e) => {
+                        eprintln!("Error reading file {:?}: {}", path, e);
+                        std::process::exit(6);
+                    }
+                }
+            } else if let Some(ref t) = text {
+                t.clone()
+            } else {
+                eprintln!("Error: Must provide --file, --text, --hierarchy, --list-rules, --add-rule, or --clear-rules");
+                std::process::exit(6);
+            };
+
+            // Parse the grounding statement
+            let statement = match parse_grounding_statement(&statement_text) {
+                Ok(s) => s,
+                Err(e) => {
+                    if json {
+                        let output = serde_json::json!({
+                            "status": "schema_error",
+                            "error": e.to_string()
+                        });
+                        println!("{}", serde_json::to_string_pretty(&output).unwrap());
+                    } else {
+                        eprintln!("Parse error: {}", e);
+                    }
+                    std::process::exit(6);
+                }
+            };
+
+            // Run adversarial validation
+            let vocabulary = Vocabulary::defaults();
+            let physics = get_default_physics();
+            let w = warden.read().await;
+            let result = w.validate(&statement, &vocabulary, &physics);
+
+            // Determine exit code
+            let exit_code = if result.deceptive_detected {
+                2 // DECEPTIVE
+            } else if result.drift_detected {
+                1 // DRIFT
+            } else {
+                match result.base_result.status {
+                    ValidationStatus::Valid => 0,
+                    ValidationStatus::Drift => 1,
+                    ValidationStatus::Deceptive => 2,
+                    ValidationStatus::SchemaError => 6,
+                }
+            };
+
+            if json {
+                let output = serde_json::json!({
+                    "base_status": format!("{:?}", result.base_result.status).to_lowercase(),
+                    "drift_detected": result.drift_detected,
+                    "deceptive_detected": result.deceptive_detected,
+                    "component": statement.component,
+                    "cited_zone": statement.cited_zone.to_string(),
+                    "required_zone": result.base_result.required_zone.to_string(),
+                    "base_checks": result.base_result.checks.iter().map(|c| serde_json::json!({
+                        "name": c.name,
+                        "passed": c.passed,
+                        "reason": c.reason
+                    })).collect::<Vec<_>>(),
+                    "adversarial_checks": result.adversarial_checks.iter().map(|c| serde_json::json!({
+                        "name": c.name,
+                        "passed": c.passed,
+                        "reason": c.reason
+                    })).collect::<Vec<_>>(),
+                    "corrections": result.base_result.corrections.iter().map(|c| serde_json::json!({
+                        "field": c.field,
+                        "current": c.current,
+                        "suggested": c.suggested,
+                        "reason": c.reason
+                    })).collect::<Vec<_>>()
+                });
+                println!("{}", serde_json::to_string_pretty(&output).unwrap());
+            } else {
+                println!("Adversarial Validation Result");
+                println!();
+                println!("Base status: {:?}", result.base_result.status);
+                println!("Drift detected: {}", result.drift_detected);
+                println!("Deceptive detected: {}", result.deceptive_detected);
+                println!();
+                println!("Component: {}", statement.component);
+                println!("Cited zone: {}", statement.cited_zone);
+                println!("Required zone: {}", result.base_result.required_zone);
+                println!();
+                println!("Base checks:");
+                for check in &result.base_result.checks {
+                    let status = if check.passed { "✓" } else { "✗" };
+                    println!("  {} {}: {}", status, check.name, check.reason);
+                }
+
+                if !result.adversarial_checks.is_empty() {
+                    println!();
+                    println!("Adversarial checks:");
+                    for check in &result.adversarial_checks {
+                        let status = if check.passed { "✓" } else { "✗" };
+                        println!("  {} {}: {}", status, check.name, check.reason);
+                    }
+                }
+
+                if !result.base_result.corrections.is_empty() {
+                    println!();
+                    println!("Corrections needed:");
+                    for correction in &result.base_result.corrections {
+                        println!(
+                            "  {}: {} (current: {}, suggested: {})",
+                            correction.field,
+                            correction.reason,
+                            correction.current,
+                            correction.suggested
+                        );
+                    }
+                }
+            }
+
+            std::process::exit(exit_code);
         }
 
         None => {

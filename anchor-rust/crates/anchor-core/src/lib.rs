@@ -34,8 +34,11 @@ pub use types::{
     SnapshotRegistry, SyncStrategy, Task, TaskStatus, TaskType, Zone,
 };
 pub use warden::{
-    get_default_physics, load_physics, load_physics_cached, resolve_effect_from_keywords,
-    KeywordCategory, PhysicsLoader, TypeOverride, Vocabulary, VocabularyLoader,
+    check_hierarchy, check_relevance, check_rules, get_default_physics, get_warden, load_physics,
+    load_physics_cached, parse_grounding_statement, required_zone_for_effect,
+    resolve_effect_from_keywords, validate_grounding, AdversarialResult, AdversarialWarden,
+    CheckResult, ClaimedPhysics, Correction, GroundingStatement, KeywordCategory, LearnedRule,
+    PhysicsLoader, TypeOverride, ValidationResult, ValidationStatus, Vocabulary, VocabularyLoader,
 };
 
 /// Result type alias for Anchor operations.
