@@ -14,7 +14,7 @@ pub enum AnchorError {
 
     // RPC errors
     #[error("RPC error: {0}")]
-    Rpc(#[from] RpcError),
+    Rpc(String),
 
     // Fork errors
     #[error("Failed to spawn Anvil: {0}")]
@@ -94,25 +94,6 @@ impl AnchorError {
     }
 }
 
-/// RPC-specific errors.
-#[derive(Debug, Error)]
-pub enum RpcError {
-    #[error("Network error: {0}")]
-    Network(String),
-
-    #[error("Parse error: {0}")]
-    Parse(String),
-
-    #[error("RPC error {code}: {message}")]
-    Rpc { code: i32, message: String },
-
-    #[error("No result in response")]
-    NoResult,
-
-    #[error("RPC timeout")]
-    Timeout,
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -155,8 +136,7 @@ mod tests {
 
     #[test]
     fn test_rpc_error_exit_code() {
-        let rpc_err = RpcError::Timeout;
-        let err = AnchorError::Rpc(rpc_err);
+        let err = AnchorError::Rpc("timeout".to_string());
         assert_eq!(err.exit_code(), 4);
     }
 

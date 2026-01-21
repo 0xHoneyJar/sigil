@@ -19,10 +19,14 @@
 //! ```
 
 pub mod error;
+pub mod lifecycle;
+pub mod rpc;
 pub mod types;
 
 // Re-export commonly used types at crate root
 pub use error::AnchorError;
+pub use lifecycle::ForkManager;
+pub use rpc::{AnvilMethods, RpcClient, RpcError};
 pub use types::{
     ConfirmationType, EffectType, Fork, ForkRegistry, Network, PhysicsRule, PhysicsTable,
     SyncStrategy, Task, TaskStatus, TaskType, Zone,

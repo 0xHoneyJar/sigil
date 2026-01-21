@@ -30,3 +30,4 @@ tracing-subscriber = { workspace = true }
 
 # Utilities
 anyhow = { workspace = true }
+dirs = "5.0"
