@@ -454,64 +454,72 @@ Loa executes, Sigil applies physics to UI work
 
 ---
 
-## Anchor: Ground Truth Enforcement
+## Anchor & Lens: Rust CLIs
 
-Anchor is Sigil's validation layer — it ensures AI-generated code actually follows the physics rules.
+Anchor and Lens are **native Rust CLIs** for formal verification of design physics. They validate that AI-generated code actually follows physics rules.
 
-### Why Anchor?
+| CLI | Purpose | Performance |
+|-----|---------|-------------|
+| **Anchor** | Zone/effect validation, keyword mapping | ~10ms |
+| **Lens** | Formal constraint verification, component linting | ~27ms |
 
-When AI generates UI code, it might *claim* to follow physics ("800ms pessimistic for financial") but generate something different. Anchor validates grounding statements against actual physics requirements.
+### Installation
+
+```bash
+# Build from source
+cd anchor-rust
+cargo build --release
+
+# Binaries available at:
+# ./target/release/anchor
+# ./target/release/lens
+
+# Optional: add to PATH
+export PATH="$PATH:$(pwd)/target/release"
+```
 
 ### Quick Start
 
 ```bash
-# Validate a grounding statement
-anchor warden --text "Component: ClaimButton\nZone: critical\nSync: pessimistic\nTiming: 800ms"
+# Validate physics request (zone/effect mapping)
+anchor validate --request-id <UUID>
 
-# Check from file
-anchor warden --file grounding.txt
+# Verify formal constraints (CEL-based)
+lens verify --request-id <UUID>
 
-# Show zone hierarchy
-anchor warden --hierarchy
-# Output: critical (most restrictive) > elevated > standard > local (least restrictive)
+# Lint a component directly
+lens lint --file src/components/ClaimButton.tsx
 ```
-
-### Validation Status
-
-| Code | Status | Meaning |
-|------|--------|---------|
-| 0 | VALID | Grounding matches required physics |
-| 1 | DRIFT | Over-claiming (citing strict physics for simple components) |
-| 2 | DECEPTIVE | Under-claiming (citing lenient physics for critical operations) |
 
 ### Zone Hierarchy
 
-| Zone | Components | Example |
-|------|------------|---------|
-| **critical** | Financial, transaction | ClaimButton, WithdrawModal |
-| **elevated** | Destructive, revoke | DeleteButton, RevokeAccess |
-| **standard** | CRUD, social | SaveButton, LikeButton |
-| **local** | UI state, preferences | ThemeToggle, FilterDropdown |
+| Zone | Effects | Constraints |
+|------|---------|-------------|
+| **Critical** | Financial, Destructive | Strict timing, confirmation required |
+| **Cautious** | SoftDelete | Undo required |
+| **Standard** | Standard, Local, Navigation | Minimal constraints |
 
-### Advanced: Session Management
+### Exit Codes
 
-Anchor can manage EVM state for testing Web3 flows:
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 10 | Critical zone violations |
+| 11 | Cautious zone warnings |
+| 12 | Standard zone info |
+| 20 | Schema validation error |
+| 30 | I/O error |
 
-```bash
-# Create a session with fork
-anchor session mainnet --block 19000000
+### Communication Protocol
 
-# Take snapshots during testing
-anchor snapshot --description "Before claim"
+Anchor and Lens communicate via `grimoires/pub/`:
 
-# Revert if needed
-anchor revert <snapshot-id>
+1. Claude writes request → `pub/requests/<uuid>.json`
+2. `anchor validate` checks zone mapping
+3. `lens verify` checks formal constraints
+4. Claude reads response ← `pub/responses/anchor-<uuid>.json` / `lens-<uuid>.json`
 
-# Checkpoint for recovery
-anchor checkpoint <session-id>
-```
-
-See `packages/anchor/` for full documentation.
+See `anchor-rust/` for full documentation.
 
 ---
 
@@ -716,6 +724,16 @@ grimoires/sigil/
 │   └── {user}-diagnostic.md  # Individual sessions
 ├── context/                  # Project context
 └── moodboard/                # Visual references
+
+anchor-rust/                  # Native Rust CLIs (~10ms validation)
+├── anchor/                   # Zone/effect validation
+│   ├── src/commands/         # validate, check-source, state
+│   └── data/                 # vocabulary.yaml, zones.yaml
+├── lens/                     # Formal constraint verification
+│   ├── src/cel/              # CEL constraint engine
+│   ├── src/heuristics/       # Tree-sitter based checks
+│   └── data/                 # constraints.yaml
+└── sigil-ipc/                # Shared I/O crate
 
 packages/
 ├── anchor/                   # Ground truth enforcement (TypeScript bindings)
