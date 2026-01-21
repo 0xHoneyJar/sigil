@@ -6,6 +6,10 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Ground truth enforcement library for Sigil design physics"
+readme = "../../README.md"
+keywords = ["blockchain", "ethereum", "defi", "design-system", "validation"]
+categories = ["development-tools", "command-line-utilities", "web-programming"]
+documentation = "https://docs.rs/sigil-anchor-core"
 
 [dependencies]
 # Async
@@ -46,6 +50,11 @@ windows-sys = { version = "0.52", features = ["Win32_System_Threading"] }
 proptest = "1.4"
 tokio-test = "0.4"
 tempfile = "3.10"
+criterion = { workspace = true }
+
+[[bench]]
+name = "benchmarks"
+harness = false
 
 [features]
 default = []

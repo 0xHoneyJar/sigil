@@ -75,11 +75,7 @@ fn test_task_execution_order() {
     let mut graph = TaskGraph::new();
 
     // Create tasks
-    let task1 = Task::new(
-        "task-1".to_string(),
-        TaskType::Fork,
-        serde_json::json!({}),
-    );
+    let task1 = Task::new("task-1".to_string(), TaskType::Fork, serde_json::json!({}));
     let task2 = Task::with_dependencies(
         "task-2".to_string(),
         TaskType::Ground,
@@ -129,11 +125,7 @@ fn test_task_execution_order() {
 fn test_task_error_recovery() {
     let mut graph = TaskGraph::new();
 
-    let task1 = Task::new(
-        "task-1".to_string(),
-        TaskType::Fork,
-        serde_json::json!({}),
-    );
+    let task1 = Task::new("task-1".to_string(), TaskType::Fork, serde_json::json!({}));
     let task2 = Task::with_dependencies(
         "task-2".to_string(),
         TaskType::Ground,
@@ -162,11 +154,7 @@ fn test_parallel_task_execution() {
     let mut graph = TaskGraph::new();
 
     // Create independent tasks
-    let task1 = Task::new(
-        "task-1".to_string(),
-        TaskType::Fork,
-        serde_json::json!({}),
-    );
+    let task1 = Task::new("task-1".to_string(), TaskType::Fork, serde_json::json!({}));
     let task2 = Task::new(
         "task-2".to_string(),
         TaskType::Ground,
@@ -235,7 +223,9 @@ fn test_physics_table() {
     let physics = PhysicsTable::defaults();
 
     // Financial should have pessimistic sync and 800ms timing
-    let financial_rule = physics.get(&sigil_anchor_core::EffectType::Financial).unwrap();
+    let financial_rule = physics
+        .get(&sigil_anchor_core::EffectType::Financial)
+        .unwrap();
     assert_eq!(
         financial_rule.sync,
         sigil_anchor_core::SyncStrategy::Pessimistic
@@ -243,7 +233,9 @@ fn test_physics_table() {
     assert_eq!(financial_rule.timing_ms, 800);
 
     // Standard should have optimistic sync and 200ms timing
-    let standard_rule = physics.get(&sigil_anchor_core::EffectType::Standard).unwrap();
+    let standard_rule = physics
+        .get(&sigil_anchor_core::EffectType::Standard)
+        .unwrap();
     assert_eq!(
         standard_rule.sync,
         sigil_anchor_core::SyncStrategy::Optimistic
@@ -279,10 +271,7 @@ fn test_task_graph_serialization() {
 
     // Verify
     assert_eq!(restored.len(), 2);
-    assert_eq!(
-        restored.get("task-1").unwrap().task_type,
-        TaskType::Fork
-    );
+    assert_eq!(restored.get("task-1").unwrap().task_type, TaskType::Fork);
     assert_eq!(
         restored.get("task-2").unwrap().dependencies,
         vec!["task-1".to_string()]

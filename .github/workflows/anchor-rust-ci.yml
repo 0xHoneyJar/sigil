@@ -38,8 +38,9 @@ jobs:
       run:
         working-directory: anchor-rust
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-14]
+        os: [ubuntu-latest, macos-latest, macos-14, windows-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -47,6 +48,23 @@ jobs:
         with:
           workspaces: anchor-rust -> target
       - run: cargo test --all-features
+
+  bench:
+    name: Benchmarks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: anchor-rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: anchor-rust -> target
+      - name: Run benchmarks
+        run: cargo bench --no-run
+      - name: Check benchmark compilation
+        run: cargo bench -- --test
 
   fmt:
     name: Format

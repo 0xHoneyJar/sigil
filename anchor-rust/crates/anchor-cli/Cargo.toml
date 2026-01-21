@@ -6,6 +6,9 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 description = "Ground truth enforcement CLI for Sigil design physics"
+readme = "../../README.md"
+keywords = ["blockchain", "ethereum", "defi", "cli", "validation"]
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "anchor"
