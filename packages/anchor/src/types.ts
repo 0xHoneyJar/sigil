@@ -64,13 +64,13 @@ export const ForkSchema = z.object({
   rpcUrl: z.string(),
   port: z.number(),
   pid: z.number(),
-  createdAt: z.string().transform((s) => new Date(s)),
+  createdAt: z.string().transform((s: string) => new Date(s)),
   sessionId: z.string().optional(),
 });
 
 export const ForkRegistrySchema = z.object({
   forks: z.array(ForkSchema),
-  lastUpdated: z.string().transform((s) => new Date(s)),
+  lastUpdated: z.string().transform((s: string) => new Date(s)),
 });
 
 export type ForkRegistry = z.infer<typeof ForkRegistrySchema>;

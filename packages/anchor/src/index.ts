@@ -12,6 +12,15 @@ export {
   SnapshotManager,
   getSnapshotManager,
   resetSnapshotManager,
+  CheckpointManager,
+  getCheckpointManager,
+  resetCheckpointManager,
+  SessionManager,
+  getSessionManager,
+  resetSessionManager,
+  type Session,
+  type SessionMetadata,
+  type SessionManagerConfig,
 } from './lifecycle/index.js';
 
 // Graph

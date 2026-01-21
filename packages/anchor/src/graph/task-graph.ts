@@ -22,15 +22,18 @@ const TaskSchema = z.object({
   input: z.unknown(),
   output: z.unknown().optional(),
   error: z.string().optional(),
-  createdAt: z.string().transform((s) => new Date(s)),
-  completedAt: z.string().transform((s) => new Date(s)).optional(),
+  createdAt: z.string().transform((s: string) => new Date(s)),
+  completedAt: z
+    .string()
+    .transform((s: string) => new Date(s))
+    .optional(),
 });
 
 const TaskGraphDataSchema = z.object({
   sessionId: z.string(),
   tasks: z.array(TaskSchema),
   headTaskId: z.string().optional(),
-  lastUpdated: z.string().transform((s) => new Date(s)),
+  lastUpdated: z.string().transform((s: string) => new Date(s)),
 });
 
 /** Task graph configuration */
@@ -370,15 +373,24 @@ export class TaskGraph {
   }
 
   /**
+   * Export graph data as JSON-serializable object
+   *
+   * @returns Task graph data
+   */
+  toJSON(): TaskGraphData {
+    return {
+      sessionId: this.sessionId,
+      tasks: Array.from(this.tasks.values()),
+      lastUpdated: new Date(),
+      ...(this.headTaskId !== undefined && { headTaskId: this.headTaskId }),
+    };
+  }
+
+  /**
    * Save the graph to disk
    */
   async save(): Promise<void> {
-    const data: TaskGraphData = {
-      sessionId: this.sessionId,
-      tasks: Array.from(this.tasks.values()),
-      headTaskId: this.headTaskId,
-      lastUpdated: new Date(),
-    };
+    const data = this.toJSON();
 
     const path = this.getGraphPath();
     const dir = dirname(path);

@@ -8,7 +8,7 @@
 import { spawn, ChildProcess } from 'node:child_process';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { dirname } from 'node:path';
 import { EventEmitter } from 'eventemitter3';
 import { rpcCall, waitForRpc } from '../utils/rpc.js';
 import type { Fork, ForkConfig, ForkRegistry } from '../types.js';
@@ -106,7 +106,7 @@ export class ForkManager extends EventEmitter<ForkManagerEvents> {
       port,
       pid,
       createdAt: new Date(),
-      sessionId: config.sessionId,
+      ...(config.sessionId !== undefined && { sessionId: config.sessionId }),
     };
 
     // Track fork
@@ -233,10 +233,23 @@ export class ForkManager extends EventEmitter<ForkManagerEvents> {
       const registry = ForkRegistrySchema.parse(data);
 
       // Only load forks that are still running (by checking if process exists)
-      for (const fork of registry.forks) {
+      for (const registryFork of registry.forks) {
         try {
           // Check if process is still running
-          process.kill(fork.pid, 0);
+          process.kill(registryFork.pid, 0);
+
+          // Build Fork object with proper types
+          const fork: Fork = {
+            id: registryFork.id,
+            network: registryFork.network,
+            blockNumber: registryFork.blockNumber,
+            rpcUrl: registryFork.rpcUrl,
+            port: registryFork.port,
+            pid: registryFork.pid,
+            createdAt: registryFork.createdAt,
+            ...(registryFork.sessionId !== undefined && { sessionId: registryFork.sessionId }),
+          };
+
           // Check if RPC is responsive
           const ready = await this.checkForkHealth(fork);
           if (ready) {

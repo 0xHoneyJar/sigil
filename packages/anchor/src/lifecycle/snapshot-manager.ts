@@ -62,10 +62,10 @@ export class SnapshotManager {
       id: snapshotId,
       forkId: config.forkId,
       sessionId: config.sessionId,
-      taskId: config.taskId,
       blockNumber,
       createdAt: new Date(),
-      description: config.description,
+      ...(config.taskId !== undefined && { taskId: config.taskId }),
+      ...(config.description !== undefined && { description: config.description }),
     };
 
     // Store in memory
