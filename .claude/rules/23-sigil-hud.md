@@ -1,6 +1,6 @@
 # Sigil: Diagnostic HUD Integration
 
-Patterns for integrating @sigil/hud, the composable diagnostic toolkit.
+Patterns for integrating @thehoneyjar/sigil-hud, the composable diagnostic toolkit.
 
 <when_to_trigger>
 ## When to Trigger
@@ -10,7 +10,7 @@ Load this rule when detecting:
 | Signal | Example |
 |--------|---------|
 | Keywords | "diagnostic", "HUD", "debug toolbar", "dev toolbar", "inspection" |
-| Package refs | "@sigil/hud", "@sigil/diagnostics", "@sigil/dev-toolbar" |
+| Package refs | "@thehoneyjar/sigil-hud", "@thehoneyjar/sigil-diagnostics", "@thehoneyjar/sigil-dev-toolbar" |
 | Craft intent | "add debugging", "replace debug toolbar", "physics inspection" |
 | File patterns | `debug-toolbar.tsx`, `dev-tools.tsx`, `diagnostic*.tsx` |
 
@@ -21,27 +21,32 @@ Load this rule when detecting:
 
 | Package | Purpose | Size |
 |---------|---------|------|
-| `@sigil/hud` | Composable diagnostic components | 92 KB |
-| `@sigil/diagnostics` | Physics compliance checking | 25 KB |
-| `@sigil/lens` | User Lens (address impersonation) | 5 KB |
-| `@sigil/fork` | Fork state management | 9 KB |
-| `@sigil/simulation` | Transaction simulation | 7 KB |
-| `@sigil/dev-toolbar` | Full-featured dev toolbar | 78 KB |
+| `@thehoneyjar/sigil-hud` | Composable diagnostic components | 92 KB |
+| `@thehoneyjar/sigil-diagnostics` | Physics compliance checking | 25 KB |
+| `@thehoneyjar/sigil-lens` | User Lens (address impersonation) | 5 KB |
+| `@thehoneyjar/sigil-fork` | Fork state management | 9 KB |
+| `@thehoneyjar/sigil-simulation` | Transaction simulation | 7 KB |
+| `@thehoneyjar/sigil-dev-toolbar` | Full-featured dev toolbar | 78 KB |
 
 **Recommendation:**
-- For new projects: Start with `@sigil/hud` (all-in-one)
-- For existing toolbars: Replace with `@sigil/hud` components
-- For Web3 apps: Add `@sigil/dev-toolbar` for Lens + fork state
+- For new projects: Start with `@thehoneyjar/sigil-hud` (all-in-one)
+- For existing toolbars: Replace with `@thehoneyjar/sigil-hud` components
+- For Web3 apps: Add `@thehoneyjar/sigil-dev-toolbar` for Lens + fork state
+
+**Note:** The `@sigil` npm scope is not owned by this project. If you prefer shorter imports, you can use npm aliases:
+```bash
+npm install @thehoneyjar/sigil-hud@npm:@thehoneyjar/sigil-hud
+```
 
 </package_overview>
 
 <hud_components>
-## @sigil/hud Components
+## @thehoneyjar/sigil-hud Components
 
 ### Core Layout
 
 ```tsx
-import { HudProvider, HudPanel, HudTrigger } from '@sigil/hud'
+import { HudProvider, HudPanel, HudTrigger } from '@thehoneyjar/sigil-hud'
 
 // Wrap app in provider
 <HudProvider>
@@ -87,7 +92,7 @@ import { HudProvider, HudPanel, HudTrigger } from '@sigil/hud'
 
 ```tsx
 // app/layout.tsx
-import { HudProvider, HudPanel, HudTrigger } from '@sigil/hud'
+import { HudProvider, HudPanel, HudTrigger } from '@thehoneyjar/sigil-hud'
 
 export default function RootLayout({ children }) {
   return (
@@ -130,7 +135,7 @@ When user has a custom debug toolbar, replace with HUD:
 ### Pattern 3: Web3 App (Lens + Fork)
 
 ```tsx
-import { DevToolbarProvider, DevToolbar, UserLens } from '@sigil/dev-toolbar'
+import { DevToolbarProvider, DevToolbar, UserLens } from '@thehoneyjar/sigil-dev-toolbar'
 
 function App() {
   return (
@@ -153,7 +158,7 @@ import {
   PhysicsAnalysis,
   DataSourceIndicator,
   useDataSource
-} from '@sigil/hud'
+} from '@thehoneyjar/sigil-hud'
 
 function MyComponent() {
   const { source, staleness } = useDataSource('balance')
@@ -194,7 +199,7 @@ When HUD integration is detected, add to craft analysis:
 │  Craft Type:   Generate (new) / Replace (existing)     │
 │                                                        │
 │  Tooling:                                              │
-│  ✓ @sigil/hud available                               │
+│  ✓ @thehoneyjar/sigil-hud available                               │
 │  ✓ Pattern: [Full HUD / Replace / Web3 / Selective]   │
 │                                                        │
 │  Components to use:                                    │
@@ -217,7 +222,7 @@ When HUD integration is detected, add to craft analysis:
 ### useHudStore
 
 ```tsx
-import { useHudStore } from '@sigil/hud'
+import { useHudStore } from '@thehoneyjar/sigil-hud'
 
 function MyComponent() {
   const { isOpen, toggle, setPanel } = useHudStore()
@@ -233,7 +238,7 @@ function MyComponent() {
 ### useDataSource
 
 ```tsx
-import { useDataSource } from '@sigil/hud'
+import { useDataSource } from '@thehoneyjar/sigil-hud'
 
 function BalanceDisplay() {
   const {
@@ -252,7 +257,7 @@ function BalanceDisplay() {
 ### useSignalCapture
 
 ```tsx
-import { useSignalCapture } from '@sigil/hud'
+import { useSignalCapture } from '@thehoneyjar/sigil-hud'
 
 function ComponentWithFeedback() {
   const { captureSignal } = useSignalCapture()
@@ -271,7 +276,7 @@ function ComponentWithFeedback() {
 ### useObservationCapture
 
 ```tsx
-import { useObservationCapture } from '@sigil/hud'
+import { useObservationCapture } from '@thehoneyjar/sigil-hud'
 
 function Inspector() {
   const { capture, isCapturing } = useObservationCapture()
@@ -297,7 +302,7 @@ When replacing an existing debug toolbar:
 - [ ] **Audit existing features** - List what current toolbar does
 - [ ] **Map to HUD components** - Find equivalent components
 - [ ] **Check state management** - Preserve stores if needed
-- [ ] **Install packages** - `pnpm add @sigil/hud`
+- [ ] **Install packages** - `pnpm add @thehoneyjar/sigil-hud`
 - [ ] **Add HudProvider** - Wrap app at root level
 - [ ] **Add HudPanel + HudTrigger** - Basic setup
 - [ ] **Remove old toolbar** - Delete deprecated files
