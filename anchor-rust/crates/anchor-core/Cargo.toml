@@ -1,0 +1,51 @@
+[package]
+name = "sigil-anchor-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Ground truth enforcement library for Sigil design physics"
+
+[dependencies]
+# Async
+tokio = { workspace = true }
+
+# HTTP
+reqwest = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Graph
+petgraph = { workspace = true }
+
+# Parsing
+regex = { workspace = true }
+pulldown-cmark = { workspace = true }
+
+# Utilities
+uuid = { workspace = true }
+chrono = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+once_cell = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+nix = { version = "0.27", features = ["signal", "process"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.52", features = ["Win32_System_Threading"] }
+
+[dev-dependencies]
+proptest = "1.4"
+tokio-test = "0.4"
+tempfile = "3.10"
+
+[features]
+default = []
+embedded-defaults = []
