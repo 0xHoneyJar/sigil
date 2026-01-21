@@ -32,11 +32,16 @@ pub fn response_path(request_id: &str) -> Result<PathBuf> {
 pub fn validate_request_id(id: &str) -> Result<Uuid> {
     // Check for path traversal attempts
     if id.contains('/') || id.contains('\\') || id.contains("..") {
-        return Err(AnchorError::PathTraversal);
+        return Err(AnchorError::PathTraversal {
+            id: id.to_string(),
+        });
     }
 
     // Must be valid UUID
-    Uuid::parse_str(id).map_err(|_| AnchorError::InvalidRequestId(id.to_string()))
+    Uuid::parse_str(id).map_err(|e| AnchorError::InvalidRequestId {
+        id: id.to_string(),
+        reason: e.to_string(),
+    })
 }
 
 /// Read a request from the pub/requests/ directory
@@ -45,13 +50,18 @@ pub fn read_request<T: DeserializeOwned>(request_id: &str) -> Result<T> {
 
     // Check if file exists
     if !path.exists() {
-        return Err(AnchorError::RequestNotFound(request_id.to_string()));
+        return Err(AnchorError::RequestNotFound {
+            path: path.display().to_string(),
+        });
     }
 
     // Check file size
     let metadata = fs::metadata(&path)?;
     if metadata.len() > MAX_REQUEST_SIZE {
-        return Err(AnchorError::RequestTooLarge { size: metadata.len() });
+        return Err(AnchorError::RequestTooLarge {
+            size: metadata.len(),
+            max_size: MAX_REQUEST_SIZE,
+        });
     }
 
     // Read and parse

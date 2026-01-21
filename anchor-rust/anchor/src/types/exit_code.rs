@@ -28,6 +28,9 @@ pub enum ExitCode {
 
     /// Schema error - fix input, retry once
     Schema = 6,
+
+    /// RPC error - network or provider failure
+    Rpc = 7,
 }
 
 impl ExitCode {
@@ -41,6 +44,7 @@ impl ExitCode {
             ExitCode::Revert => "Internal failure",
             ExitCode::Corrupt => "Corrupt state",
             ExitCode::Schema => "Schema error",
+            ExitCode::Rpc => "RPC error",
         }
     }
 
@@ -48,7 +52,7 @@ impl ExitCode {
     pub fn is_error(&self) -> bool {
         matches!(
             self,
-            ExitCode::Violation | ExitCode::Revert | ExitCode::Corrupt | ExitCode::Schema
+            ExitCode::Violation | ExitCode::Revert | ExitCode::Corrupt | ExitCode::Schema | ExitCode::Rpc
         )
     }
 
@@ -76,6 +80,7 @@ impl TryFrom<i32> for ExitCode {
             4 => Ok(ExitCode::Revert),
             5 => Ok(ExitCode::Corrupt),
             6 => Ok(ExitCode::Schema),
+            7 => Ok(ExitCode::Rpc),
             _ => Err(()),
         }
     }
@@ -94,6 +99,7 @@ mod tests {
         assert_eq!(ExitCode::Revert as i32, 4);
         assert_eq!(ExitCode::Corrupt as i32, 5);
         assert_eq!(ExitCode::Schema as i32, 6);
+        assert_eq!(ExitCode::Rpc as i32, 7);
     }
 
     #[test]
