@@ -2,6 +2,7 @@
 members = [
     "anchor",
     "lens",
+    "sigil-ipc",
 ]
 resolver = "2"
 

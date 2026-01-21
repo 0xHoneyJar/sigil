@@ -20,6 +20,10 @@ pub enum AnchorError {
     #[error("YAML error: {0}")]
     Yaml(#[from] serde_yaml::Error),
 
+    /// IPC error from sigil-ipc crate
+    #[error("IPC error: {0}")]
+    Ipc(#[from] sigil_ipc::IpcError),
+
     /// Invalid request ID (must be valid UUID)
     #[error("Invalid request ID: {0}")]
     InvalidRequestId(String),

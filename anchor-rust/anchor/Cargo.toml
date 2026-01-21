@@ -28,5 +28,8 @@ fs2.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 
+# Shared IPC utilities
+sigil-ipc = { path = "../sigil-ipc" }
+
 [dev-dependencies]
 tempfile = "3"

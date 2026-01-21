@@ -326,3 +326,108 @@ export const ExitCode = {
 } as const;
 
 export type ExitCodeValue = (typeof ExitCode)[keyof typeof ExitCode];
+
+// =============================================================================
+// Lens Context Types (Sprint 4)
+// =============================================================================
+
+/**
+ * Lens context for User Lens impersonation validation
+ * Used to verify data source consistency when viewing as another address
+ */
+export interface LensContext {
+  /** Address being impersonated */
+  impersonatedAddress: string;
+  /** Real user address (for signing) */
+  realAddress?: string;
+  /** Component being validated */
+  component: string;
+  /** Value observed in the UI */
+  observedValue?: string;
+  /** Value from on-chain read */
+  onChainValue?: string;
+  /** Value from indexer (Envio, Subgraph) */
+  indexedValue?: string;
+  /** Data source used by component */
+  dataSource?: 'on-chain' | 'indexed' | 'mixed' | 'unknown';
+}
+
+/** Lens context schema for validation */
+export const LensContextSchema = z.object({
+  impersonatedAddress: z.string(),
+  realAddress: z.string().optional(),
+  component: z.string(),
+  observedValue: z.string().optional(),
+  onChainValue: z.string().optional(),
+  indexedValue: z.string().optional(),
+  dataSource: z.enum(['on-chain', 'indexed', 'mixed', 'unknown']).optional(),
+});
+
+/**
+ * Lens validation issue types
+ */
+export type LensIssueType =
+  | 'data_source_mismatch'     // observed != on_chain
+  | 'stale_indexed_data'       // indexed != on_chain
+  | 'lens_financial_check'     // Financial zone using indexed source
+  | 'impersonation_leak';      // Real address used where impersonated expected
+
+/**
+ * Lens validation issue severity
+ */
+export type LensIssueSeverity = 'error' | 'warning' | 'info';
+
+/**
+ * Individual lens validation issue
+ */
+export interface LensValidationIssue {
+  /** Issue type */
+  type: LensIssueType;
+  /** Severity (varies by zone) */
+  severity: LensIssueSeverity;
+  /** Human-readable message */
+  message: string;
+  /** Component where issue was found */
+  component: string;
+  /** Zone context */
+  zone?: Zone;
+  /** Expected value */
+  expected?: string;
+  /** Actual value */
+  actual?: string;
+  /** Suggested fix */
+  suggestion?: string;
+}
+
+/** Lens validation issue schema */
+export const LensValidationIssueSchema = z.object({
+  type: z.enum(['data_source_mismatch', 'stale_indexed_data', 'lens_financial_check', 'impersonation_leak']),
+  severity: z.enum(['error', 'warning', 'info']),
+  message: z.string(),
+  component: z.string(),
+  zone: z.enum(['critical', 'elevated', 'standard', 'local']).optional(),
+  expected: z.string().optional(),
+  actual: z.string().optional(),
+  suggestion: z.string().optional(),
+});
+
+/**
+ * Lens validation result
+ */
+export interface LensValidationResult {
+  /** Whether validation passed */
+  valid: boolean;
+  /** List of issues found */
+  issues: LensValidationIssue[];
+  /** Summary message */
+  summary: string;
+}
+
+/** Extended exit codes for lens validation */
+export const LensExitCode = {
+  ...ExitCode,
+  LENS_WARNING: 11,
+  LENS_ERROR: 10,
+} as const;
+
+export type LensExitCodeValue = (typeof LensExitCode)[keyof typeof LensExitCode];

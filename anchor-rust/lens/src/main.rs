@@ -50,21 +50,6 @@ enum Commands {
         output: String,
     },
 
-    /// Lint physics with heuristic checks
-    Lint {
-        /// Request ID (UUID) to process
-        #[arg(short, long)]
-        request_id: Option<String>,
-
-        /// Path to physics JSON file
-        #[arg(short, long)]
-        file: Option<String>,
-
-        /// Auto-fix issues where possible
-        #[arg(long)]
-        fix: bool,
-    },
-
     /// List available constraints
     Constraints {
         /// Filter by category: behavioral, animation, material, protected, general
@@ -116,13 +101,6 @@ async fn run(cli: Cli) -> Result<ExitCode, Box<dyn std::error::Error>> {
         } => {
             run_verify(request_id, file, &output).await
         }
-        Commands::Lint {
-            request_id,
-            file,
-            fix,
-        } => {
-            run_lint(request_id, file, fix).await
-        }
         Commands::Constraints {
             category,
             enabled_only,
@@ -140,17 +118,18 @@ async fn run_verify(
     output_format: &str,
 ) -> Result<ExitCode, Box<dyn std::error::Error>> {
     // Load physics from request or file
-    let (physics, req_id) = match (request_id, file) {
+    // Track whether request_id was explicitly provided (vs generated for file mode)
+    let (physics, req_id, has_request_id) = match (request_id, file) {
         (Some(req_id), _) => {
             info!("Loading physics from request: {}", req_id);
             let request: VerifyRequest = io::read_request(&req_id)?;
-            (request.physics, req_id)
+            (request.physics, req_id, true)
         }
         (None, Some(file_path)) => {
             info!("Loading physics from file: {}", file_path);
             let content = fs::read_to_string(&file_path)?;
             let physics: PhysicsAnalysis = serde_json::from_str(&content)?;
-            (physics, uuid::Uuid::new_v4().to_string())
+            (physics, uuid::Uuid::new_v4().to_string(), false)
         }
         (None, None) => {
             eprintln!("Error: Either --request-id or --file must be provided");
@@ -165,16 +144,18 @@ async fn run_verify(
     // Create response
     let response = VerifyResponse::new(req_id.clone(), results);
 
-    // Output results
+    // FR-003 fix: Always write response file when request_id was provided,
+    // regardless of output format. This ensures IPC consumers can read the response.
+    if has_request_id {
+        io::write_response(&req_id, &response)?;
+        info!("Response written to pub/responses/lens-{}.json", req_id);
+    }
+
+    // Output results to stdout
     match output_format {
         "json" => {
             let json = serde_json::to_string_pretty(&response)?;
             println!("{}", json);
-
-            // Also write to response file if request_id was provided
-            if !req_id.is_empty() {
-                io::write_response(&req_id, &response)?;
-            }
         }
         _ => {
             print_verify_results(&response);
@@ -229,17 +210,6 @@ fn print_verify_results(response: &VerifyResponse) {
 
     println!("│");
     println!("└────────────────────────────────────────────────────────┘\n");
-}
-
-/// Run the lint command (placeholder for now)
-async fn run_lint(
-    _request_id: Option<String>,
-    _file: Option<String>,
-    _fix: bool,
-) -> Result<ExitCode, Box<dyn std::error::Error>> {
-    println!("Lint command not yet fully implemented.");
-    println!("Use 'lens verify' for formal constraint verification.");
-    Ok(ExitCode::SUCCESS)
 }
 
 /// Run the constraints listing command

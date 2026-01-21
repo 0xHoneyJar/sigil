@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { isAddress } from 'viem'
 import type { Address } from 'viem'
 import { useDevToolbar } from '../providers/DevToolbarProvider'
@@ -31,7 +31,7 @@ export function UserLens() {
   const [error, setError] = useState<string | null>(null)
   const [isResolving, setIsResolving] = useState(false)
 
-  const { setImpersonatedAddress, disableLens, saveAddress } = useDevToolbar()
+  const { setImpersonatedAddress, disableLens, saveAddress, userLens } = useDevToolbar()
   const { savedAddresses, selectAddress, removeAddress } = useSavedAddresses()
   const isImpersonating = useIsImpersonating()
 
@@ -127,7 +127,7 @@ export function UserLens() {
             </button>
           </div>
           <code className="sigil-user-lens__address">
-            {useDevToolbar().userLens.impersonatedAddress}
+            {userLens.impersonatedAddress}
           </code>
         </div>
       )}

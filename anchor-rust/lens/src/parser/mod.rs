@@ -73,7 +73,7 @@ impl CodeParser {
 
         match kind {
             // JSX elements
-            "jsx_element" | "jsx_self_closing_element" => {
+            "jsx_element" => {
                 metrics.element_count += 1;
                 if depth > metrics.max_nesting_depth {
                     metrics.max_nesting_depth = depth;
@@ -87,9 +87,27 @@ impl CodeParser {
                 }
             }
 
-            // JSX opening element - check for event handlers
+            // Self-closing JSX elements (like <input />, <br />) - count element AND event handlers
+            "jsx_self_closing_element" => {
+                metrics.element_count += 1;
+                if depth > metrics.max_nesting_depth {
+                    metrics.max_nesting_depth = depth;
+                }
+
+                // Check if it's an interactive element
+                if let Some(tag_name) = self.get_jsx_tag_name(node, source) {
+                    if is_interactive_element(&tag_name) {
+                        metrics.interactive_element_count += 1;
+                    }
+                }
+
+                // Count event handlers directly on self-closing elements
+                metrics.event_handler_count += self.count_event_handlers_in_element(node, source);
+            }
+
+            // JSX opening element - check for event handlers (for non-self-closing elements)
             "jsx_opening_element" => {
-                metrics.event_handler_count += self.count_event_handlers_in_opening(node, source);
+                metrics.event_handler_count += self.count_event_handlers_in_element(node, source);
             }
 
             // Function declarations and expressions
@@ -107,16 +125,8 @@ impl CodeParser {
                 }
             }
 
-            // JSX attribute - check for event handlers
-            "jsx_attribute" => {
-                if let Some(name_node) = node.child(0) {
-                    if let Ok(name) = name_node.utf8_text(source) {
-                        if is_event_handler_name(name) {
-                            metrics.event_handler_count += 1;
-                        }
-                    }
-                }
-            }
+            // NOTE: jsx_attribute case removed to fix FR-004 double-counting bug.
+            // Event handlers are already counted via jsx_opening_element → count_event_handlers_in_opening()
 
             _ => {}
         }
@@ -164,8 +174,8 @@ impl CodeParser {
         None
     }
 
-    /// Count event handlers in JSX opening element attributes
-    fn count_event_handlers_in_opening(&self, node: Node, source: &[u8]) -> usize {
+    /// Count event handlers in JSX element attributes (works for both opening and self-closing)
+    fn count_event_handlers_in_element(&self, node: Node, source: &[u8]) -> usize {
         let mut count = 0;
         let mut cursor = node.walk();
 
@@ -293,9 +303,11 @@ function Form() {
 "#;
         let metrics = parser.parse(code).unwrap();
 
-        // Check that we detect at least some event handlers and interactive elements
-        assert!(metrics.event_handler_count >= 1, "Should detect event handlers");
-        assert!(metrics.interactive_element_count >= 1, "Should detect interactive elements");
+        // FR-004 fix: Now counts event handlers exactly once (via jsx_opening_element only)
+        // onSubmit + onChange + onBlur + onClick = 4 event handlers
+        assert_eq!(metrics.event_handler_count, 4, "Should count each event handler exactly once");
+        // form, input, button = 3 interactive elements
+        assert_eq!(metrics.interactive_element_count, 3, "Should detect interactive elements");
     }
 
     #[test]

@@ -23,6 +23,10 @@ pub enum LensError {
     #[error("YAML error: {0}")]
     Yaml(#[from] serde_yaml::Error),
 
+    /// IPC error from sigil-ipc crate
+    #[error("IPC error: {0}")]
+    Ipc(#[from] sigil_ipc::IpcError),
+
     /// CEL compilation error
     #[error("CEL compilation error for constraint '{constraint_id}': {reason}")]
     CelCompilation { constraint_id: String, reason: String },
@@ -107,6 +111,7 @@ impl LensError {
                 format!("Failed to write response for '{}': {}", request_id, reason)
             }
             LensError::Parse { reason } => format!("Code parse error: {}", reason),
+            LensError::Ipc(e) => format!("IPC error: {}", e),
         }
     }
 
@@ -131,6 +136,7 @@ impl LensError {
             LensError::Config(_) => ExitCode::Revert as i32,
             LensError::ResponseWrite { .. } => ExitCode::Revert as i32,
             LensError::Parse { .. } => ExitCode::Schema as i32,
+            LensError::Ipc(_) => ExitCode::Revert as i32,
         }
     }
 }

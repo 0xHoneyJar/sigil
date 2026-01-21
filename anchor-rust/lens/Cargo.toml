@@ -46,3 +46,6 @@ tree-sitter-typescript.workspace = true
 
 # Shared types from anchor (library is sigil_anchor_core)
 sigil_anchor_core = { path = "../anchor", package = "sigil-anchor" }
+
+# Shared IPC utilities
+sigil-ipc = { path = "../sigil-ipc" }

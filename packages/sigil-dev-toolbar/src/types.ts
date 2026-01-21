@@ -1,6 +1,79 @@
 import type { Address } from 'viem'
 
 /**
+ * Zone hierarchy for physics validation
+ */
+export type Zone = 'critical' | 'elevated' | 'standard' | 'local'
+
+/**
+ * Lens context for User Lens impersonation validation
+ */
+export interface LensContext {
+  /** Address being impersonated */
+  impersonatedAddress: string
+  /** Real user address (for signing) */
+  realAddress?: string
+  /** Component being validated */
+  component: string
+  /** Value observed in the UI */
+  observedValue?: string
+  /** Value from on-chain read */
+  onChainValue?: string
+  /** Value from indexer (Envio, Subgraph) */
+  indexedValue?: string
+  /** Data source used by component */
+  dataSource?: 'on-chain' | 'indexed' | 'mixed' | 'unknown'
+}
+
+/**
+ * Lens validation issue types
+ */
+export type LensIssueType =
+  | 'data_source_mismatch'
+  | 'stale_indexed_data'
+  | 'lens_financial_check'
+  | 'impersonation_leak'
+
+/**
+ * Lens validation issue severity
+ */
+export type LensIssueSeverity = 'error' | 'warning' | 'info'
+
+/**
+ * Individual lens validation issue
+ */
+export interface LensValidationIssue {
+  /** Issue type */
+  type: LensIssueType
+  /** Severity */
+  severity: LensIssueSeverity
+  /** Human-readable message */
+  message: string
+  /** Component where issue was found */
+  component: string
+  /** Zone context */
+  zone?: Zone
+  /** Expected value */
+  expected?: string
+  /** Actual value */
+  actual?: string
+  /** Suggested fix */
+  suggestion?: string
+}
+
+/**
+ * Lens validation result
+ */
+export interface LensValidationResult {
+  /** Whether validation passed */
+  valid: boolean
+  /** List of issues found */
+  issues: LensValidationIssue[]
+  /** Summary message */
+  summary: string
+}
+
+/**
  * User Lens state for address impersonation
  */
 export interface UserLensState {

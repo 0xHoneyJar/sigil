@@ -1,0 +1,48 @@
+{
+  "name": "@sigil/simulation",
+  "version": "0.1.0",
+  "description": "Transaction simulation against fork chains",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@sigil/fork": "workspace:*"
+  },
+  "peerDependencies": {
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "viem": "^2.0.0",
+    "vitest": "^1.2.0"
+  },
+  "keywords": [
+    "sigil",
+    "simulation",
+    "transaction",
+    "web3",
+    "testing"
+  ],
+  "author": "Sigil Framework",
+  "license": "MIT"
+}

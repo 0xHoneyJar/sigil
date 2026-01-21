@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import { useDevToolbar, useDevToolbarConfig } from '../providers/DevToolbarProvider'
 import { UserLens, LensActiveBadge } from './UserLens'
 import type { ToolbarTab } from '../types'
