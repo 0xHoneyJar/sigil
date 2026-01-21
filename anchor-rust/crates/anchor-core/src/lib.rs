@@ -19,6 +19,7 @@
 //! ```
 
 pub mod error;
+pub mod graph;
 pub mod lifecycle;
 pub mod rpc;
 pub mod types;
@@ -26,6 +27,7 @@ pub mod warden;
 
 // Re-export commonly used types at crate root
 pub use error::AnchorError;
+pub use graph::TaskGraph;
 pub use lifecycle::{CheckpointManager, ForkManager, SessionManager, SnapshotManager};
 pub use rpc::{AnvilMethods, RpcClient, RpcError};
 pub use types::{

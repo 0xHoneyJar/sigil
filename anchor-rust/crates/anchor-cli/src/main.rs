@@ -21,12 +21,14 @@
 //! - `anchor resolve` - Resolve effect type from keywords
 //! - `anchor validate` - Validate a grounding statement
 //! - `anchor warden` - Adversarial warden for drift/deceptive detection
+//! - `anchor graph` - Show task graph for a session
 
 use clap::{Parser, Subcommand};
 use sigil_anchor_core::{
     get_default_physics, get_warden, parse_grounding_statement, validate_grounding,
     CheckpointManager, ForkManager, LearnedRule, Network, PhysicsLoader, RpcClient, SessionManager,
-    SessionStatus, SnapshotManager, ValidationStatus, Vocabulary, VocabularyLoader, Zone, VERSION,
+    SessionStatus, SnapshotManager, TaskGraph, ValidationStatus, Vocabulary, VocabularyLoader,
+    Zone, VERSION,
 };
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -310,6 +312,29 @@ enum Commands {
         /// Output as JSON
         #[arg(long)]
         json: bool,
+    },
+
+    /// Show task graph for a session
+    Graph {
+        /// Session ID to show graph for
+        #[arg(short, long)]
+        session: Option<String>,
+
+        /// Path to graph file (alternative to --session)
+        #[arg(short, long)]
+        file: Option<PathBuf>,
+
+        /// Output as JSON
+        #[arg(long)]
+        json: bool,
+
+        /// Show only tasks with specific status
+        #[arg(long)]
+        status: Option<String>,
+
+        /// Show in topological order
+        #[arg(long)]
+        topo: bool,
     },
 }
 
@@ -1559,6 +1584,133 @@ async fn main() {
             }
 
             std::process::exit(exit_code);
+        }
+
+        Some(Commands::Graph {
+            session,
+            file,
+            json,
+            status,
+            topo,
+        }) => {
+            use sigil_anchor_core::TaskStatus;
+
+            // Load graph from file or session
+            let graph = if let Some(ref path) = file {
+                match TaskGraph::load(path).await {
+                    Ok(g) => g,
+                    Err(e) => {
+                        eprintln!("Error loading graph from {:?}: {}", path, e);
+                        std::process::exit(6);
+                    }
+                }
+            } else if let Some(ref session_id) = session {
+                // Try to load from session's graph file
+                let graph_path = registry_path
+                    .parent()
+                    .unwrap_or(&registry_path)
+                    .join("sessions")
+                    .join(format!("{}_graph.json", session_id));
+
+                match TaskGraph::load(&graph_path).await {
+                    Ok(g) => g,
+                    Err(e) => {
+                        eprintln!("Error loading graph for session {}: {}", session_id, e);
+                        eprintln!("Graph file not found at: {:?}", graph_path);
+                        std::process::exit(6);
+                    }
+                }
+            } else {
+                eprintln!("Error: Must provide --session or --file");
+                std::process::exit(6);
+            };
+
+            // Filter by status if specified
+            let status_filter: Option<TaskStatus> =
+                status
+                    .as_ref()
+                    .and_then(|s| match s.to_lowercase().as_str() {
+                        "pending" => Some(TaskStatus::Pending),
+                        "running" => Some(TaskStatus::Running),
+                        "complete" | "completed" => Some(TaskStatus::Complete),
+                        "blocked" => Some(TaskStatus::Blocked),
+                        "failed" => Some(TaskStatus::Failed),
+                        _ => {
+                            eprintln!(
+                            "Invalid status: {}. Use: pending, running, complete, blocked, failed",
+                            s
+                        );
+                            None
+                        }
+                    });
+
+            if json {
+                // Output raw JSON
+                match graph.to_json() {
+                    Ok(json_str) => println!("{}", json_str),
+                    Err(e) => {
+                        eprintln!("Error serializing graph: {}", e);
+                        std::process::exit(6);
+                    }
+                }
+            } else {
+                // Pretty print
+                println!("Task Graph");
+                println!("==========");
+                println!("Total tasks: {}", graph.len());
+                println!();
+
+                // Summary by status
+                let pending = graph.get_by_status(TaskStatus::Pending).len();
+                let running = graph.get_by_status(TaskStatus::Running).len();
+                let complete = graph.get_by_status(TaskStatus::Complete).len();
+                let blocked = graph.get_by_status(TaskStatus::Blocked).len();
+                let failed = graph.get_by_status(TaskStatus::Failed).len();
+
+                println!(
+                    "Status: {} pending, {} running, {} complete, {} blocked, {} failed",
+                    pending, running, complete, blocked, failed
+                );
+                println!();
+
+                // Ready tasks
+                let ready = graph.get_ready_tasks();
+                if !ready.is_empty() {
+                    println!("Ready to execute:");
+                    for task in &ready {
+                        println!("  ○ {} [{}]", task.id, task.task_type);
+                    }
+                    println!();
+                }
+
+                // Task list or tree
+                if topo {
+                    println!("Tasks (topological order):");
+                    for task in graph.topological_order() {
+                        if let Some(ref filter) = status_filter {
+                            if task.status != *filter {
+                                continue;
+                            }
+                        }
+                        let status_icon = match task.status {
+                            TaskStatus::Complete => "✓",
+                            TaskStatus::Running => "►",
+                            TaskStatus::Failed => "✗",
+                            TaskStatus::Blocked => "◌",
+                            TaskStatus::Pending => "○",
+                        };
+                        let deps = if task.dependencies.is_empty() {
+                            String::new()
+                        } else {
+                            format!(" <- {}", task.dependencies.join(", "))
+                        };
+                        println!("  {} {} [{}]{}", status_icon, task.id, task.task_type, deps);
+                    }
+                } else {
+                    println!("Dependency tree:");
+                    println!("{}", graph.pretty_tree());
+                }
+            }
         }
 
         None => {

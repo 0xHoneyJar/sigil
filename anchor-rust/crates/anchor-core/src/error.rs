@@ -46,8 +46,24 @@ pub enum AnchorError {
     #[error("Task not found: {0}")]
     TaskNotFound(String),
 
-    #[error("Circular dependency detected: {0} -> {1}")]
-    CircularDependency(String, String),
+    #[error("Task already exists: {0}")]
+    TaskAlreadyExists(String),
+
+    #[error("Dependency not found: {0}")]
+    DependencyNotFound(String),
+
+    #[error("Circular dependency detected involving: {0}")]
+    CircularDependency(String),
+
+    #[error("Task {0} has dependents: {1:?}")]
+    TaskHasDependents(String, Vec<String>),
+
+    // Serialization errors
+    #[error("Serialization error: {0}")]
+    SerializationError(String),
+
+    #[error("IO error: {0}")]
+    IoError(String),
 
     // Validation errors
     #[error("Invalid zone: {0}")]
