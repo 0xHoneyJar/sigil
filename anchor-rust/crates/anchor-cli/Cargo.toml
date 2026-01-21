@@ -1,0 +1,36 @@
+[package]
+name = "sigil-anchor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Ground truth enforcement CLI for Sigil design physics"
+readme = "../../README.md"
+keywords = ["blockchain", "ethereum", "defi", "cli", "validation"]
+categories = ["command-line-utilities", "development-tools"]
+
+[[bin]]
+name = "anchor"
+path = "src/main.rs"
+
+[dependencies]
+sigil-anchor-core = { path = "../anchor-core" }
+
+# Async
+tokio = { workspace = true }
+
+# CLI
+clap = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Logging
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# Utilities
+anyhow = { workspace = true }
+dirs = "5.0"

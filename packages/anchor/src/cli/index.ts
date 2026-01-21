@@ -18,9 +18,11 @@ import {
   loadVocabulary,
   AdversarialWarden,
   getHierarchyDescription,
+  validateLensContext,
+  getLensExitCode,
 } from '../warden/index.js';
-import { ZONE_HIERARCHY } from '../types.js';
-import type { NetworkConfig } from '../types.js';
+import { ZONE_HIERARCHY, LensContextSchema } from '../types.js';
+import type { NetworkConfig, LensContext, Zone } from '../types.js';
 
 const VERSION = '4.3.1';
 
@@ -732,6 +734,9 @@ program
   .option('-t, --text <statement>', 'Statement text to validate')
   .option('--physics <path>', 'Path to physics rules file')
   .option('--vocabulary <path>', 'Path to vocabulary file')
+  .option('--lens <json>', 'Lens context JSON for data source validation')
+  .option('--lens-file <path>', 'Read lens context from JSON file')
+  .option('--zone <zone>', 'Zone for lens validation (critical, elevated, standard, local)')
   .option('--json', 'Output as JSON')
   .option('--exit-code', 'Exit with validation status code')
   .action(async (options: {
@@ -739,11 +744,57 @@ program
     text?: string;
     physics?: string;
     vocabulary?: string;
+    lens?: string;
+    lensFile?: string;
+    zone?: string;
     json?: boolean;
     exitCode?: boolean;
   }) => {
-    let statement: string;
+    let statement: string | undefined;
+    let lensContext: LensContext | undefined;
+    let zone: Zone | undefined;
 
+    // Parse zone if provided
+    if (options.zone) {
+      const validZones = ['critical', 'elevated', 'standard', 'local'];
+      if (!validZones.includes(options.zone)) {
+        console.error(`Invalid zone: ${options.zone}. Must be one of: ${validZones.join(', ')}`);
+        process.exit(1);
+      }
+      zone = options.zone as Zone;
+    }
+
+    // Parse lens context if provided
+    if (options.lens) {
+      try {
+        const parsed = JSON.parse(options.lens);
+        const validated = LensContextSchema.safeParse(parsed);
+        if (!validated.success) {
+          console.error('Invalid lens context:', validated.error.message);
+          process.exit(1);
+        }
+        lensContext = validated.data as LensContext;
+      } catch {
+        console.error('Failed to parse lens context JSON');
+        process.exit(1);
+      }
+    } else if (options.lensFile) {
+      try {
+        const content = await readFile(options.lensFile, 'utf-8');
+        const parsed = JSON.parse(content);
+        const validated = LensContextSchema.safeParse(parsed);
+        if (!validated.success) {
+          console.error('Invalid lens context:', validated.error.message);
+          process.exit(1);
+        }
+        lensContext = validated.data as LensContext;
+      } catch {
+        console.error(`Failed to read lens context file: ${options.lensFile}`);
+        process.exit(1);
+      }
+    }
+
+    // Read grounding statement
     if (options.file) {
       try {
         statement = await readFile(options.file, 'utf-8');
@@ -753,8 +804,11 @@ program
       }
     } else if (options.text) {
       statement = options.text;
-    } else {
-      console.error('Provide a statement with -f (file) or -t (text)');
+    }
+
+    // Must have either statement or lens context
+    if (!statement && !lensContext) {
+      console.error('Provide a statement with -f (file) or -t (text), or lens context with --lens or --lens-file');
       process.exit(1);
     }
 
@@ -763,30 +817,90 @@ program
       if (options.physics) validateOptions.physicsPath = options.physics;
       if (options.vocabulary) validateOptions.vocabularyPath = options.vocabulary;
 
-      const result = await validateGrounding(statement, validateOptions);
+      // Run grounding validation if statement provided
+      let groundingResult;
+      if (statement) {
+        groundingResult = await validateGrounding(statement, validateOptions);
+      }
+
+      // Run lens validation if lens context provided
+      let lensResult;
+      if (lensContext) {
+        // Use zone from grounding result if not explicitly provided
+        const effectiveZone = zone ?? groundingResult?.requiredZone ?? 'standard';
+        lensResult = validateLensContext(lensContext, effectiveZone);
+      }
+
+      // Build combined result
+      const combinedResult = {
+        ...(groundingResult && {
+          status: groundingResult.status,
+          checks: groundingResult.checks,
+          requiredZone: groundingResult.requiredZone,
+          citedZone: groundingResult.citedZone,
+          correction: groundingResult.correction,
+        }),
+        ...(lensResult && {
+          lens_validation: {
+            valid: lensResult.valid,
+            issues: lensResult.issues,
+            summary: lensResult.summary,
+          },
+        }),
+      };
 
       if (options.json) {
-        console.log(JSON.stringify(result, null, 2));
+        console.log(JSON.stringify(combinedResult, null, 2));
       } else {
-        const statusEmoji = result.status === 'VALID' ? '✓' : result.status === 'DRIFT' ? '⚠' : '✗';
-        console.log(`${statusEmoji} Status: ${result.status}`);
-        console.log('');
-        console.log('Checks:');
-        console.log(`  Relevance:  ${result.checks.relevance.passed ? '✓' : '✗'} ${result.checks.relevance.reason}`);
-        console.log(`  Hierarchy:  ${result.checks.hierarchy.passed ? '✓' : '✗'} ${result.checks.hierarchy.reason}`);
-        console.log(`  Rules:      ${result.checks.rules.passed ? '✓' : '✗'} ${result.checks.rules.reason}`);
-        console.log('');
-        console.log(`Required Zone: ${result.requiredZone}`);
-        console.log(`Cited Zone:    ${result.citedZone ?? '(none)'}`);
-
-        if (result.correction) {
+        // Show grounding validation results
+        if (groundingResult) {
+          const statusEmoji = groundingResult.status === 'VALID' ? '✓' : groundingResult.status === 'DRIFT' ? '⚠' : '✗';
+          console.log(`${statusEmoji} Status: ${groundingResult.status}`);
           console.log('');
-          console.log(`Correction: ${result.correction}`);
+          console.log('Grounding Checks:');
+          console.log(`  Relevance:  ${groundingResult.checks.relevance.passed ? '✓' : '✗'} ${groundingResult.checks.relevance.reason}`);
+          console.log(`  Hierarchy:  ${groundingResult.checks.hierarchy.passed ? '✓' : '✗'} ${groundingResult.checks.hierarchy.reason}`);
+          console.log(`  Rules:      ${groundingResult.checks.rules.passed ? '✓' : '✗'} ${groundingResult.checks.rules.reason}`);
+          console.log('');
+          console.log(`Required Zone: ${groundingResult.requiredZone}`);
+          console.log(`Cited Zone:    ${groundingResult.citedZone ?? '(none)'}`);
+
+          if (groundingResult.correction) {
+            console.log('');
+            console.log(`Correction: ${groundingResult.correction}`);
+          }
+        }
+
+        // Show lens validation results
+        if (lensResult) {
+          if (groundingResult) console.log('');
+          const lensEmoji = lensResult.valid ? '✓' : '✗';
+          console.log(`${lensEmoji} Lens Validation: ${lensResult.summary}`);
+
+          if (lensResult.issues.length > 0) {
+            console.log('');
+            console.log('Lens Issues:');
+            for (const issue of lensResult.issues) {
+              const severityEmoji = issue.severity === 'error' ? '✗' : issue.severity === 'warning' ? '⚠' : 'ℹ';
+              console.log(`  ${severityEmoji} [${issue.type}] ${issue.message}`);
+              if (issue.suggestion) {
+                console.log(`    → ${issue.suggestion}`);
+              }
+            }
+          }
         }
       }
 
       if (options.exitCode) {
-        process.exit(getExitCode(result));
+        // Return the most severe exit code
+        let exitCode = 0;
+        if (groundingResult) {
+          exitCode = Math.max(exitCode, getExitCode(groundingResult));
+        }
+        if (lensResult) {
+          exitCode = Math.max(exitCode, getLensExitCode(lensResult));
+        }
+        process.exit(exitCode);
       }
     } catch (error) {
       console.error('Validation error:', error instanceof Error ? error.message : error);

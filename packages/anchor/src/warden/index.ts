@@ -60,3 +60,11 @@ export {
 } from './adversarial-warden.js';
 
 export type { AdversarialWardenResult } from './adversarial-warden.js';
+
+// Lens Validator
+export {
+  validateLensContext,
+  isLensContextValid,
+  getLensExitCode,
+  validateMultipleLensContexts,
+} from './lens-validator.js';

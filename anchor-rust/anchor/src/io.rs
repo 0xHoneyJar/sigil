@@ -1,118 +1,45 @@
 //! I/O utilities for reading requests and writing responses
 //!
+//! This module wraps the shared sigil-ipc crate with Anchor-specific defaults.
 //! All communication between constructs happens via the shared `grimoires/pub/` directory.
 
-use std::fs;
-use std::path::{Path, PathBuf};
-
 use serde::{de::DeserializeOwned, Serialize};
-use uuid::Uuid;
+use sigil_ipc::CliName;
 
-use crate::error::{AnchorError, Result};
+use crate::error::Result;
 
-/// Maximum request file size (1MB)
-const MAX_REQUEST_SIZE: u64 = 1_048_576;
-
-/// Base path for shared pub directory
-const PUB_PATH: &str = "grimoires/pub";
-
-/// Get the path to a request file
-pub fn request_path(request_id: &str) -> Result<PathBuf> {
-    validate_request_id(request_id)?;
-    Ok(PathBuf::from(PUB_PATH).join("requests").join(format!("{}.json", request_id)))
-}
-
-/// Get the path to a response file
-pub fn response_path(request_id: &str) -> Result<PathBuf> {
-    validate_request_id(request_id)?;
-    Ok(PathBuf::from(PUB_PATH).join("responses").join(format!("{}.json", request_id)))
-}
-
-/// Validate that a request ID is safe (valid UUID, no path traversal)
-pub fn validate_request_id(id: &str) -> Result<Uuid> {
-    // Check for path traversal attempts
-    if id.contains('/') || id.contains('\\') || id.contains("..") {
-        return Err(AnchorError::PathTraversal {
-            id: id.to_string(),
-        });
-    }
-
-    // Must be valid UUID
-    Uuid::parse_str(id).map_err(|e| AnchorError::InvalidRequestId {
-        id: id.to_string(),
-        reason: e.to_string(),
-    })
-}
+// Re-export types that may be used by consumers
+pub use sigil_ipc::{
+    cleanup_stale_files, ensure_pub_directory, init_pub_directory, read_pub_file, request_path,
+    validate_request_id, write_pub_file,
+};
 
 /// Read a request from the pub/requests/ directory
 pub fn read_request<T: DeserializeOwned>(request_id: &str) -> Result<T> {
-    let path = request_path(request_id)?;
-
-    // Check if file exists
-    if !path.exists() {
-        return Err(AnchorError::RequestNotFound {
-            path: path.display().to_string(),
-        });
-    }
-
-    // Check file size
-    let metadata = fs::metadata(&path)?;
-    if metadata.len() > MAX_REQUEST_SIZE {
-        return Err(AnchorError::RequestTooLarge {
-            size: metadata.len(),
-            max_size: MAX_REQUEST_SIZE,
-        });
-    }
-
-    // Read and parse
-    let content = fs::read_to_string(&path)?;
-    let request: T = serde_json::from_str(&content)?;
-
-    Ok(request)
+    sigil_ipc::read_request(request_id).map_err(Into::into)
 }
 
-/// Write a response to the pub/responses/ directory
+/// Write a response to the pub/responses/ directory with Anchor CLI prefix
+///
+/// Response files are prefixed with "anchor-" to prevent collision with other CLIs.
+/// Path format: `grimoires/pub/responses/anchor-{request_id}.json`
 pub fn write_response<T: Serialize>(request_id: &str, response: &T) -> Result<()> {
-    let path = response_path(request_id)?;
-
-    // Ensure directory exists
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent)?;
-    }
-
-    // Serialize and write
-    let content = serde_json::to_string_pretty(response)?;
-    fs::write(&path, content)?;
-
-    Ok(())
+    sigil_ipc::write_response(CliName::Anchor, request_id, response).map_err(Into::into)
 }
 
-/// Ensure the pub/ directory structure exists
-pub fn ensure_pub_directory() -> Result<()> {
-    let pub_path = Path::new(PUB_PATH);
-    fs::create_dir_all(pub_path.join("requests"))?;
-    fs::create_dir_all(pub_path.join("responses"))?;
-    Ok(())
+/// Read a request with advisory locking (for concurrent access)
+pub fn read_request_locked<T: DeserializeOwned>(request_id: &str) -> Result<T> {
+    sigil_ipc::read_request_locked(request_id).map_err(Into::into)
 }
 
-/// Write a file to the pub/ directory
-pub fn write_pub_file(filename: &str, content: &str) -> Result<()> {
-    let path = PathBuf::from(PUB_PATH).join(filename);
-
-    // Ensure directory exists
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent)?;
-    }
-
-    fs::write(&path, content)?;
-    Ok(())
+/// Write a response with advisory locking (for concurrent access)
+pub fn write_response_locked<T: Serialize>(request_id: &str, response: &T) -> Result<()> {
+    sigil_ipc::write_response_locked(CliName::Anchor, request_id, response).map_err(Into::into)
 }
 
-/// Read a file from the pub/ directory
-pub fn read_pub_file(filename: &str) -> Result<String> {
-    let path = PathBuf::from(PUB_PATH).join(filename);
-    let content = fs::read_to_string(&path)?;
-    Ok(content)
+/// Get the path to a response file with Anchor CLI prefix
+pub fn response_path(request_id: &str) -> Result<std::path::PathBuf> {
+    sigil_ipc::response_path(CliName::Anchor, request_id).map_err(Into::into)
 }
 
 #[cfg(test)]
@@ -120,37 +47,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_validate_request_id_valid() {
-        let id = "550e8400-e29b-41d4-a716-446655440000";
-        assert!(validate_request_id(id).is_ok());
-    }
-
-    #[test]
-    fn test_validate_request_id_path_traversal() {
-        assert!(validate_request_id("../etc/passwd").is_err());
-        assert!(validate_request_id("foo/bar").is_err());
-        assert!(validate_request_id("foo\\bar").is_err());
-    }
-
-    #[test]
-    fn test_validate_request_id_invalid_uuid() {
-        assert!(validate_request_id("not-a-uuid").is_err());
-        assert!(validate_request_id("").is_err());
-    }
-
-    #[test]
-    fn test_request_path() {
-        let id = "550e8400-e29b-41d4-a716-446655440000";
-        let path = request_path(id).unwrap();
-        assert!(path.to_string_lossy().contains("requests"));
-        assert!(path.to_string_lossy().contains(&format!("{}.json", id)));
-    }
-
-    #[test]
-    fn test_response_path() {
+    fn test_response_path_has_anchor_prefix() {
         let id = "550e8400-e29b-41d4-a716-446655440000";
         let path = response_path(id).unwrap();
-        assert!(path.to_string_lossy().contains("responses"));
-        assert!(path.to_string_lossy().contains(&format!("{}.json", id)));
+        assert!(path.to_string_lossy().contains("anchor-"));
     }
 }

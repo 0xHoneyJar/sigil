@@ -1,23 +1,10 @@
 {
   "state": "CLOSED",
   "triggers": {
-    "same_issue": {
-      "count": 0,
-      "threshold": 3,
-      "last_hash": null
-    },
-    "no_progress": {
-      "count": 0,
-      "threshold": 5
-    },
-    "cycle_count": {
-      "current": 0,
-      "limit": 20
-    },
-    "timeout": {
-      "started": "2026-01-20T23:45:00Z",
-      "limit_hours": 8
-    }
+    "same_issue": {"count": 0, "threshold": 3, "last_hash": null},
+    "no_progress": {"count": 0, "threshold": 5},
+    "cycle_count": {"current": 0, "limit": 20},
+    "timeout": {"started": "2026-01-20T00:00:00Z", "limit_hours": 8}
   },
   "history": []
 }

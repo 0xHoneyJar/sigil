@@ -1,0 +1,61 @@
+[package]
+name = "sigil-anchor-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description = "Ground truth enforcement library for Sigil design physics"
+readme = "../../README.md"
+keywords = ["blockchain", "ethereum", "defi", "design-system", "validation"]
+categories = ["development-tools", "command-line-utilities", "web-programming"]
+documentation = "https://docs.rs/sigil-anchor-core"
+
+[dependencies]
+# Async
+tokio = { workspace = true }
+
+# HTTP
+reqwest = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Graph
+petgraph = { workspace = true }
+
+# Parsing
+regex = { workspace = true }
+pulldown-cmark = { workspace = true }
+
+# Utilities
+uuid = { workspace = true }
+chrono = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+once_cell = { workspace = true }
+hex = "0.4"
+
+# Logging
+tracing = { workspace = true }
+
+[target.'cfg(unix)'.dependencies]
+nix = { version = "0.27", features = ["signal", "process"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.52", features = ["Win32_System_Threading"] }
+
+[dev-dependencies]
+proptest = "1.4"
+tokio-test = "0.4"
+tempfile = "3.10"
+criterion = { workspace = true }
+
+[[bench]]
+name = "benchmarks"
+harness = false
+
+[features]
+default = []
+embedded-defaults = []

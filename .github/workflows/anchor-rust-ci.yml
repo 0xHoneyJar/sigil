@@ -1,0 +1,112 @@
+name: Anchor Rust CI
+
+on:
+  push:
+    branches: [main, "feature/**"]
+    paths:
+      - "anchor-rust/**"
+      - ".github/workflows/anchor-rust-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "anchor-rust/**"
+      - ".github/workflows/anchor-rust-ci.yml"
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: anchor-rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: anchor-rust -> target
+      - run: cargo check --all-features
+
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: anchor-rust
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-14, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: anchor-rust -> target
+      - run: cargo test --all-features
+
+  bench:
+    name: Benchmarks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: anchor-rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: anchor-rust -> target
+      - name: Run benchmarks
+        run: cargo bench --no-run
+      - name: Check benchmark compilation
+        run: cargo bench -- --test
+
+  fmt:
+    name: Format
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: anchor-rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt --all --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: anchor-rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: anchor-rust -> target
+      - run: cargo clippy --all-features -- -D warnings
+
+  doc:
+    name: Documentation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: anchor-rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: anchor-rust -> target
+      - run: cargo doc --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: -D warnings

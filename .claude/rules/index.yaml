@@ -340,6 +340,29 @@ rules:
     priority: 4
     conditional: true
 
+  # Anchor/Lens Integration (Formal Verification)
+  - file: "22-sigil-anchor-lens.md"
+    triggers:
+      keywords:
+        - "validate"
+        - "verify"
+        - "constraint"
+        - "anchor"
+        - "lens"
+        - "correction"
+        - "violation"
+      effects:
+        - "Financial"
+        - "Destructive"
+        - "SoftDelete"
+      zones:
+        - "Critical"
+        - "Cautious"
+    tokens: 2200
+    priority: 4
+    # Load after physics analysis is confirmed, before code generation
+    phase: "post_analysis"
+
   # Semantic Search
   - file: "17-semantic-search.md"
     triggers:
@@ -356,7 +379,7 @@ loading:
   max_tokens: 4000
 
   # Priority order for loading (lower = higher priority)
-  priority_order: [1, 2, 3, 4]
+  priority_order: [1, 2, 3, 4, 5, 6]
 
   # Stop loading lower priority rules when limit reached
   stop_on_limit: true
@@ -371,3 +394,127 @@ loading:
     - "01-sigil-physics.md"
     - "05-sigil-animation.md"
     - "07-sigil-material.md"
+
+# ===========================================
+# PRIORITY 5: Project Extensions
+# ===========================================
+# Project-specific rules that extend or customize Sigil physics
+# These are loaded from grimoires/sigil/rules/ in the target project
+
+extensions:
+  # Path where projects can add custom rules
+  paths:
+    - "grimoires/sigil/rules/*.md"
+
+  # Extension rules are loaded after core rules
+  priority: 5
+
+  # Extensions can override core physics (use with caution)
+  allow_override: true
+
+  # Schema for extension files
+  schema:
+    required_fields:
+      - "name"           # Rule name for identification
+      - "triggers"       # When to load this extension
+    optional_fields:
+      - "tokens"         # Estimated token count
+      - "overrides"      # Which core rules this modifies
+      - "description"    # Human-readable description
+
+# ===========================================
+# PRIORITY 6: Local Overrides
+# ===========================================
+# Developer-specific overrides (not committed to repo)
+# These take highest priority for local customization
+
+overrides:
+  # Path for local override files
+  paths:
+    - ".claude/overrides/*.md"
+
+  # Overrides have highest priority
+  priority: 6
+
+  # Overrides always win over extensions and core
+  allow_override: true
+
+  # Typical override use cases:
+  # - Faster timings for power users
+  # - Custom taste preferences
+  # - Project-specific physics adjustments
+
+  # Example override file format:
+  # ```markdown
+  # # Override: 01-sigil-physics
+  #
+  # ## Custom Timings
+  #
+  # For this project, use faster timings:
+  #
+  # | Effect | Default | Override |
+  # |--------|---------|----------|
+  # | Financial | 800ms | 500ms |
+  # | Destructive | 600ms | 400ms |
+  #
+  # ## Rationale
+  # Power user audience prefers snappier interactions.
+  # ```
+
+# Extension discovery algorithm
+extension_loading:
+  # 1. Scan extension paths for .md files
+  # 2. Parse YAML frontmatter for triggers
+  # 3. Match triggers against current context
+  # 4. Load matching extensions after core rules
+  # 5. Apply overrides last (highest priority)
+
+  # Frontmatter schema for extension files:
+  # ```yaml
+  # ---
+  # name: "custom-timing"
+  # triggers:
+  #   keywords: ["fast", "snappy"]
+  #   effects: ["Financial"]
+  # tokens: 200
+  # overrides: ["01-sigil-physics.md"]
+  # ---
+  # ```
+
+  # Discovery is cached per session
+  cache_duration: "session"
+
+# ===========================================
+# SEARCH CONFIGURATION
+# ===========================================
+# Unified search abstraction for /craft and other skills
+
+search:
+  # Detection script for ck availability
+  detection_script: ".claude/scripts/sigil-search.sh"
+
+  # Environment variable set after detection
+  env_var: "SIGIL_SEARCH_MODE"
+
+  # Supported modes (in priority order)
+  modes:
+    - name: "ck"
+      binary: "ck"
+      capabilities: ["semantic", "hybrid", "regex"]
+      preferred: true
+    - name: "grep"
+      binary: "grep"
+      capabilities: ["regex"]
+      fallback: true
+
+  # Output format (consistent across all modes)
+  output_format: "jsonl"
+  output_schema:
+    file: "string"      # Absolute file path
+    line: "number"      # Line number
+    snippet: "string"   # Matched content
+    score: "number"     # Relevance score (0.0 for grep)
+
+  # User-facing behavior
+  transparent: true     # Never mention tool choice to user
+  cache_detection: true # Cache detection result per session

@@ -1,0 +1,51 @@
+[package]
+name = "sigil-lens"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Lens CLI - Formal verification and heuristic linting for Sigil physics"
+
+[[bin]]
+name = "lens"
+path = "src/main.rs"
+
+[lib]
+name = "sigil_lens_core"
+path = "src/lib.rs"
+
+[dependencies]
+# CLI
+clap.workspace = true
+
+# Async runtime
+tokio.workspace = true
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
+
+# Utilities
+uuid.workspace = true
+thiserror.workspace = true
+chrono.workspace = true
+fs2.workspace = true
+
+# Logging
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+# CEL engine
+cel-interpreter.workspace = true
+
+# Tree-sitter for code parsing
+tree-sitter.workspace = true
+tree-sitter-typescript.workspace = true
+
+# Shared types from anchor (library is sigil_anchor_core)
+sigil_anchor_core = { path = "../anchor", package = "sigil-anchor" }
+
+# Shared IPC utilities
+sigil-ipc = { path = "../sigil-ipc" }

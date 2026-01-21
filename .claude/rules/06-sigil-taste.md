@@ -70,8 +70,59 @@ When users provide feedback (MODIFY/REJECT), optional diagnostic questions captu
 | Source | Description |
 |--------|-------------|
 | `cli` | Signal from Claude Code /craft command |
-| `toolbar` | Signal from Sigil Toolbar browser extension |
+| `toolbar` | Signal from Sigil Dev Toolbar |
 | `product` | Signal from product-embedded feedback widget |
+
+## Toolbar-Specific Fields
+
+When signals are captured from the Sigil Dev Toolbar (`source: toolbar`), additional context is available:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `lens_context` | object | User Lens impersonation state when signal was captured |
+| `lens_context.enabled` | boolean | Whether User Lens was active |
+| `lens_context.impersonated_address` | string | Address being impersonated (if enabled) |
+| `lens_context.real_address` | string | Real connected wallet address |
+| `screenshot_ref` | string | Path to screenshot if captured (relative to grimoires/sigil/) |
+
+### Lens Context Example
+
+```yaml
+---
+timestamp: "2026-01-20T10:15:00Z"
+signal: MODIFY
+source: toolbar
+component:
+  name: "StakePanel"
+  effect: "Financial"
+  craft_type: "diagnose"
+lens_context:
+  enabled: true
+  impersonated_address: "0x1234...abcd"
+  real_address: "0xabcd...1234"
+screenshot_ref: "screenshots/stake-panel-2026-01-20-101500.png"
+physics:
+  behavioral:
+    sync: "pessimistic"
+    timing: "800ms"
+change:
+  from: "indexed data source"
+  to: "on-chain data source"
+learning:
+  inference: "Financial displays should use on-chain data when lens is active"
+  recommendation: "Switch to on-chain reads when impersonating for accuracy"
+---
+```
+
+### Screenshot Capture
+
+Screenshots are saved to `grimoires/sigil/screenshots/` with naming convention:
+`{component}-{timestamp}.png`
+
+Screenshots are captured when:
+- User clicks "Report Issue" in toolbar
+- User manually captures via toolbar
+- Diagnostic panel detects critical mismatch
 
 ## Reading Taste
 

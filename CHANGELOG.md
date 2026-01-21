@@ -7,6 +7,304 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.2.0] - 2026-01-21 — "Diagnostic HUD & Package Architecture"
+
+### Summary
+
+v3.2.0 delivers the **Diagnostic HUD** (`@sigil/hud`) — a composable React component library for diagnostic-first development. This release also includes critical bug fixes from Sprint 0 and establishes the modular package architecture with `@sigil/diagnostics`, `@sigil/fork`, `@sigil/lens`, and `@sigil/simulation`.
+
+**Key achievement**: Complete HUD implementation with physics analysis, data source tracing, observation capture, and feedback loop integration.
+
+### Added
+
+#### HUD Package (`@sigil/hud`)
+
+- **DiagnosticsPanel** — Inline physics compliance checking (TASK-201)
+  - Real-time physics analysis display (Behavioral, Animation, Material)
+  - Issue detection with severity levels (error, warning, info)
+  - Quick diagnose buttons for common symptoms
+  - Keyboard shortcut Cmd+Shift+D to toggle
+  - Integration with Anchor CLI for validation
+
+- **DataSourceIndicator** — State source tracing (TASK-202)
+  - Visual badges for data sources (on-chain, indexed, cached, unknown)
+  - Staleness calculation (fresh, stale, very-stale) for both block-based and time-based data
+  - `useDataSource` and `useMultipleDataSources` hooks for programmatic access
+
+- **ObservationCaptureModal** — User observation capture (TASK-203)
+  - Three observation types: User Truth, Issue, Insight
+  - Tag system with suggested and custom tags
+  - Component context capture (name, effect, lens address)
+  - Keyboard shortcut Cmd+Shift+O to trigger
+  - `useObservationCapture` hook with capture methods
+
+- **FeedbackPrompt** — Feedback loop integration (TASK-204)
+  - "Does this feel right?" prompt with structured options
+  - Automatic signal capture (ACCEPT, MODIFY, REJECT)
+  - Links observations to signals for learning
+  - `useSignalCapture` hook for taste.md integration
+
+- **Theme System** — Consistent styling (TASK-205)
+  - Design tokens: colors, typography, spacing, radii, shadows, transitions
+  - Effect color mapping for physics display
+  - Common style patterns for buttons, inputs, cards, badges
+  - `createStyles` utility for type-safe style objects
+
+- **Supporting Components**
+  - `PhysicsAnalysis` — Effect badge and compliance display
+  - `IssueList` — Severity-grouped issue display with suggestions
+  - `HudPanel` — Main panel container with tabs
+  - `HudTrigger` — Floating trigger button
+  - `LensPanel` — User lens management
+  - `SimulationPanel` — Transaction simulation display
+  - `StateComparison` — Side-by-side state diff
+
+- **Hooks & Store**
+  - `useKeyboardShortcuts` — Global HUD keyboard navigation
+  - `useHudStore` — Zustand store for HUD state
+  - `HudProvider` — Context provider for services integration
+
+#### New Packages
+
+- **`@sigil/diagnostics`** — Physics compliance detection service
+  - Effect detection from component code
+  - Compliance checking against physics rules
+  - Issue generation with suggestions
+
+- **`@sigil/fork`** — Chain fork management
+  - Anvil provider with balance manipulation
+  - Tenderly provider with fork creation
+  - Snapshot/revert capabilities
+
+- **`@sigil/lens`** — User lens (impersonation) service
+  - Address impersonation for testing
+  - Saved addresses management
+
+- **`@sigil/simulation`** — Transaction simulation service
+  - Dry-run execution on forks
+  - Balance and state change tracking
+  - Event log capture
+
+#### Shared IPC Infrastructure
+
+- **sigil-ipc Rust crate** — Shared I/O for Anchor/Lens CLIs (TASK-001)
+  - `CliName` enum for prefixed responses
+  - Centralized request/response path handling
+  - Input validation and security checks
+
+### Fixed
+
+#### Sprint 0 Bug Fixes
+
+- **TASK-005**: Fixed conditional hook call in UserLens component
+  - Moved `useDevToolbar()` extraction from conditional JSX to component top level
+  - Prevents React hooks rules violation
+
+- **TASK-006**: Fixed impersonation cleanup on simulation error
+  - Added `finally` block to ensure `stopImpersonating()` always called
+  - Prevents orphaned impersonation state after simulation failures
+
+- **TASK-007**: Fixed double-counting JSX event handlers in Lens parser
+  - Removed duplicate `jsx_attribute` case that counted handlers twice
+
+### Changed
+
+- **Anchor CLI** — Migrated to sigil-ipc crate (TASK-002)
+- **Lens CLI** — Migrated to sigil-ipc crate, removed lint stub command (TASK-003, TASK-004)
+- **IPC Client** — Updated for CLI-prefixed response paths (TASK-008)
+
+### Package Versions
+
+| Package | Version |
+|---------|---------|
+| @sigil/hud | 0.1.0 |
+| @sigil/diagnostics | 0.1.0 |
+| @sigil/fork | 0.1.0 |
+| @sigil/lens | 0.1.0 |
+| @sigil/simulation | 0.1.0 |
+| sigil-anchor | 0.2.0 |
+| sigil-lens | 0.2.0 |
+| sigil-ipc | 0.1.0 |
+
+### Migration
+
+No breaking changes. New packages are additive. Install `@sigil/hud` to use the diagnostic HUD:
+
+```tsx
+import { HudProvider, HudPanel, HudTrigger } from '@sigil/hud'
+
+function App() {
+  return (
+    <HudProvider>
+      <YourApp />
+      <HudPanel />
+      <HudTrigger />
+    </HudProvider>
+  )
+}
+```
+
+---
+
+## [3.1.0] - 2026-01-20 — "Anchor Rust & /craft Evolution"
+
+### Summary
+
+v3.1.0 delivers the **Anchor/Lens Rust CLIs** — high-performance native binaries that replace the TypeScript validation layer. This release also includes comprehensive planning for `/craft` optimization: mode-based loading (Quick/Chisel/Hammer/Debug), RLM on-demand rule loading, and Dev Toolbar integration.
+
+**Key achievement**: Anchor validates in ~10ms, Lens verifies in ~27ms — both well under target.
+
+### Added
+
+#### Anchor CLI (`sigil-anchor`) — Native Rust
+
+- **Zone/Effect Validation** — Map keywords to physics zones (Critical, Cautious, Standard)
+- **Effect Detection** — Detect Financial, Destructive, SoftDelete, Standard, Local, Navigation effects
+- **Data Source Verification** — Validate correct data source for use cases (on-chain vs indexed)
+- **Vocabulary Publishing** — Export vocabulary.yaml and zones.yaml to pub/ directory
+- **Exit Code System** — Consistent exit codes (0=success, 10=critical, 11=cautious, 12=standard, 20=schema, 30=I/O)
+
+#### Lens CLI (`sigil-lens`) — Native Rust
+
+- **CEL Constraint Engine** — Formal verification using Common Expression Language
+- **Constraint Categories** — timing, confirmation, sync, undo, animation constraints
+- **Heuristic Linting** — Tree-sitter based code analysis for TSX components
+- **Correction Context** — Actionable fix suggestions when violations detected
+- **Constraint Publishing** — Export constraints.yaml to pub/ directory
+
+#### Shared Infrastructure
+
+- **pub/ Directory IPC** — Request/response communication via `grimoires/pub/`
+- **UUID-Based Requests** — Secure request identification with full UUID validation
+- **Security Hardening** — Path traversal prevention, file size limits, input validation
+- **Advisory Locking** — Safe concurrent file access using `fs2`
+- **TTL Cleanup** — Automatic cleanup of stale files after 1 hour
+- **155 Tests Passing** — Comprehensive test coverage across both CLIs
+
+#### Dev Toolbar (`@sigil/dev-toolbar`)
+
+- **User Lens** — Impersonate any wallet address to test different user states
+  - `useLensAwareAccount` hook returns effective address based on impersonation state
+  - `useIsImpersonating`, `useImpersonatedAddress` for granular control
+  - `useSavedAddresses` for managing frequently used test addresses
+  - `LensActiveBadge` component shows current impersonation status
+
+- **Fork Chain State Integration** — Manage Anvil/Tenderly forks for transaction simulation
+  - `createAnvilForkService()` and `createTenderlyForkService()` factory functions
+  - `useForkState` hook for React integration with fork lifecycle
+  - Snapshot/revert capabilities for testing scenarios
+  - Balance manipulation and account impersonation support
+
+- **Transaction Simulation** — Dry-run transactions without broadcasting
+  - `useTransactionSimulation` and `useSimulation` hooks
+  - `SimulationPanel` component with gas, balance changes, event logs display
+  - Revert reason decoding (Error, Panic, custom errors)
+  - Support for EIP-1559 and legacy transactions
+
+- **State Comparison** — Side-by-side diff with data source tracing
+  - `StateComparison` component with filtering and JSON export
+  - `useStateSnapshots` hook for capturing state at points in time
+  - Data source badges (on-chain, indexed, cache, local)
+  - Change type highlighting (added, removed, modified, unchanged)
+
+- **Diagnostic Panel** — Real-time physics compliance checking
+  - `DiagnosticPanel` component with severity levels (error, warning, info)
+  - `useDiagnosticItems` hook for programmatic access
+  - IPC integration for Anchor validation
+
+- **IPC Communication** — Bridge between toolbar and Anchor CLI
+  - `IPCClient` with LocalStorage and Mock transports
+  - `useIPCClient` hook for React integration
+  - Request/response protocol for lens and anchor validation
+
+#### Skill Authoring Guide
+
+- Created `.claude/docs/skill-authoring.md` comprehensive guide
+- Progressive Disclosure Pattern (L0-L4 layers)
+- Mode Architecture (analyze, generate, diagnose, repair)
+- RLM Integration patterns
+- Context Management best practices
+- Quality Gates (pre/post generation)
+- Feedback Loops (signal capture and pattern detection)
+- Checklist for new skill creation
+
+#### Taste System Extensions
+
+- Extended `06-sigil-taste.md` with toolbar-specific fields:
+  - `lens_context` for capturing impersonation state during signals
+  - `screenshot_ref` for visual evidence attachment
+  - Source field now includes `toolbar` option
+- Screenshot capture workflow documentation
+
+#### Integration
+
+- **Rule 22** — New `22-sigil-anchor-lens.md` for /craft integration
+- **Correction Loop** — Max 2 attempts to fix violations before user escalation
+- **Violation UX** — Clear violation boxes with apply/override/cancel options
+- **Taste Logging** — Validation results logged to taste.md for learning
+
+### Performance
+
+| CLI | Target | Actual |
+|-----|--------|--------|
+| Anchor validate | <100ms | ~10ms |
+| Lens verify | <200ms | ~27ms |
+
+### Planning Documents
+
+This release includes comprehensive planning for the next evolution:
+
+- **PRD v1.1.0** — `/craft` Optimization & Dev Toolbar (`grimoires/loa/prd-craft-optimization.md`)
+- **SDD v1.0.0** — Technical design for craft.md split, RLM extensions, toolbar architecture
+- **Sprint Plan** — 6 sprints, 25 tasks for solo developer with 1-week cycles
+
+### The /craft Entry Point Philosophy
+
+`/craft` is Sigil's primary entry point — the command that bridges creative intuition with physics grounding. All other commands support the feedback loop:
+
+```
+              ┌─────────────────────────────────────────┐
+              │                                         │
+              │              /craft                     │
+              │        (primary entry point)            │
+              │                                         │
+              │   Detects scope → Applies physics →     │
+              │   Generates code → Collects feedback    │
+              │                                         │
+              └─────────────────────────────────────────┘
+                              │
+         ┌──────────────────┬─┴─┬──────────────────┐
+         │                  │   │                  │
+         ▼                  ▼   ▼                  ▼
+    ┌─────────┐      ┌───────────────┐      ┌──────────┐
+    │UNDERSTAND│      │   VALIDATE    │      │  LEARN   │
+    │/observe  │      │   /ward       │      │/inscribe │
+    │/understand│     │   /garden     │      │          │
+    └─────────┘      └───────────────┘      └──────────┘
+         │                  │                     │
+         └──────────────────┴─────────────────────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │   taste.md    │
+                    │ (accumulated  │
+                    │ understanding)│
+                    └───────────────┘
+```
+
+### Dependencies
+
+- Rust 2021 edition
+- CEL interpreter 0.8 for constraint evaluation
+- Tree-sitter 0.24 for TSX parsing
+- Alloy 1.0 for Ethereum RPC (optional)
+
+### Migration
+
+No breaking changes. Anchor/Lens CLIs are additive — install and use alongside existing workflows.
+
+---
+
 ## [3.0.0] - 2026-01-21 — "Anchor Ground Truth"
 
 ### Summary
@@ -1407,6 +1705,8 @@ Sigil 0.2 can coexist with Loa on the same repository:
 - Design context capture commands
 - Basic moodboard and rules structure
 
+[3.2.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v3.2.0
+[3.1.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v3.1.0
 [2.4.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v2.4.0
 [2.3.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v2.3.0
 [2.2.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v2.2.0
