@@ -103,8 +103,8 @@ get_latest_version() {
         || echo "1.0.0"
 }
 
-# Download binary
-download_binary() {
+# Download archive (does not extract)
+download_archive() {
     local name=$1
     local platform=$2
     local version=$3
@@ -120,6 +120,16 @@ download_binary() {
         error "Please check if the release exists: https://github.com/$REPO/releases/tag/cli-v${version}"
         return 2
     fi
+}
+
+# Extract and install binary from verified archive
+extract_and_install() {
+    local name=$1
+    local platform=$2
+    local version=$3
+    local temp_dir=$4
+
+    local archive_name="${name}-${version}-${platform}.tar.gz"
 
     # Extract
     tar -xzf "$temp_dir/$archive_name" -C "$temp_dir"
@@ -134,10 +144,11 @@ download_binary() {
     fi
 }
 
-# Verify checksums
+# Verify checksums against downloaded archives (not extracted binaries)
 verify_checksums() {
     local version=$1
-    local temp_dir=$2
+    local platform=$2
+    local temp_dir=$3
 
     if [[ "$VERIFY" != "true" ]]; then
         return 0
@@ -153,37 +164,39 @@ verify_checksums() {
     fi
 
     info "Verifying checksums..."
-    cd "$INSTALL_DIR"
+    cd "$temp_dir"
 
-    # Verify each binary
+    # Verify each archive (not extracted binary)
     for binary in anchor lens; do
-        if [[ -f "$binary" ]]; then
+        local archive_name="${binary}-${version}-${platform}.tar.gz"
+        if [[ -f "$archive_name" ]]; then
             local expected
-            expected=$(grep "$binary" "$checksum_file" 2>/dev/null | awk '{print $1}' || true)
+            # Use -F for exact string match to avoid matching multiple platforms
+            expected=$(grep -F "$archive_name" "$checksum_file" 2>/dev/null | awk '{print $1}' || true)
 
             if [[ -z "$expected" ]]; then
-                warn "No checksum found for $binary - skipping"
+                warn "No checksum found for $archive_name - skipping"
                 continue
             fi
 
             local actual
             if command -v sha256sum &>/dev/null; then
-                actual=$(sha256sum "$binary" | awk '{print $1}')
+                actual=$(sha256sum "$archive_name" | awk '{print $1}')
             elif command -v shasum &>/dev/null; then
-                actual=$(shasum -a 256 "$binary" | awk '{print $1}')
+                actual=$(shasum -a 256 "$archive_name" | awk '{print $1}')
             else
                 warn "No checksum tool available - skipping verification"
                 return 0
             fi
 
             if [[ "$actual" != "$expected" ]]; then
-                error "Checksum mismatch for $binary"
+                error "Checksum mismatch for $archive_name"
                 error "Expected: $expected"
                 error "Actual:   $actual"
                 return 3
             fi
 
-            info "$binary checksum verified ✓"
+            info "$archive_name checksum verified ✓"
         fi
     done
 }
@@ -249,15 +262,20 @@ main() {
     mkdir -p "$INSTALL_DIR"
     TEMP_DIR=$(mktemp -d)
 
-    # Download and install both CLIs
+    # Download both archives first
+    header "Downloading CLIs..."
+    download_archive "anchor" "$platform" "$version" "$TEMP_DIR"
+    download_archive "lens" "$platform" "$version" "$TEMP_DIR"
+
+    # Verify checksums against archives before extraction
+    verify_checksums "$version" "$platform" "$TEMP_DIR"
+
+    # Extract and install after verification
     header "Installing anchor..."
-    download_binary "anchor" "$platform" "$version" "$TEMP_DIR"
+    extract_and_install "anchor" "$platform" "$version" "$TEMP_DIR"
 
     header "Installing lens..."
-    download_binary "lens" "$platform" "$version" "$TEMP_DIR"
-
-    # Verify checksums
-    verify_checksums "$version" "$TEMP_DIR"
+    extract_and_install "lens" "$platform" "$version" "$TEMP_DIR"
 
     # Verify binaries
     header "Verifying installation..."

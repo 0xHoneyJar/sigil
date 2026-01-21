@@ -203,13 +203,30 @@ install_construct_git() {
         cp -r "$temp_dir/sigil/.claude/skills/"* .claude/skills/ 2>/dev/null || true
     fi
 
-    # Create version marker
+    # Resolve version before writing marker
+    local resolved_version="$VERSION"
+    if [[ "$resolved_version" == "latest" ]]; then
+        # Try to get version from cloned repo's VERSION.json
+        if [[ -f "$temp_dir/sigil/VERSION.json" ]]; then
+            if command -v jq &>/dev/null; then
+                resolved_version=$(jq -r '.sigil // .constructs_pack // "0.0.0"' "$temp_dir/sigil/VERSION.json" 2>/dev/null || echo "0.0.0")
+            else
+                # Fallback without jq - extract sigil version
+                resolved_version=$(grep -o '"sigil"[[:space:]]*:[[:space:]]*"[^"]*"' "$temp_dir/sigil/VERSION.json" 2>/dev/null | sed 's/.*"\([^"]*\)"$/\1/' || echo "0.0.0")
+            fi
+        else
+            # Fallback: fetch from remote
+            resolved_version=$(curl -fsSL "https://raw.githubusercontent.com/0xHoneyJar/sigil/main/VERSION.json" 2>/dev/null | grep -o '"sigil"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"\([^"]*\)"$/\1/' || echo "0.0.0")
+        fi
+    fi
+
+    # Create version marker with resolved semver
     mkdir -p .claude/constructs/packs/sigil
-    echo "$VERSION" > .claude/constructs/packs/sigil/VERSION
+    echo "$resolved_version" > .claude/constructs/packs/sigil/VERSION
 
     local rule_count
     rule_count=$(find .claude/rules -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
-    info "Installed $rule_count rules"
+    info "Installed $rule_count rules (v$resolved_version)"
 }
 
 # Phase 3: Install Rust CLIs

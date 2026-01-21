@@ -339,18 +339,21 @@ main() {
         echo -e "│  ${BLUE}Optional:${NC}                                                     │"
     fi
 
-    # Optional checks
-    local rust_result
-    check_rust
-    rust_result=$?
+    # Optional checks - use || true to prevent set -e from aborting on exit code 2
+    local rust_result=0
+    check_rust || rust_result=$?
     if [[ $rust_result -eq 2 ]]; then
+        optional_warned=true
+    elif [[ $rust_result -eq 1 ]]; then
+        # Unexpected failure in optional check, treat as warning
         optional_warned=true
     fi
 
-    local existing_result
-    check_existing_sigil
-    existing_result=$?
+    local existing_result=0
+    check_existing_sigil || existing_result=$?
     if [[ $existing_result -eq 2 ]]; then
+        optional_warned=true
+    elif [[ $existing_result -eq 1 ]]; then
         optional_warned=true
     fi
 

@@ -223,17 +223,15 @@ main() {
         echo -e "│  ${BLUE}CLI Tools:${NC}                                                    │"
     fi
 
-    # Optional checks (CLIs)
-    local anchor_result
-    check_anchor_cli
-    anchor_result=$?
+    # Optional checks (CLIs) - use || true to prevent set -e from aborting on exit code 2
+    local anchor_result=0
+    check_anchor_cli || anchor_result=$?
     if [[ $anchor_result -eq 2 ]]; then
         optional_warned=true
     fi
 
-    local lens_result
-    check_lens_cli
-    lens_result=$?
+    local lens_result=0
+    check_lens_cli || lens_result=$?
     if [[ $lens_result -eq 2 ]]; then
         optional_warned=true
     fi
