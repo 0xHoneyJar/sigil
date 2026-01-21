@@ -25,13 +25,18 @@
 #   4 = verification failed
 # =============================================================================
 
-set -euo pipefail
+set -eo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# Source platform utilities if available
-if [[ -f "$SCRIPT_DIR/lib/platform.sh" ]]; then
-    source "$SCRIPT_DIR/lib/platform.sh"
+# Handle being run via curl | bash (BASH_SOURCE is empty)
+if [[ -n "${BASH_SOURCE[0]:-}" ]] && [[ -f "${BASH_SOURCE[0]}" ]]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    # Source platform utilities if available locally
+    if [[ -f "$SCRIPT_DIR/lib/platform.sh" ]]; then
+        source "$SCRIPT_DIR/lib/platform.sh"
+    fi
+else
+    # Running from stdin (curl | bash) - no local script dir
+    SCRIPT_DIR=""
 fi
 
 # Configuration
