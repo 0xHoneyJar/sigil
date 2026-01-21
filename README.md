@@ -814,6 +814,8 @@ learning:
 
 | Tool | Required | Purpose | Install |
 |------|----------|---------|---------|
+| Node.js 20+ | Yes | Runtime | [nodejs.org](https://nodejs.org) |
+| Git | Yes | Version control | [git-scm.com](https://git-scm.com) |
 | [Claude Code](https://claude.ai/code) | Yes | AI runtime | `npm install -g @anthropic-ai/claude-code` |
 | [Loa](https://github.com/0xHoneyJar/loa) | Yes | Architecture framework | See Loa docs |
 | [agent-browser](https://github.com/anthropics/agent-browser) | No | Visual validation | `npm install -g agent-browser` |
@@ -822,16 +824,59 @@ learning:
 
 ## Quick Start
 
-### Installation
+### Unified Installation (Recommended)
+
+Mount Sigil onto any project with a single command:
 
 ```bash
-# Clone and install
-git clone https://github.com/0xHoneyJar/sigil.git
-cd sigil && ./.claude/scripts/constructs-install.sh
+# From your project directory (via Claude Code)
+/mount sigil
+```
 
-# Or mount onto existing project
+This runs the unified installer which:
+1. **Pre-flight checks** — Verifies Node 20+, git, Loa
+2. **Installs construct pack** — Rules, commands, skills
+3. **Installs Rust CLIs** — anchor and lens for formal verification
+4. **Detects React projects** — Offers npm packages for diagnostic HUD
+5. **Verifies installation** — Confirms everything works
+
+### Manual Installation
+
+```bash
+# Clone and run mount script
+git clone https://github.com/0xHoneyJar/sigil.git
 cd your-project
-/mount  # from Claude Code
+../sigil/scripts/mount-sigil.sh
+
+# Or with options
+../sigil/scripts/mount-sigil.sh --skip-cli    # Skip Rust CLI installation
+../sigil/scripts/mount-sigil.sh --skip-npm    # Skip npm package suggestions
+../sigil/scripts/mount-sigil.sh --force       # Reinstall even if already installed
+```
+
+### CLI-Only Installation
+
+Install just the Rust CLIs (anchor and lens):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/scripts/install-cli.sh | bash
+```
+
+### Updating Sigil
+
+Check for updates and upgrade:
+
+```bash
+# Check for available updates
+./scripts/update-sigil.sh --check
+
+# Update all components
+./scripts/update-sigil.sh
+
+# Update specific components
+./scripts/update-sigil.sh --construct  # Rules, commands, skills only
+./scripts/update-sigil.sh --cli        # Rust CLIs only
+./scripts/update-sigil.sh --npm        # npm packages only
 ```
 
 ### Via Loa Framework

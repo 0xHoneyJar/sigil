@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/0xHoneyJar/sigil/VERSION.schema.json",
+  "title": "Sigil Version Manifest",
+  "description": "Version coordination for the Sigil ecosystem",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "sigil": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Overall Sigil version (semver)"
+    },
+    "constructs_pack": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Loa Constructs pack version"
+    },
+    "rust_cli": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Rust CLI version (anchor + lens)"
+    },
+    "npm_packages": {
+      "type": "object",
+      "description": "npm package versions by name",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "description": "Compatibility requirements",
+      "properties": {
+        "rust_cli": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+              "description": "Minimum compatible Rust CLI version"
+            },
+            "recommended": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+              "description": "Recommended Rust CLI version"
+            }
+          },
+          "required": ["min", "recommended"]
+        },
+        "node": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+              "description": "Minimum required Node.js version"
+            }
+          },
+          "required": ["min"]
+        },
+        "loa": {
+          "type": "object",
+          "properties": {
+            "min": {
+              "type": "string",
+              "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+              "description": "Minimum required Loa framework version"
+            }
+          },
+          "required": ["min"]
+        }
+      },
+      "required": ["rust_cli", "node", "loa"]
+    },
+    "release_notes": {
+      "type": "object",
+      "description": "Release notes by version",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["sigil", "constructs_pack", "rust_cli", "npm_packages", "compatibility"]
+}

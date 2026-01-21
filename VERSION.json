@@ -1,0 +1,30 @@
+{
+  "$schema": "./VERSION.schema.json",
+  "sigil": "3.3.0",
+  "constructs_pack": "3.3.0",
+  "rust_cli": "1.0.0",
+  "npm_packages": {
+    "@thehoneyjar/sigil-hud": "0.1.0",
+    "@thehoneyjar/sigil-anchor": "4.3.1",
+    "@thehoneyjar/sigil-diagnostics": "0.1.0",
+    "@thehoneyjar/sigil-fork": "0.1.0",
+    "@thehoneyjar/sigil-lens": "0.1.0",
+    "@thehoneyjar/sigil-simulation": "0.1.0",
+    "@thehoneyjar/sigil-dev-toolbar": "0.1.0"
+  },
+  "compatibility": {
+    "rust_cli": {
+      "min": "1.0.0",
+      "recommended": "1.0.0"
+    },
+    "node": {
+      "min": "20.0.0"
+    },
+    "loa": {
+      "min": "0.7.0"
+    }
+  },
+  "release_notes": {
+    "3.3.0": "Unified installation experience with pre-flight verification"
+  }
+}

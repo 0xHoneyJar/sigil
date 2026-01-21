@@ -1,0 +1,206 @@
+name: Sigil CLI Release
+
+on:
+  push:
+    tags:
+      - "cli-v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.1.0)'
+        required: true
+        type: string
+
+env:
+  CARGO_TERM_COLOR: always
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: anchor-rust
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x86_64
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            platform: linux-x64
+          # Linux aarch64 (cross-compile)
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            platform: linux-arm64
+            cross: true
+          # macOS x86_64
+          - target: x86_64-apple-darwin
+            os: macos-13
+            platform: darwin-x64
+          # macOS aarch64 (Apple Silicon)
+          - target: aarch64-apple-darwin
+            os: macos-14
+            platform: darwin-arm64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross-compilation tools (Linux aarch64)
+        if: matrix.cross
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: anchor-rust -> target
+
+      - name: Build release binaries
+        run: |
+          if [ "${{ matrix.cross }}" = "true" ]; then
+            export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
+          fi
+
+          # Build anchor
+          cargo build --release --target ${{ matrix.target }} -p sigil-anchor
+
+          # Build lens
+          cargo build --release --target ${{ matrix.target }} -p sigil-lens
+        shell: bash
+
+      - name: Get version
+        id: version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/cli-v}" >> $GITHUB_OUTPUT
+          fi
+        shell: bash
+        working-directory: ${{ github.workspace }}
+
+      - name: Package binaries
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          TARGET="${{ matrix.target }}"
+
+          mkdir -p dist
+
+          # Package anchor
+          tar -czvf dist/anchor-${VERSION}-${TARGET}.tar.gz -C target/${TARGET}/release anchor
+
+          # Package lens
+          tar -czvf dist/lens-${VERSION}-${TARGET}.tar.gz -C target/${TARGET}/release lens
+
+          # Generate checksums
+          cd dist
+          if [[ "${{ matrix.os }}" == macos-* ]]; then
+            shasum -a 256 *.tar.gz > checksums-${{ matrix.platform }}.sha256
+          else
+            sha256sum *.tar.gz > checksums-${{ matrix.platform }}.sha256
+          fi
+        shell: bash
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.platform }}
+          path: anchor-rust/dist/*
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: binaries-*
+          merge-multiple: true
+
+      - name: Get version
+        id: version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "VERSION=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/cli-v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Merge checksums
+        run: |
+          cd artifacts
+          cat checksums-*.sha256 > checksums.sha256
+          rm checksums-*.sha256
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: cli-v${{ steps.version.outputs.VERSION }}
+          name: Sigil CLIs v${{ steps.version.outputs.VERSION }}
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, 'alpha') || contains(steps.version.outputs.VERSION, 'beta') }}
+          files: artifacts/*
+          body: |
+            ## Sigil CLIs v${{ steps.version.outputs.VERSION }}
+
+            Ground truth enforcement and formal verification for Sigil design physics.
+
+            ### Quick Install
+
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/scripts/install-cli.sh | bash
+            ```
+
+            Or specify a version:
+
+            ```bash
+            SIGIL_CLI_VERSION=${{ steps.version.outputs.VERSION }} curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/scripts/install-cli.sh | bash
+            ```
+
+            ### Manual Download
+
+            | Platform | anchor | lens |
+            |----------|--------|------|
+            | macOS (Apple Silicon) | [anchor-${{ steps.version.outputs.VERSION }}-aarch64-apple-darwin.tar.gz](https://github.com/0xHoneyJar/sigil/releases/download/cli-v${{ steps.version.outputs.VERSION }}/anchor-${{ steps.version.outputs.VERSION }}-aarch64-apple-darwin.tar.gz) | [lens-${{ steps.version.outputs.VERSION }}-aarch64-apple-darwin.tar.gz](https://github.com/0xHoneyJar/sigil/releases/download/cli-v${{ steps.version.outputs.VERSION }}/lens-${{ steps.version.outputs.VERSION }}-aarch64-apple-darwin.tar.gz) |
+            | macOS (Intel) | [anchor-${{ steps.version.outputs.VERSION }}-x86_64-apple-darwin.tar.gz](https://github.com/0xHoneyJar/sigil/releases/download/cli-v${{ steps.version.outputs.VERSION }}/anchor-${{ steps.version.outputs.VERSION }}-x86_64-apple-darwin.tar.gz) | [lens-${{ steps.version.outputs.VERSION }}-x86_64-apple-darwin.tar.gz](https://github.com/0xHoneyJar/sigil/releases/download/cli-v${{ steps.version.outputs.VERSION }}/lens-${{ steps.version.outputs.VERSION }}-x86_64-apple-darwin.tar.gz) |
+            | Linux (x86_64) | [anchor-${{ steps.version.outputs.VERSION }}-x86_64-unknown-linux-gnu.tar.gz](https://github.com/0xHoneyJar/sigil/releases/download/cli-v${{ steps.version.outputs.VERSION }}/anchor-${{ steps.version.outputs.VERSION }}-x86_64-unknown-linux-gnu.tar.gz) | [lens-${{ steps.version.outputs.VERSION }}-x86_64-unknown-linux-gnu.tar.gz](https://github.com/0xHoneyJar/sigil/releases/download/cli-v${{ steps.version.outputs.VERSION }}/lens-${{ steps.version.outputs.VERSION }}-x86_64-unknown-linux-gnu.tar.gz) |
+            | Linux (ARM64) | [anchor-${{ steps.version.outputs.VERSION }}-aarch64-unknown-linux-gnu.tar.gz](https://github.com/0xHoneyJar/sigil/releases/download/cli-v${{ steps.version.outputs.VERSION }}/anchor-${{ steps.version.outputs.VERSION }}-aarch64-unknown-linux-gnu.tar.gz) | [lens-${{ steps.version.outputs.VERSION }}-aarch64-unknown-linux-gnu.tar.gz](https://github.com/0xHoneyJar/sigil/releases/download/cli-v${{ steps.version.outputs.VERSION }}/lens-${{ steps.version.outputs.VERSION }}-aarch64-unknown-linux-gnu.tar.gz) |
+
+            ### Verify Checksums
+
+            ```bash
+            # Download checksum file
+            curl -fsSL https://github.com/0xHoneyJar/sigil/releases/download/cli-v${{ steps.version.outputs.VERSION }}/checksums.sha256 -o checksums.sha256
+
+            # Verify (Linux)
+            sha256sum -c checksums.sha256
+
+            # Verify (macOS)
+            shasum -a 256 -c checksums.sha256
+            ```
+
+            ### Usage
+
+            ```bash
+            # Zone/effect validation
+            anchor validate --request-id <UUID>
+
+            # Formal constraint verification
+            lens lint --request-id <UUID>
+
+            # Component linting
+            lens lint --file src/components/ClaimButton.tsx
+            ```

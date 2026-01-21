@@ -1,14 +1,23 @@
-# @sigil/hud
+# @thehoneyjar/sigil-hud
 
 Diagnostic HUD for Sigil - composable React components for development.
 
 ## Installation
 
 ```bash
-pnpm add @sigil/hud
+# Using the official scope
+pnpm add @thehoneyjar/sigil-hud
 
 # Optional: Install packages you want to use
-pnpm add @sigil/lens @sigil/fork @sigil/simulation @sigil/diagnostics
+pnpm add @thehoneyjar/sigil-lens @thehoneyjar/sigil-fork @thehoneyjar/sigil-simulation @thehoneyjar/sigil-diagnostics
+```
+
+**Alias option:** If you prefer shorter imports, you can alias the package:
+
+```bash
+pnpm add @sigil/hud@npm:@thehoneyjar/sigil-hud
+pnpm add @sigil/lens@npm:@thehoneyjar/sigil-lens
+# etc.
 ```
 
 ## Usage
@@ -16,9 +25,9 @@ pnpm add @sigil/lens @sigil/fork @sigil/simulation @sigil/diagnostics
 ### Basic Setup
 
 ```tsx
-import { HudProvider, HudPanel, HudTrigger } from '@sigil/hud'
-import { createLensService } from '@sigil/lens'
-import { createDiagnosticsService } from '@sigil/diagnostics'
+import { HudProvider, HudPanel, HudTrigger } from '@thehoneyjar/sigil-hud'
+import { createLensService } from '@thehoneyjar/sigil-lens'
+import { createDiagnosticsService } from '@thehoneyjar/sigil-diagnostics'
 
 const lensService = createLensService()
 const diagnosticsService = createDiagnosticsService()
@@ -53,7 +62,7 @@ function App() {
 | `Esc` | Close HUD |
 
 ```tsx
-import { useKeyboardShortcuts } from '@sigil/hud'
+import { useKeyboardShortcuts } from '@thehoneyjar/sigil-hud'
 
 function MyComponent() {
   useKeyboardShortcuts({ enabled: true })
@@ -64,7 +73,7 @@ function MyComponent() {
 ### Signal Capture
 
 ```tsx
-import { useSignalCapture } from '@sigil/hud'
+import { useSignalCapture } from '@thehoneyjar/sigil-hud'
 
 function MyComponent() {
   const { accept, modify, reject } = useSignalCapture()
@@ -85,7 +94,7 @@ function MyComponent() {
 ### Observation Capture
 
 ```tsx
-import { useObservationCapture } from '@sigil/hud'
+import { useObservationCapture } from '@thehoneyjar/sigil-hud'
 
 function MyComponent() {
   const { captureUserTruth, captureIssue } = useObservationCapture()
@@ -124,9 +133,9 @@ function MyComponent() {
 
 The HUD works with any subset of packages. Features gracefully degrade when packages are not installed:
 
-- No `@sigil/lens` → Lens panel shows "not available" message
-- No `@sigil/simulation` → Simulation panel shows "not available" message
-- No `@sigil/diagnostics` → Diagnostics panel shows "not available" message
+- No `@thehoneyjar/sigil-lens` → Lens panel shows "not available" message
+- No `@thehoneyjar/sigil-simulation` → Simulation panel shows "not available" message
+- No `@thehoneyjar/sigil-diagnostics` → Diagnostics panel shows "not available" message
 
 ## Configuration
 
