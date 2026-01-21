@@ -199,6 +199,25 @@ rules:
     tokens: 1600
     priority: 2
 
+  # UI Copy Physics
+  - file: "21-sigil-ui-copy.md"
+    triggers:
+      keywords:
+        - "copy"
+        - "label"
+        - "text"
+        - "wording"
+        - "terminology"
+        - "rebate"
+        - "fee"
+        - "rewards"
+        - "percentage"
+      craft_type:
+        - "generate"
+        - "refine"
+    tokens: 1800
+    priority: 2
+
   # ===========================================
   # PRIORITY 3: React Rules (conditional)
   # ===========================================
