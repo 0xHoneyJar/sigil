@@ -80,6 +80,54 @@ Non-negotiable (see `fragments/protected-caps.md`):
 - **Touch target** → ≥44px minimum
 - **Focus ring** → Always visible
 
+## Mode Selection Algorithm
+
+On `/craft` invocation, select mode using this priority:
+
+```
+1. Check iteration count (from craft-state.md)
+   → iteration >= 3 AND same component → Debug mode
+
+2. Check for error context
+   → "fix", "broken", "error", "not working", "fails" → Debug mode
+
+3. Check for exploration signals
+   → Ends with "?" OR "how does", "what is", "explain" → Explore mode
+
+4. Check for multi-file signals
+   → "build feature", "implement", "refactor all", "across" → Hammer mode
+
+5. Default
+   → Chisel mode (single-component workflow)
+```
+
+### Mode Triggers (Detailed)
+
+| Mode | Triggers | Priority |
+|------|----------|----------|
+| Debug | iteration >= 3, "fix", "broken", "error", "not working", error context present | 1 |
+| Explore | "?", "how does", "what is", "why does", "explain", "understand" | 2 |
+| Hammer | "build", "feature", "implement", "system", "refactor all", multi-file scope | 3 |
+| Chisel | Default when no other mode matches | 4 |
+
+## Continuation Behavior
+
+On continuation within same session:
+
+1. **Read craft-state.md** for current component, iteration, loaded fragments
+2. **Skip already-loaded fragments** (except feedback-loop, always needed)
+3. **Increment iteration count** in craft-state.md
+4. **Check for loop patterns** - if iteration >= 3 with same issue, suggest escalation
+
+### Fragment Skip Rules
+
+| Fragment | Skip on Continuation? |
+|----------|----------------------|
+| physics-table | Yes, if effect unchanged |
+| protected-caps | Yes, if already verified |
+| detection | Yes, if effect determined |
+| feedback-loop | Never skip (needed for signals) |
+
 ## Escalation Paths
 
 ```
