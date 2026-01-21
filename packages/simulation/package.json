@@ -1,5 +1,5 @@
 {
-  "name": "@sigil/simulation",
+  "name": "@thehoneyjar/sigil-simulation",
   "version": "0.1.0",
   "description": "Transaction simulation against fork chains",
   "type": "module",
@@ -24,7 +24,7 @@
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {
-    "@sigil/fork": "workspace:*"
+    "@thehoneyjar/sigil-fork": "workspace:*"
   },
   "peerDependencies": {
     "viem": "^2.0.0"
@@ -44,5 +44,21 @@
     "testing"
   ],
   "author": "Sigil Framework",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xHoneyJar/sigil.git",
+    "directory": "packages/simulation"
+  },
+  "bugs": {
+    "url": "https://github.com/0xHoneyJar/sigil/issues"
+  },
+  "homepage": "https://github.com/0xHoneyJar/sigil/tree/main/packages/simulation#readme",
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }

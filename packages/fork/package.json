@@ -1,5 +1,5 @@
 {
-  "name": "@sigil/fork",
+  "name": "@thehoneyjar/sigil-fork",
   "version": "0.1.0",
   "description": "Fork chain state for local testing - Anvil and Tenderly integration",
   "type": "module",
@@ -42,5 +42,21 @@
     "testing"
   ],
   "author": "Sigil Framework",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xHoneyJar/sigil.git",
+    "directory": "packages/fork"
+  },
+  "bugs": {
+    "url": "https://github.com/0xHoneyJar/sigil/issues"
+  },
+  "homepage": "https://github.com/0xHoneyJar/sigil/tree/main/packages/fork#readme",
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }

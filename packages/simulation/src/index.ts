@@ -20,10 +20,10 @@ export { SimulationError, SimulationErrorCodes } from './types'
 export { createSimulationService } from './service'
 
 // Re-export fork types for convenience
-export type { ForkService, ForkState, ForkConfig } from '@sigil/fork'
+export type { ForkService, ForkState, ForkConfig } from '@thehoneyjar/sigil-fork'
 
 // Singleton management
-import type { ForkService } from '@sigil/fork'
+import type { ForkService } from '@thehoneyjar/sigil-fork'
 import type { SimulationService } from './types'
 import { createSimulationService } from './service'
 

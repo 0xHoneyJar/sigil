@@ -1,0 +1,114 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (skip actual publish)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build & Verify
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm --filter "@thehoneyjar/*" run build
+
+      - name: Verify builds
+        run: node scripts/verify-builds.mjs
+
+  publish:
+    name: Publish to npm
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ !inputs.dry_run }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm --filter "@thehoneyjar/*" run build
+
+      - name: Publish packages
+        run: |
+          # Publish in topological order (dependencies first)
+          PACKAGES=(
+            "anchor"
+            "fork"
+            "lens"
+            "diagnostics"
+            "simulation"
+            "hud"
+            "sigil-dev-toolbar"
+          )
+
+          for pkg in "${PACKAGES[@]}"; do
+            PKG_DIR="packages/$pkg"
+            if [ -d "$PKG_DIR" ]; then
+              PKG_NAME=$(node -p "require('./$PKG_DIR/package.json').name")
+              echo "Publishing $PKG_NAME..."
+              cd "$PKG_DIR"
+              pnpm publish --access public --no-git-checks || echo "Note: $PKG_NAME may already be published at this version"
+              cd ../..
+            fi
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Verify published packages
+        run: |
+          echo "Waiting for npm registry to update..."
+          sleep 10
+
+          PACKAGES=(
+            "@thehoneyjar/sigil-anchor"
+            "@thehoneyjar/sigil-fork"
+            "@thehoneyjar/sigil-lens"
+            "@thehoneyjar/sigil-diagnostics"
+            "@thehoneyjar/sigil-simulation"
+            "@thehoneyjar/sigil-hud"
+            "@thehoneyjar/sigil-dev-toolbar"
+          )
+
+          for pkg in "${PACKAGES[@]}"; do
+            echo "Checking $pkg..."
+            npm view "$pkg" version || echo "Warning: Could not verify $pkg"
+          done

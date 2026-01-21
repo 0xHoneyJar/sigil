@@ -1,5 +1,5 @@
 {
-  "name": "@sigil/diagnostics",
+  "name": "@thehoneyjar/sigil-diagnostics",
   "version": "0.1.0",
   "description": "Physics compliance checking and issue detection for Sigil",
   "type": "module",
@@ -23,9 +23,10 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@sigil/anchor": "workspace:*"
+    "@thehoneyjar/sigil-anchor": "workspace:*"
   },
   "devDependencies": {
+    "@types/node": "^20.11.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },
@@ -39,9 +40,20 @@
   },
   "sideEffects": false,
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/thj/sigil.git",
+    "url": "https://github.com/0xHoneyJar/sigil.git",
     "directory": "packages/diagnostics"
+  },
+  "bugs": {
+    "url": "https://github.com/0xHoneyJar/sigil/issues"
+  },
+  "homepage": "https://github.com/0xHoneyJar/sigil/tree/main/packages/diagnostics#readme",
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

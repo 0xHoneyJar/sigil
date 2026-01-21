@@ -41,13 +41,16 @@ importers:
 
   packages/diagnostics:
     dependencies:
-      '@sigil/anchor':
+      '@thehoneyjar/sigil-anchor':
         specifier: workspace:*
         version: link:../anchor
       react:
         specifier: '>=18.0.0'
         version: 18.2.0
     devDependencies:
+      '@types/node':
+        specifier: ^20.11.0
+        version: 20.11.0
       tsup:
         specifier: ^8.0.0
         version: 8.0.1(typescript@5.3.3)
@@ -79,22 +82,25 @@ importers:
         specifier: ^4.5.0
         version: 4.5.0(@types/react@18.2.45)(react@18.2.0)
     optionalDependencies:
-      '@sigil/anchor':
+      '@thehoneyjar/sigil-anchor':
         specifier: workspace:*
         version: link:../anchor
-      '@sigil/diagnostics':
+      '@thehoneyjar/sigil-diagnostics':
         specifier: workspace:*
         version: link:../diagnostics
-      '@sigil/fork':
+      '@thehoneyjar/sigil-fork':
         specifier: workspace:*
         version: link:../fork
-      '@sigil/lens':
+      '@thehoneyjar/sigil-lens':
         specifier: workspace:*
         version: link:../lens
-      '@sigil/simulation':
+      '@thehoneyjar/sigil-simulation':
         specifier: workspace:*
         version: link:../simulation
     devDependencies:
+      '@types/node':
+        specifier: ^20.11.0
+        version: 20.11.0
       '@types/react':
         specifier: ^18.0.0
         version: 18.2.45
@@ -145,6 +151,9 @@ importers:
         specifier: ^4.4.7
         version: 4.5.0(@types/react@18.2.45)(react@18.2.0)
     devDependencies:
+      '@types/node':
+        specifier: ^20.11.0
+        version: 20.11.0
       '@types/react':
         specifier: ^18.2.45
         version: 18.2.45
@@ -200,7 +209,7 @@ importers:
 
   packages/simulation:
     dependencies:
-      '@sigil/fork':
+      '@thehoneyjar/sigil-fork':
         specifier: workspace:*
         version: link:../fork
     devDependencies:

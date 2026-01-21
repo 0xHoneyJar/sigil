@@ -1,5 +1,5 @@
 {
-  "name": "@sigil/hud",
+  "name": "@thehoneyjar/sigil-hud",
   "version": "0.1.0",
   "description": "Diagnostic HUD for Sigil - composable React components for development",
   "type": "module",
@@ -29,18 +29,19 @@
     "react": ">=18.0.0"
   },
   "optionalDependencies": {
-    "@sigil/anchor": "workspace:*",
-    "@sigil/fork": "workspace:*",
-    "@sigil/simulation": "workspace:*",
-    "@sigil/lens": "workspace:*",
-    "@sigil/diagnostics": "workspace:*"
+    "@thehoneyjar/sigil-anchor": "workspace:*",
+    "@thehoneyjar/sigil-fork": "workspace:*",
+    "@thehoneyjar/sigil-simulation": "workspace:*",
+    "@thehoneyjar/sigil-lens": "workspace:*",
+    "@thehoneyjar/sigil-diagnostics": "workspace:*"
   },
   "devDependencies": {
-    "@sigil/anchor": "workspace:*",
-    "@sigil/fork": "workspace:*",
-    "@sigil/simulation": "workspace:*",
-    "@sigil/lens": "workspace:*",
-    "@sigil/diagnostics": "workspace:*",
+    "@thehoneyjar/sigil-anchor": "workspace:*",
+    "@thehoneyjar/sigil-fork": "workspace:*",
+    "@thehoneyjar/sigil-simulation": "workspace:*",
+    "@thehoneyjar/sigil-lens": "workspace:*",
+    "@thehoneyjar/sigil-diagnostics": "workspace:*",
+    "@types/node": "^20.11.0",
     "@types/react": "^18.0.0",
     "react": "^18.0.0",
     "tsup": "^8.0.0",
@@ -48,9 +49,20 @@
   },
   "sideEffects": false,
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/thj/sigil.git",
+    "url": "https://github.com/0xHoneyJar/sigil.git",
     "directory": "packages/hud"
+  },
+  "bugs": {
+    "url": "https://github.com/0xHoneyJar/sigil/issues"
+  },
+  "homepage": "https://github.com/0xHoneyJar/sigil/tree/main/packages/hud#readme",
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

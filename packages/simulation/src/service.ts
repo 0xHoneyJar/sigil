@@ -6,7 +6,7 @@
  */
 
 import type { Address, Hash, Hex } from 'viem'
-import type { ForkService } from '@sigil/fork'
+import type { ForkService } from '@thehoneyjar/sigil-fork'
 import type {
   SimulationRequest,
   SimulationResult,

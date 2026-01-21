@@ -1,5 +1,5 @@
 {
-  "name": "@sigil/dev-toolbar",
+  "name": "@thehoneyjar/sigil-dev-toolbar",
   "version": "0.1.0",
   "description": "Development toolbar for Sigil with User Lens, simulation, and diagnostics",
   "type": "module",
@@ -33,6 +33,7 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@types/node": "^20.11.0",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
     "react": "^18.2.0",
@@ -50,5 +51,22 @@
     "user-lens",
     "impersonation"
   ],
-  "license": "MIT"
+  "author": "Sigil Framework",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xHoneyJar/sigil.git",
+    "directory": "packages/sigil-dev-toolbar"
+  },
+  "bugs": {
+    "url": "https://github.com/0xHoneyJar/sigil/issues"
+  },
+  "homepage": "https://github.com/0xHoneyJar/sigil/tree/main/packages/sigil-dev-toolbar#readme",
+  "engines": {
+    "node": ">=20.0.0"
+  }
 }

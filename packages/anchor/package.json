@@ -1,5 +1,5 @@
 {
-  "name": "@sigil/anchor",
+  "name": "@thehoneyjar/sigil-anchor",
   "version": "4.3.1",
   "description": "Ground truth enforcement layer for Sigil - validates AI-generated code against design physics",
   "type": "module",
@@ -55,5 +55,18 @@
     "web3"
   ],
   "author": "Sigil Framework",
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xHoneyJar/sigil.git",
+    "directory": "packages/anchor"
+  },
+  "bugs": {
+    "url": "https://github.com/0xHoneyJar/sigil/issues"
+  },
+  "homepage": "https://github.com/0xHoneyJar/sigil/tree/main/packages/anchor#readme"
 }
