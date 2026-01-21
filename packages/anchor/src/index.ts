@@ -26,6 +26,35 @@ export {
 // Graph
 export { TaskGraph, generateTaskId, resetTaskCounter } from './graph/index.js';
 
+// Warden
+export {
+  loadPhysics,
+  getPhysicsRule,
+  getDefaultPhysics,
+  clearPhysicsCache,
+  isPhysicsCached,
+  loadVocabulary,
+  resolveEffectFromKeywords,
+  getDefaultVocabulary,
+  clearVocabularyCache,
+  isVocabularyCached,
+  parseGroundingStatement,
+  validateGrounding,
+  isGroundingValid,
+  getExitCode,
+  type SyncStrategy,
+  type ConfirmationType,
+  type EffectType,
+  type PhysicsRule,
+  type PhysicsTable,
+  type VocabularyEntry,
+  type Vocabulary,
+  type GroundingStatement,
+  type CheckName,
+  type ExtendedCheckResult,
+  type ValidationContext,
+} from './warden/index.js';
+
 // Utils
 export {
   rpcCall,

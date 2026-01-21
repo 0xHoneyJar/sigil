@@ -97,6 +97,7 @@ describe('SnapshotManager', () => {
     it('should return snapshots sorted by time', async () => {
       const { rpcCall } = await import('../utils/rpc.js');
       vi.mocked(rpcCall)
+        .mockReset()
         .mockResolvedValueOnce('0x1')
         .mockResolvedValueOnce('0x100')
         .mockResolvedValueOnce('0x2')

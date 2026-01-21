@@ -247,6 +247,70 @@ export interface WardenResult {
 }
 
 // =============================================================================
+// Learned Rules Types
+// =============================================================================
+
+/** Learned rule trigger conditions */
+export interface LearnedRuleTrigger {
+  /** Component name patterns to match */
+  component_name_contains?: string[];
+  /** Zone to match */
+  zone?: Zone;
+  /** Effect type to match */
+  effect?: string;
+  /** Props to check for */
+  has_props?: string[];
+}
+
+/** Learned rule constraint */
+export interface LearnedRuleConstraint {
+  /** Constraint type */
+  type: 'timing' | 'sync' | 'easing' | 'confirmation' | 'custom';
+  /** Operator for comparison */
+  operator: '==' | '!=' | '>' | '>=' | '<' | '<=' | 'contains' | 'matches';
+  /** Expected value */
+  expected: string | number;
+  /** Message on violation */
+  message: string;
+}
+
+/** Grounding requirement for a rule */
+export interface LearnedRuleGroundingRequirement {
+  /** Fields that must be cited */
+  must_cite?: {
+    zone?: Zone;
+    physics?: string[];
+  };
+  /** Warden check questions */
+  warden_check?: string[];
+}
+
+/** A learned rule from pattern detection or manual definition */
+export interface LearnedRule {
+  /** Unique rule ID */
+  id: string;
+  /** Rule version */
+  version: string;
+  /** Human-readable description */
+  description: string;
+  /** How the rule was created */
+  created_from: 'manual' | 'pattern_detection' | 'import';
+  /** Pattern ID if created from pattern */
+  pattern_id?: string;
+  /** Rule definition */
+  rule: {
+    trigger: LearnedRuleTrigger;
+    constraint: LearnedRuleConstraint;
+  };
+  /** Grounding requirements */
+  grounding_requirement?: LearnedRuleGroundingRequirement;
+  /** Creation timestamp */
+  created_at: string;
+  /** Last updated timestamp */
+  updated_at: string;
+}
+
+// =============================================================================
 // Exit Codes
 // =============================================================================
 

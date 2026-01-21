@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * Anchor CLI
  *
@@ -7,11 +5,21 @@
  */
 
 import { Command } from 'commander';
+import { readFile } from 'node:fs/promises';
 import { ForkManager } from '../lifecycle/fork-manager.js';
 import { SnapshotManager } from '../lifecycle/snapshot-manager.js';
 import { CheckpointManager } from '../lifecycle/checkpoint-manager.js';
 import { SessionManager } from '../lifecycle/session-manager.js';
 import { TaskGraph } from '../graph/task-graph.js';
+import {
+  validateGrounding,
+  getExitCode,
+  loadPhysics,
+  loadVocabulary,
+  AdversarialWarden,
+  getHierarchyDescription,
+} from '../warden/index.js';
+import { ZONE_HIERARCHY } from '../types.js';
 import type { NetworkConfig } from '../types.js';
 
 const VERSION = '4.3.1';
@@ -709,6 +717,249 @@ program
       console.log(`  RPC URL:      ${fork.rpcUrl}`);
     } catch (error) {
       console.error('Failed to restore:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// =============================================================================
+// Warden Commands
+// =============================================================================
+
+program
+  .command('validate')
+  .description('Validate a grounding statement against Sigil physics')
+  .option('-f, --file <path>', 'Read statement from file')
+  .option('-t, --text <statement>', 'Statement text to validate')
+  .option('--physics <path>', 'Path to physics rules file')
+  .option('--vocabulary <path>', 'Path to vocabulary file')
+  .option('--json', 'Output as JSON')
+  .option('--exit-code', 'Exit with validation status code')
+  .action(async (options: {
+    file?: string;
+    text?: string;
+    physics?: string;
+    vocabulary?: string;
+    json?: boolean;
+    exitCode?: boolean;
+  }) => {
+    let statement: string;
+
+    if (options.file) {
+      try {
+        statement = await readFile(options.file, 'utf-8');
+      } catch {
+        console.error(`Failed to read file: ${options.file}`);
+        process.exit(1);
+      }
+    } else if (options.text) {
+      statement = options.text;
+    } else {
+      console.error('Provide a statement with -f (file) or -t (text)');
+      process.exit(1);
+    }
+
+    try {
+      const validateOptions: { physicsPath?: string; vocabularyPath?: string } = {};
+      if (options.physics) validateOptions.physicsPath = options.physics;
+      if (options.vocabulary) validateOptions.vocabularyPath = options.vocabulary;
+
+      const result = await validateGrounding(statement, validateOptions);
+
+      if (options.json) {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        const statusEmoji = result.status === 'VALID' ? '✓' : result.status === 'DRIFT' ? '⚠' : '✗';
+        console.log(`${statusEmoji} Status: ${result.status}`);
+        console.log('');
+        console.log('Checks:');
+        console.log(`  Relevance:  ${result.checks.relevance.passed ? '✓' : '✗'} ${result.checks.relevance.reason}`);
+        console.log(`  Hierarchy:  ${result.checks.hierarchy.passed ? '✓' : '✗'} ${result.checks.hierarchy.reason}`);
+        console.log(`  Rules:      ${result.checks.rules.passed ? '✓' : '✗'} ${result.checks.rules.reason}`);
+        console.log('');
+        console.log(`Required Zone: ${result.requiredZone}`);
+        console.log(`Cited Zone:    ${result.citedZone ?? '(none)'}`);
+
+        if (result.correction) {
+          console.log('');
+          console.log(`Correction: ${result.correction}`);
+        }
+      }
+
+      if (options.exitCode) {
+        process.exit(getExitCode(result));
+      }
+    } catch (error) {
+      console.error('Validation error:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('physics')
+  .description('Show loaded physics rules')
+  .option('-p, --path <path>', 'Path to physics file')
+  .option('--json', 'Output as JSON')
+  .action(async (options: { path?: string; json?: boolean }) => {
+    try {
+      const physics = await loadPhysics(options.path);
+
+      if (options.json) {
+        const obj: Record<string, unknown> = {};
+        for (const [key, value] of physics) {
+          obj[key] = value;
+        }
+        console.log(JSON.stringify(obj, null, 2));
+        return;
+      }
+
+      console.log('Physics Rules:');
+      console.log('');
+      console.log('  Effect          Sync          Timing   Confirmation');
+      console.log('  ──────────────  ────────────  ───────  ────────────');
+
+      for (const [effect, rule] of physics) {
+        const effectPad = effect.padEnd(14);
+        const syncPad = rule.sync.padEnd(12);
+        const timingPad = `${rule.timing}ms`.padEnd(7);
+        console.log(`  ${effectPad}  ${syncPad}  ${timingPad}  ${rule.confirmation}`);
+      }
+    } catch (error) {
+      console.error('Failed to load physics:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('vocabulary')
+  .description('Show loaded vocabulary')
+  .option('-p, --path <path>', 'Path to vocabulary file')
+  .option('--json', 'Output as JSON')
+  .action(async (options: { path?: string; json?: boolean }) => {
+    try {
+      const vocabulary = await loadVocabulary(options.path);
+
+      if (options.json) {
+        const obj = {
+          effects: Object.fromEntries(vocabulary.effects),
+          typeOverrides: Object.fromEntries(vocabulary.typeOverrides),
+          domainDefaults: Object.fromEntries(vocabulary.domainDefaults),
+        };
+        console.log(JSON.stringify(obj, null, 2));
+        return;
+      }
+
+      console.log('Vocabulary:');
+      console.log('');
+
+      console.log('Effect Keywords:');
+      for (const [effect, entry] of vocabulary.effects) {
+        console.log(`  ${effect}: ${entry.keywords.slice(0, 8).join(', ')}${entry.keywords.length > 8 ? '...' : ''}`);
+      }
+
+      console.log('');
+      console.log('Type Overrides:');
+      for (const [type, effect] of vocabulary.typeOverrides) {
+        console.log(`  ${type} → ${effect}`);
+      }
+    } catch (error) {
+      console.error('Failed to load vocabulary:', error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+
+// =============================================================================
+// Adversarial Warden Commands
+// =============================================================================
+
+program
+  .command('warden')
+  .description('Run adversarial warden validation')
+  .option('-f, --file <path>', 'Read statement from file')
+  .option('-t, --text <statement>', 'Statement text to test')
+  .option('--hierarchy', 'Show zone hierarchy')
+  .option('--physics <path>', 'Path to physics rules file')
+  .option('--vocabulary <path>', 'Path to vocabulary file')
+  .option('--json', 'Output as JSON')
+  .option('--exit-code', 'Exit with validation status code')
+  .action(async (options: {
+    file?: string;
+    text?: string;
+    hierarchy?: boolean;
+    physics?: string;
+    vocabulary?: string;
+    json?: boolean;
+    exitCode?: boolean;
+  }) => {
+    // Show hierarchy if requested
+    if (options.hierarchy) {
+      console.log('Zone Hierarchy:');
+      console.log('');
+      console.log(`  ${getHierarchyDescription()}`);
+      console.log('');
+      console.log('Zones:');
+      for (const zone of ZONE_HIERARCHY) {
+        const index = ZONE_HIERARCHY.indexOf(zone);
+        const restriction = index === 0 ? '(most restrictive)' : index === ZONE_HIERARCHY.length - 1 ? '(least restrictive)' : '';
+        console.log(`  ${index + 1}. ${zone} ${restriction}`);
+      }
+      return;
+    }
+
+    // Validate statement
+    let statement: string;
+
+    if (options.file) {
+      try {
+        statement = await readFile(options.file, 'utf-8');
+      } catch {
+        console.error(`Failed to read file: ${options.file}`);
+        process.exit(1);
+      }
+    } else if (options.text) {
+      statement = options.text;
+    } else {
+      console.error('Provide a statement with -f (file) or -t (text), or use --hierarchy');
+      process.exit(1);
+    }
+
+    try {
+      const warden = new AdversarialWarden();
+
+      const validateOptions: { physicsPath?: string; vocabularyPath?: string } = {};
+      if (options.physics) validateOptions.physicsPath = options.physics;
+      if (options.vocabulary) validateOptions.vocabularyPath = options.vocabulary;
+
+      const result = await warden.validate(statement, validateOptions);
+
+      if (options.json) {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        const statusEmoji = result.status === 'VALID' ? '✓' : result.status === 'DRIFT' ? '⚠' : '✗';
+        console.log(`${statusEmoji} Status: ${result.status}`);
+        console.log('');
+        console.log('Grounding Checks:');
+        console.log(`  Relevance:  ${result.checks.relevance.passed ? '✓' : '✗'} ${result.checks.relevance.reason}`);
+        console.log(`  Hierarchy:  ${result.checks.hierarchy.passed ? '✓' : '✗'} ${result.checks.hierarchy.reason}`);
+        console.log(`  Rules:      ${result.checks.rules.passed ? '✓' : '✗'} ${result.checks.rules.reason}`);
+        console.log('');
+        console.log('Adversarial Checks:');
+        console.log(`  Relevance:     ${result.adversarialChecks.relevance.passed ? '✓' : '✗'} ${result.adversarialChecks.relevance.reason}`);
+        console.log(`  Learned Rules: ${result.adversarialChecks.learnedRules.passed ? '✓' : '✗'} ${result.adversarialChecks.learnedRules.reason}`);
+        console.log('');
+        console.log(`Required Zone: ${result.requiredZone}`);
+        console.log(`Cited Zone:    ${result.citedZone ?? '(none)'}`);
+
+        if (result.correction) {
+          console.log('');
+          console.log(`Correction: ${result.correction}`);
+        }
+      }
+
+      if (options.exitCode) {
+        process.exit(getExitCode(result));
+      }
+    } catch (error) {
+      console.error('Warden error:', error instanceof Error ? error.message : error);
       process.exit(1);
     }
   });
