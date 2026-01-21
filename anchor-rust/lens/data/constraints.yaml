@@ -1,0 +1,230 @@
+# Sigil Physics Constraints
+# CEL (Common Expression Language) rules for formal verification
+#
+# These constraints encode the physics rules from Sigil.
+# See: .claude/rules/01-sigil-physics.md for rationale
+
+version: "1.0"
+
+constraints:
+  # ============================================================================
+  # FINANCIAL EFFECT CONSTRAINTS
+  # Financial operations cannot roll back. Users need time to verify amounts.
+  # ============================================================================
+
+  - id: "financial-timing-001"
+    name: "Financial Timing Minimum"
+    description: "Financial effects must have timing >= 800ms to give users time to verify amounts"
+    rule: "physics.effect != 'Financial' || physics.behavioral.timing >= 800"
+    severity: error
+    category: behavioral
+    failure_message: "Financial operations require minimum 800ms timing for user verification"
+
+  - id: "financial-sync-001"
+    name: "Financial Sync Strategy"
+    description: "Financial effects must use pessimistic sync - server must confirm before UI updates"
+    rule: "physics.effect != 'Financial' || physics.behavioral.sync == 'pessimistic'"
+    severity: error
+    category: behavioral
+    failure_message: "Financial operations must use pessimistic sync - money cannot roll back"
+
+  - id: "financial-confirmation-001"
+    name: "Financial Confirmation Required"
+    description: "Financial effects must require user confirmation"
+    rule: "physics.effect != 'Financial' || physics.behavioral.confirmation == true"
+    severity: error
+    category: behavioral
+    failure_message: "Financial operations must require confirmation before execution"
+
+  # ============================================================================
+  # DESTRUCTIVE EFFECT CONSTRAINTS
+  # Permanent actions need deliberation. Slower timing signals gravity.
+  # ============================================================================
+
+  - id: "destructive-timing-001"
+    name: "Destructive Timing Minimum"
+    description: "Destructive effects must have timing >= 600ms for deliberation"
+    rule: "physics.effect != 'Destructive' || physics.behavioral.timing >= 600"
+    severity: error
+    category: behavioral
+    failure_message: "Destructive operations require minimum 600ms timing for deliberation"
+
+  - id: "destructive-sync-001"
+    name: "Destructive Sync Strategy"
+    description: "Destructive effects must use pessimistic sync"
+    rule: "physics.effect != 'Destructive' || physics.behavioral.sync == 'pessimistic'"
+    severity: error
+    category: behavioral
+    failure_message: "Destructive operations must use pessimistic sync"
+
+  - id: "destructive-confirmation-001"
+    name: "Destructive Confirmation Required"
+    description: "Destructive effects must require user confirmation"
+    rule: "physics.effect != 'Destructive' || physics.behavioral.confirmation == true"
+    severity: error
+    category: behavioral
+    failure_message: "Destructive operations must require confirmation"
+
+  # ============================================================================
+  # STANDARD EFFECT CONSTRAINTS
+  # Low stakes should feel snappy. UI updates immediately, rolls back on error.
+  # ============================================================================
+
+  - id: "standard-timing-001"
+    name: "Standard Timing Range"
+    description: "Standard effects should have timing around 200ms for snappy feedback"
+    rule: "physics.effect != 'Standard' || (physics.behavioral.timing >= 100 && physics.behavioral.timing <= 400)"
+    severity: warning
+    category: behavioral
+    failure_message: "Standard operations should have timing between 100-400ms for optimal UX"
+
+  - id: "standard-sync-001"
+    name: "Standard Sync Strategy"
+    description: "Standard effects should use optimistic sync for responsiveness"
+    rule: "physics.effect != 'Standard' || physics.behavioral.sync == 'optimistic'"
+    severity: warning
+    category: behavioral
+    failure_message: "Standard operations should use optimistic sync for snappy feedback"
+
+  # ============================================================================
+  # LOCAL STATE CONSTRAINTS
+  # No server = instant feedback expected. Any delay feels broken.
+  # ============================================================================
+
+  - id: "local-timing-001"
+    name: "Local State Timing"
+    description: "Local state changes should be immediate (timing <= 150ms)"
+    rule: "physics.effect != 'Local' || physics.behavioral.timing <= 150"
+    severity: warning
+    category: behavioral
+    failure_message: "Local state changes should have timing <= 150ms"
+
+  - id: "local-sync-001"
+    name: "Local Sync Strategy"
+    description: "Local state should use immediate sync (no server round-trip)"
+    rule: "physics.effect != 'Local' || physics.behavioral.sync == 'immediate'"
+    severity: warning
+    category: behavioral
+    failure_message: "Local state should use immediate sync"
+
+  # ============================================================================
+  # SOFT DELETE CONSTRAINTS
+  # Undo exists, so we can be fast. Toast provides safety net.
+  # ============================================================================
+
+  - id: "softdelete-undo-001"
+    name: "Soft Delete Undo Required"
+    description: "Soft delete operations must have an undo option"
+    rule: "physics.effect != 'SoftDelete' || physics.behavioral.has_undo == true"
+    severity: error
+    category: behavioral
+    failure_message: "Soft delete operations must provide an undo option"
+
+  - id: "softdelete-sync-001"
+    name: "Soft Delete Sync Strategy"
+    description: "Soft delete can use optimistic sync because undo exists"
+    rule: "physics.effect != 'SoftDelete' || physics.behavioral.sync == 'optimistic'"
+    severity: warning
+    category: behavioral
+    failure_message: "Soft delete should use optimistic sync (undo provides safety)"
+
+  # ============================================================================
+  # PROTECTED CAPABILITY CONSTRAINTS
+  # Non-negotiable rules that prevent user harm.
+  # ============================================================================
+
+  - id: "protected-touch-001"
+    name: "Minimum Touch Target"
+    description: "Interactive elements must have touch target >= 44px (Apple HIG)"
+    rule: "physics.metadata.touch_target >= 44"
+    severity: error
+    category: protected
+    failure_message: "Touch targets must be at least 44px for accessibility"
+    enabled: false  # Disabled until metadata is commonly provided
+
+  - id: "protected-focus-001"
+    name: "Focus Ring Required"
+    description: "Interactive elements must have visible focus rings for keyboard navigation"
+    rule: "physics.metadata.has_focus_ring == true"
+    severity: error
+    category: protected
+    failure_message: "Interactive elements must have visible focus rings"
+    enabled: false  # Disabled until metadata is commonly provided
+
+  # ============================================================================
+  # ANIMATION CONSTRAINTS
+  # Animation communicates the weight of an action.
+  # ============================================================================
+
+  - id: "animation-easing-001"
+    name: "Entrance Animation Easing"
+    description: "Elements entering the screen should use ease-out for responsive feel"
+    rule: "!(physics.animation.easing in ['ease-out', 'spring'])"
+    severity: info
+    category: animation
+    failure_message: "Consider using ease-out or spring for entrance animations"
+    enabled: false  # Disabled until animation data is commonly provided
+
+  - id: "animation-linear-001"
+    name: "Linear Easing Restriction"
+    description: "Linear easing should only be used for marquees, progress bars, and timers"
+    rule: "physics.animation.easing != 'linear'"
+    severity: warning
+    category: animation
+    failure_message: "Linear easing makes UI feel robotic - use ease-out or spring instead"
+    enabled: false  # Disabled until animation data is commonly provided
+
+  - id: "animation-ease-in-001"
+    name: "Ease-In Restriction"
+    description: "Ease-in should be avoided as it makes UI feel sluggish"
+    rule: "physics.animation.easing != 'ease-in'"
+    severity: warning
+    category: animation
+    failure_message: "Ease-in makes UI feel sluggish - use ease-out instead"
+    enabled: false  # Disabled until animation data is commonly provided
+
+  # ============================================================================
+  # MATERIAL CONSTRAINTS
+  # Material physics describes surface qualities and visual constraints.
+  # ============================================================================
+
+  - id: "material-gradient-001"
+    name: "Gradient Stops Limit"
+    description: "Gradients should have maximum 2 stops (3+ looks dated)"
+    rule: "physics.material.gradient_stops <= 2"
+    severity: warning
+    category: material
+    failure_message: "Gradients should have at most 2 stops"
+    enabled: false  # Disabled until material data is commonly provided
+
+  - id: "material-radius-001"
+    name: "Border Radius Limit"
+    description: "Border radius should not exceed 16px (except for pill shapes)"
+    rule: "physics.material.radius <= 16"
+    severity: info
+    category: material
+    failure_message: "Border radius should be at most 16px (use 9999px only for pills)"
+    enabled: false  # Disabled until material data is commonly provided
+
+  # ============================================================================
+  # COMPOUND RULES
+  # Rules that check multiple physics layers together.
+  # ============================================================================
+
+  - id: "compound-financial-animation-001"
+    name: "Financial Animation Timing"
+    description: "Financial operations should have deliberate animation timing matching behavioral timing"
+    rule: "physics.effect != 'Financial' || physics.animation.duration >= 600"
+    severity: warning
+    category: animation
+    failure_message: "Financial operations should have animation duration >= 600ms for deliberate feel"
+    enabled: false  # Disabled until animation data is commonly provided
+
+  - id: "compound-destructive-animation-001"
+    name: "Destructive Animation Non-Interruptible"
+    description: "Destructive operations should not be interruptible"
+    rule: "physics.effect != 'Destructive' || physics.animation.interruptible == false"
+    severity: warning
+    category: animation
+    failure_message: "Destructive operation animations should not be interruptible"
+    enabled: false  # Disabled until animation data is commonly provided

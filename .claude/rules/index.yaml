@@ -199,6 +199,25 @@ rules:
     tokens: 1600
     priority: 2
 
+  # UI Copy Physics
+  - file: "21-sigil-ui-copy.md"
+    triggers:
+      keywords:
+        - "copy"
+        - "label"
+        - "text"
+        - "wording"
+        - "terminology"
+        - "rebate"
+        - "fee"
+        - "rewards"
+        - "percentage"
+      craft_type:
+        - "generate"
+        - "refine"
+    tokens: 1800
+    priority: 2
+
   # ===========================================
   # PRIORITY 3: React Rules (conditional)
   # ===========================================
@@ -320,6 +339,29 @@ rules:
     tokens: 6800
     priority: 4
     conditional: true
+
+  # Anchor/Lens Integration (Formal Verification)
+  - file: "22-sigil-anchor-lens.md"
+    triggers:
+      keywords:
+        - "validate"
+        - "verify"
+        - "constraint"
+        - "anchor"
+        - "lens"
+        - "correction"
+        - "violation"
+      effects:
+        - "Financial"
+        - "Destructive"
+        - "SoftDelete"
+      zones:
+        - "Critical"
+        - "Cautious"
+    tokens: 2200
+    priority: 4
+    # Load after physics analysis is confirmed, before code generation
+    phase: "post_analysis"
 
   # Semantic Search
   - file: "17-semantic-search.md"

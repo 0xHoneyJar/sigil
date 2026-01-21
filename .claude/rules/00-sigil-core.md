@@ -24,6 +24,7 @@ CRITICAL: After user confirms analysis, generate/apply changes immediately.
 - Write complete, working code
 - Match codebase conventions exactly
 - Include all relevant physics layers
+- Run formal verification for high-stakes effects (Financial, Destructive, SoftDelete)
 - Log taste signal after completion
 
 **DO NOT:**
@@ -31,6 +32,10 @@ CRITICAL: After user confirms analysis, generate/apply changes immediately.
 - Ask "would you like me to generate this?"
 - Provide partial implementations
 - Add comments unless explaining physics override
+
+**Formal Verification (for high-stakes effects):**
+After generating code, run `anchor validate` and `lens lint` via the pub/ directory.
+See `22-sigil-anchor-lens.md` for the full workflow. Skip if CLIs not available.
 
 If the user's request is ambiguous, infer the most useful interpretation and proceed. Use the physics detection rules to resolve ambiguity. Only ask clarifying questions when the effect type cannot be determined from keywords, types, or context.
 </action_default>

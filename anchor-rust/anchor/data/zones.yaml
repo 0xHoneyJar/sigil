@@ -1,0 +1,68 @@
+# Anchor Zones - Security Classification Hierarchy
+# Version: 1.0.0
+# Part of the Loa Constructs Triad
+
+version: "1.0.0"
+updated: "2026-01-20T00:00:00Z"
+
+hierarchy:
+  - name: critical
+    description: "Operations that can lose user funds or cause irreversible harm"
+    effects:
+      - financial
+      - destructive
+    validation: required
+    physics:
+      sync: pessimistic
+      timing_min: 600
+      confirmation: required
+
+  - name: elevated
+    description: "Operations with significant but reversible impact"
+    effects:
+      - soft_delete
+    validation: recommended
+    physics:
+      sync: optimistic
+      timing_min: 200
+      confirmation: toast_undo
+
+  - name: standard
+    description: "Normal CRUD operations"
+    effects:
+      - standard
+    validation: optional
+    physics:
+      sync: optimistic
+      timing_min: 150
+      confirmation: none
+
+  - name: local
+    description: "Client-only state changes"
+    effects:
+      - local
+    validation: none
+    physics:
+      sync: immediate
+      timing_min: 0
+      confirmation: none
+
+# Zone escalation rules
+escalation:
+  # If multiple effects detected, use highest severity zone
+  rule: "max_severity"
+
+  # Type overrides always win over keyword detection
+  type_priority: true
+
+  # Context modifiers
+  modifiers:
+    - pattern: "with undo"
+      effect: "soft_delete"
+      override: true
+    - pattern: "for wallet"
+      effect: "financial"
+      override: false
+    - pattern: "checkout"
+      effect: "financial"
+      override: true

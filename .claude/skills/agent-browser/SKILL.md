@@ -141,3 +141,149 @@ agent-browser open example.com --headed  # Show browser window
 agent-browser console                    # View console messages
 agent-browser errors                     # View page errors
 ```
+
+---
+
+## Web3 Testing (Anchor Integration)
+
+For Web3 dApps, agent-browser integrates with **Anchor** to provide wallet mocking and contract state injection.
+
+### Prerequisites
+
+```bash
+# Anchor must be installed
+anchor --version
+
+# Create a development session with Anvil fork
+anchor session create --network mainnet --block 18500000
+anchor fork create --session <id> --rpc-url $ETH_RPC_URL
+```
+
+### Web3 Mock Mode
+
+Launch browser with mock wallet state:
+
+```bash
+# Basic mock - inject address and balance
+agent-browser open http://localhost:3000 --web3-mock \
+  --address 0x1234...abcd \
+  --balance 1000000000000000000
+
+# Full mock with contract reads
+agent-browser open http://localhost:3000 --web3-mock \
+  --address 0x1234...abcd \
+  --balance 1eth \
+  --mock-reads mock-state.json
+```
+
+### Mock State File Format
+
+Create `mock-state.json` for complex contract mocking:
+
+```json
+{
+  "wallet": {
+    "address": "0x1234567890abcdef1234567890abcdef12345678",
+    "balance": "1000000000000000000",
+    "chainId": 1
+  },
+  "contracts": {
+    "0xVaultAddress": {
+      "balanceOf(address)": {
+        "0x1234...": "500000000000000000"
+      },
+      "totalSupply()": "10000000000000000000000"
+    }
+  },
+  "badges": {
+    "count": 5,
+    "rebatePercentage": 1666
+  }
+}
+```
+
+### Anchor Fork Integration
+
+Use Anchor to manage blockchain state for testing:
+
+```bash
+# 1. Create fork at specific block
+anchor fork create --session dev --rpc-url $ETH_RPC_URL --block 18500000
+
+# 2. Save current state as snapshot
+anchor snapshot create <fork-id>
+
+# 3. Open browser against fork RPC
+agent-browser open http://localhost:3000 --web3-mock \
+  --rpc-url http://localhost:8545 \
+  --address 0x1234...
+
+# 4. Take screenshot for PR documentation
+agent-browser screenshot rewards-card.png
+
+# 5. Revert to snapshot for next test
+anchor snapshot revert <snapshot-id>
+```
+
+### Transaction Flow Testing
+
+Test pessimistic sync flows without real transactions:
+
+```bash
+# Mock pending state
+agent-browser open http://localhost:3000 --web3-mock \
+  --address 0x1234... \
+  --tx-state pending
+
+# Take screenshot of pending UI
+agent-browser screenshot claim-pending.png
+
+# Mock success state
+agent-browser open http://localhost:3000 --web3-mock \
+  --address 0x1234... \
+  --tx-state success \
+  --tx-hash 0xabc...
+
+# Take screenshot of success UI
+agent-browser screenshot claim-success.png
+```
+
+### Example: Screenshot Wallet-Dependent Component
+
+```bash
+# 1. Setup Anchor fork
+anchor session create --network mainnet --block latest
+anchor fork create --session dev --rpc-url $ETH_RPC_URL
+
+# 2. Open app with mocked wallet
+agent-browser open http://localhost:3000/rewards --web3-mock \
+  --address 0x1234567890abcdef1234567890abcdef12345678 \
+  --balance 10eth \
+  --mock-reads ./test-fixtures/rewards-state.json
+
+# 3. Wait for component to render
+agent-browser wait --text "Fee Rebate"
+agent-browser wait 500  # Allow animations
+
+# 4. Screenshot the component
+agent-browser screenshot pr-assets/rewards-card.png
+
+# 5. Cleanup
+agent-browser close
+anchor fork kill <fork-id>
+```
+
+### Environment Variables
+
+```bash
+# Set defaults for Web3 testing
+export ANCHOR_SESSION_ID=dev
+export WEB3_MOCK_ADDRESS=0x1234...
+export WEB3_MOCK_RPC=http://localhost:8545
+```
+
+### Limitations
+
+- Mock state is injected via localStorage/window, not actual chain
+- Complex contract interactions may need Anchor fork with actual state
+- Transaction signing still requires mock connector setup in app

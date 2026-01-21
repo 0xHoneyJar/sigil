@@ -1,189 +1,156 @@
-# Anchor Rust
+# Sigil Constructs: Anchor & Lens
 
-[![Anchor Rust CI](https://github.com/0xHoneyJar/sigil/actions/workflows/anchor-rust-ci.yml/badge.svg)](https://github.com/0xHoneyJar/sigil/actions/workflows/anchor-rust-ci.yml)
+Formal verification CLIs for Sigil design physics. These tools validate that generated UI components follow the correct physics rules before code generation.
 
-Ground truth enforcement for Sigil design physics. A Rust port of the TypeScript Anchor library with identical behavior and file format compatibility.
+## The Triad
 
-## Overview
+| Construct | Role | Invocation |
+|-----------|------|------------|
+| **Anchor** | Validate keywords → zones, detect effects | `anchor validate` |
+| **Lens** | Verify physics + lint components | `lens lint` |
+| **Claude** | Generate code with physics | `/craft` |
 
-Anchor provides a pipeline for state-pinned development on blockchain applications:
-
-- **Fork Management**: Create and manage Anvil forks for isolated testing
-- **Snapshot/Checkpoint**: Save and restore blockchain state
-- **Session Management**: Track development sessions across restarts
-- **Task Graphs**: Dependency-aware task execution pipelines
-- **Physics Validation**: Enforce Sigil design physics (zones, timing, confirmation patterns)
-
-## Installation
-
-### From Binary Releases
-
-Download the latest release for your platform from [GitHub Releases](https://github.com/0xHoneyJar/sigil/releases).
+## Quick Start
 
 ```bash
-# Linux/macOS
-tar -xzf anchor-<version>-<target>.tar.gz
-./anchor --help
-
-# Windows
-# Extract the zip file and run anchor.exe
-```
-
-### From Source
-
-```bash
-cd anchor-rust
-cargo install --path crates/anchor-cli
-```
-
-## CLI Usage
-
-```bash
-# Create a new development session
-anchor session create --network mainnet --block 18500000
-
-# Fork management
-anchor fork create --session <id> --rpc-url $ETH_RPC_URL
-anchor fork list
-anchor fork kill <fork-id>
-
-# Snapshot management
-anchor snapshot create <fork-id>
-anchor snapshot revert <snapshot-id>
-
-# Checkpoint management
-anchor checkpoint save <session-id>
-anchor checkpoint load <checkpoint-id>
-
-# Physics validation
-anchor validate --statement "Component: ClaimButton; Zone: Critical; Keywords: claim"
-
-# Task graph operations
-anchor graph --session <id> show
-anchor graph --session <id> --topo  # Topological order
-anchor graph --session <id> --json  # JSON output
-```
-
-## Library Usage
-
-```rust
-use sigil_anchor_core::{
-    Session, Network, Zone, PhysicsTable, TaskGraph, Task, TaskType,
-    parse_grounding_statement, validate_grounding, Vocabulary,
-};
-
-// Create a session
-let session = Session::new("dev-session", Network::Mainnet, 18500000);
-
-// Build a task graph
-let mut graph = TaskGraph::new();
-graph.add_task(Task::new("fork", TaskType::Fork, serde_json::json!({})))?;
-graph.add_task(Task::with_dependencies(
-    "validate",
-    TaskType::Validate,
-    serde_json::json!({}),
-    vec!["fork".to_string()],
-))?;
-
-// Physics validation
-let statement = parse_grounding_statement(r#"
-    Component: ClaimButton
-    Zone: Critical
-    Keywords: claim, withdraw
-    Sync: pessimistic
-    Timing: 800ms
-"#)?;
-
-let physics = PhysicsTable::defaults();
-let vocab = Vocabulary::defaults();
-let result = validate_grounding(&statement, &vocab, &physics);
-```
-
-## Supported Networks
-
-| Network | Chain ID | Alias |
-|---------|----------|-------|
-| Ethereum Mainnet | 1 | mainnet, ethereum, eth |
-| Sepolia Testnet | 11155111 | sepolia |
-| Base | 8453 | base |
-| Arbitrum One | 42161 | arbitrum, arb |
-| Optimism | 10 | optimism, op |
-| Berachain | 80094 | berachain, bera |
-
-## Exit Codes
-
-| Code | Name | Description |
-|------|------|-------------|
-| 0 | VALID | Validation passed |
-| 1 | DRIFT | Over-claiming physics (zone too high) |
-| 2 | DECEPTIVE | Under-claiming physics (zone too low) |
-| 3 | VIOLATION | Physics rule violated |
-| 4 | REVERT | Snapshot revert failed |
-| 5 | CORRUPT | State corruption detected |
-| 6 | SCHEMA | Invalid input schema |
-
-## Configuration
-
-Anchor looks for configuration in:
-1. `~/.config/anchor/config.toml` (Linux/macOS)
-2. `%APPDATA%\anchor\config.toml` (Windows)
-3. Environment variables
-
-```toml
-[rpc]
-mainnet = "https://eth-mainnet.g.alchemy.com/v2/..."
-base = "https://base-mainnet.g.alchemy.com/v2/..."
-
-[defaults]
-network = "mainnet"
-```
-
-Environment variables:
-- `ANCHOR_RPC_MAINNET` - Mainnet RPC URL
-- `ANCHOR_RPC_BASE` - Base RPC URL
-- `ANCHOR_DATA_DIR` - Data directory path
-
-## Performance
-
-Targets:
-- Cold start: <50ms
-- RPC latency: <25ms (network excluded)
-- Validation: <30ms
-- Binary size: <10MB compressed
-
-Run benchmarks:
-```bash
-cargo bench -p sigil-anchor-core
-```
-
-## Development
-
-```bash
-# Run tests
-cargo test --all-features
-
-# Run clippy
-cargo clippy --all-features -- -D warnings
-
-# Format code
-cargo fmt --all
-
-# Build release
+# Build both CLIs
 cargo build --release
+
+# Validate a physics request
+./target/release/anchor validate --request <UUID>
+
+# Verify physics constraints
+./target/release/lens verify --request-id <UUID>
+
+# Lint a component
+./target/release/lens lint --file component.tsx
 ```
 
 ## Architecture
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for module overview and design decisions.
+```
+anchor-rust/
+├── Cargo.toml          # Workspace manifest
+├── anchor/             # Ground truth enforcement
+│   ├── src/
+│   │   ├── commands/   # validate, check-source, publish
+│   │   ├── types/      # vocabulary, zones, requests
+│   │   └── io.rs       # pub/ directory I/O
+│   └── README.md
+├── lens/               # Formal verification + heuristics
+│   ├── src/
+│   │   ├── cel/        # CEL constraint engine
+│   │   ├── commands/   # verify, lint
+│   │   ├── heuristics/ # Tree-sitter based checks
+│   │   ├── parser/     # TSX parsing
+│   │   └── correction/ # Fix suggestions
+│   └── README.md
+└── grimoires/pub/      # Shared request/response directory
+    ├── requests/       # Input requests (UUID.json)
+    └── responses/      # Output responses (UUID.json)
+```
 
-## Migration from TypeScript
+## Communication Protocol
 
-The Rust version is a drop-in replacement for the TypeScript version:
-- Identical file formats (JSON sessions, checkpoints, snapshots)
-- Same CLI commands and flags
-- Same exit codes
-- Same validation behavior
+Anchor and Lens communicate via the shared `grimoires/pub/` directory:
+
+1. **Write Request**: Claude writes physics analysis to `pub/requests/<uuid>.json`
+2. **Validate**: `anchor validate --request-id <uuid>` checks zone/effect mapping
+3. **Verify**: `lens verify --request-id <uuid>` checks formal constraints
+4. **Read Response**: Claude reads results from `pub/responses/<uuid>.json`
+5. **Correction**: If violations found, apply fixes and retry (max 2 attempts)
+
+## Physics Zones
+
+| Zone | Effects | Constraints |
+|------|---------|-------------|
+| Critical | Financial, Destructive | Strict timing, confirmation required |
+| Cautious | SoftDelete | Undo required, warnings on edge cases |
+| Standard | Standard, Local, Navigation | Minimal constraints |
+
+## Exit Codes
+
+Both CLIs use consistent exit codes:
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 10 | Critical zone violations |
+| 11 | Cautious zone warnings |
+| 12 | Standard zone info |
+| 20 | Schema validation error |
+| 30 | I/O error |
+
+## Security
+
+Both CLIs implement defense-in-depth security measures:
+
+### Input Validation
+
+| Protection | Implementation |
+|------------|----------------|
+| **Path Traversal** | Request IDs are validated to reject `/`, `\`, and `..` sequences |
+| **UUID Validation** | All request IDs must be valid UUIDs (RFC 4122) |
+| **File Size Limits** | Requests capped at 1MB to prevent memory exhaustion |
+| **Schema Validation** | JSON input validated via serde deserialization |
+
+### File System Safety
+
+| Protection | Implementation |
+|------------|----------------|
+| **Sandboxed Directory** | All I/O confined to `grimoires/pub/` |
+| **Advisory Locking** | Concurrent access uses `fs2` file locks |
+| **TTL Cleanup** | Stale files auto-deleted after 1 hour |
+| **Gitignore** | Request/response files excluded from version control |
+
+### Best Practices
+
+- **No arbitrary file access**: CLIs only read/write within the pub/ directory
+- **No shell execution**: All operations are pure Rust with no shell invocation
+- **No network access**: CLIs are offline tools operating on local files
+- **Deterministic output**: Same input always produces same output
+
+## Development
+
+```bash
+# Run all tests
+cargo test --workspace
+
+# Run specific crate tests
+cargo test -p sigil-anchor
+cargo test -p sigil-lens
+
+# Run integration tests
+cargo test --workspace --test integration
+
+# Run E2E workflow test
+./tests/e2e_workflow.sh
+
+# Check for warnings
+cargo clippy --workspace
+```
+
+## Integration with Sigil
+
+These CLIs integrate with the Sigil framework via Claude Code. When `/craft` detects a high-stakes effect (Financial, Destructive, SoftDelete), it:
+
+1. Writes a physics request to `pub/requests/`
+2. Runs `anchor validate` and `lens lint` in parallel
+3. Reads responses from `pub/responses/`
+4. Shows violations/corrections to the user
+5. Applies fixes and retries if needed (max 2 attempts)
+
+See `.claude/rules/22-sigil-anchor-lens.md` for the full integration protocol.
+
+## Crates
+
+| Crate | Description | Binary |
+|-------|-------------|--------|
+| `sigil-anchor` | Zone/effect validation | `anchor` |
+| `sigil-lens` | Constraint verification | `lens` |
+
+Both crates expose a library (`sigil_anchor_core`, `sigil_lens_core`) for programmatic use.
 
 ## License
 
-AGPL-3.0 - See [LICENSE](../LICENSE) for details.
+MIT License

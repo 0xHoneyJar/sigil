@@ -1,8 +1,8 @@
 # Sigil
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](CHANGELOG.md)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-green.svg)](LICENSE.md)
-[![Release](https://img.shields.io/badge/release-Anchor_Ground_Truth-purple.svg)](CHANGELOG.md#300---2026-01-21--anchor-ground-truth)
+[![Release](https://img.shields.io/badge/release-Anchor_Rust_%26_craft_Evolution-purple.svg)](CHANGELOG.md#310---2026-01-20--anchor-rust--craft-evolution)
 
 > *"A sigil holds the tension — creative intuition grounded in user truth. Move fast without losing sight of what actually matters."*
 
@@ -198,32 +198,72 @@ Corrections weight 5x because they're specific. Silence is ambiguous.
 
 ## Commands
 
-### By Phase
+### The Primary Entry Point
 
-| Phase | Command | Purpose |
-|-------|---------|---------|
-| **Understand** | `/observe` | Capture user insights — what do they actually need? |
-| | `/understand` | Research domain before crafting |
-| **Craft** | `/craft` | Apply physics — primary entry point |
-| | `/style` | Material only (looks wrong) |
-| | `/animate` | Animation only (movement off) |
-| | `/behavior` | Behavioral only (timing wrong) |
-| | `/distill` | Break feature into craft-able components |
-| **Validate** | `/ward` | Audit against physics — does it actually work? |
-| | `/garden` | Component authority report |
-| **Learn** | `/inscribe` | Graduate patterns to permanent rules |
+**`/craft` is Sigil's single entry point.** Everything flows through craft:
+
+```
+/craft "claim button"        → Chisel mode: fast iteration on feel
+/craft "build rewards flow"  → Hammer mode: triggers architecture first
+/craft --debug              → Debug mode: systematic investigation
+```
+
+All other commands exist to support `/craft` in the feedback loop:
+
+```
+                    ┌──────────────────────────┐
+                    │                          │
+                    │         /craft           │
+                    │    (primary entry)       │
+                    │                          │
+                    │  Quick → Chisel → Hammer │
+                    │  → Debug                 │
+                    │                          │
+                    └──────────────────────────┘
+                              │
+       ┌──────────────────────┼──────────────────────┐
+       │                      │                      │
+       ▼                      ▼                      ▼
+  UNDERSTAND              VALIDATE                LEARN
+  ───────────             ────────               ─────
+  /observe                /ward                  /inscribe
+  /understand             /garden                taste.md
+       │                      │                      │
+       └──────────────────────┴──────────────────────┘
+                              │
+                              ▼
+                         ITERATE
+```
+
+### Supporting Commands
+
+| Phase | Command | When to Use |
+|-------|---------|-------------|
+| **Understand** | `/observe` | Capture user insights before crafting |
+| | `/understand` | Research domain knowledge |
+| **Validate** | `/ward` | Audit physics compliance after crafting |
+| | `/garden` | Check component authority health |
+| **Learn** | `/inscribe` | Graduate taste patterns to permanent rules |
 | **Run** | `/run` | Autonomous sprint execution |
-| | `/run-status` | Check autonomous progress |
-| | `/run-halt` | Emergency stop |
+
+### Specialized Refinement
+
+When `/craft` output needs targeted fixes (rare — usually iterate via `/craft`):
+
+| Command | When | Instead of Full /craft |
+|---------|------|------------------------|
+| `/style` | Only material is wrong | "Too clinical" → adjust surface |
+| `/animate` | Only motion is off | "Too bouncy" → adjust springs |
+| `/behavior` | Only timing is wrong | "Too slow" → adjust sync |
 
 ### By Speed
 
 | Speed | Commands | When |
 |-------|----------|------|
-| **Fast iteration** | `/craft`, `/style`, `/animate`, `/behavior` | You have intuition, test it |
-| **Strategic pause** | `/observe`, `/understand`, `/distill` | Step back, get grounded |
+| **Fast iteration** | `/craft` (chisel) | You have intuition, test it |
+| **Strategic pause** | `/craft` (hammer) | Scope requires architecture |
+| **Debug** | `/craft --debug` | Something's wrong, investigate |
 | **Validation** | `/ward`, `/garden` | Check if reality matches intent |
-| **Autonomous** | `/run`, `/run-status`, `/run-halt` | Extended execution with safety |
 
 ---
 
@@ -645,4 +685,4 @@ AGPL-3.0. See [LICENSE.md](LICENSE.md).
 
 ---
 
-*v3.0.0 "Anchor Ground Truth"*
+*v3.1.0 "Anchor Rust & /craft Evolution"*

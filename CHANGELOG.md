@@ -7,6 +7,110 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.1.0] - 2026-01-20 — "Anchor Rust & /craft Evolution"
+
+### Summary
+
+v3.1.0 delivers the **Anchor/Lens Rust CLIs** — high-performance native binaries that replace the TypeScript validation layer. This release also includes comprehensive planning for `/craft` optimization: mode-based loading (Quick/Chisel/Hammer/Debug), RLM on-demand rule loading, and Dev Toolbar integration.
+
+**Key achievement**: Anchor validates in ~10ms, Lens verifies in ~27ms — both well under target.
+
+### Added
+
+#### Anchor CLI (`sigil-anchor`) — Native Rust
+
+- **Zone/Effect Validation** — Map keywords to physics zones (Critical, Cautious, Standard)
+- **Effect Detection** — Detect Financial, Destructive, SoftDelete, Standard, Local, Navigation effects
+- **Data Source Verification** — Validate correct data source for use cases (on-chain vs indexed)
+- **Vocabulary Publishing** — Export vocabulary.yaml and zones.yaml to pub/ directory
+- **Exit Code System** — Consistent exit codes (0=success, 10=critical, 11=cautious, 12=standard, 20=schema, 30=I/O)
+
+#### Lens CLI (`sigil-lens`) — Native Rust
+
+- **CEL Constraint Engine** — Formal verification using Common Expression Language
+- **Constraint Categories** — timing, confirmation, sync, undo, animation constraints
+- **Heuristic Linting** — Tree-sitter based code analysis for TSX components
+- **Correction Context** — Actionable fix suggestions when violations detected
+- **Constraint Publishing** — Export constraints.yaml to pub/ directory
+
+#### Shared Infrastructure
+
+- **pub/ Directory IPC** — Request/response communication via `grimoires/pub/`
+- **UUID-Based Requests** — Secure request identification with full UUID validation
+- **Security Hardening** — Path traversal prevention, file size limits, input validation
+- **Advisory Locking** — Safe concurrent file access using `fs2`
+- **TTL Cleanup** — Automatic cleanup of stale files after 1 hour
+- **155 Tests Passing** — Comprehensive test coverage across both CLIs
+
+#### Integration
+
+- **Rule 22** — New `22-sigil-anchor-lens.md` for /craft integration
+- **Correction Loop** — Max 2 attempts to fix violations before user escalation
+- **Violation UX** — Clear violation boxes with apply/override/cancel options
+- **Taste Logging** — Validation results logged to taste.md for learning
+
+### Performance
+
+| CLI | Target | Actual |
+|-----|--------|--------|
+| Anchor validate | <100ms | ~10ms |
+| Lens verify | <200ms | ~27ms |
+
+### Planning Documents
+
+This release includes comprehensive planning for the next evolution:
+
+- **PRD v1.1.0** — `/craft` Optimization & Dev Toolbar (`grimoires/loa/prd-craft-optimization.md`)
+- **SDD v1.0.0** — Technical design for craft.md split, RLM extensions, toolbar architecture
+- **Sprint Plan** — 6 sprints, 25 tasks for solo developer with 1-week cycles
+
+### The /craft Entry Point Philosophy
+
+`/craft` is Sigil's primary entry point — the command that bridges creative intuition with physics grounding. All other commands support the feedback loop:
+
+```
+              ┌─────────────────────────────────────────┐
+              │                                         │
+              │              /craft                     │
+              │        (primary entry point)            │
+              │                                         │
+              │   Detects scope → Applies physics →     │
+              │   Generates code → Collects feedback    │
+              │                                         │
+              └─────────────────────────────────────────┘
+                              │
+         ┌──────────────────┬─┴─┬──────────────────┐
+         │                  │   │                  │
+         ▼                  ▼   ▼                  ▼
+    ┌─────────┐      ┌───────────────┐      ┌──────────┐
+    │UNDERSTAND│      │   VALIDATE    │      │  LEARN   │
+    │/observe  │      │   /ward       │      │/inscribe │
+    │/understand│     │   /garden     │      │          │
+    └─────────┘      └───────────────┘      └──────────┘
+         │                  │                     │
+         └──────────────────┴─────────────────────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │   taste.md    │
+                    │ (accumulated  │
+                    │ understanding)│
+                    └───────────────┘
+```
+
+### Dependencies
+
+- Rust 2021 edition
+- CEL interpreter 0.8 for constraint evaluation
+- Tree-sitter 0.24 for TSX parsing
+- Alloy 1.0 for Ethereum RPC (optional)
+
+### Migration
+
+No breaking changes. Anchor/Lens CLIs are additive — install and use alongside existing workflows.
+
+---
+
 ## [3.0.0] - 2026-01-21 — "Anchor Ground Truth"
 
 ### Summary
@@ -1407,6 +1511,7 @@ Sigil 0.2 can coexist with Loa on the same repository:
 - Design context capture commands
 - Basic moodboard and rules structure
 
+[3.1.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v3.1.0
 [2.4.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v2.4.0
 [2.3.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v2.3.0
 [2.2.0]: https://github.com/0xHoneyJar/sigil/releases/tag/v2.2.0

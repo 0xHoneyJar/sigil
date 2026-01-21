@@ -44,6 +44,21 @@ Condensed decision tree for /craft. Full rules loaded on-demand via index.yaml.
 **React project** (detected from package.json):
 → Load `10-react-core.md` conditionally
 
+**Formal verification** (Financial, Destructive, SoftDelete effects):
+→ Load `22-sigil-anchor-lens.md` for CLI validation
+
+## Formal Verification (Anchor/Lens)
+
+For high-stakes effects (Financial, Destructive, SoftDelete):
+
+1. **Write request** to `grimoires/pub/requests/{uuid}.json`
+2. **Run CLIs** in parallel: `anchor validate` + `lens lint`
+3. **Read responses** from `grimoires/pub/responses/`
+4. **Correction loop**: Max 2 attempts to fix violations
+5. **Surface conflicts**: Ask user to prioritize safety vs speed
+
+**Skip when**: CLIs not installed, Standard/Local/Navigation effect, or disabled in constitution.yaml
+
 ## Action Default
 
 After analysis confirmation:

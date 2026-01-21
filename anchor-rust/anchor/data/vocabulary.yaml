@@ -1,0 +1,188 @@
+# Anchor Vocabulary - Effect Keywords to Physics Mappings
+# Version: 1.0.0
+# Part of the Loa Constructs Triad
+
+version: "1.0.0"
+updated: "2026-01-20T00:00:00Z"
+
+effects:
+  financial:
+    keywords:
+      - claim
+      - deposit
+      - withdraw
+      - transfer
+      - swap
+      - send
+      - pay
+      - purchase
+      - mint
+      - burn
+      - stake
+      - unstake
+      - bridge
+      - approve
+      - redeem
+      - harvest
+      - collect
+      - vest
+      - unlock
+      - liquidate
+      - borrow
+      - lend
+      - repay
+      - airdrop
+      - delegate
+      - undelegate
+      - redelegate
+      - bond
+      - unbond
+      - checkout
+      - order
+      - subscribe
+      - upgrade
+      - downgrade
+      - refund
+    type_overrides:
+      - Currency
+      - Money
+      - Balance
+      - Wei
+      - Token
+      - BigInt
+      - Amount
+      - Price
+      - Fee
+    physics:
+      sync: pessimistic
+      timing: 800
+      confirmation: true
+
+  destructive:
+    keywords:
+      - delete
+      - remove
+      - destroy
+      - revoke
+      - terminate
+      - purge
+      - erase
+      - wipe
+      - clear
+      - reset
+      - ban
+      - block
+      - suspend
+      - deactivate
+      - cancel
+      - void
+      - invalidate
+      - expire
+      - kill
+    type_overrides:
+      - Password
+      - Secret
+      - Key
+      - Permission
+      - Role
+      - Access
+    physics:
+      sync: pessimistic
+      timing: 600
+      confirmation: true
+
+  soft_delete:
+    keywords:
+      - archive
+      - hide
+      - trash
+      - dismiss
+      - snooze
+      - mute
+      - silence
+      - ignore
+      - skip
+      - defer
+      - postpone
+    type_overrides: []
+    physics:
+      sync: optimistic
+      timing: 200
+      confirmation: toast_undo
+
+  standard:
+    keywords:
+      - save
+      - update
+      - edit
+      - create
+      - add
+      - like
+      - follow
+      - bookmark
+      - favorite
+      - star
+      - pin
+      - tag
+      - label
+      - comment
+      - share
+      - repost
+      - quote
+      - reply
+      - mention
+      - react
+      - submit
+      - post
+      - publish
+      - upload
+      - attach
+      - link
+      - change
+      - modify
+      - set
+      - configure
+      - customize
+      - personalize
+    type_overrides: []
+    physics:
+      sync: optimistic
+      timing: 200
+      confirmation: false
+
+  local:
+    keywords:
+      - toggle
+      - switch
+      - expand
+      - collapse
+      - select
+      - focus
+      - show
+      - hide
+      - open
+      - close
+      - reveal
+      - conceal
+      - check
+      - uncheck
+      - enable
+      - disable
+      - activate
+      - sort
+      - filter
+      - search
+      - zoom
+      - pan
+      - scroll
+    type_overrides:
+      - Theme
+      - Preference
+      - Setting
+      - Filter
+      - Sort
+      - View
+    physics:
+      sync: immediate
+      timing: 100
+      confirmation: false

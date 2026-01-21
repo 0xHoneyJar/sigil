@@ -189,7 +189,7 @@ Check `grimoires/sigil/taste.md` for `output_mode` preference.
 ```
 [Target] | [Effect] | [Craft Type]
 Behavioral: [sync] [timing] | Animation: [easing] | Material: [surface]
-Protected: [pass/fail] | Codebase: [libs detected]
+Protected: [pass/fail] | Codebase: [libs] | Patterns: [source component]
 
 Apply? (y/n)
 ```
@@ -208,6 +208,10 @@ Apply? (y/n)
 │  Material      [Surface] | [Shadow] | [Radius]         │
 │                                                        │
 │  Codebase:     [styling] + [animation] + [data]        │
+│  Patterns:     [tokens from existing component]        │
+│    Source:     [component read for patterns]           │
+│    Colors:     bg-muted, text-muted-foreground         │
+│    Radius:     rounded-md                              │
 │                                                        │
 │  Output:       [file(s) to create/modify]              │
 │                                                        │
@@ -1722,6 +1726,36 @@ Extract from dependencies:
 - Toast: `sonner` | `react-hot-toast` | native
 - Styling: `tailwindcss` | `styled-components` | `@emotion`
 
+**1d-bis. Extract design patterns from existing components** (for Generate craft type):
+
+When generating a NEW component, read ONE existing similar component to extract patterns:
+
+```
+Find: src/components/ui/{similar-component}.tsx
+  OR: components/{similar-type}.tsx
+  OR: Any component with similar purpose (button → button, card → card, etc.)
+```
+
+Extract and note:
+- **Color tokens**: `bg-muted`, `text-muted-foreground`, `border` (not `bg-black`, `text-white`)
+- **Spacing tokens**: `p-4`, `gap-2`, `space-y-3` (note conventions)
+- **Border radius**: `rounded-md`, `rounded-lg`, `rounded-xl` (match existing)
+- **Shadow patterns**: `shadow-sm`, `shadow-md` (if used)
+- **State classes**: hover, focus, disabled patterns
+
+**CRITICAL**: Use discovered tokens, not generic defaults:
+| Generic (avoid) | Project Token (use) |
+|-----------------|---------------------|
+| `bg-black/20` | `bg-muted/50` |
+| `rounded-full` | `rounded-md` |
+| `text-white` | `text-foreground` |
+| `border-gray-200` | `border` |
+
+If no similar component found, check:
+- `tailwind.config.js` for custom theme tokens
+- `globals.css` for CSS variable definitions
+- Design system docs in `grimoires/sigil/context/brand/`
+
 **1e. If refining existing code:**
 - Read the file(s) being refined
 - Understand current patterns before changing
@@ -2088,6 +2122,145 @@ See `.claude/skills/agent-browser/SKILL.md` for full command reference.
 Read grimoires/sigil/constitution.yaml
 If features.subagent_validators == false: Skip to Step 6
 ```
+
+**5.5a: Formal Verification (Anchor + Lens)**
+
+When effect is Financial, Destructive, or SoftDelete, AND CLIs are available:
+
+```bash
+# Generate request ID
+REQUEST_ID=$(uuidgen | tr '[:upper:]' '[:lower:]')
+
+# Write physics request to pub/requests/
+mkdir -p grimoires/pub/requests grimoires/pub/responses
+cat > "grimoires/pub/requests/${REQUEST_ID}.json" << EOF
+{
+  "request_id": "${REQUEST_ID}",
+  "physics": {
+    "effect": "${EFFECT}",
+    "behavioral": {
+      "sync": "${SYNC}",
+      "timing": ${TIMING},
+      "confirmation": ${CONFIRMATION}
+    },
+    "animation": {
+      "easing": "${EASING}",
+      "duration": ${DURATION}
+    },
+    "material": {
+      "surface": "${SURFACE}",
+      "shadow": "${SHADOW}",
+      "radius": ${RADIUS}
+    }
+  },
+  "component_code": "${TSX_SOURCE}",
+  "keywords": ${KEYWORDS_ARRAY},
+  "context": {
+    "file_path": "${FILE_PATH}",
+    "effect_source": "${EFFECT_SOURCE}"
+  }
+}
+EOF
+
+# Run validations in parallel
+anchor validate --request "$REQUEST_ID" &
+lens lint --request-id "$REQUEST_ID" &
+wait
+
+# Read responses
+ANCHOR_RESPONSE=$(cat "grimoires/pub/responses/${REQUEST_ID}-anchor.json" 2>/dev/null)
+LENS_RESPONSE=$(cat "grimoires/pub/responses/${REQUEST_ID}-lens.json" 2>/dev/null)
+```
+
+**Anchor/Lens Result Handling:**
+
+| Anchor | Lens | Action |
+|--------|------|--------|
+| valid: true | pass: true | Silent pass → Continue to subagent validators |
+| valid: true | pass: false | Show correction box → Apply fix → Retry (max 2) |
+| valid: false | Any | Show violation box → Block with prompt |
+| Any | correction != null | Apply suggested fix → Re-validate |
+
+See `.claude/rules/22-sigil-anchor-lens.md` for full correction loop and conflict detection.
+
+**Correction Loop (when Lens returns pass: false):**
+
+```
+attempt = 1
+max_attempts = 2
+
+while lens_response.pass == false AND attempt <= max_attempts:
+    # Check if correction context is available
+    if lens_response.correction != null:
+        # Show correction box
+        ┌─ Constraint Violation ─────────────────────────────────┐
+        │                                                        │
+        │  ✗ {lens_response.correction.violations[0].rule}       │
+        │    Rule: {constraint description}                      │
+        │    Actual: {current_value}                             │
+        │    Required: {required_value}                          │
+        │                                                        │
+        │  Suggested Fix:                                        │
+        │    → {target}: {current} → {required}                  │
+        │    Reason: {reason}                                    │
+        │                                                        │
+        │  [a] Apply fix and regenerate                          │
+        │  [o] Override (explain why this is acceptable)         │
+        │  [c] Cancel and reconsider                             │
+        │                                                        │
+        └────────────────────────────────────────────────────────┘
+
+        # Wait for user response
+        if response == 'a':
+            Apply fix to physics analysis
+            Regenerate component with corrected physics
+            Re-run lens lint
+            attempt++
+        elif response == 'o':
+            Log override reason to taste.md
+            Break loop, proceed to Step 6
+        elif response == 'c':
+            Cancel craft, return control to user
+            Exit
+
+    else:
+        # No correction context - surface conflict
+        ┌─ Physics Conflict ─────────────────────────────────────┐
+        │                                                        │
+        │  Validation failed but no automatic fix available.     │
+        │                                                        │
+        │  Violations:                                           │
+        │  {list violations}                                     │
+        │                                                        │
+        │  [r] Reconsider physics analysis                       │
+        │  [o] Override and proceed                              │
+        │  [c] Cancel                                            │
+        │                                                        │
+        └────────────────────────────────────────────────────────┘
+
+if attempt > max_attempts AND lens_response.pass == false:
+    # Max attempts reached, surface to user
+    ┌─ Correction Loop Exhausted ────────────────────────────────┐
+    │                                                            │
+    │  After {max_attempts} attempts, validation still fails.    │
+    │                                                            │
+    │  Remaining violations:                                     │
+    │  {list remaining violations}                               │
+    │                                                            │
+    │  Options:                                                  │
+    │  [o] Override and proceed (document why)                   │
+    │  [r] Return to physics analysis                            │
+    │  [c] Cancel craft                                          │
+    │                                                            │
+    └────────────────────────────────────────────────────────────┘
+```
+
+**Skip when:**
+- CLIs not installed (check with `command -v anchor` and `command -v lens`)
+- Effect is Standard, Local, or Navigation (low-stakes)
+- User has disabled formal verification in constitution.yaml
+
+**5.5b: Subagent Validators**
 
 Run validators in sequence:
 
