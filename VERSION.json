@@ -1,7 +1,7 @@
 {
   "$schema": "./VERSION.schema.json",
-  "sigil": "3.3.0",
-  "constructs_pack": "3.3.0",
+  "sigil": "13.0.0",
+  "constructs_pack": "13.0.0",
   "rust_cli": "1.0.0",
   "npm_packages": {
     "@thehoneyjar/sigil-hud": "0.1.0",
@@ -25,6 +25,7 @@
     }
   },
   "release_notes": {
+    "13.0.0": "Unified Sigil Architecture - complete installation infrastructure",
     "3.3.0": "Unified installation experience with pre-flight verification"
   }
 }
