@@ -47,6 +47,10 @@ Condensed decision tree for /craft. Full rules loaded on-demand via index.yaml.
 **Formal verification** (Financial, Destructive, SoftDelete effects):
 → Load `22-sigil-anchor-lens.md` for CLI validation
 
+**Diagnostic tooling** (diagnostic, HUD, debug toolbar, dev toolbar):
+→ Load `23-sigil-hud.md` for @sigil/hud integration patterns
+→ Detect existing toolbar files to determine replace vs new pattern
+
 ## Formal Verification (Anchor/Lens)
 
 For high-stakes effects (Financial, Destructive, SoftDelete):

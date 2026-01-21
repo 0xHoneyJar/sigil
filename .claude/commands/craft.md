@@ -174,6 +174,15 @@ Detect what's being crafted before detecting effect:
 | "theme", "colors", "mode", config file | **Configure** | Edit config/theme |
 | "loading", "data", "fetch", "state" | **Pattern** | Hook or utility |
 | "hover", "focus", "states", multiple files | **Polish** | Batch edits |
+| "diagnostic", "HUD", "debug toolbar", "replace toolbar" | **Tooling** | @sigil/hud integration |
+
+**Tooling Detection (v3.2.0):**
+When tooling keywords detected, load `23-sigil-hud.md` and check:
+1. Does an existing debug toolbar exist? → Replace pattern
+2. Is this a new integration? → Full HUD pattern
+3. Is this a Web3 app (wagmi, viem)? → Add Lens + Fork panels
+
+Existing toolbar signals: `debug-toolbar.tsx`, `dev-tools.tsx`, `diagnostic*.tsx`
 
 **Ambiguity Resolution:**
 If unclear, ask ONE question:

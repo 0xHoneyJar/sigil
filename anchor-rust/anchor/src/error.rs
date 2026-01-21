@@ -92,6 +92,7 @@ impl AnchorError {
             },
             AnchorError::Json(_) => "Invalid JSON format".to_string(),
             AnchorError::Yaml(_) => "Invalid YAML format".to_string(),
+            AnchorError::Ipc(e) => format!("IPC error: {}", e),
             AnchorError::InvalidRequestId { id, .. } => {
                 format!("Invalid request ID: {}", id)
             }
@@ -139,7 +140,7 @@ impl AnchorError {
         use crate::types::exit_code::ExitCode;
         match self {
             AnchorError::Io(_) | AnchorError::RequestNotFound { .. } => ExitCode::Revert as i32,
-            AnchorError::Json(_) | AnchorError::Yaml(_) => ExitCode::Schema as i32,
+            AnchorError::Json(_) | AnchorError::Yaml(_) | AnchorError::Ipc(_) => ExitCode::Schema as i32,
             AnchorError::InvalidRequestId { .. }
             | AnchorError::RequestTooLarge { .. }
             | AnchorError::PathTraversal { .. } => ExitCode::Schema as i32,

@@ -373,6 +373,33 @@ rules:
     tokens: 185
     priority: 4
 
+  # Diagnostic HUD Integration (v3.2.0)
+  - file: "23-sigil-hud.md"
+    triggers:
+      keywords:
+        - "diagnostic"
+        - "HUD"
+        - "debug toolbar"
+        - "dev toolbar"
+        - "inspection"
+        - "physics panel"
+        - "data source"
+        - "observation"
+      packages:
+        - "@sigil/hud"
+        - "@sigil/diagnostics"
+        - "@sigil/dev-toolbar"
+        - "@sigil/fork"
+        - "@sigil/lens"
+        - "@sigil/simulation"
+      file_patterns:
+        - "debug-toolbar"
+        - "dev-tools"
+        - "diagnostic"
+    tokens: 2100
+    priority: 2
+    # Load when tooling integration is detected
+
 # Loading strategy
 loading:
   # Maximum tokens to load per invocation (soft limit)
