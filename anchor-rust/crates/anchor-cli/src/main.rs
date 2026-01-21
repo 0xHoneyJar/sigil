@@ -12,11 +12,15 @@
 //! - `anchor checkpoint` - Save full state checkpoint
 //! - `anchor checkpoints` - List all checkpoints
 //! - `anchor restore` - Restore from a checkpoint
+//! - `anchor session` - Create a new development session
+//! - `anchor sessions` - List all sessions
+//! - `anchor resume` - Resume a paused session
 //! - `anchor status` - Show current fork and task status
 
 use clap::{Parser, Subcommand};
 use sigil_anchor_core::{
-    CheckpointManager, ForkManager, Network, RpcClient, SnapshotManager, Zone, VERSION,
+    CheckpointManager, ForkManager, Network, RpcClient, SessionManager, SessionStatus,
+    SnapshotManager, Zone, VERSION,
 };
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -173,8 +177,53 @@ enum Commands {
         session: String,
     },
 
+    /// Create a new development session
+    Session {
+        /// Network to fork (mainnet, sepolia, base, arbitrum, optimism, berachain)
+        #[arg(short, long, default_value = "mainnet")]
+        network: String,
+
+        /// Block number to fork from (latest if not specified)
+        #[arg(short, long)]
+        block: Option<u64>,
+
+        /// Description for the session
+        #[arg(short, long)]
+        description: Option<String>,
+    },
+
+    /// List all sessions
+    Sessions {
+        /// Filter by status (active, paused, completed, failed)
+        #[arg(short, long)]
+        status: Option<String>,
+
+        /// Output as JSON
+        #[arg(long)]
+        json: bool,
+    },
+
+    /// Resume a paused session
+    Resume {
+        /// Session ID to resume
+        session_id: String,
+    },
+
+    /// Pause an active session
+    Pause {
+        /// Session ID to pause
+        session_id: String,
+    },
+
     /// Show current fork and task status
-    Status,
+    Status {
+        /// Session ID to show status for (optional, shows all if not specified)
+        session_id: Option<String>,
+
+        /// Output as JSON
+        #[arg(long)]
+        json: bool,
+    },
 
     /// Show version information
     Version,
@@ -634,20 +683,277 @@ async fn main() {
             }
         }
 
-        Some(Commands::Status) => {
-            println!("Anchor Status");
-            println!("  Version: {}", VERSION);
-            println!("  Zone: {}", zone);
-            println!("  Registry: {}", registry_path.display());
-            println!();
+        Some(Commands::Session {
+            network,
+            block,
+            description,
+        }) => {
+            let net = match Network::from_str(&network) {
+                Ok(n) => n,
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(6);
+                }
+            };
 
-            let forks = manager.all();
-            if forks.is_empty() {
-                println!("No active forks.");
+            // Create session manager
+            let sessions_dir = registry_path
+                .parent()
+                .unwrap_or(&registry_path)
+                .join("sessions");
+
+            let mut session_manager = SessionManager::new(&sessions_dir);
+            if let Err(e) = session_manager.load().await {
+                eprintln!("Warning: Failed to load session registry: {}", e);
+            }
+
+            println!("Creating session...");
+            println!("  Network: {} (chain ID: {})", net.name(), net.chain_id());
+            println!(
+                "  Block: {}",
+                block.map_or("latest".to_string(), |b| b.to_string())
+            );
+
+            match session_manager.create(net, block, description).await {
+                Ok(session) => {
+                    println!("\nSession created successfully!");
+                    println!("  ID: {}", session.id);
+                    println!("  Network: {}", session.network.name());
+                    println!("  Block: {}", session.block_number);
+                    println!("  Status: {:?}", session.status);
+                    if let Some(ref fork_id) = session.fork_id {
+                        println!("  Fork: {}", fork_id);
+                    }
+                    if let Some(ref desc) = session.description {
+                        println!("  Description: {}", desc);
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Error creating session: {}", e);
+                    std::process::exit(4);
+                }
+            }
+        }
+
+        Some(Commands::Sessions { status, json }) => {
+            // Create session manager
+            let sessions_dir = registry_path
+                .parent()
+                .unwrap_or(&registry_path)
+                .join("sessions");
+
+            let mut session_manager = SessionManager::new(&sessions_dir);
+            if let Err(e) = session_manager.load().await {
+                eprintln!("Warning: Failed to load session registry: {}", e);
+            }
+
+            let sessions: Vec<_> = if let Some(ref status_str) = status {
+                let status_filter = match status_str.to_lowercase().as_str() {
+                    "active" => SessionStatus::Active,
+                    "paused" => SessionStatus::Paused,
+                    "completed" => SessionStatus::Completed,
+                    "failed" => SessionStatus::Failed,
+                    _ => {
+                        eprintln!(
+                            "Invalid status: {}. Use: active, paused, completed, failed",
+                            status_str
+                        );
+                        std::process::exit(6);
+                    }
+                };
+                session_manager.list_by_status(status_filter)
             } else {
-                println!("Active forks: {}", forks.len());
-                for fork in forks {
-                    println!("  - {} ({}:{})", fork.id, fork.network.name(), fork.port);
+                session_manager.list().iter().collect()
+            };
+
+            if json {
+                match serde_json::to_string_pretty(&sessions) {
+                    Ok(output) => println!("{}", output),
+                    Err(e) => {
+                        eprintln!("Error serializing sessions: {}", e);
+                        std::process::exit(6);
+                    }
+                }
+            } else if sessions.is_empty() {
+                println!("No sessions found.");
+            } else {
+                println!("Sessions:");
+                println!();
+                for session_meta in sessions {
+                    let session = &session_meta.session;
+                    println!("  {} ({:?})", session.id, session.status);
+                    println!("    Network: {}", session.network.name());
+                    println!("    Block: {}", session.block_number);
+                    println!("    Created: {}", session.created_at);
+                    if let Some(ref fork_id) = session.fork_id {
+                        println!("    Fork: {}", fork_id);
+                    }
+                    if let Some(ref desc) = session.description {
+                        println!("    Description: {}", desc);
+                    }
+                    println!("    Snapshots: {}", session_meta.snapshot_count);
+                    println!("    Checkpoints: {}", session_meta.checkpoint_count);
+                    println!();
+                }
+            }
+        }
+
+        Some(Commands::Resume { session_id }) => {
+            // Create session manager
+            let sessions_dir = registry_path
+                .parent()
+                .unwrap_or(&registry_path)
+                .join("sessions");
+
+            let mut session_manager = SessionManager::new(&sessions_dir);
+            if let Err(e) = session_manager.load().await {
+                eprintln!("Warning: Failed to load session registry: {}", e);
+            }
+
+            match session_manager.resume(&session_id).await {
+                Ok(session) => {
+                    println!("Session resumed successfully!");
+                    println!("  ID: {}", session.id);
+                    println!("  Network: {}", session.network.name());
+                    println!("  Block: {}", session.block_number);
+                    println!("  Status: {:?}", session.status);
+                    if let Some(ref fork_id) = session.fork_id {
+                        println!("  Fork: {}", fork_id);
+                    }
+                }
+                Err(e) => {
+                    eprintln!("Error resuming session: {}", e);
+                    std::process::exit(4);
+                }
+            }
+        }
+
+        Some(Commands::Pause { session_id }) => {
+            // Create session manager
+            let sessions_dir = registry_path
+                .parent()
+                .unwrap_or(&registry_path)
+                .join("sessions");
+
+            let mut session_manager = SessionManager::new(&sessions_dir);
+            if let Err(e) = session_manager.load().await {
+                eprintln!("Warning: Failed to load session registry: {}", e);
+            }
+
+            match session_manager.pause(&session_id).await {
+                Ok(()) => {
+                    println!("Session {} paused.", session_id);
+                }
+                Err(e) => {
+                    eprintln!("Error pausing session: {}", e);
+                    std::process::exit(4);
+                }
+            }
+        }
+
+        Some(Commands::Status { session_id, json }) => {
+            // Create session manager
+            let sessions_dir = registry_path
+                .parent()
+                .unwrap_or(&registry_path)
+                .join("sessions");
+
+            let mut session_manager = SessionManager::new(&sessions_dir);
+            if let Err(e) = session_manager.load().await {
+                eprintln!("Warning: Failed to load session registry: {}", e);
+            }
+
+            if let Some(ref sid) = session_id {
+                // Show specific session status
+                match session_manager.get(sid) {
+                    Some(session_meta) => {
+                        if json {
+                            match serde_json::to_string_pretty(&session_meta) {
+                                Ok(output) => println!("{}", output),
+                                Err(e) => {
+                                    eprintln!("Error serializing session: {}", e);
+                                    std::process::exit(6);
+                                }
+                            }
+                        } else {
+                            let session = &session_meta.session;
+                            println!("Session: {}", session.id);
+                            println!("  Status: {:?}", session.status);
+                            println!("  Network: {}", session.network.name());
+                            println!("  Block: {}", session.block_number);
+                            println!("  Created: {}", session.created_at);
+                            if let Some(ref resumed) = session.resumed_at {
+                                println!("  Resumed: {}", resumed);
+                            }
+                            if let Some(ref fork_id) = session.fork_id {
+                                println!("  Fork: {}", fork_id);
+                            }
+                            if let Some(ref desc) = session.description {
+                                println!("  Description: {}", desc);
+                            }
+                            println!();
+                            println!("Statistics:");
+                            println!("  Snapshots: {}", session_meta.snapshot_count);
+                            println!("  Checkpoints: {}", session_meta.checkpoint_count);
+                            println!(
+                                "  Checkpoint size: {} bytes",
+                                session_meta.checkpoint_size_bytes
+                            );
+                            println!("  Tasks completed: {}", session_meta.tasks_completed);
+                            println!("  Tasks pending: {}", session_meta.tasks_pending);
+                            println!("  Last activity: {}", session_meta.last_activity);
+                        }
+                    }
+                    None => {
+                        eprintln!("Session not found: {}", sid);
+                        std::process::exit(6);
+                    }
+                }
+            } else {
+                // Show general status
+                if json {
+                    let status = serde_json::json!({
+                        "version": VERSION,
+                        "zone": format!("{}", zone),
+                        "registry": registry_path.display().to_string(),
+                        "active_forks": manager.all().len(),
+                        "active_session": session_manager.get_active().map(|s| &s.session.id),
+                    });
+                    match serde_json::to_string_pretty(&status) {
+                        Ok(output) => println!("{}", output),
+                        Err(e) => {
+                            eprintln!("Error serializing status: {}", e);
+                            std::process::exit(6);
+                        }
+                    }
+                } else {
+                    println!("Anchor Status");
+                    println!("  Version: {}", VERSION);
+                    println!("  Zone: {}", zone);
+                    println!("  Registry: {}", registry_path.display());
+                    println!();
+
+                    // Show active session
+                    if let Some(active) = session_manager.get_active() {
+                        println!("Active session: {}", active.session.id);
+                        println!("  Network: {}", active.session.network.name());
+                        println!("  Block: {}", active.session.block_number);
+                        if let Some(ref fork_id) = active.session.fork_id {
+                            println!("  Fork: {}", fork_id);
+                        }
+                        println!();
+                    }
+
+                    // Show forks
+                    let forks = manager.all();
+                    if forks.is_empty() {
+                        println!("No active forks.");
+                    } else {
+                        println!("Active forks: {}", forks.len());
+                        for fork in forks {
+                            println!("  - {} ({}:{})", fork.id, fork.network.name(), fork.port);
+                        }
+                    }
                 }
             }
         }

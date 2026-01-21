@@ -25,12 +25,12 @@ pub mod types;
 
 // Re-export commonly used types at crate root
 pub use error::AnchorError;
-pub use lifecycle::{CheckpointManager, ForkManager, SnapshotManager};
+pub use lifecycle::{CheckpointManager, ForkManager, SessionManager, SnapshotManager};
 pub use rpc::{AnvilMethods, RpcClient, RpcError};
 pub use types::{
     Checkpoint, CheckpointRegistry, ConfirmationType, EffectType, Fork, ForkRegistry, Network,
-    PhysicsRule, PhysicsTable, Snapshot, SnapshotRegistry, SyncStrategy, Task, TaskStatus,
-    TaskType, Zone,
+    PhysicsRule, PhysicsTable, Session, SessionMetadata, SessionRegistry, SessionStatus, Snapshot,
+    SnapshotRegistry, SyncStrategy, Task, TaskStatus, TaskType, Zone,
 };
 
 /// Result type alias for Anchor operations.

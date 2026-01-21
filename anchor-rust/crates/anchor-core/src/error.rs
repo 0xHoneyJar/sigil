@@ -33,6 +33,15 @@ pub enum AnchorError {
     #[error("Session not found: {0}")]
     SessionNotFound(String),
 
+    #[error("Session {0} cannot be resumed: status is {1}")]
+    SessionNotResumable(String, String),
+
+    #[error("Session {0} corrupted: missing required data")]
+    SessionCorrupted(String),
+
+    #[error("Invalid session state for {0}: {1}")]
+    InvalidSessionState(String, String),
+
     // Task errors
     #[error("Task not found: {0}")]
     TaskNotFound(String),
