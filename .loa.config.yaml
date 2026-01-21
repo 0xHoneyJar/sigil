@@ -33,6 +33,23 @@ disabled_agents: []
 #   - translating-for-executives
 
 # =============================================================================
+# Run Mode (Autonomous Execution)
+# =============================================================================
+run_mode:
+  enabled: true
+  defaults:
+    max_cycles: 20
+    timeout_hours: 8
+  rate_limiting:
+    calls_per_hour: 100
+  circuit_breaker:
+    same_issue_threshold: 3
+    no_progress_threshold: 5
+  git:
+    branch_prefix: "feature/"
+    create_draft_pr: true
+
+# =============================================================================
 # Custom Paths
 # =============================================================================
 paths:
