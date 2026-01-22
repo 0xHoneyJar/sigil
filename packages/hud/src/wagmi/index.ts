@@ -16,6 +16,7 @@
  * ```
  */
 
+import { useState, useEffect, useSyncExternalStore } from 'react'
 import { useAccount as useWagmiAccount } from 'wagmi'
 import type { Address } from 'viem'
 
@@ -41,16 +42,109 @@ export interface LensAwareAccountReturn {
   status: ReturnType<typeof useWagmiAccount>['status']
 }
 
-// Attempt to import lens store - may not be installed
-let useLensStore: (() => { impersonatedAddress: Address | null; enabled: boolean }) | null = null
+/**
+ * Lens store type
+ */
+type LensStore = {
+  getState: () => { impersonatedAddress: Address | null; enabled: boolean }
+  subscribe: (listener: () => void) => () => void
+}
 
-try {
-  // Dynamic require to handle optional dependency
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const lensModule = require('@thehoneyjar/sigil-lens')
-  useLensStore = lensModule.useLensStore
-} catch {
-  // sigil-lens not installed, will fall back to standard wagmi behavior
+/**
+ * Module-level state for lens store
+ */
+let lensStore: LensStore | null = null
+let lensLoadAttempted = false
+let lensLoadPromise: Promise<void> | null = null
+const lensLoadListeners = new Set<() => void>()
+
+/**
+ * Notify listeners when lens load state changes
+ */
+function notifyLensLoadListeners() {
+  lensLoadListeners.forEach((listener) => listener())
+}
+
+/**
+ * Load lens store using dynamic import (ESM-safe)
+ */
+function loadLensStore(): Promise<void> {
+  if (lensLoadPromise) return lensLoadPromise
+
+  // Use dynamic import with string variable to avoid TypeScript module resolution
+  // This is intentional - sigil-lens is an optional peer dependency
+  const moduleName = '@thehoneyjar/sigil-lens'
+  lensLoadPromise = import(/* webpackIgnore: true */ moduleName)
+    .then((module: { useLensStore?: LensStore }) => {
+      // The module exports useLensStore which is a zustand hook
+      // Zustand hooks have a getState() method and subscribe()
+      const { useLensStore } = module
+      if (useLensStore && typeof useLensStore.getState === 'function') {
+        lensStore = useLensStore
+      }
+    })
+    .catch(() => {
+      // sigil-lens not installed or failed to load
+      // This is expected when the optional dependency isn't installed
+    })
+    .finally(() => {
+      lensLoadAttempted = true
+      notifyLensLoadListeners()
+    })
+
+  return lensLoadPromise
+}
+
+// Start loading lens store immediately (non-blocking)
+if (typeof window !== 'undefined') {
+  loadLensStore()
+}
+
+/**
+ * Hook to track lens store loading state
+ */
+function useLensStoreLoaded(): boolean {
+  const [loaded, setLoaded] = useState(lensLoadAttempted)
+
+  useEffect(() => {
+    if (lensLoadAttempted) {
+      setLoaded(true)
+      return
+    }
+
+    // Start loading if not already started
+    loadLensStore()
+
+    // Subscribe to load completion
+    const listener = () => setLoaded(true)
+    lensLoadListeners.add(listener)
+
+    return () => {
+      lensLoadListeners.delete(listener)
+    }
+  }, [])
+
+  return loaded
+}
+
+/**
+ * Hook to subscribe to lens store state
+ */
+function useLensState(): { impersonatedAddress: Address | null; enabled: boolean } | null {
+  const loaded = useLensStoreLoaded()
+
+  // Use useSyncExternalStore for proper React 18 concurrent mode support
+  const state = useSyncExternalStore(
+    (callback) => {
+      if (!lensStore) return () => {}
+      return lensStore.subscribe(callback)
+    },
+    () => (lensStore ? lensStore.getState() : null),
+    () => null // Server snapshot
+  )
+
+  if (!loaded || !lensStore) return null
+  return state
 }
 
 /**
@@ -78,22 +172,18 @@ try {
  */
 export function useAccount(): LensAwareAccountReturn {
   const wagmiAccount = useWagmiAccount()
+  const lensState = useLensState()
 
-  // If sigil-lens is available, check for impersonation
-  if (useLensStore) {
-    try {
-      const lensState = useLensStore()
-      const isImpersonating = lensState.enabled && lensState.impersonatedAddress !== null
+  // If sigil-lens is available and has state, check for impersonation
+  if (lensState) {
+    const isImpersonating = lensState.enabled && lensState.impersonatedAddress !== null
 
-      return {
-        ...wagmiAccount,
-        address: isImpersonating ? lensState.impersonatedAddress! : wagmiAccount.address,
-        realAddress: wagmiAccount.address,
-        isImpersonating,
-        impersonatedAddress: lensState.impersonatedAddress,
-      }
-    } catch {
-      // If lens store errors, fall back to standard behavior
+    return {
+      ...wagmiAccount,
+      address: isImpersonating ? lensState.impersonatedAddress! : wagmiAccount.address,
+      realAddress: wagmiAccount.address,
+      isImpersonating,
+      impersonatedAddress: lensState.impersonatedAddress,
     }
   }
 
