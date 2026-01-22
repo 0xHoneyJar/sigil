@@ -1,0 +1,121 @@
+name: Melange Discord Notification
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'melange')
+
+    steps:
+      - name: Parse Melange Issue
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+            const body = issue.body || '';
+
+            // Extract routing from labels or body
+            let toConstruct = 'unknown';
+            const toLabel = labels.find(l => l.startsWith('to:'));
+            if (toLabel) {
+              toConstruct = toLabel.replace('to:', '');
+            } else {
+              const toMatch = body.match(/### To \(Receiving Construct\)\s*\n\n(\w+)/i);
+              if (toMatch) {
+                toConstruct = toMatch[1].toLowerCase();
+              }
+            }
+
+            // Extract impact from labels or body
+            let impact = 'unknown';
+            const impactLabel = labels.find(l => l.startsWith('impact:'));
+            if (impactLabel) {
+              impact = impactLabel.replace('impact:', '');
+            } else {
+              const impactMatch = body.match(/### Impact\s*\n\n([\w-]+)/i);
+              if (impactMatch) {
+                impact = impactMatch[1].toLowerCase();
+              }
+            }
+
+            const fromConstruct = context.repo.repo;
+
+            core.setOutput('to', toConstruct);
+            core.setOutput('from', fromConstruct);
+            core.setOutput('impact', impact);
+            core.setOutput('title', issue.title);
+            core.setOutput('url', issue.html_url);
+            core.setOutput('number', issue.number);
+
+      - name: Auto-apply routing label
+        if: "!contains(github.event.issue.labels.*.name, 'to:')"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const toMatch = body.match(/### To \(Receiving Construct\)\s*\n\n(\w+)/i);
+
+            if (toMatch) {
+              const toConstruct = toMatch[1].toLowerCase();
+              const validConstructs = ['sigil', 'loa', 'registry'];
+
+              if (validConstructs.includes(toConstruct)) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.payload.issue.number,
+                  labels: [`to:${toConstruct}`]
+                });
+              }
+            }
+
+      - name: Auto-apply impact label
+        if: "!contains(github.event.issue.labels.*.name, 'impact:')"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+            const impactMatch = body.match(/### Impact\s*\n\n([\w-]+)/i);
+
+            if (impactMatch) {
+              const impact = impactMatch[1].toLowerCase();
+              const validImpacts = ['game-changing', 'important', 'nice-to-have'];
+
+              if (validImpacts.includes(impact)) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.payload.issue.number,
+                  labels: [`impact:${impact}`]
+                });
+              }
+            }
+
+      - name: Send Notification (game-changing)
+        if: steps.parse.outputs.impact == 'game-changing'
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.MELANGE_DISCORD_WEBHOOK }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK" ]; then
+            curl -H "Content-Type: application/json" \
+              -d "{\"content\": \"🔴 **[game-changing] ${{ steps.parse.outputs.from }} → ${{ steps.parse.outputs.to }}**\n\n${{ steps.parse.outputs.title }}\n\n${{ steps.parse.outputs.url }}\n\n@here\"}" \
+              "$DISCORD_WEBHOOK"
+          fi
+
+      - name: Send Notification (important)
+        if: steps.parse.outputs.impact == 'important'
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.MELANGE_DISCORD_WEBHOOK }}
+        run: |
+          if [ -n "$DISCORD_WEBHOOK" ]; then
+            curl -H "Content-Type: application/json" \
+              -d "{\"content\": \"🟡 **[important] ${{ steps.parse.outputs.from }} → ${{ steps.parse.outputs.to }}**\n\n${{ steps.parse.outputs.title }}\n\n${{ steps.parse.outputs.url }}\"}" \
+              "$DISCORD_WEBHOOK"
+          fi
+
+      # nice-to-have: no notification (discoverable via GitHub search)
