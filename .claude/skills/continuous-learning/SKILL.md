@@ -79,21 +79,6 @@ Agent learned patterns specific to this codebase through experimentation.
 - Specific to this project's architecture or conventions
 - Would be valuable for future agents in this codebase
 
-### Trigger 5: UI Copy Corrections
-
-Agent's UI copy was corrected due to terminology, accuracy, or consistency issues.
-
-**Signals**:
-- User corrected copy due to terminology conflict with existing UI
-- User corrected copy because it didn't match actual system behavior
-- Multiple rounds of copy refinement needed
-- User said copy "sounds awkward" or "doesn't match"
-
-**Extraction Focus**:
-- Terminology mappings (what terms this project uses)
-- System behavior clarifications (what the code actually does)
-- Read-aloud failures (phrasing patterns to avoid)
-
 ---
 
 ## Integration with Loa Architecture

@@ -7,16 +7,13 @@ Bash utilities for deterministic operations in the Loa framework.
 | Tool | Required By | Install |
 |------|-------------|---------|
 | `yq` | `mcp-registry.sh` | `brew install yq` / `apt install yq` |
-| `agent-browser` | `agent-browser-api.sh`, `/observe` | `npm install -g agent-browser && agent-browser install` |
 
 ## Script Inventory
 
 | Script | Purpose | Exit Codes |
 |--------|---------|------------|
 | `analytics.sh` | Analytics helper functions (THJ only) | 0=success |
-| `check-beads.sh` | Check if Beads (bd CLI) is installed | 0=installed, 1=not installed |
-| `check-agent-browser.sh` | Check if agent-browser CLI is installed | 0=installed, 1=not installed, 2=needs setup |
-| `agent-browser-api.sh` | Browser automation function library | (sourced, not executed) |
+| `check-beads.sh` | Check if beads_rust (br CLI) is installed | 0=installed, 1=not installed |
 | `context-check.sh` | Context size assessment for parallel execution | 0=success |
 | `git-safety.sh` | Template repository detection | 0=template, 1=not template |
 | `preflight.sh` | Pre-flight validation functions | 0=pass, 1=fail |
@@ -104,43 +101,6 @@ get_user_type
 ./.claude/scripts/check-beads.sh --quiet
 # Returns: INSTALLED | NOT_INSTALLED (no install instructions)
 ```
-
-### Check agent-browser Installation
-```bash
-./.claude/scripts/check-agent-browser.sh
-# Returns: INSTALLED|version | NEEDS_SETUP|... | NOT_INSTALLED|...
-
-./.claude/scripts/check-agent-browser.sh --quiet
-# Returns: INSTALLED | NEEDS_SETUP | NOT_INSTALLED
-```
-
-### Browser Automation API
-```bash
-# Source the API
-source ./.claude/scripts/agent-browser-api.sh
-
-# Navigate and capture
-ab_open "http://localhost:3000"
-screenshot=$(ab_screenshot)
-snapshot=$(ab_snapshot --filter interactive)
-
-# Interact with elements
-ab_click "button.submit"
-ab_fill "input[name='email']" "user@example.com"
-ab_hover ".menu-trigger"
-
-# Physics checks
-violations=$(ab_check_touch_targets)  # 44px minimum
-missing=$(ab_check_focus_rings)        # Focus visibility
-
-# Full audit capture
-result=$(ab_capture_for_audit "ClaimButton" "http://localhost:3000/claim")
-
-# Cleanup
-ab_close
-```
-
-Reference: [vercel-labs/agent-browser](https://github.com/vercel-labs/agent-browser)
 
 ## Design Principles
 

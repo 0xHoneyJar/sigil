@@ -48,6 +48,29 @@ yq_to_json() {
   fi
 }
 
+# Validate config file exists and contains valid YAML (L-003)
+validate_config() {
+  local config="$1"
+
+  if [[ ! -f "$config" ]]; then
+    warn "Config file not found: $config (using defaults)"
+    return 1
+  fi
+
+  # Check for valid YAML using yq
+  if yq --version 2>&1 | grep -q "mikefarah"; then
+    if ! yq eval '.' "$config" > /dev/null 2>&1; then
+      err "Invalid YAML in config: $config"
+    fi
+  else
+    if ! yq . "$config" > /dev/null 2>&1; then
+      err "Invalid YAML in config: $config"
+    fi
+  fi
+
+  return 0
+}
+
 check_deps() {
   command -v jq >/dev/null || err "jq is required"
   command -v yq >/dev/null || err "yq is required"
@@ -60,12 +83,16 @@ get_version() {
 }
 
 set_version() {
-  local tmp=$(mktemp)
+  local tmp
+  tmp=$(mktemp)
+  trap "rm -f '$tmp'" RETURN
   jq --arg k "$1" --arg v "$2" '.[$k] = $v' "$VERSION_FILE" > "$tmp" && mv "$tmp" "$VERSION_FILE"
 }
 
 set_version_int() {
-  local tmp=$(mktemp)
+  local tmp
+  tmp=$(mktemp)
+  trap "rm -f '$tmp'" RETURN
   jq --arg k "$1" --argjson v "$2" '.[$k] = $v' "$VERSION_FILE" > "$tmp" && mv "$tmp" "$VERSION_FILE"
 }
 
@@ -220,7 +247,9 @@ run_migrations() {
 
         log "Running migration: $mid (BLOCKING)"
         if bash "$migration"; then
-          local tmp=$(mktemp)
+          local tmp
+          tmp=$(mktemp)
+          trap "rm -f '$tmp'" RETURN
           jq --arg m "$mid" '.migrations_applied += [$m]' "$VERSION_FILE" > "$tmp" && mv "$tmp" "$VERSION_FILE"
           log "Migration $mid completed"
         else
@@ -237,7 +266,7 @@ run_migrations() {
 }
 
 apply_stealth_mode() {
-  if [[ ! -f "$CONFIG_FILE" ]]; then return 0; fi
+  if ! validate_config "$CONFIG_FILE" 2>/dev/null; then return 0; fi
 
   local mode=$(yq_read "$CONFIG_FILE" '.persistence_mode' "standard")
 
@@ -253,20 +282,163 @@ apply_stealth_mode() {
   fi
 }
 
+# === Version Check ===
+do_version_check() {
+  local json_output="${1:-false}"
+  local script_dir
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local check_script="$script_dir/check-updates.sh"
+
+  if [[ ! -x "$check_script" ]]; then
+    err "check-updates.sh not found or not executable"
+  fi
+
+  if [[ "$json_output" == "true" ]]; then
+    "$check_script" --json --check --notify
+  else
+    "$check_script" --check --notify
+  fi
+}
+
+# === Create Version Tag ===
+create_version_tag() {
+  local version="$1"
+
+  # Check if auto-tag is enabled in config
+  local auto_tag="true"
+  if validate_config "$CONFIG_FILE" 2>/dev/null; then
+    auto_tag=$(yq_read "$CONFIG_FILE" '.upgrade.auto_tag' "true")
+  fi
+
+  if [[ "$auto_tag" != "true" ]]; then
+    return 0
+  fi
+
+  local tag_name="loa@v${version}"
+
+  # Check if tag already exists
+  if git tag -l "$tag_name" | grep -q "$tag_name"; then
+    log "Tag $tag_name already exists"
+    return 0
+  fi
+
+  git tag -a "$tag_name" -m "Loa framework v${version}" 2>/dev/null || {
+    warn "Failed to create tag $tag_name"
+    return 1
+  }
+
+  log "Created tag: $tag_name"
+}
+
+# === Create Upgrade Commit ===
+# Creates a single atomic commit for framework upgrade
+# Arguments:
+#   $1 - old_version: previous version
+#   $2 - new_version: new version being installed
+#   $3 - no_commit: whether to skip commit (from CLI flag)
+#   $4 - force: whether force mode is enabled
+create_upgrade_commit() {
+  local old_version="$1"
+  local new_version="$2"
+  local skip_commit="${3:-false}"
+  local force_mode="${4:-false}"
+
+  # Check if --no-commit flag was passed
+  if [[ "$skip_commit" == "true" ]]; then
+    log "Skipping commit (--no-commit)"
+    return 0
+  fi
+
+  # Check stealth mode - no commits in stealth
+  if validate_config "$CONFIG_FILE" 2>/dev/null; then
+    local mode=$(yq_read "$CONFIG_FILE" '.persistence_mode' "standard")
+    if [[ "$mode" == "stealth" ]]; then
+      log "Skipping commit (stealth mode)"
+      return 0
+    fi
+  fi
+
+  # Check config option for auto_commit
+  local auto_commit="true"
+  if validate_config "$CONFIG_FILE" 2>/dev/null; then
+    auto_commit=$(yq_read "$CONFIG_FILE" '.upgrade.auto_commit' "true")
+  fi
+
+  if [[ "$auto_commit" != "true" ]]; then
+    log "Skipping commit (auto_commit: false in config)"
+    return 0
+  fi
+
+  # Check for dirty working tree (excluding our changes)
+  if ! git diff --quiet 2>/dev/null; then
+    if [[ "$force_mode" != "true" ]]; then
+      warn "Working tree has unstaged changes - they will NOT be included in commit"
+    fi
+  fi
+
+  log "Creating upgrade commit..."
+
+  # Stage framework files
+  git add .claude .loa-version.json 2>/dev/null || true
+
+  # Check if there are staged changes
+  if git diff --cached --quiet 2>/dev/null; then
+    log "No changes to commit"
+    return 0
+  fi
+
+  # Build commit message
+  local commit_prefix="chore"
+  if validate_config "$CONFIG_FILE" 2>/dev/null; then
+    commit_prefix=$(yq_read "$CONFIG_FILE" '.upgrade.commit_prefix' "chore")
+  fi
+
+  local commit_msg="${commit_prefix}(loa): upgrade framework v${old_version} -> v${new_version}
+
+- Updated .claude/ System Zone
+- Preserved .claude/overrides/
+- See: https://github.com/0xHoneyJar/loa/releases/tag/v${new_version}
+
+Generated by Loa update.sh"
+
+  # Create commit (--no-verify to skip pre-commit hooks that might interfere)
+  git commit -m "$commit_msg" --no-verify 2>/dev/null || {
+    warn "Failed to create commit (git commit failed)"
+    return 1
+  }
+
+  log "Created upgrade commit"
+
+  # Create version tag
+  create_version_tag "$new_version"
+}
+
 # === Main ===
 main() {
   local dry_run=false
   local force=false
   local force_restore=false
+  local check_only=false
+  local json_output=false
+  local no_commit=false
 
   while [[ $# -gt 0 ]]; do
     case $1 in
       --dry-run) dry_run=true; shift ;;
       --force) force=true; shift ;;
       --force-restore) force_restore=true; shift ;;
+      --check) check_only=true; shift ;;
+      --json) json_output=true; shift ;;
+      --no-commit) no_commit=true; shift ;;
       *) shift ;;
     esac
   done
+
+  # Handle --check mode: just check for updates, don't perform update
+  if [[ "$check_only" == "true" ]]; then
+    do_version_check "$json_output"
+    exit $?
+  fi
 
   log "======================================================================="
   log "  Loa Framework Update v0.9.0"
@@ -293,7 +465,7 @@ EOF
 
   # Get enforcement level from config
   local enforcement="strict"
-  if [[ -f "$CONFIG_FILE" ]]; then
+  if validate_config "$CONFIG_FILE" 2>/dev/null; then
     enforcement=$(yq_read "$CONFIG_FILE" '.integrity_enforcement' "strict")
   fi
 
@@ -356,7 +528,9 @@ EOF
   set_version "last_sync" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
   # Update integrity verification timestamp
-  local tmp=$(mktemp)
+  local tmp
+  tmp=$(mktemp)
+  trap "rm -f '$tmp'" RETURN
   jq '.integrity.last_verified = "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"' "$VERSION_FILE" > "$tmp" && mv "$tmp" "$VERSION_FILE"
 
   # === STAGE 8: Generate New Checksums ===
@@ -366,7 +540,7 @@ EOF
   apply_stealth_mode
 
   # === STAGE 10: Regenerate Config Snapshot ===
-  if [[ -f "$CONFIG_FILE" ]]; then
+  if validate_config "$CONFIG_FILE" 2>/dev/null; then
     mkdir -p grimoires/loa/context
     yq_to_json "$CONFIG_FILE" > grimoires/loa/context/config_snapshot.json 2>/dev/null || true
   fi
@@ -374,7 +548,10 @@ EOF
   # Cleanup old backups (keep 3)
   ls -dt .claude.backup.* 2>/dev/null | tail -n +4 | xargs rm -rf 2>/dev/null || true
 
-  # === STAGE 11: Check for Grimoire Migration ===
+  # === STAGE 11: Create Atomic Commit ===
+  create_upgrade_commit "$current" "$new_version" "$no_commit" "$force"
+
+  # === STAGE 12: Check for Grimoire Migration ===
   local migrate_script="$SYSTEM_DIR/scripts/migrate-grimoires.sh"
   if [[ -x "$migrate_script" ]]; then
     if "$migrate_script" check --json 2>/dev/null | grep -q '"needs_migration": true'; then
@@ -393,10 +570,32 @@ EOF
     fi
   fi
 
-  log ""
-  log "======================================================================="
-  log "  Update complete: $current -> $new_version"
-  log "======================================================================="
+  # === STAGE 13: Run Upgrade Health Check ===
+  local health_check_script="$SYSTEM_DIR/scripts/upgrade-health-check.sh"
+  if [[ -x "$health_check_script" ]]; then
+    log ""
+    log "Running post-upgrade health check..."
+    "$health_check_script" --quiet || {
+      local exit_code=$?
+      if [[ $exit_code -eq 2 ]]; then
+        warn "Health check found issues - run: .claude/scripts/upgrade-health-check.sh"
+      elif [[ $exit_code -eq 1 ]]; then
+        log "Health check has suggestions - run: .claude/scripts/upgrade-health-check.sh"
+      fi
+    }
+  fi
+
+  # === STAGE 14: Show Completion Banner ===
+  local banner_script="$SYSTEM_DIR/scripts/upgrade-banner.sh"
+  if [[ -x "$banner_script" ]]; then
+    "$banner_script" "$current" "$new_version"
+  else
+    # Fallback: simple completion message
+    log ""
+    log "======================================================================="
+    log "  Update complete: $current -> $new_version"
+    log "======================================================================="
+  fi
 }
 
 main "$@"

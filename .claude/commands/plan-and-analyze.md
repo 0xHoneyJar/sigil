@@ -1,9 +1,10 @@
 ---
 name: "plan-and-analyze"
-version: "0.2.0"
+version: "2.1.0"
 description: |
   Launch PRD discovery with automatic context ingestion.
   Reads existing documentation from grimoires/loa/context/ before interviewing.
+  Initializes Sprint Ledger and creates development cycle automatically.
 
 arguments: []
 
@@ -27,11 +28,12 @@ context_files:
     required: false
     purpose: "Organizational context and conventions"
 
-pre_flight:
-  - check: "file_exists"
-    path: ".loa-setup-complete"
-    error: "Loa setup has not been completed. Run /setup first."
+  # Ledger (for cycle awareness)
+  - path: "grimoires/loa/ledger.json"
+    required: false
+    purpose: "Sprint Ledger for cycle management"
 
+pre_flight:
   - check: "file_not_exists"
     path: "grimoires/loa/prd.md"
     error: "PRD already exists. Delete or rename grimoires/loa/prd.md to restart discovery."
@@ -46,6 +48,9 @@ outputs:
   - path: "grimoires/loa/prd.md"
     type: "file"
     description: "Product Requirements Document"
+  - path: "grimoires/loa/ledger.json"
+    type: "file"
+    description: "Sprint Ledger (created if needed)"
 
 mode:
   default: "foreground"
@@ -156,8 +161,8 @@ All files are optional. The more context provided, the fewer questions asked.
 
 ## Prerequisites
 
-- Setup completed (`.loa-setup-complete` exists)
-- Run `/setup` first if not configured
+- No prerequisites - this is the entry point for new projects
+- Alternatively, use `/mount` then `/ride` for existing codebases
 
 ## Outputs
 
@@ -180,8 +185,38 @@ Generated PRD includes citations:
 
 | Error | Cause | Resolution |
 |-------|-------|------------|
-| "Loa setup has not been completed" | Missing `.loa-setup-complete` | Run `/setup` first |
 | "PRD already exists" | `grimoires/loa/prd.md` exists | Delete/rename existing PRD |
+
+## Sprint Ledger Integration
+
+This command automatically manages the Sprint Ledger:
+
+1. **First Run**: Initializes `grimoires/loa/ledger.json` if not exists
+2. **Creates Cycle**: Registers a new development cycle with PRD title as label
+3. **Active Cycle Check**: If a cycle is already active, prompts to archive or continue
+
+### Ledger Behavior
+
+```bash
+# First run on new project
+/plan-and-analyze
+# → Creates ledger.json
+# → Creates cycle-001 with PRD title
+
+# Second run (new cycle)
+/plan-and-analyze
+# → Prompts: "Active cycle exists. Archive 'MVP Development' or continue?"
+# → If archive: Archives cycle, creates cycle-002
+# → If continue: Continues with existing cycle
+```
+
+### Commands for Ledger Management
+
+| Command | Purpose |
+|---------|---------|
+| `/ledger` | View current ledger status |
+| `/ledger history` | View all cycles |
+| `/archive-cycle "label"` | Archive current cycle manually |
 
 ## Next Step
 

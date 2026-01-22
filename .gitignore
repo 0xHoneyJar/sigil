@@ -44,10 +44,16 @@ tmp/
 temp/
 *.tmp
 
-# Loa Framework State
-# Created by /setup command when first-time configuration completes
-# Each developer runs setup independently, so this should not be shared
+# Loa Framework State (Legacy - v0.14.0 and earlier)
+# The .loa-setup-complete file is no longer created as of v0.15.0.
+# THJ membership is now detected via LOA_CONSTRUCTS_API_KEY environment variable.
+# This entry remains for backward compatibility with projects using older versions.
 .loa-setup-complete
+
+# Run Mode state (v0.18.0)
+# Contains execution state, circuit breaker, and tracking files
+# Must be preserved locally for resume capability but not committed
+.run/
 
 # User context files (discovery inputs, uploaded docs, extracted content)
 # These are user-specific inputs that should never be committed
@@ -67,39 +73,67 @@ grimoires/loa/a2a/trajectory/*.jsonl
 # Kept in case /feedback fails to submit to Linear - automatically retried
 grimoires/loa/analytics/pending-feedback.json
 
+# Permission audit log (user-specific HITL approval history)
+# Used by /permission-audit to suggest settings.json additions
+grimoires/loa/analytics/permission-requests.jsonl
+
 # Server audit reports (contain sensitive deployment info)
 grimoires/loa/deployment/SERVER-REALITY-AUDIT.md
 
 # =============================================================================
-# LOA GRIMOIRE (private development artifacts)
+# LOA TEMPLATE EXCLUSIONS
 # =============================================================================
-# The grimoires/loa/ directory contains private development artifacts that
-# should remain local-only. This includes:
-# - PRDs, SDDs, sprint plans
-# - Security audit reports
-# - Agent-to-agent communication
-# - Analytics and deployment configs
-#
-# These are generated per-project and must never be committed.
+# These files are ALWAYS excluded from the template repository.
+# They are generated per-project and must never be committed to the main loa repo.
 
-# Exclude all loa grimoire content
-grimoires/loa/*
+# Generated documentation artifacts
+grimoires/loa/prd.md
+grimoires/loa/sdd.md
+grimoires/loa/sprint.md
+grimoires/loa/NOTES.md
 
-# Keep directory structure with README files
-!grimoires/loa/README.md
-!grimoires/loa/a2a/
+# Sprint Ledger (project-specific cycle/sprint history)
+# Created by /plan-and-analyze, tracks development cycles per-project
+grimoires/loa/ledger.json
+grimoires/loa/ledger.json.bak
+
+# Archived development cycles (project-specific history)
+grimoires/loa/archive/
+
+# Agent-to-Agent communication (sprint-specific, generated)
+# README.md files are kept to explain the directory purpose
 grimoires/loa/a2a/*
 !grimoires/loa/a2a/README.md
-!grimoires/loa/context/
-grimoires/loa/context/*
-!grimoires/loa/context/README.md
-!grimoires/loa/context/archive/
-grimoires/loa/context/archive/**
+!grimoires/loa/a2a/trajectory/
+grimoires/loa/a2a/trajectory/*
+!grimoires/loa/a2a/trajectory/README.md
+
+# Deployment artifacts (project-specific)
+grimoires/loa/deployment/*
+!grimoires/loa/deployment/README.md
+
+# Reality extraction (codebase-specific)
+grimoires/loa/reality/*
+!grimoires/loa/reality/README.md
+
+# Analytics (usage tracking, developer-specific)
+grimoires/loa/analytics/*
+!grimoires/loa/analytics/README.md
+
+# Research files (project-specific discoveries)
+grimoires/loa/research/*
+!grimoires/loa/research/README.md
 
 # Public grimoires (project-specific outputs, not template content)
-# Only README.md files are tracked to preserve directory structure
+# Only README.md files and research documents are tracked
+# Research documents contain reusable framework insights
 grimoires/pub/**/*
 !grimoires/pub/**/README.md
+# Re-include research markdown files (framework improvement research)
+!grimoires/pub/research/
+grimoires/pub/research/*
+!grimoires/pub/research/README.md
+!grimoires/pub/research/*.md
 
 # =============================================================================
 # LOA CONSTRUCTS (licensed skills, user-specific)
@@ -119,6 +153,16 @@ grimoires/pub/**/*
 # Uncomment to keep local-only:
 # .beads/
 
+# Beads runtime files (never commit)
+.beads/daemon.lock
+.beads/.local_version
+.beads/beads.db
+.beads/*.meta.json
+
+# Beads task graph (template repo - exclude all)
+# For project repos, remove this line to track sprint tasks
+.beads/*.jsonl
+
 # Application artifacts (app/)
 app/src/
 app/tests/
@@ -127,114 +171,3 @@ app/package.json
 app/package-lock.json
 app/tsconfig.json
 app/ecosystem.config.js
-
-# =============================================================================
-# SIGIL GRIMOIRE STATE (v10.1+)
-# =============================================================================
-# Sigil grimoire runtime directories contain per-developer state.
-# These are gitignored to keep context invisible and developer-specific.
-
-# Invisible context accumulation (taste, persona, project)
-grimoires/sigil/.context/*
-!grimoires/sigil/.context/.gitkeep
-
-# Vector embeddings for semantic search
-grimoires/sigil/index/*
-!grimoires/sigil/index/.gitkeep
-
-# Legacy state directory (v9.x)
-grimoires/sigil/state/*
-!grimoires/sigil/state/README.md
-
-# User context (personas, brand, domain expertise)
-# Project-specific inputs that should never be committed
-grimoires/sigil/context/*
-!grimoires/sigil/context/README.md
-!grimoires/sigil/context/**/.gitkeep
-
-# Visual observations (screenshots, snapshots from /observe)
-# Large binary files, generated per-session
-grimoires/sigil/observations/*
-!grimoires/sigil/observations/.gitkeep
-
-# =============================================================================
-# SIGIL ARTIFACT MODEL
-# =============================================================================
-# Sigil artifacts fall into three categories:
-#
-# 1. SHARED (tracked): Team taste, curated references, survival metrics
-#    - sigil-mark/*.md, sigil-mark/moodboard/*.md
-#    - .sigil/survival.json, .sigil/seed.yaml, .sigil/eras/
-#
-# 2. MACHINE-GENERATED (ignored): Rebuilds automatically
-#    - .sigil/workshop.json, .sigil/craft-log/
-#
-# 3. USER-SPECIFIC (ignored): Local experimentation, raw assets
-#    - sigil-mark/moodboard/sandbox/, raw images
-#
-# =============================================================================
-
-# -----------------------------------------------------------------------------
-# .sigil/ Machine-Generated State
-# -----------------------------------------------------------------------------
-# These files are generated per-session or rebuild automatically.
-# They should not be committed to version control.
-
-# Workshop index (pre-computed, rebuilds on package/import changes)
-.sigil/workshop.json
-
-# Craft logs (session-specific debugging, per-developer)
-.sigil/craft-log/
-
-# -----------------------------------------------------------------------------
-# .sigil/ Shared State (TRACKED - do not add to gitignore)
-# -----------------------------------------------------------------------------
-# These files ARE tracked and shared with the team:
-# - .sigil/survival.json      # Pattern tracking (team consensus)
-# - .sigil/survival-stats.json # Component metrics (team visibility)
-# - .sigil/seed.yaml          # Virtual Sanctuary taste (team direction)
-# - .sigil/pending-ops.json   # CI/CD queue (team operations)
-# - .sigil/eras/              # Historical record (team memory)
-
-# -----------------------------------------------------------------------------
-# Moodboard Sandbox (User-Specific Experimentation)
-# -----------------------------------------------------------------------------
-# Local experimentation space for design exploration.
-# Drop anything here without worrying about polluting team taste.
-# README.md is tracked to explain the directory's purpose.
-sigil-mark/moodboard/sandbox/*
-!sigil-mark/moodboard/sandbox/README.md
-
-# -----------------------------------------------------------------------------
-# Moodboard Raw Assets (User-Specific)
-# -----------------------------------------------------------------------------
-# Raw assets should be processed/optimized before sharing.
-# Curated markdown references are tracked.
-
-# Raw image formats (unprocessed)
-sigil-mark/moodboard/**/*.png
-sigil-mark/moodboard/**/*.PNG
-sigil-mark/moodboard/**/*.jpg
-sigil-mark/moodboard/**/*.jpeg
-sigil-mark/moodboard/**/*.JPG
-sigil-mark/moodboard/**/*.JPEG
-sigil-mark/moodboard/**/*.gif
-sigil-mark/moodboard/**/*.GIF
-sigil-mark/moodboard/**/*.webp
-sigil-mark/moodboard/**/*.WEBP
-sigil-mark/moodboard/**/*.svg
-sigil-mark/moodboard/**/*.SVG
-sigil-mark/moodboard/**/*.psd
-sigil-mark/moodboard/**/*.PSD
-sigil-mark/moodboard/**/*.ai
-sigil-mark/moodboard/**/*.AI
-sigil-mark/moodboard/**/*.sketch
-sigil-mark/moodboard/**/*.fig
-
-# Keep structure files
-!sigil-mark/moodboard/**/.gitkeep
-!sigil-mark/moodboard/**/README.md
-!sigil-mark/moodboard/**/*.yaml
-!sigil-mark/moodboard/**/*.md
-.obsidian/
-.run/state.json
