@@ -1,9 +1,9 @@
 {
   "$schema": "https://constructs.network/schemas/pack-manifest.json",
   "name": "sigil",
-  "version": "2.1.0",
+  "version": "4.0.0",
   "description": "Design physics framework for AI-generated UI components. Three-layer physics: Behavioral + Animation + Material = Feel.",
-  "longDescription": "Sigil teaches Claude how to generate UI components with correct design physics. It detects effect from keywords and types, applies timing/sync/confirmation based on physics rules, and accumulates user taste preferences without configuration.",
+  "longDescription": "Sigil teaches Claude how to generate UI components with correct design physics. It detects effect from keywords and types, applies timing/sync/confirmation based on physics rules, and accumulates user taste preferences without configuration. Includes Web3 flow patterns, formal verification via Anchor/Lens CLIs, and diagnostic HUD integration.",
   "author": {
     "name": "THJ Team",
     "url": "https://thehoneyjar.xyz"
@@ -21,7 +21,10 @@
     "frontend",
     "ux",
     "accessibility",
-    "framer-motion"
+    "framer-motion",
+    "web3",
+    "defi",
+    "blockchain"
   ],
   "skills": [
     {
@@ -60,9 +63,19 @@
       "description": "Inscribe learnings into permanent rules"
     },
     {
+      "name": "synthesizing-taste",
+      "path": ".claude/skills/synthesizing-taste",
+      "description": "Synthesize taste patterns from accumulated signals"
+    },
+    {
       "name": "distilling-components",
       "path": ".claude/skills/distilling-components",
       "description": "Bridge architecture to physics-ready components"
+    },
+    {
+      "name": "observing-users",
+      "path": ".claude/skills/observing-users",
+      "description": "Observe user behavior and capture insights"
     },
     {
       "name": "mounting-sigil",
@@ -77,7 +90,67 @@
     {
       "name": "agent-browser",
       "path": ".claude/skills/agent-browser",
-      "description": "Visual validation of generated components"
+      "description": "Visual validation of generated components via browser automation"
+    },
+    {
+      "name": "blockchain-inspector",
+      "path": ".claude/skills/blockchain-inspector",
+      "description": "Inspect blockchain state and contract interactions"
+    },
+    {
+      "name": "continuous-learning",
+      "path": ".claude/skills/continuous-learning",
+      "description": "Autonomous skill extraction from debugging discoveries"
+    },
+    {
+      "name": "run-mode",
+      "path": ".claude/skills/run-mode",
+      "description": "Autonomous sprint execution with checkpoints"
+    },
+    {
+      "name": "discovering-requirements",
+      "path": ".claude/skills/discovering-requirements",
+      "description": "PRD discovery with context ingestion"
+    },
+    {
+      "name": "designing-architecture",
+      "path": ".claude/skills/designing-architecture",
+      "description": "Software design document creation"
+    },
+    {
+      "name": "planning-sprints",
+      "path": ".claude/skills/planning-sprints",
+      "description": "Sprint planning with task breakdown"
+    },
+    {
+      "name": "implementing-tasks",
+      "path": ".claude/skills/implementing-tasks",
+      "description": "Execute sprint tasks with production-quality code"
+    },
+    {
+      "name": "reviewing-code",
+      "path": ".claude/skills/reviewing-code",
+      "description": "Review sprint implementation against acceptance criteria"
+    },
+    {
+      "name": "auditing-security",
+      "path": ".claude/skills/auditing-security",
+      "description": "Security and quality audit of implementations"
+    },
+    {
+      "name": "deploying-infrastructure",
+      "path": ".claude/skills/deploying-infrastructure",
+      "description": "Production infrastructure deployment"
+    },
+    {
+      "name": "translating-for-executives",
+      "path": ".claude/skills/translating-for-executives",
+      "description": "Translate technical docs for non-technical stakeholders"
+    },
+    {
+      "name": "riding-codebase",
+      "path": ".claude/skills/riding-codebase",
+      "description": "Analyze codebase and generate grimoire artifacts"
     }
   ],
   "commands": [
@@ -107,6 +180,11 @@
       "description": "Check for physics violations"
     },
     {
+      "name": "/ward-all",
+      "path": ".claude/commands/ward-all.md",
+      "description": "Check all components for physics violations"
+    },
+    {
       "name": "/garden",
       "path": ".claude/commands/garden.md",
       "description": "Survey pattern authority"
@@ -117,9 +195,19 @@
       "description": "Inscribe taste learnings permanently"
     },
     {
+      "name": "/taste-synthesize",
+      "path": ".claude/commands/taste-synthesize.md",
+      "description": "Synthesize taste patterns from signals"
+    },
+    {
       "name": "/distill",
       "path": ".claude/commands/distill.md",
       "description": "Distill tasks into craft-able components"
+    },
+    {
+      "name": "/observe",
+      "path": ".claude/commands/observe.md",
+      "description": "Observe user behavior and capture insights"
     },
     {
       "name": "/mount",
@@ -140,6 +228,56 @@
       "name": "/feedback",
       "path": ".claude/commands/feedback.md",
       "description": "Submit feedback about Sigil"
+    },
+    {
+      "name": "/understand",
+      "path": ".claude/commands/understand.md",
+      "description": "Research before crafting"
+    },
+    {
+      "name": "/validate",
+      "path": ".claude/commands/validate.md",
+      "description": "Validate component against physics rules"
+    },
+    {
+      "name": "/plan-and-analyze",
+      "path": ".claude/commands/plan-and-analyze.md",
+      "description": "Launch PRD discovery with context ingestion"
+    },
+    {
+      "name": "/architect",
+      "path": ".claude/commands/architect.md",
+      "description": "Create software design document"
+    },
+    {
+      "name": "/sprint-plan",
+      "path": ".claude/commands/sprint-plan.md",
+      "description": "Create sprint plan from PRD and SDD"
+    },
+    {
+      "name": "/implement",
+      "path": ".claude/commands/implement.md",
+      "description": "Execute sprint tasks"
+    },
+    {
+      "name": "/review-sprint",
+      "path": ".claude/commands/review-sprint.md",
+      "description": "Review sprint implementation"
+    },
+    {
+      "name": "/audit",
+      "path": ".claude/commands/audit.md",
+      "description": "Security and quality audit"
+    },
+    {
+      "name": "/ride",
+      "path": ".claude/commands/ride.md",
+      "description": "Analyze codebase and extract ground truth"
+    },
+    {
+      "name": "/run",
+      "path": ".claude/commands/run.md",
+      "description": "Autonomous sprint execution"
     }
   ],
   "rules": [
@@ -227,7 +365,49 @@
       "name": "semantic-search",
       "path": ".claude/rules/17-semantic-search.md",
       "description": "Semantic code search integration"
+    },
+    {
+      "name": "sigil-complexity",
+      "path": ".claude/rules/18-sigil-complexity.md",
+      "description": "Complexity detection and handoff protocols"
+    },
+    {
+      "name": "sigil-data-physics",
+      "path": ".claude/rules/19-sigil-data-physics.md",
+      "description": "Data source selection for Web3 (indexed vs on-chain)"
+    },
+    {
+      "name": "sigil-web3-flows",
+      "path": ".claude/rules/20-sigil-web3-flows.md",
+      "description": "Web3 transaction flow patterns"
+    },
+    {
+      "name": "sigil-ui-copy",
+      "path": ".claude/rules/21-sigil-ui-copy.md",
+      "description": "UI copy physics and terminology verification"
+    },
+    {
+      "name": "sigil-anchor-lens",
+      "path": ".claude/rules/22-sigil-anchor-lens.md",
+      "description": "Formal verification via Anchor and Lens CLIs"
+    },
+    {
+      "name": "sigil-hud",
+      "path": ".claude/rules/23-sigil-hud.md",
+      "description": "Diagnostic HUD integration patterns"
+    },
+    {
+      "name": "rlm-core-summary",
+      "path": ".claude/rules/rlm-core-summary.md",
+      "description": "Condensed decision tree for RLM loading"
     }
   ],
-  "minLoaVersion": "1.0.0"
+  "minLoaVersion": "0.7.0",
+  "compatibility": {
+    "node": ">=20.0.0",
+    "optionalCli": {
+      "anchor": ">=1.0.0",
+      "lens": ">=1.0.0"
+    }
+  }
 }
