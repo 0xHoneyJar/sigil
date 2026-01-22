@@ -2,18 +2,18 @@
  * HUD Trigger Component
  *
  * Floating button to open the HUD.
+ * Uses inline styles only - no Tailwind classes for consumer compatibility.
  */
 
 import type { ReactNode } from 'react'
 import { useHud } from '../providers/HudProvider'
+import { colors, shadows, transitions, zIndex } from '../styles/theme'
 import type { HudPosition } from '../types'
 
 /**
  * Props for HudTrigger
  */
 export interface HudTriggerProps {
-  /** Custom class name */
-  className?: string
   /** Custom children (replaces default icon) */
   children?: ReactNode
   /** Override position (defaults to HUD position) */
@@ -21,10 +21,19 @@ export interface HudTriggerProps {
 }
 
 /**
+ * Position styles mapping - inline CSS instead of Tailwind classes
+ */
+const positionStyles: Record<HudPosition, React.CSSProperties> = {
+  'bottom-right': { bottom: '16px', right: '16px' },
+  'bottom-left': { bottom: '16px', left: '16px' },
+  'top-right': { top: '16px', right: '16px' },
+  'top-left': { top: '16px', left: '16px' },
+}
+
+/**
  * Floating trigger button to open the HUD
  */
 export function HudTrigger({
-  className = '',
   children,
   position: overridePosition,
 }: HudTriggerProps) {
@@ -32,47 +41,42 @@ export function HudTrigger({
 
   const position = overridePosition ?? hudPosition
 
-  // Position classes
-  const positionClasses: Record<typeof position, string> = {
-    'bottom-right': 'bottom-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
-    'top-right': 'top-4 right-4',
-    'top-left': 'top-4 left-4',
-  }
-
   // Don't show trigger when HUD is open
   if (isOpen) return null
 
   return (
     <button
       onClick={toggle}
-      className={`fixed ${positionClasses[position]} z-50 ${className}`}
       style={{
+        position: 'fixed',
+        ...positionStyles[position],
+        zIndex: zIndex.fixed,
         width: '44px',
         height: '44px',
         borderRadius: '50%',
-        backgroundColor: 'rgba(16, 185, 129, 0.9)',
-        border: '2px solid rgba(16, 185, 129, 0.3)',
-        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+        backgroundColor: colors.primary,
+        border: `2px solid ${colors.primaryBorder}`,
+        boxShadow: shadows.primary,
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        transition: 'transform 0.2s, box-shadow 0.2s',
+        transition: `transform ${transitions.slow}, box-shadow ${transitions.slow}`,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'scale(1.1)'
-        e.currentTarget.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.4)'
+        e.currentTarget.style.boxShadow = shadows.primaryHover
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'scale(1)'
-        e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)'
+        e.currentTarget.style.boxShadow = shadows.primary
       }}
       aria-label="Open Sigil HUD"
-      title="Sigil HUD (⌘⇧D)"
+      title="Sigil HUD (Ctrl+Shift+D)"
+      data-sigil-hud="trigger"
     >
       {children ?? (
-        <span style={{ color: '#fff', fontSize: '18px', fontWeight: 600 }}>
+        <span style={{ color: colors.text, fontSize: '18px', fontWeight: 600 }}>
           ◆
         </span>
       )}

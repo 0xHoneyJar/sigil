@@ -2,11 +2,13 @@
  * HUD Panel Component
  *
  * Main panel container for the HUD.
+ * Uses inline styles only - no Tailwind classes for consumer compatibility.
  */
 
 import type { ReactNode } from 'react'
 import { useHud } from '../providers/HudProvider'
-import type { HudPanelType } from '../types'
+import { colors, typography, spacing, radii, shadows, zIndex } from '../styles/theme'
+import type { HudPanelType, HudPosition } from '../types'
 
 /**
  * Props for HudPanel
@@ -14,8 +16,6 @@ import type { HudPanelType } from '../types'
 export interface HudPanelProps {
   /** Panel content */
   children?: ReactNode
-  /** Custom class name */
-  className?: string
 }
 
 /**
@@ -28,9 +28,19 @@ interface PanelTab {
 }
 
 /**
+ * Position styles mapping - inline CSS instead of Tailwind classes
+ */
+const positionStyles: Record<HudPosition, React.CSSProperties> = {
+  'bottom-right': { bottom: '16px', right: '16px' },
+  'bottom-left': { bottom: '16px', left: '16px' },
+  'top-right': { top: '16px', right: '16px' },
+  'top-left': { top: '16px', left: '16px' },
+}
+
+/**
  * Main HUD panel component
  */
-export function HudPanel({ children, className = '' }: HudPanelProps) {
+export function HudPanel({ children }: HudPanelProps) {
   const {
     isOpen,
     isMinimized,
@@ -58,27 +68,22 @@ export function HudPanel({ children, className = '' }: HudPanelProps) {
 
   const availableTabs = tabs.filter((t) => t.available)
 
-  // Position classes
-  const positionClasses: Record<typeof position, string> = {
-    'bottom-right': 'bottom-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
-    'top-right': 'top-4 right-4',
-    'top-left': 'top-4 left-4',
-  }
-
   return (
     <div
-      className={`fixed ${positionClasses[position]} z-50 ${className}`}
+      data-sigil-hud="panel"
       style={{
+        position: 'fixed',
+        ...positionStyles[position],
+        zIndex: zIndex.fixed,
         width: isMinimized ? '200px' : '400px',
         maxHeight: isMinimized ? '40px' : '600px',
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        borderRadius: '8px',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
-        fontFamily: 'ui-monospace, monospace',
-        fontSize: '12px',
-        color: '#fff',
+        backgroundColor: colors.background,
+        borderRadius: radii.lg,
+        border: `1px solid ${colors.border}`,
+        boxShadow: shadows.xl,
+        fontFamily: typography.fontFamily,
+        fontSize: typography.base,
+        color: colors.text,
         overflow: 'hidden',
       }}
     >
@@ -89,20 +94,20 @@ export function HudPanel({ children, className = '' }: HudPanelProps) {
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '8px 12px',
-          borderBottom: isMinimized ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          borderBottom: isMinimized ? 'none' : `1px solid ${colors.border}`,
+          backgroundColor: colors.backgroundHover,
         }}
       >
-        <span style={{ fontWeight: 600, color: '#10b981' }}>◆ Sigil HUD</span>
+        <span style={{ fontWeight: typography.semibold, color: colors.primary }}>◆ Sigil HUD</span>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={toggleMinimized}
             style={{
               background: 'none',
               border: 'none',
-              color: '#666',
+              color: colors.textDim,
               cursor: 'pointer',
-              fontSize: '14px',
+              fontSize: typography.lg,
             }}
           >
             {isMinimized ? '◻' : '–'}
@@ -112,9 +117,9 @@ export function HudPanel({ children, className = '' }: HudPanelProps) {
             style={{
               background: 'none',
               border: 'none',
-              color: '#666',
+              color: colors.textDim,
               cursor: 'pointer',
-              fontSize: '14px',
+              fontSize: typography.lg,
             }}
           >
             ×
@@ -130,7 +135,7 @@ export function HudPanel({ children, className = '' }: HudPanelProps) {
               display: 'flex',
               gap: '2px',
               padding: '4px',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              backgroundColor: colors.backgroundInput,
             }}
           >
             {availableTabs.map((tab) => (
@@ -139,17 +144,17 @@ export function HudPanel({ children, className = '' }: HudPanelProps) {
                 onClick={() => setActivePanel(tab.id)}
                 style={{
                   flex: 1,
-                  padding: '6px 8px',
+                  padding: `${spacing.sm} ${spacing.md}`,
                   background:
                     activePanel === tab.id
-                      ? 'rgba(16, 185, 129, 0.2)'
+                      ? colors.primaryLight
                       : 'transparent',
                   border: 'none',
-                  borderRadius: '4px',
-                  color: activePanel === tab.id ? '#10b981' : '#888',
+                  borderRadius: radii.sm,
+                  color: activePanel === tab.id ? colors.primary : colors.textMuted,
                   cursor: 'pointer',
-                  fontSize: '11px',
-                  fontWeight: 500,
+                  fontSize: typography.sm,
+                  fontWeight: typography.medium,
                 }}
               >
                 {tab.label}
@@ -167,7 +172,7 @@ export function HudPanel({ children, className = '' }: HudPanelProps) {
           >
             {children}
             {!activePanel && (
-              <div style={{ color: '#666', textAlign: 'center', padding: '20px' }}>
+              <div style={{ color: colors.textDim, textAlign: 'center', padding: spacing['2xl'] }}>
                 Select a panel to get started
               </div>
             )}

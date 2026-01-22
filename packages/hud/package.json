@@ -1,6 +1,6 @@
 {
   "name": "@thehoneyjar/sigil-hud",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Diagnostic HUD for Sigil - composable React components for development",
   "type": "module",
   "main": "./dist/index.js",
@@ -10,6 +10,15 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./wagmi": {
+      "types": "./dist/wagmi/index.d.ts",
+      "import": "./dist/wagmi/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "wagmi": ["./dist/wagmi/index.d.ts"]
     }
   },
   "files": [
@@ -20,7 +29,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "zustand": "^4.5.0"
@@ -28,12 +38,20 @@
   "peerDependencies": {
     "react": ">=18.0.0"
   },
+  "peerDependenciesMeta": {
+    "wagmi": {
+      "optional": true
+    },
+    "viem": {
+      "optional": true
+    }
+  },
   "optionalDependencies": {
-    "@thehoneyjar/sigil-anchor": "workspace:*",
-    "@thehoneyjar/sigil-fork": "workspace:*",
-    "@thehoneyjar/sigil-simulation": "workspace:*",
-    "@thehoneyjar/sigil-lens": "workspace:*",
-    "@thehoneyjar/sigil-diagnostics": "workspace:*"
+    "@thehoneyjar/sigil-anchor": "^4.3.0",
+    "@thehoneyjar/sigil-fork": "^0.2.0",
+    "@thehoneyjar/sigil-simulation": "^0.2.0",
+    "@thehoneyjar/sigil-lens": "^0.2.0",
+    "@thehoneyjar/sigil-diagnostics": "^0.2.0"
   },
   "devDependencies": {
     "@thehoneyjar/sigil-anchor": "workspace:*",
@@ -41,10 +59,13 @@
     "@thehoneyjar/sigil-simulation": "workspace:*",
     "@thehoneyjar/sigil-lens": "workspace:*",
     "@thehoneyjar/sigil-diagnostics": "workspace:*",
+    "@types/node": "^20.0.0",
     "@types/react": "^18.0.0",
     "react": "^18.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "wagmi": "^2.0.0",
+    "viem": "^2.0.0"
   },
   "sideEffects": false,
   "license": "MIT",
@@ -52,5 +73,17 @@
     "type": "git",
     "url": "https://github.com/0xHoneyJar/sigil.git",
     "directory": "packages/hud"
-  }
+  },
+  "homepage": "https://github.com/0xHoneyJar/sigil/tree/main/packages/hud#readme",
+  "bugs": {
+    "url": "https://github.com/0xHoneyJar/sigil/issues"
+  },
+  "keywords": [
+    "sigil",
+    "hud",
+    "diagnostic",
+    "devtools",
+    "react",
+    "web3"
+  ]
 }

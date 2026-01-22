@@ -41,7 +41,7 @@ importers:
 
   packages/diagnostics:
     dependencies:
-      '@sigil/anchor':
+      '@thehoneyjar/sigil-anchor':
         specifier: workspace:*
         version: link:../anchor
       react:
@@ -79,22 +79,13 @@ importers:
         specifier: ^4.5.0
         version: 4.5.0(@types/react@18.2.45)(react@18.2.0)
     optionalDependencies:
-      '@sigil/anchor':
-        specifier: workspace:*
+      '@thehoneyjar/sigil-anchor':
+        specifier: ^4.3.0
         version: link:../anchor
-      '@sigil/diagnostics':
-        specifier: workspace:*
-        version: link:../diagnostics
-      '@sigil/fork':
-        specifier: workspace:*
-        version: link:../fork
-      '@sigil/lens':
-        specifier: workspace:*
-        version: link:../lens
-      '@sigil/simulation':
-        specifier: workspace:*
-        version: link:../simulation
     devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.11.0
       '@types/react':
         specifier: ^18.0.0
         version: 18.2.45
@@ -107,6 +98,12 @@ importers:
       typescript:
         specifier: ^5.0.0
         version: 5.3.3
+      viem:
+        specifier: ^2.0.0
+        version: 2.0.0(typescript@5.3.3)
+      wagmi:
+        specifier: ^2.0.0
+        version: 2.0.0(@tanstack/react-query@5.0.0-beta.23)(@types/react@18.2.45)(react@18.2.0)(typescript@5.3.3)(viem@2.0.0)
 
   packages/lens:
     dependencies:
@@ -200,7 +197,7 @@ importers:
 
   packages/simulation:
     dependencies:
-      '@sigil/fork':
+      '@thehoneyjar/sigil-fork':
         specifier: workspace:*
         version: link:../fork
     devDependencies:
@@ -503,7 +500,7 @@ packages:
       eth-rpc-errors: 4.0.2
       json-rpc-engine: 6.1.0
       keccak: 3.0.4
-      preact: 10.19.3
+      preact: 10.24.2
       qs: 6.14.1
       rxjs: 6.6.7
       sha.js: 2.4.12
@@ -1658,7 +1655,7 @@ packages:
   /@scure/bip32@1.7.0:
     resolution: {integrity: sha512-E4FFX/N3f4B80AKWp5dP6ow+flD1LQZo/w8UnLGYZO674jS6YnYeepycOOksv+vLPSpgN35wgKgy+ybfTb2SMw==}
     dependencies:
-      '@noble/curves': 1.9.1
+      '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
     dev: true
@@ -5886,7 +5883,6 @@ packages:
   /preact@10.24.2:
     resolution: {integrity: sha512-1cSoF0aCC8uaARATfrlz4VCBqE8LwZwRfLgkxJOQwAlQt6ayTmi0D9OF7nXid1POI5SZidFuG9CnlXbDfLqY/Q==}
     dev: true
-    optional: true
 
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}

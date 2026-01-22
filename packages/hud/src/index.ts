@@ -79,6 +79,31 @@ export type { ObservationCaptureModalProps } from './components/ObservationCaptu
 export { FeedbackPrompt } from './components/FeedbackPrompt'
 export type { FeedbackPromptProps } from './components/FeedbackPrompt'
 
+export { JsonPreview } from './components/JsonPreview'
+export type { JsonPreviewProps } from './components/JsonPreview'
+
+// Inspector
+export {
+  useElementInspector,
+  useAnnotationSession,
+  ElementInspector,
+  AnnotationMarker,
+  AnnotationMarkerList,
+  CATEGORY_INFO,
+} from './inspector'
+export type {
+  InspectedElement,
+  UseElementInspectorOptions,
+  UseElementInspectorReturn,
+  Annotation,
+  AnnotationCategory,
+  UseAnnotationSessionOptions,
+  UseAnnotationSessionReturn,
+  ElementInspectorProps,
+  AnnotationMarkerProps,
+  AnnotationMarkerListProps,
+} from './inspector'
+
 // Hooks
 export { useKeyboardShortcuts, getShortcutHelp } from './hooks/useKeyboardShortcuts'
 export type { UseKeyboardShortcutsProps } from './hooks/useKeyboardShortcuts'

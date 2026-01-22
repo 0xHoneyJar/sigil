@@ -1,0 +1,85 @@
+name: Publish HUD Package
+
+on:
+  push:
+    tags:
+      - 'hud-v*'
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build HUD package
+        run: pnpm --filter @thehoneyjar/sigil-hud build
+
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+          ls -la packages/hud/dist/
+
+          # Verify main entry exists
+          if [ ! -f "packages/hud/dist/index.js" ]; then
+            echo "ERROR: Main entry (dist/index.js) not found"
+            exit 1
+          fi
+
+          # Verify wagmi subpath exists
+          if [ ! -f "packages/hud/dist/wagmi/index.js" ]; then
+            echo "ERROR: Wagmi entry (dist/wagmi/index.js) not found"
+            exit 1
+          fi
+
+          # Verify type definitions
+          if [ ! -f "packages/hud/dist/index.d.ts" ]; then
+            echo "ERROR: Type definitions (dist/index.d.ts) not found"
+            exit 1
+          fi
+
+          echo "Build verification passed!"
+
+      - name: Publish to npm
+        run: pnpm --filter @thehoneyjar/sigil-hud publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  verify:
+    name: Verify Publication
+    needs: publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wait for npm propagation
+        run: sleep 30
+
+      - name: Verify package on npm
+        run: |
+          # Extract version from tag
+          VERSION=${GITHUB_REF#refs/tags/hud-v}
+
+          echo "Verifying @thehoneyjar/sigil-hud@$VERSION on npm..."
+          npm view @thehoneyjar/sigil-hud@$VERSION version
+
+          echo "Package successfully published!"
