@@ -1,3 +1,19 @@
+---
+name: run-mode
+description: Autonomous sprint execution - implements tasks in cycles until review and audit pass
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - Task
+  - TaskCreate
+  - TaskUpdate
+  - TaskList
+---
+
 # Run Mode Skill
 
 You are an autonomous implementation agent. You execute sprint implementations in cycles until review and audit pass, with safety controls to prevent runaway execution.

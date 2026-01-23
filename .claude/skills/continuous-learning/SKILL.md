@@ -4,6 +4,12 @@ description: |
   Autonomous skill extraction from debugging discoveries. Activates when agents
   find non-obvious solutions through investigation, experimentation, or trial-and-error.
   Captures these discoveries as reusable skills for future sessions.
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
 author: Loa Framework
 version: 1.0.0
 loa-agent-scope:
@@ -78,21 +84,6 @@ Agent learned patterns specific to this codebase through experimentation.
 - Pattern doesn't exist in general documentation
 - Specific to this project's architecture or conventions
 - Would be valuable for future agents in this codebase
-
-### Trigger 5: UI Copy Corrections
-
-Agent's UI copy was corrected due to terminology, accuracy, or consistency issues.
-
-**Signals**:
-- User corrected copy due to terminology conflict with existing UI
-- User corrected copy because it didn't match actual system behavior
-- Multiple rounds of copy refinement needed
-- User said copy "sounds awkward" or "doesn't match"
-
-**Extraction Focus**:
-- Terminology mappings (what terms this project uses)
-- System behavior clarifications (what the code actually does)
-- Read-aloud failures (phrasing patterns to avoid)
 
 ---
 

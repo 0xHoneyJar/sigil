@@ -1,3 +1,12 @@
+---
+name: validating-physics
+description: Validate component compliance with Sigil physics - audit for violations before they harm users
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+---
+
 # Validating Physics Skill
 
 Protective barrier check — reveals physics violations before they harm users.

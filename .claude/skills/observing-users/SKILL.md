@@ -1,3 +1,14 @@
+---
+name: observing-users
+description: Diagnose user feedback using Mom Test framework - extracts Level 3 goals from bug reports and feature requests
+allowed-tools:
+  - Read
+  - Write
+  - WebFetch
+  - Glob
+  - Grep
+---
+
 # Observing Users Skill
 
 Capture user feedback as structured diagnostic observations using the Level 3 framework.
@@ -20,6 +31,47 @@ Most feedback stops at surface level. This skill digs to the actionable truth: *
 - Feedback appears in Discord/Telegram/support channels
 - You notice behavioral patterns worth investigating
 - Before building features based on user requests
+
+---
+
+## Auto-Trigger Detection
+
+This skill should activate automatically when detecting:
+
+| Pattern | Example | Action |
+|---------|---------|--------|
+| Bug report keywords | "not working", "missing", "can't find", "broken" | Start diagnostic |
+| User quote blocks | `> "I can't see my..."` | Extract Level 3 goal |
+| Discord/Telegram paste | `username — timestamp` format | Begin observation |
+| "User says" framing | "A user reported that..." | Apply Mom Test |
+| Support request | "How do I ask them...", "help diagnose" | Load this skill |
+
+---
+
+## Verify Before Asking
+
+**Principle**: Don't ask what you can verify. Query first, ask only for client-side state.
+
+| Type | Examples | Action |
+|------|----------|--------|
+| **Verifiable** | Vault deposits, stake amounts, transaction history, balances | Query on-chain/indexer FIRST |
+| **Not Verifiable** | Browser/wallet type, console errors, what they see, network | Ask user |
+
+**Anti-Pattern**: Asking "Did you complete the deposit?" when you can verify on-chain.
+**Correct**: Query first, then ask "I see your deposit at block X. What are you seeing in the UI?"
+
+---
+
+## Anti-Patterns
+
+| Bad Pattern | Why It's Bad | Do Instead |
+|-------------|--------------|------------|
+| Jump into code investigation | Builds understanding of system, not user | Ask Mom Test opener first |
+| "Did you mean X?" | Leading, puts words in their mouth | "Tell me more about what you saw" |
+| "What does [specific UI] show?" | Asks user to debug for us | "Walk me through what happened" |
+| Correct their terminology | Dismissive, misses their mental model | Note discrepancy, ask for experience |
+| Ask about verifiable data | Wastes a support round-trip | Query on-chain/indexer first |
+| Propose solutions before diagnosis | May build the wrong thing | Extract Level 3 goal first |
 
 ---
 
@@ -331,6 +383,26 @@ When running `/craft` for a user-facing component:
 - Workflow dependency: Accumulation data → burn decision
 - Frequency: Daily check
 ```
+
+---
+
+## Agent Browser Integration
+
+For web3 apps, use the agent-browser MCP to simulate user view:
+
+| Capability | Use Case |
+|------------|----------|
+| **Connect as address** | View-only impersonation of user's wallet |
+| **See what user sees** | Render the app as if we were that address |
+| **Inspect data flow** | Check indexer response → hook processing → render |
+| **Screenshot** | Capture actual UI state for comparison |
+
+**Workflow**:
+1. Get user's address from their report
+2. Use HUD's Lens to impersonate their view
+3. Query indexer/on-chain data for their address
+4. Compare expected vs actual data at each layer
+5. Only THEN ask about client-side state if needed
 
 ---
 

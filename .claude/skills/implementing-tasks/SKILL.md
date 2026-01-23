@@ -1,4 +1,18 @@
 ---
+name: implementing-tasks
+description: Execute sprint tasks with production-quality code and tests - addresses audit feedback iteratively
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - Task
+  - TaskCreate
+  - TaskUpdate
+  - TaskList
+# Custom config
 parallel_threshold: 3000
 timeout_minutes: 120
 zones:
@@ -182,26 +196,29 @@ Before implementing:
 <workflow>
 ## Phase -2: Beads Integration Check
 
-Check if Beads is available for task lifecycle management:
+Check if beads_rust is available for task lifecycle management:
 
 ```bash
-.claude/scripts/check-beads.sh --quiet
+.claude/scripts/beads/check-beads.sh --quiet
 ```
 
-**If INSTALLED**, use Beads for task lifecycle:
-- `bd ready` - Get next actionable task (JIT retrieval)
-- `bd update <task-id> --status in_progress` - Mark task started (done automatically)
-- `bd close <task-id>` - Mark task completed (done automatically)
-- Task state persists across context windows
+**If INSTALLED**:
+1. Import latest state: `br sync --import-only`
+2. Use beads_rust for task lifecycle:
+   - `br ready` - Get next actionable task (JIT retrieval)
+   - `br update <task-id> --status in_progress` - Mark task started
+   - `br close <task-id>` - Mark task completed
+   - Task state persists across context windows
 
 **If NOT_INSTALLED**, use markdown-based tracking from sprint.md.
 
-**IMPORTANT**: Users should NOT run bd commands manually. This agent handles the entire Beads lifecycle internally:
+**IMPORTANT**: Users should NOT run br commands manually. This agent handles the entire beads_rust lifecycle internally:
 
-1. On start: Run `bd ready` to find first unblocked task
-2. Before implementing: Auto-run `bd update <task-id> --status in_progress`
-3. After completing: Auto-run `bd close <task-id>`
-4. Repeat until sprint complete
+1. On start: Run `br sync --import-only` then `br ready` to find first unblocked task
+2. Before implementing: Auto-run `br update <task-id> --status in_progress`
+3. After completing: Auto-run `br close <task-id>`
+4. At session end: Run `br sync --flush-only` to persist state
+5. Repeat until sprint complete
 
 ## Phase -1: Context Assessment & Parallel Task Splitting (CRITICAL—DO THIS FIRST)
 
@@ -290,25 +307,41 @@ Check `grimoires/loa/a2a/integration-context.md`:
 
 ## Phase 2: Implementation
 
-### Beads Task Loop (if Beads installed)
+### Beads Task Loop (if beads_rust installed)
 
 ```bash
+# 0. Import latest state (session start)
+br sync --import-only
+
 # 1. Get next actionable task
-TASK=$(bd ready --format json | head -1)
+TASK=$(br ready --json | jq '.[0]')
 TASK_ID=$(echo $TASK | jq -r '.id')
 
 # 2. Mark in progress (automatic - user never sees this)
-bd update $TASK_ID --status in_progress
+br update $TASK_ID --status in_progress
 
 # 3. Implement the task...
 
 # 4. Mark complete (automatic - user never sees this)
-bd close $TASK_ID
+br close $TASK_ID
 
-# 5. Repeat for next task
+# 5. Repeat for next task...
+
+# 6. Flush state before commit (session end)
+br sync --flush-only
 ```
 
-The user only runs `/implement sprint-1`. All bd commands are invisible.
+The user only runs `/implement sprint-1`. All br commands are invisible.
+
+### Log Discovered Issues
+
+When bugs or tech debt are discovered during implementation:
+
+```bash
+.claude/scripts/beads/log-discovered-issue.sh "$CURRENT_TASK_ID" "Description of discovered issue" bug 2
+```
+
+This creates a new issue with semantic label `discovered-during:<parent-id>` for traceability.
 
 ### For each task:
 1. Implement according to specifications
@@ -357,54 +390,17 @@ Key sections:
 </workflow>
 
 <parallel_execution>
-## When to Split
+## Parallel Execution
 
+See `patterns.md` for detailed parallel execution strategies including:
+- Parallel feedback checking (Phase 0)
+- Parallel task implementation (Phase 2)
+- Consolidation procedures
+
+**Quick reference:**
 - SMALL (<3,000 lines): Sequential
 - MEDIUM (3,000-8,000 lines) with >3 independent tasks: Consider parallel
 - LARGE (>8,000 lines): MUST split
-
-## Option A: Parallel Feedback Checking (Phase 0)
-
-When multiple feedback sources exist:
-
-```
-Spawn 2 parallel Explore agents:
-
-Agent 1: "Read grimoires/loa/a2a/sprint-N/auditor-sprint-feedback.md:
-1. Does file exist?
-2. If yes, verdict (CHANGES_REQUIRED or APPROVED)?
-3. If CHANGES_REQUIRED, list all CRITICAL/HIGH issues with file paths
-Return: structured summary"
-
-Agent 2: "Read grimoires/loa/a2a/sprint-N/engineer-feedback.md:
-1. Does file exist?
-2. If yes, verdict (All good or changes requested)?
-3. If changes, list all feedback items with file paths
-Return: structured summary"
-```
-
-## Option B: Parallel Task Implementation (Phase 2)
-
-When sprint has multiple independent tasks:
-
-```
-1. Read sprint.md and identify all tasks
-2. Analyze task dependencies
-3. Group into parallel batches:
-   - Batch 1: Tasks with no dependencies (parallel)
-   - Batch 2: Tasks depending on Batch 1 (after Batch 1)
-
-For independent tasks, spawn parallel agents:
-Agent 1: "Implement Task 1.2 - read acceptance criteria, review patterns, implement, write tests, return summary"
-Agent 2: "Implement Task 1.3 - read acceptance criteria, review patterns, implement, write tests, return summary"
-```
-
-## Consolidation
-
-1. Collect results from all parallel agents
-2. Verify no conflicts between implementations
-3. Run integration tests across all changes
-4. Generate unified report
 </parallel_execution>
 
 <output_format>
@@ -428,40 +424,17 @@ Key sections:
 - **Time-bound**: Report generated for review
 </success_criteria>
 
-<semver_requirements>
-## Version Format: MAJOR.MINOR.PATCH
+<extended_references>
+## Extended References
 
-- **MAJOR**: Breaking changes (incompatible API changes)
-- **MINOR**: New features (backwards-compatible additions)
-- **PATCH**: Bug fixes (backwards-compatible fixes)
+For detailed patterns and checklists, see:
 
-### When to Update Version
+- **`patterns.md`** - Parallel execution, task planning, beads workflow
+- **`checklist.md`** - SemVer requirements, quality checklists, red flags
 
-| Change | Bump | Example |
-|--------|------|---------|
-| New feature implementation | MINOR | 0.1.0 → 0.2.0 |
-| Bug fix | PATCH | 0.2.0 → 0.2.1 |
-| Breaking API change | MAJOR | 0.2.1 → 1.0.0 |
-
-### Version Update Process
-
-1. Determine bump type based on changes
-2. Update package.json version
-3. Update CHANGELOG.md with sections: Added, Changed, Fixed, Removed, Security
-4. Reference version in completion comments
-</semver_requirements>
-
-<checklists>
-See `resources/REFERENCE.md` for complete checklists:
-- Pre-Implementation Checklist
-- Code Quality Checklist
-- Testing Checklist
-- Documentation Checklist
-- Versioning Checklist
-
-**Red Flags (immediate action required):**
-- No tests for new code
-- Hardcoded secrets
-- Skipped error handling
-- Ignored existing patterns
-</checklists>
+**Quick Links:**
+- Task planning templates → `patterns.md#task-planning`
+- Beads workflow → `patterns.md#beads-workflow`
+- Version bumping → `checklist.md#semver-requirements`
+- Pre-implementation checklist → `checklist.md#pre-implementation-checklist`
+</extended_references>

@@ -1,3 +1,14 @@
+---
+name: crafting-physics
+description: Apply Sigil design physics to UI components - detects effect, applies behavioral/animation/material physics
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+---
+
 # Crafting Physics Skill
 
 Design physics enforcement for UI components. Detects effect, applies physics, validates compliance.
