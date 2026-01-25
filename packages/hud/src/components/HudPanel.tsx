@@ -5,7 +5,7 @@
  * Uses inline styles only - no Tailwind classes for consumer compatibility.
  */
 
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useHud } from '../providers/HudProvider'
 import { colors, typography, spacing, radii, shadows, zIndex } from '../styles/theme'
 import type { HudPanelType, HudPosition } from '../types'
@@ -35,6 +35,60 @@ const positionStyles: Record<HudPosition, React.CSSProperties> = {
   'bottom-left': { bottom: '16px', left: '16px' },
   'top-right': { top: '16px', right: '16px' },
   'top-left': { top: '16px', left: '16px' },
+}
+
+/**
+ * Extend window interface for Agentation
+ */
+declare global {
+  interface Window {
+    __agentation?: {
+      toggle: () => void
+      isActive?: () => boolean
+    }
+  }
+}
+
+/**
+ * Agentation toggle button for visual annotations
+ */
+function AgentationToggle() {
+  const [isActive, setIsActive] = useState(false)
+
+  const toggle = () => {
+    if (typeof window !== 'undefined' && window.__agentation) {
+      window.__agentation.toggle()
+      setIsActive(!isActive)
+    } else {
+      console.warn(
+        'Agentation not installed. Add to your app:\n' +
+        '  npm install agentation\n' +
+        '  import { Agentation } from "agentation"\n' +
+        '  {process.env.NODE_ENV === "development" && <Agentation />}'
+      )
+    }
+  }
+
+  return (
+    <button
+      onClick={toggle}
+      title={isActive ? 'Stop annotating' : 'Start annotating UI elements'}
+      style={{
+        background: isActive ? colors.primaryLight : 'none',
+        border: 'none',
+        color: isActive ? colors.primary : colors.textDim,
+        cursor: 'pointer',
+        fontSize: typography.sm,
+        padding: '2px 6px',
+        borderRadius: radii.sm,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+      }}
+    >
+      📌 {isActive ? 'Annotating' : 'Annotate'}
+    </button>
+  )
 }
 
 /**
@@ -99,7 +153,8 @@ export function HudPanel({ children }: HudPanelProps) {
         }}
       >
         <span style={{ fontWeight: typography.semibold, color: colors.primary }}>◆ Sigil HUD</span>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <AgentationToggle />
           <button
             onClick={toggleMinimized}
             style={{
