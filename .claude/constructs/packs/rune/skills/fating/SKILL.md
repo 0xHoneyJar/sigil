@@ -113,7 +113,20 @@ Where:
 
 ## Rules Loaded
 
-- `.claude/constructs/packs/rune/rules/wyrd/*.md` (always)
+### Core Rules
+- `rules/wyrd/00-wyrd-core.md` - Philosophy
+- `rules/wyrd/01-wyrd-hypothesis.md` - Hypothesis format
+- `rules/wyrd/02-wyrd-learning.md` - Learning protocol
+
+### Confidence & Calibration
+- `rules/wyrd/03-wyrd-confidence.md` - Confidence calculation
+- `rules/wyrd/08-wyrd-recalibration.md` - Recalibration protocol
+
+### Rejection & Learning
+- `rules/wyrd/04-wyrd-rejection-capture.md` - Explicit rejection handling
+- `rules/wyrd/05-wyrd-file-modification.md` - Implicit edit detection
+- `rules/wyrd/06-wyrd-change-analysis.md` - Physics change analysis
+- `rules/wyrd/07-wyrd-pattern-detection.md` - Pattern detection algorithm
 
 ## State Files
 
@@ -122,3 +135,26 @@ Where:
 | `grimoires/rune/wyrd.md` | Current confidence state |
 | `grimoires/rune/rejections.md` | Rejection history (append-only) |
 | `grimoires/rune/patterns.md` | Extracted patterns |
+
+## Learning Pipeline
+
+```
+User Rejection ("n")  ──┐
+                        ├──→ rejections.md ──→ Pattern Detection ──→ Tier Promotion
+User Edit (implicit)  ──┘
+                                    │
+                                    ↓
+                            3+ similar rejections
+                                    │
+                                    ↓
+                            patterns.md → taste.md (Tier 2)
+```
+
+## File Modification Monitoring
+
+After Glyph generates a file:
+1. Start 30-minute monitoring window
+2. Detect physics-relevant changes via git diff
+3. Prompt: "Record as taste? [y/n]"
+4. Log to rejections.md (implicit_edit type)
+5. Check for pattern detection

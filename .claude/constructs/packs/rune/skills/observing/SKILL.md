@@ -63,6 +63,41 @@ The Sigil construct: taste capture and preference learning.
    - 2026-01-23: No modals for confirmations
    ```
 
+## Capture Sources
+
+| Source | Trigger | Tier |
+|--------|---------|------|
+| Manual | `/sigil "insight"` | 1 (Observation) |
+| Explicit rejection | User says "n" to hypothesis | 1 (Observation) |
+| Implicit edit | User modifies generated code | 1 (Observation) |
+| Pattern detection | 3+ similar rejections | 2 (Pattern) |
+| User promotion | `/sigil promote <id>` | 3 (Rule) |
+
+## Maturity Tiers
+
+| Tier | Name | Application | Confidence Boost |
+|------|------|-------------|------------------|
+| 1 | Observation | Applied with note | +0.00 |
+| 2 | Pattern | Applied with confidence | +0.05 |
+| 3 | Rule | Applied always | +0.10 |
+
+## Workflow: Promote (`/sigil promote <id>`)
+
+Promote a pattern to a rule:
+
+```
+/sigil promote pattern-1706234567890
+
+Promoting "Financial Timing" pattern to Rule.
+
+This will:
+- Always apply 500ms for Financial effects
+- Override physics table default
+- No longer ask for confirmation
+
+Confirm? [y/n]
+```
+
 ## Integration with Glyph
 
 When `/glyph` runs, it reads `taste.md` and applies:
@@ -76,8 +111,16 @@ When `/glyph` runs, it reads `taste.md` and applies:
 
 Glyph notes when taste is applied:
 ```
-Timing: 500ms (taste: power user preference)
+Timing: 500ms (taste: power user preference, Tier 2)
+Confidence: 0.90 (+0.05 from Tier 2 match)
 ```
+
+## Rules Loaded
+
+- `rules/sigil/00-sigil-core.md` - Philosophy
+- `rules/sigil/01-sigil-taste.md` - Reading and applying taste
+- `rules/sigil/02-sigil-capture.md` - Capture protocol
+- `rules/sigil/03-sigil-maturity.md` - Tier system
 
 ## State File
 
