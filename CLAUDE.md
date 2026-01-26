@@ -88,13 +88,155 @@ Validates data correctness in web3 components. Catches bugs that lose money.
 
 ## Action Default
 
-After user confirms analysis, generate/apply changes immediately.
+**Guided Workflow** (v0.21.0): `/loa` - Shows current state and suggests next command
+
+**Ad-hoc**: `/audit`, `/audit-deployment`, `/translate`, `/contribute`, `/update-loa`, `/validate`
 
 **DO**: Write complete, working code. Match codebase conventions.
 
 **DON'T**: Describe what you would build. Ask "would you like me to generate this?"
 
-## Repository Structure
+## Intelligent Subagents
+
+| Subagent | Purpose | Verdict Levels |
+|----------|---------|----------------|
+| `architecture-validator` | SDD compliance checking | COMPLIANT, DRIFT_DETECTED, CRITICAL_VIOLATION |
+| `security-scanner` | OWASP Top 10 vulnerability detection | CRITICAL, HIGH, MEDIUM, LOW |
+| `test-adequacy-reviewer` | Test quality assessment | STRONG, ADEQUATE, WEAK, INSUFFICIENT |
+| `documentation-coherence` | Per-task documentation validation | COHERENT, NEEDS_UPDATE, ACTION_REQUIRED |
+| `goal-validator` | PRD goal achievement verification | GOAL_ACHIEVED, GOAL_AT_RISK, GOAL_BLOCKED |
+
+**Usage**: `/validate`, `/validate architecture`, `/validate security`, `/validate goals`
+
+### Goal Traceability (v0.21.0)
+
+Prevents silent goal failures by mapping PRD goals through sprint tasks to validation:
+
+**Components**:
+- **Goal IDs**: PRD goals identified as G-1, G-2, etc.
+- **Appendix C**: Sprint plan section mapping goals to contributing tasks
+- **E2E Validation Task**: Auto-generated in final sprint
+- **Goal Validator**: Subagent verifying goals are achieved
+
+**Configuration** (`.loa.config.yaml`):
+```yaml
+goal_traceability:
+  enabled: true              # Enable goal ID system
+  require_goal_ids: false    # Require G-N IDs in PRD (backward compat)
+  auto_assign_ids: true      # Auto-assign if missing
+  generate_appendix_c: true  # Generate goal mapping in sprint
+  generate_e2e_task: true    # Auto-generate E2E validation task
+
+goal_validation:
+  enabled: true              # Enable goal validation
+  block_on_at_risk: false    # Block review on AT_RISK (default: warn)
+  block_on_blocked: true     # Block review on BLOCKED
+  require_e2e_task: true     # Require E2E task in final sprint
+```
+
+**Workflow Integration**:
+- `/sprint-plan`: Generates Appendix C + E2E task
+- `/review-sprint`: Invokes goal-validator on final sprint
+- `/validate goals`: Manual goal validation
+
+## Key Protocols
+
+### Structured Agentic Memory
+
+Agents maintain persistent working memory in `grimoires/loa/NOTES.md`:
+- **Current Focus**: Active task, status, blocked by, next action
+- **Session Log**: Append-only event history table
+- **Decisions**: Architecture/implementation decisions table
+- **Blockers**: Checkbox list with [RESOLVED] marking
+- **Technical Debt**: Issues for future attention
+- **Goal Status**: PRD goal achievement tracking (v0.21.0)
+- **Learnings**: Project-specific knowledge
+- **Session Continuity**: Recovery anchor
+
+**Protocol**: See `.claude/protocols/structured-memory.md`
+
+### Lossless Ledger Protocol
+
+The "Clear, Don't Compact" paradigm for context management:
+
+**Truth Hierarchy**:
+1. CODE (src/) - Absolute truth
+2. BEADS (.beads/) - Lossless task graph
+3. NOTES.md - Decision log, session continuity
+4. TRAJECTORY - Audit trail, handoffs
+5. PRD/SDD - Design intent
+
+**Key Protocols**:
+- `session-continuity.md` - Tiered recovery, fork detection
+- `grounding-enforcement.md` - Citation requirements (>=0.95 ratio)
+- `synthesis-checkpoint.md` - Pre-clear validation
+- `jit-retrieval.md` - Lightweight identifiers + cache integration
+
+### Recursive JIT Context (v0.20.0)
+
+Context optimization for multi-subagent workflows, leveraging RLM research patterns:
+
+| Component | Script | Purpose |
+|-----------|--------|---------|
+| Semantic Cache | `cache-manager.sh` | Cross-session result caching |
+| Condensation | `condense.sh` | Result compression (~20-50 tokens) |
+| Early-Exit | `early-exit.sh` | Parallel subagent coordination |
+| Semantic Recovery | `context-manager.sh --query` | Query-based section selection |
+
+**Usage**:
+```bash
+# Cache audit results
+key=$(cache-manager.sh generate-key --paths "src/auth.ts" --query "audit")
+cache-manager.sh set --key "$key" --condensed '{"verdict":"PASS"}'
+
+# Condense large results
+condense.sh condense --strategy structured_verdict --input result.json
+
+# Coordinate parallel subagents
+early-exit.sh signal session-123 agent-1
+```
+
+**Protocol**: See `.claude/protocols/recursive-context.md`, `.claude/protocols/semantic-cache.md`
+
+### Feedback Loops
+
+Three quality gates:
+
+1. **Implementation Loop** (Phase 4-5): Engineer <-> Senior Lead until "All good"
+2. **Security Audit Loop** (Phase 5.5): After approval -> Auditor review -> "APPROVED - LETS FUCKING GO"
+3. **Deployment Loop**: DevOps <-> Auditor until infrastructure approved
+
+**Priority**: Audit feedback checked FIRST on `/implement`, then engineer feedback.
+
+### Git Safety
+
+Prevents accidental pushes to upstream template:
+- 4-layer detection (cached -> origin URL -> upstream remote -> GitHub API)
+- Soft block with user confirmation via AskUserQuestion
+- `/contribute` command bypasses (has own safeguards)
+
+### beads_rust Integration
+
+Optional task graph management using beads_rust (`br` CLI). Non-invasive by design:
+- Never touches git (no daemon, no auto-commit)
+- Explicit sync protocol
+- SQLite for fast queries, JSONL for git-friendly diffs
+
+**Sync Protocol**:
+```bash
+br sync --import-only    # Session start
+br sync --flush-only     # Session end
+```
+
+### Sprint Ledger
+
+Global sprint numbering across multiple development cycles:
+
+**Location**: `grimoires/loa/ledger.json`
+
+**Commands**: `/ledger`, `/ledger history`, `/archive-cycle "label"`
+
+## Document Flow
 
 ```
 .claude/

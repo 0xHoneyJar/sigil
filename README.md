@@ -1,230 +1,104 @@
 # Rune
 
-Constructs for AI-assisted craftsmanship. Activate what the task demands.
+[![Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](CHANGELOG.md)
+[![License](https://img.shields.io/badge/license-AGPL--3.0-green.svg)](LICENSE.md)
+[![Release](https://img.shields.io/badge/release-Goal%20Traceability%20%26%20Guided%20Workflow-purple.svg)](CHANGELOG.md#170---2026-01-24--goal-traceability--guided-workflow)
 
 ## Constructs
 
-|  | Construct | Activate | Effect | Status |
-|:--:|:--|:--|:--|:--:|
-| ᛝ | **Sigil** | `/sigil` | Captures taste — why users prefer what they prefer | ✓ |
-| ⚒ | **Glyph** | `/glyph` | Design physics — correct timing, sync, confirmation | ✓ |
-| ⚖ | **Rigor** | `/rigor` | Data correctness — catches bugs that lose money | ✓ |
-| ᚢ | *Voice* | `/voice` | UI copy — text that matches product tone | · |
-| ⛨ | *Ward* | `/ward` | Security — patterns that prevent vulnerabilities | · |
-
----
+**Run Mode AI** — Agent-driven development framework using 9 specialized AI agents to orchestrate the complete product lifecycle. From requirements through production deployment.
 
 ## Quick Start
 
-```
-Build a claim button /glyph
+```bash
+# One-liner install onto any repo
+curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/loa/main/.claude/scripts/mount-loa.sh | bash
+
+# Start Claude Code and begin
+claude
+/plan-and-analyze
 ```
 
-```
-Build the staking flow /glyph /rigor
-```
+See **[INSTALLATION.md](INSTALLATION.md)** for detailed setup options and prerequisites.
 
-```
-/glyph for the UI, /rigor for the data — build a withdraw panel
-```
+## The Workflow
 
----
+| Phase | Command | Output |
+|-------|---------|--------|
+| 1 | `/plan-and-analyze` | Product Requirements (PRD) |
+| 2 | `/architect` | Software Design (SDD) |
+| 3 | `/sprint-plan` | Sprint Plan |
+| 4 | `/implement sprint-N` | Code + Tests |
+| 5 | `/review-sprint sprint-N` | Approval or Feedback |
+| 5.5 | `/audit-sprint sprint-N` | Security Approval |
+| 6 | `/deploy-production` | Infrastructure |
 
-## Activation Examples
+**Ad-hoc**: `/audit`, `/translate`, `/validate`, `/loa` (guided workflow)
 
-**Single construct:**
-```
-/glyph create a like button
-```
+See **[PROCESS.md](PROCESS.md)** for complete workflow documentation.
 
-**Chained constructs:**
-```
-/glyph /rigor build the claim rewards flow
-```
+## The Agents
 
-**Inline activation:**
-```
-Build a staking panel. Use /glyph for the component and /rigor to validate the data handling.
-```
+Nine specialized agents that ride alongside you:
 
-**Sequential work:**
-```
-/sigil "they prefer inline confirmations over modals"
-```
-Then later:
-```
-/glyph delete button
-```
-Glyph reads what Sigil captured and applies it.
+| Agent | Role |
+|-------|------|
+| discovering-requirements | Senior Product Manager |
+| designing-architecture | Software Architect |
+| planning-sprints | Technical PM |
+| implementing-tasks | Senior Engineer |
+| reviewing-code | Tech Lead |
+| auditing-security | Security Auditor |
+| deploying-infrastructure | DevOps Architect |
+| translating-for-executives | Developer Relations |
+| run-mode | Autonomous Executor |
 
----
+## Architecture
 
-## Sigil — Taste
+Loa uses a **three-zone model** inspired by AWS Projen and Google's ADK:
 
-Captures insights about user preferences. Glyph reads these when generating.
+| Zone | Path | Description |
+|------|------|-------------|
+| **System** | `.claude/` | Framework-managed (never edit directly) |
+| **State** | `grimoires/`, `.beads/` | Project memory |
+| **App** | `src/`, `lib/` | Your code |
 
-```
-/sigil "power traders find 800ms sluggish, they prefer 500ms for financial ops"
-```
+**Key principle**: Customize via `.claude/overrides/` and `.loa.config.yaml`, not by editing `.claude/` directly.
 
-```
-/sigil "they hate modals — always use inline confirmation patterns"
-```
+## Key Features
+
+| Feature | Description | Documentation |
+|---------|-------------|---------------|
+| **Run Mode** | Autonomous sprint execution with draft PRs | [CLAUDE.md](CLAUDE.md#run-mode) |
+| **Simstim** | Telegram bridge for remote monitoring | [simstim/README.md](simstim/README.md) |
+| **Goal Traceability** | PRD goals tracked through implementation | [CLAUDE.md](CLAUDE.md#goal-traceability) |
+| **Continuous Learning** | Extract discoveries into reusable skills | [CLAUDE.md](CLAUDE.md#key-protocols) |
+| **Loa Constructs** | Commercial skill packs from registry | [INSTALLATION.md](INSTALLATION.md#loa-constructs-commercial-skills) |
+| **Sprint Ledger** | Global sprint numbering across cycles | [CLAUDE.md](CLAUDE.md#sprint-ledger) |
+| **Structured Memory** | Persistent working memory in NOTES.md | [PROCESS.md](PROCESS.md#structured-agentic-memory) |
+| **beads_rust** | Persistent task graph across sessions | [INSTALLATION.md](INSTALLATION.md) |
+| **ck Search** | Semantic code search | [INSTALLATION.md](INSTALLATION.md#optional-enhancements) |
+| **Quality Gates** | Two-phase review: Tech Lead + Security Auditor | [PROCESS.md](PROCESS.md#agent-to-agent-communication) |
 
 <details>
 <summary>How it works</summary>
 
-Sigil appends to `grimoires/sigil/taste.md`. When Glyph runs, it reads this file and adjusts physics accordingly.
+| Document | Purpose |
+|----------|---------|
+| **[INSTALLATION.md](INSTALLATION.md)** | Setup, prerequisites, configuration, updates |
+| **[PROCESS.md](PROCESS.md)** | Complete workflow, agents, commands, protocols |
+| **[CLAUDE.md](CLAUDE.md)** | Technical reference for Claude Code |
+| **[CHANGELOG.md](CHANGELOG.md)** | Version history |
 
 **Key files:**
 - `rules/sigil/00-sigil-core.md` — Philosophy
 - `rules/sigil/01-sigil-taste.md` — How taste is read and applied
 
-</details>
+In William Gibson's Sprawl trilogy, Loa are AI entities that "ride" humans through neural interfaces. These agents don't replace you—they **ride with you**, channeling expertise through the interface.
 
 ---
 
-## Glyph — Craft
-
-Generates UI with correct design physics. Detects what the action *does* and applies appropriate timing, sync, and confirmation.
-
-```
-/glyph withdraw button
-```
-
-```
-/glyph validate StakePanel.tsx
-```
-
-**The Physics Table:**
-
-| Effect | Timing | Sync | Confirmation |
-|--------|--------|------|--------------|
-| Financial | 800ms | Pessimistic | Required |
-| Destructive | 600ms | Pessimistic | Required |
-| Soft Delete | 200ms | Optimistic | Toast+Undo |
-| Standard | 200ms | Optimistic | None |
-| Navigation | 150ms | Immediate | None |
-| Local State | 100ms | Immediate | None |
-
-<details>
-<summary>Why these physics?</summary>
-
-**Effect is truth.** A "claim" button is Financial — doesn't matter what you call it.
-
-**800ms for financial:** Time for users to read amount, mentally commit, feel the weight of irreversible decision.
-
-**Pessimistic sync:** Server confirms before UI updates. Money can't roll back.
-
-**Key files:**
-- `rules/glyph/01-glyph-physics.md` — The physics table
-- `rules/glyph/02-glyph-detection.md` — Effect detection + keywords
-- `rules/glyph/04-glyph-patterns.md` — Golden implementation patterns
-
-</details>
-
----
-
-## Rigor — Correctness
-
-Validates data handling in web3 components. Catches bugs that lose money.
-
-```
-/rigor ClaimButton.tsx
-```
-
-```
-/glyph /rigor build the bridge flow
-```
-
-**Critical patterns:**
-- BigInt: `0n` is falsy — use `amount != null && amount > 0n`
-- Receipt guard: Check hash changed before processing
-- Data source: Transaction amounts MUST come from on-chain
-
-<details>
-<summary>Common bugs by symptom</summary>
-
-| Symptom | Likely Cause | Fix |
-|---------|--------------|-----|
-| Button never enables | BigInt falsy check | `!= null && > 0n` |
-| Same tx triggers twice | Missing receipt guard | Add hash comparison |
-| Wrong amount in tx | Using indexed data | On-chain read |
-| Callback uses old data | Stale closure | Use ref or useCallback |
-
-**Key files:**
-- `rules/rigor/01-rigor-data.md` — Indexed vs on-chain decision table
-- `rules/rigor/02-rigor-web3.md` — BigInt safety, receipt guards, stale closures
-
-</details>
-
----
-
-## Stringing Constructs
-
-The power is in combination. Activate what the moment demands.
-
-| Task | Activate | Why |
-|------|----------|-----|
-| Simple UI | `/glyph` | Just need correct physics |
-| Web3 UI | `/glyph /rigor` | Physics + data correctness |
-| After feedback | `/sigil` then `/glyph` | Capture taste, apply on next generation |
-| Full flow | `/sigil /glyph /rigor` | Learning + craft + correctness |
-
-**Example — building a staking feature:**
-
-```
-/sigil "users here are degens, they want speed over hand-holding"
-```
-
-```
-/glyph /rigor build the stake and unstake panels with real-time balance updates
-```
-
-The constructs work together: Sigil's taste influences Glyph's physics, Rigor validates the data handling.
-
----
-
-## Protected Capabilities
-
-Non-negotiable. These override everything else.
-
-| Capability | Rule |
-|------------|------|
-| Withdraw | Always reachable (never hide behind loading) |
-| Cancel | Always visible (every flow needs escape) |
-| Balance | Always accurate (invalidate on mutation) |
-| Touch target | ≥44px |
-| Focus ring | Always visible |
-
----
-
-## Philosophy
-
-**Effect is truth.** What the code does determines its physics.
-
-**Physics over preferences.** "Make it feel trustworthy" is not physics. "800ms pessimistic with confirmation" is physics.
-
-**Correctness over feel.** A beautiful button that sends the wrong amount is worse than an ugly one that's accurate.
-
----
-
-<details>
-<summary><strong>Reference: Detection Keywords</strong></summary>
-
-**Financial:** claim, deposit, withdraw, transfer, swap, send, pay, mint, burn, stake, unstake, bridge, approve
-
-**Destructive:** delete, remove, destroy, revoke, terminate, purge, close account
-
-**Soft Delete:** archive, hide, trash, dismiss, snooze, mute
-
-**Standard:** save, update, edit, create, add, like, follow, bookmark
-
-**Local:** toggle, switch, expand, collapse, select, theme, dark mode
-
-</details>
-
----
+[AGPL-3.0](LICENSE.md) — Use, modify, distribute freely. Network service deployments must release source code.
 
 ## Links
 
