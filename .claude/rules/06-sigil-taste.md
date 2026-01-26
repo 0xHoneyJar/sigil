@@ -13,8 +13,12 @@ All signals go to `grimoires/sigil/taste.md`. Append-only. Human-readable.
 | ACCEPT | +1 | User uses generated code without changes |
 | MODIFY | +5 | User edits generated code (diff reveals preference) |
 | REJECT | -3 | User says no, deletes, or rewrites |
+| OBSERVE | +2 | User feedback captured via /observe or Agentation |
+| CHANGELOG_ENGAGEMENT | +1 | Track reactions/engagement on shared changelogs |
 
 Modifications weight 5x because corrections teach more than silent acceptance.
+OBSERVE signals capture user feedback patterns that inform future generation.
+CHANGELOG_ENGAGEMENT tracks which framings resonate with end users.
 
 ## Signal Schema (YAML Frontmatter)
 
@@ -123,6 +127,60 @@ Screenshots are captured when:
 - User clicks "Report Issue" in toolbar
 - User manually captures via toolbar
 - Diagnostic panel detects critical mismatch
+
+## OBSERVE Signal Schema
+
+When user feedback is captured via `/observe` or Agentation parsing:
+
+```yaml
+---
+timestamp: "2026-01-25T10:00:00Z"
+signal: OBSERVE
+source: agentation                    # agentation | discord | direct | diagnose
+component:
+  name: "ClaimButton"
+  selector: ".claim-button"
+  effect: "Financial"
+observation:
+  id: "obs-2026-01-25-001"
+  file: "agentation-2026-01-25.md"
+  type: "ui-annotation"               # ui-annotation | feedback | diagnostic
+synthesis:
+  theme: "reward-visibility"
+  tags: ["ux-clarity", "reward-visibility"]
+  related_count: 4
+  confidence: "HIGH"                  # LOW | MEDIUM | HIGH
+  insight: "Users want claimable amounts visible before action"
+learning:
+  recommendation: "Show amount in button or nearby indicator"
+  affected_components: ["ClaimButton", "RewardsDisplay"]
+---
+```
+
+### OBSERVE-Specific Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `observation.id` | string | Unique observation ID (obs-{date}-{seq}) |
+| `observation.file` | string | Path to observation markdown file |
+| `observation.type` | enum | ui-annotation, feedback, diagnostic |
+| `synthesis.theme` | string | Detected theme from pattern clustering |
+| `synthesis.tags` | array | Auto-extracted semantic tags |
+| `synthesis.related_count` | number | Count of related observations |
+| `synthesis.confidence` | enum | Pattern confidence level |
+| `learning.affected_components` | array | Components that should apply this learning |
+
+### Pattern Detection
+
+OBSERVE signals build patterns over time:
+
+| Observations | Confidence | Action |
+|--------------|------------|--------|
+| 1-2 | LOW | Log only, no auto-apply |
+| 3-4 | MEDIUM | Surface in /craft analysis |
+| 5+ | HIGH | Auto-apply recommendation |
+
+When `/craft` runs, check for HIGH-confidence OBSERVE patterns affecting the target component.
 
 ## Reading Taste
 

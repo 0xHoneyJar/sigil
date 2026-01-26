@@ -1,0 +1,193 @@
+# Changelog Entry Schema
+# Defines the structure for user-facing changelog entries
+
+version: "1.0.0"
+
+entry:
+  # Identification
+  id:
+    type: string
+    format: "changelog-{YYYY-MM-DD}-{seq}"
+    example: "changelog-2026-01-25-001"
+
+  timestamp:
+    type: datetime
+    format: ISO8601
+
+  # Classification
+  type:
+    type: enum
+    values:
+      - feat      # New feature - "New: You can now..."
+      - fix       # Bug fix - "Fixed: ..."
+      - improve   # Enhancement - "Improved: ..."
+      - clarify   # UX clarity - "Clarified: ..."
+    description: User-visible change type
+
+  impact:
+    type: enum
+    values:
+      - major     # Significant new capability
+      - minor     # Notable improvement
+      - patch     # Small fix or tweak
+    description: Semantic versioning impact
+
+  # Internal Reference (not user-facing)
+  internal:
+    commits:
+      type: array
+      items: string
+      description: Git commit hashes that implement this change
+    pr:
+      type: string
+      description: PR number if applicable
+    description:
+      type: string
+      description: Technical description from commits
+    files_changed:
+      type: array
+      items: string
+      description: Key files modified
+
+  # User-Facing Content
+  user_facing:
+    headline:
+      type: string
+      maxLength: 80
+      description: Short, scannable summary
+      example: "See claimable HENLO before claiming"
+    detail:
+      type: string
+      maxLength: 280
+      description: One-sentence explanation
+      example: "The claim button now shows exactly how much you'll receive"
+    benefit:
+      type: string
+      maxLength: 160
+      description: Why this matters to the user
+      example: "No more guessing - decide if it's worth the gas"
+
+  # Observation Link
+  feedback_ref:
+    type: string
+    nullable: true
+    description: Observation ID that requested this
+    example: "obs-2026-01-24-001"
+
+  # Persona Targeting
+  persona_match:
+    type: enum
+    values:
+      - power-user    # Concise, technical OK
+      - casual        # Friendly, explain benefits
+      - mobile        # Mobile experience focus
+      - general       # Default voice
+    default: general
+    description: Voice adaptation target
+
+  # Attribution
+  attribution:
+    type: object
+    nullable: true
+    properties:
+      users:
+        type: array
+        items: string
+        description: Usernames who requested this
+      quote:
+        type: string
+        description: Original feedback quote
+
+# Commit Classification Map
+commit_classification:
+  patterns:
+    - pattern: "feat:"
+      user_type: feat
+      include: true
+      frame: "New: You can now..."
+
+    - pattern: "fix:"
+      user_type: fix
+      include: true
+      frame: "Fixed: ..."
+      condition: "Check if user-visible"
+
+    - pattern: "improve:"
+      user_type: improve
+      include: true
+      frame: "Improved: ..."
+
+    - pattern: "ux:"
+      user_type: clarify
+      include: true
+      frame: "Clearer: ..."
+
+    - pattern: "refactor:"
+      user_type: null
+      include: false
+      reason: "Internal improvement"
+
+    - pattern: "docs:"
+      user_type: null
+      include: false
+      reason: "Documentation only"
+
+    - pattern: "chore:"
+      user_type: null
+      include: false
+      reason: "Internal maintenance"
+
+    - pattern: "test:"
+      user_type: null
+      include: false
+      reason: "Test changes only"
+
+# Persona Voice Guides
+persona_voices:
+  power-user:
+    tone: "Concise, technical OK"
+    length: short
+    example: "Claim button now shows amount"
+    emoji: false
+
+  casual:
+    tone: "Friendly, explain benefits"
+    length: medium
+    example: "See exactly how much you'll get before claiming"
+    emoji: true
+
+  mobile:
+    tone: "Focus on mobile experience"
+    length: short
+    example: "Easier to claim on mobile with visible amounts"
+    emoji: true
+
+  general:
+    tone: "Balanced, clear"
+    length: medium
+    example: "Now shows claimable amount on the claim button"
+    emoji: optional
+
+# Output Format Templates
+output_formats:
+  discord:
+    header: "🍯 Kitchen Update"
+    emoji_map:
+      feat: "✨"
+      fix: "🔧"
+      improve: "📱"
+      clarify: "💡"
+    footer: "Thanks to everyone who shared feedback! Keep it coming."
+
+  blog:
+    style: markdown
+    include_attribution: true
+    include_detail: true
+
+  json:
+    include_internal: false
+    include_timestamps: true
+
+  in_app:
+    max_entries: 5
+    include_dismiss: true

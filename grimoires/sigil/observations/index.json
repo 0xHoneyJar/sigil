@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-01-25T00:00:00Z",
+  "observations": [],
+  "themes": {},
+  "tagCategories": {
+    "ux-clarity": {
+      "keywords": ["unclear", "confusing", "doesn't show", "missing", "hard to find", "hidden"],
+      "description": "Issues with UI clarity and discoverability"
+    },
+    "reward-visibility": {
+      "keywords": ["claim", "rewards", "amount", "balance", "see", "show", "display"],
+      "description": "Users want to see reward/balance information"
+    },
+    "mobile-experience": {
+      "keywords": ["mobile", "scroll", "touch", "responsive", "phone", "tap"],
+      "description": "Mobile-specific user experience issues"
+    },
+    "performance": {
+      "keywords": ["slow", "loading", "lag", "stuck", "freeze", "wait"],
+      "description": "Performance and loading issues"
+    },
+    "financial-clarity": {
+      "keywords": ["fee", "gas", "cost", "price", "worth", "value"],
+      "description": "Clarity around financial/cost information"
+    },
+    "trust-signals": {
+      "keywords": ["confirm", "verify", "safe", "secure", "sure", "check"],
+      "description": "Users need confirmation or trust signals"
+    },
+    "workflow-efficiency": {
+      "keywords": ["steps", "click", "manual", "tedious", "workflow", "process"],
+      "description": "Workflow and efficiency concerns"
+    }
+  },
+  "confidenceLevels": {
+    "LOW": { "minCount": 1, "maxCount": 2 },
+    "MEDIUM": { "minCount": 3, "maxCount": 4 },
+    "HIGH": { "minCount": 5, "maxCount": null }
+  }
+}

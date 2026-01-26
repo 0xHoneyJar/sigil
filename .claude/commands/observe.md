@@ -20,6 +20,9 @@ Two modes:
 
 # Diagnose mode (web3 debugging)
 /observe diagnose [ComponentName]
+
+# Parse Agentation output (visual annotations)
+/observe parse
 ```
 
 ### Arguments
@@ -489,6 +492,174 @@ Reads RPC URL from (in priority order):
 - Requires ABI for complex decoding (or falls back to raw bytes)
 - Rate limited on public RPCs
 - May need user address context for per-user queries
+
+---
+
+## Agentation Parse Mode
+
+When invoked as `/observe parse`:
+
+### Overview
+
+Parses Agentation output (visual UI annotations) and converts them into structured observations. Agentation lets users click UI elements and generates markdown with CSS selectors that can be grepped in the codebase.
+
+### Expected Input Format
+
+The user will paste Agentation output in this format:
+
+```markdown
+## Agentation Feedback
+
+### Element: `.claim-button`
+- **Selector**: `button.claim-button.bg-emerald-600`
+- **Issue**: Button text unclear - "Claim" doesn't show amount
+- **Position**: (245, 380)
+
+### Text Selection: "Claim your rewards"
+- **Issue**: Should show actual HENLO amount
+```
+
+### Step P1: Detect Agentation Format
+
+When conversation contains text matching the Agentation pattern:
+- `## Agentation Feedback` or `### Element:` headers
+- `**Selector**:` with CSS selector
+- `**Issue**:` with description
+- `**Position**:` with coordinates (optional)
+
+Trigger parse mode automatically or wait for `/observe parse` command.
+
+### Step P2: Parse Elements
+
+Extract structured data from each annotation:
+
+```yaml
+elements:
+  - type: "element"
+    selector: "button.claim-button.bg-emerald-600"
+    issue: "Button text unclear - doesn't show amount"
+    position: { x: 245, y: 380 }
+  - type: "text-selection"
+    content: "Claim your rewards"
+    issue: "Should show actual HENLO amount"
+```
+
+### Step P3: Grep Codebase for Selectors
+
+For each selector, search the codebase:
+
+```bash
+# Search for class names
+grep -r "claim-button" src/ --include="*.tsx" --include="*.jsx"
+grep -r "bg-emerald-600" src/ --include="*.tsx" --include="*.jsx"
+```
+
+Build a reference map linking selectors to source files:
+
+```yaml
+code_refs:
+  - selector: "button.claim-button.bg-emerald-600"
+    files:
+      - path: "src/components/ClaimButton.tsx"
+        line: 45
+        context: "<button className=\"claim-button bg-emerald-600\">"
+```
+
+### Step P4: Generate Observation
+
+Create structured observation in `grimoires/sigil/observations/`:
+
+```yaml
+---
+timestamp: "2026-01-25T10:00:00Z"
+source: agentation
+type: ui-annotation
+session_id: "{uuid}"
+elements:
+  - selector: "button.claim-button.bg-emerald-600"
+    issue: "Button text unclear - doesn't show amount"
+    position: { x: 245, y: 380 }
+    code_ref: "src/components/ClaimButton.tsx:45"
+  - type: text-selection
+    content: "Claim your rewards"
+    issue: "Should show actual HENLO amount"
+    code_ref: null
+---
+
+# Agentation Observation - {date}
+
+## Summary
+
+{count} UI elements annotated via Agentation visual feedback.
+
+## Elements
+
+### 1. Claim Button
+- **Selector**: `button.claim-button.bg-emerald-600`
+- **Issue**: Button text unclear - doesn't show amount
+- **Code**: `src/components/ClaimButton.tsx:45`
+
+### 2. Text: "Claim your rewards"
+- **Issue**: Should show actual HENLO amount
+
+## Suggested Actions
+
+Based on annotations, consider:
+- [ ] Update ClaimButton to show amount: `Claim {amount} HENLO`
+- [ ] Review copy physics for user-facing terminology
+
+## Next Steps
+
+1. Run `/craft "ClaimButton"` to apply physics-aware improvements
+2. Or manually edit referenced files
+```
+
+### Step P5: Show Confirmation
+
+```
+┌─ Agentation Parsed ────────────────────────────────────┐
+│                                                        │
+│  Annotations: 2 elements captured                      │
+│                                                        │
+│  Code refs found:                                      │
+│  • claim-button → src/components/ClaimButton.tsx:45    │
+│                                                        │
+│  Observation saved:                                    │
+│  grimoires/sigil/observations/agentation-2026-01-25.md │
+│                                                        │
+│  Options:                                              │
+│  [c] /craft "ClaimButton" - Apply physics to fix      │
+│  [m] Manual - I'll handle it                          │
+│  [a] Add more annotations                             │
+│                                                        │
+└────────────────────────────────────────────────────────┘
+```
+
+### Integration with /craft
+
+When `/craft` is invoked after Agentation parsing:
+1. Check for recent Agentation observations
+2. Pre-load selector context and code references
+3. Apply physics based on detected component effect
+
+### Taste Signal
+
+Log Agentation parsing to taste.md:
+
+```yaml
+---
+timestamp: "2026-01-25T10:00:00Z"
+signal: ACCEPT
+source: agentation
+component:
+  name: "ClaimButton"
+  effect: "Financial"
+agentation:
+  elements_parsed: 2
+  code_refs_found: 1
+  observation_file: "grimoires/sigil/observations/agentation-2026-01-25.md"
+---
+```
 
 ---
 

@@ -2,6 +2,12 @@
 
 Diagnostic HUD for Sigil - composable React components for development.
 
+## What's New in v0.3.0
+
+- **Agentation Toggle**: One-click to annotate UI elements for AI agents
+- **User Lens Panel**: Address impersonation for debugging user issues
+- **useEffectiveAddress Hook**: Lens-aware address resolution for wagmi
+
 ## Installation
 
 ```bash
@@ -105,6 +111,50 @@ function MyComponent() {
       effect: 'financial',
     })
   }
+}
+```
+
+### Agentation Integration
+
+The HUD includes a toggle for [Agentation](https://agentation.dev), a visual feedback tool for AI agents.
+
+**Setup**: First, add the Agentation component to your app:
+
+```tsx
+import { Agentation } from 'agentation'
+
+function App() {
+  return (
+    <>
+      <YourApp />
+      {process.env.NODE_ENV === 'development' && <Agentation />}
+    </>
+  )
+}
+```
+
+**Usage**: Click the "📌 Annotate" button in the HUD header to toggle annotation mode. Click UI elements to capture their selectors, then paste the output into Claude Code and run `/observe parse`.
+
+### wagmi Integration
+
+For web3 apps, the HUD provides lens-aware address hooks:
+
+```tsx
+import { useEffectiveAddress, useAccount } from '@thehoneyjar/sigil-hud/wagmi'
+
+function MyWeb3Component() {
+  // Returns impersonated address when lens is active, real address otherwise
+  const address = useEffectiveAddress()
+
+  // Full account info with lens awareness
+  const { address: effectiveAddress, isImpersonating } = useAccount()
+
+  return (
+    <div>
+      {isImpersonating && <Badge>Viewing as {address}</Badge>}
+      <BalanceDisplay address={address} />
+    </div>
+  )
 }
 ```
 

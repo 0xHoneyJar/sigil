@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react'
+import DOMPurify from 'dompurify'
 import { useHud } from '../providers/HudProvider'
 import { PhysicsAnalysis } from './PhysicsAnalysis'
 import { IssueList } from './IssueList'
@@ -270,9 +271,10 @@ export function DiagnosticsPanel({ className = '' }: DiagnosticsPanelProps) {
 
 /**
  * Format diagnosis for display (simple markdown-like formatting)
+ * Uses DOMPurify to sanitize HTML and prevent XSS attacks
  */
 function formatDiagnosis(text: string): string {
-  return text
+  const formatted = text
     .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #10b981">$1</strong>')
     .replace(
       /`([^`]+)`/g,
@@ -282,6 +284,12 @@ function formatDiagnosis(text: string): string {
       /```(\w+)?\n([\s\S]*?)```/g,
       '<pre style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px; overflow-x: auto; margin: 8px 0;">$2</pre>'
     )
+
+  // Sanitize to prevent XSS - allow only safe tags and inline styles
+  return DOMPurify.sanitize(formatted, {
+    ALLOWED_TAGS: ['strong', 'code', 'pre'],
+    ALLOWED_ATTR: ['style'],
+  })
 }
 
 /**

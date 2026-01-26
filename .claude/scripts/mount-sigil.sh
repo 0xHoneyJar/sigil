@@ -449,6 +449,7 @@ main() {
     echo ""
     info "Sigil learns from your corrections. Use it, and it becomes yours."
     echo ""
+    install_agentation_skill
     exit 0
   fi
 
@@ -496,6 +497,38 @@ main() {
   info "  2. Run: constructs-install.sh pack sigil"
   echo ""
   info "Sigil learns from your corrections. Use it, and it becomes yours."
+  echo ""
+  install_agentation_skill
+}
+
+# === Install Agentation Skill ===
+install_agentation_skill() {
+  # Check if npx is available
+  if ! command -v npx &> /dev/null; then
+    info "npx not found - skipping Agentation skill install"
+    info "  Install manually: npx add-skill benjitaylor/agentation"
+    return 0
+  fi
+
+  echo ""
+  step "Installing Agentation visual feedback skill..."
+  info "  Agentation lets you annotate UI elements for AI agents"
+  info "  https://agentation.dev"
+  echo ""
+
+  # Attempt to install the skill (non-blocking)
+  if npx add-skill benjitaylor/agentation 2>/dev/null; then
+    log "✓ Agentation skill installed"
+    info "  Use /agentation to wire into your React app"
+  else
+    warn "Agentation skill install failed (optional)"
+    info "  Install manually: npx add-skill benjitaylor/agentation"
+  fi
+
+  echo ""
+  info "React integration (add to your app):"
+  info '  import { Agentation } from "agentation"'
+  info '  {process.env.NODE_ENV === "development" && <Agentation />}'
   echo ""
 }
 

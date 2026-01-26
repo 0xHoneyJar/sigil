@@ -267,6 +267,65 @@ When `/craft` output needs targeted fixes (rare — usually iterate via `/craft`
 
 ---
 
+## Observability Loop
+
+Sigil closes the loop from user feedback to visible improvements:
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                                                              │
+│   1. ANNOTATE                     2. OBSERVE                 │
+│   ───────────                     ──────────                 │
+│   User clicks UI issue            Patterns detected          │
+│   via Agentation                  across feedback            │
+│                                                              │
+│        ↓                               ↓                     │
+│                                                              │
+│   3. IMPLEMENT                    4. COMMUNICATE             │
+│   ────────────                    ─────────────              │
+│   /craft addresses                /changelog generates       │
+│   the pattern                     user-facing update         │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
+```
+
+### Agentation Integration
+
+Install [Agentation](https://agentation.dev) for visual UI annotation:
+
+```bash
+npm install agentation
+npx add-skill benjitaylor/agentation
+```
+
+Add to your React app:
+
+```tsx
+import { Agentation } from 'agentation'
+
+{process.env.NODE_ENV === 'development' && <Agentation />}
+```
+
+Use the 📌 button in the Sigil HUD to toggle annotation mode.
+
+### Workflow
+
+1. **Annotate**: Click UI elements to capture selectors
+2. **Observe**: Paste into Claude Code → `/observe parse`
+3. **Synthesize**: Patterns detected across observations
+4. **Implement**: `/craft` with observation context
+5. **Communicate**: `/changelog` generates user-facing copy
+
+### Key Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/observe` | Capture user feedback, diagnose issues |
+| `/observe parse` | Parse Agentation annotations |
+| `/changelog` | Generate user-facing release notes |
+
+---
+
 ## Usage
 
 ```bash
