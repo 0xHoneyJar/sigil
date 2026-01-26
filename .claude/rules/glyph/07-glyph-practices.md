@@ -225,3 +225,16 @@ See `references/rams/SKILL.md` for design review:
 - WCAG 2.1 accessibility checks
 - Visual design consistency
 - Component state coverage
+
+See `references/vercel-react/` for React/Next.js performance (57 rules):
+
+**Critical** (Priority 1-2):
+- `async-parallel.md` — Promise.all() for independent operations
+- `async-defer-await.md` — Move await into branches where used
+- `bundle-barrel-imports.md` — Import directly, avoid barrel files
+- `bundle-dynamic-imports.md` — next/dynamic for heavy components
+
+**High** (Priority 3-4):
+- `server-cache-react.md` — React.cache() for request deduplication
+- `rerender-memo.md` — Extract expensive work into memoized components
+- `rerender-lazy-state-init.md` — Pass function to useState for expensive values

@@ -19,6 +19,8 @@ references/
 | `design-engineering/` | **Glyph** | animations.dev | Animation, UI polish, forms, accessibility |
 | `ui-skills/` | **Glyph** | github.com/ibelick/ui-skills | UI baseline, motion perf, a11y, metadata |
 | `rams/` | **Glyph/Rigor** | rams.ai | A11y review, visual design checks |
+| `vercel-react/` | **Glyph** | vercel-labs/agent-skills | 57 React/Next.js perf rules |
+| `skill-creator/` | **Meta** | anthropics/skills | Guide for creating skills |
 
 ## Mapping to Constructs
 
