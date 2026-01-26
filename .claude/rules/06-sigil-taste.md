@@ -14,9 +14,11 @@ All signals go to `grimoires/sigil/taste.md`. Append-only. Human-readable.
 | MODIFY | +5 | User edits generated code (diff reveals preference) |
 | REJECT | -3 | User says no, deletes, or rewrites |
 | OBSERVE | +2 | User feedback captured via /observe or Agentation |
+| CHANGELOG_ENGAGEMENT | +1 | Track reactions/engagement on shared changelogs |
 
 Modifications weight 5x because corrections teach more than silent acceptance.
 OBSERVE signals capture user feedback patterns that inform future generation.
+CHANGELOG_ENGAGEMENT tracks which framings resonate with end users.
 
 ## Signal Schema (YAML Frontmatter)
 

@@ -1,0 +1,8 @@
+name: changelog-generation
+description: Generate user-facing changelogs from commits, linked to observations and personas
+trigger:
+  - "/changelog"
+  - "generate changelog"
+  - "release notes"
+  - "what's new"
+skill_file: SKILL.md
