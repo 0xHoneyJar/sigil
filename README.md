@@ -2,6 +2,20 @@
 
 Constructs for AI-assisted craftsmanship. Activate what the task demands.
 
+## Constructs
+
+|  | Construct | Activate | Effect | Status |
+|:--:|:--|:--|:--|:--:|
+| ✦ | **Sigil** | `/sigil` | Captures taste — why users prefer what they prefer | ✓ |
+| ◆ | **Glyph** | `/glyph` | Design physics — correct timing, sync, confirmation | ✓ |
+| ◉ | **Rigor** | `/rigor` | Data correctness — catches bugs that lose money | ✓ |
+| ◇ | *Voice* | `/voice` | UI copy — text that matches product tone | · |
+| ❖ | *Ward* | `/ward` | Security — patterns that prevent vulnerabilities | · |
+
+---
+
+## Quick Start
+
 ```
 Build a claim button /glyph
 ```
@@ -13,20 +27,6 @@ Build the staking flow /glyph /rigor
 ```
 /glyph for the UI, /rigor for the data — build a withdraw panel
 ```
-
----
-
-## Constructs
-
-Runes you activate and string together. Each one brings specialized knowledge to the task.
-
-| Construct | Activates | Purpose |
-|-----------|-----------|---------|
-| **Sigil** | `/sigil` | Taste — captures why users prefer what they prefer |
-| **Glyph** | `/glyph` | Craft — design physics for UI generation |
-| **Rigor** | `/rigor` | Correctness — data safety for web3 flows |
-| *Voice* | coming | Copy — UI text that matches product tone |
-| *Ward* | coming | Security — patterns that prevent vulnerabilities |
 
 ---
 
