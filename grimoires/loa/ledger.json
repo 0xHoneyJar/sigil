@@ -34,8 +34,9 @@
           "local_id": 3,
           "global_id": 3,
           "name": "Self-Validation",
-          "status": "planned",
-          "created": "2026-01-25T00:00:00Z"
+          "status": "in_progress",
+          "created": "2026-01-25T00:00:00Z",
+          "started": "2026-01-25T23:05:00Z"
         },
         {
           "local_id": 4,

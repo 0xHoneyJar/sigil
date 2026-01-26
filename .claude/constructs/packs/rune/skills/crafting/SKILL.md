@@ -192,6 +192,13 @@ See `rules/glyph/09-glyph-modes.md` for detection logic.
 - `rules/wyrd/03-wyrd-confidence.md` - Confidence calculation
 - `rules/wyrd/04-wyrd-rejection-capture.md` - Rejection handling
 
+### Self-Validation (L3)
+- `rules/glyph/11-glyph-physics-check.md` - Physics compliance
+- `rules/glyph/12-glyph-protected-check.md` - Protected capabilities
+- `rules/glyph/13-glyph-rigor-check.md` - Web3 safety (if detected)
+- `rules/glyph/14-glyph-auto-repair.md` - Auto-repair logic
+- `rules/glyph/15-glyph-validation-summary.md` - Summary display
+
 ### Logging
 - `rules/glyph/08-glyph-notes-logging.md` - NOTES.md protocol
 
@@ -200,3 +207,39 @@ See `rules/glyph/09-glyph-modes.md` for detection logic.
 Load when detailed tables needed:
 - `physics-reference` - Full physics tables with rationale
 - `patterns-reference` - Golden implementations
+
+## Self-Validation Pipeline
+
+After generating code (Phase 3), run validation in order:
+
+```
+1. Physics Compliance Check (11)
+   ├── Sync strategy matches effect
+   ├── Loading states present
+   ├── Timing >= minimum (or taste override)
+   └── Confirmation present (Financial/Destructive)
+
+2. Protected Capability Check (12)
+   ├── Cancel always visible
+   ├── Withdraw always reachable
+   ├── Touch targets >= 44px
+   └── Focus rings present
+
+3. Rigor Check (13) - if web3 detected
+   ├── BigInt safety
+   ├── Data source correctness
+   ├── Receipt guard
+   └── Stale closure prevention
+
+4. Auto-Repair (14)
+   ├── Fix touch targets (add min-h-[44px])
+   ├── Fix focus rings (add focus-visible:ring-2)
+   └── Fix BigInt checks (change to != null && > 0n)
+
+5. Summary Display (15)
+   ├── Show all results
+   ├── Block if BLOCK violations
+   └── Proceed with warnings
+```
+
+If ANY block-level violation exists, refuse to write file and show fix suggestions.
