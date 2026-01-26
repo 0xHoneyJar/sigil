@@ -54,9 +54,11 @@
           "local_id": 5,
           "global_id": 5,
           "name": "Workflow Integration",
-          "status": "in_progress",
+          "status": "complete",
           "created": "2026-01-25T00:00:00Z",
-          "started": "2026-01-26T00:00:00Z"
+          "started": "2026-01-26T00:00:00Z",
+          "completed": "2026-01-26T00:30:00Z",
+          "commit": "13b7fddf"
         },
         {
           "local_id": 6,
