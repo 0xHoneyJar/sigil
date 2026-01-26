@@ -33,6 +33,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
+    "dompurify": "^3.0.0",
     "zustand": "^4.5.0"
   },
   "peerDependencies": {
@@ -54,6 +55,7 @@
     "@thehoneyjar/sigil-diagnostics": "^0.1.0"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.0.0",
     "@thehoneyjar/sigil-anchor": "workspace:*",
     "@thehoneyjar/sigil-fork": "workspace:*",
     "@thehoneyjar/sigil-simulation": "workspace:*",
