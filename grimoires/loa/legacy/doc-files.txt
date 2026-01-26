@@ -1,5 +1,0 @@
-./LICENSE.md
-./.beads/README.md
-./README.md
-./AGENTS.md
-./CLAUDE.md
