@@ -70,12 +70,12 @@ What this installs:
     wyrd/     (11 files) — Learning: feedback loop
 
   .claude/skills/
-    crafting/           — /glyph command
-    observing/          — /sigil command
-    enforcing/          — /rigor command
-    fating/             — /wyrd command
+    glyph/              — /glyph command (craft)
+    sigil/              — /sigil command (taste)
+    rigor/              — /rigor command (correctness)
+    wyrd/               — /wyrd command (learning)
+    lore/               — /lore command (knowledge)
     validating/         — /validate command
-    enhancing/          — /enhance command
     physics-reference/  — Reference skill
     patterns-reference/ — Reference skill
 
@@ -150,8 +150,18 @@ cleanup_deprecated() {
     fi
   done
 
+  # Remove old skill directories (renamed to construct names)
+  local deprecated_skills=(crafting observing enforcing fating enhancing enhance)
+  for skill in "${deprecated_skills[@]}"; do
+    if [[ -d ".claude/skills/${skill}" ]]; then
+      rm -rf ".claude/skills/${skill}"
+      log "  Removed deprecated: .claude/skills/${skill}/"
+      cleaned=$((cleaned + 1))
+    fi
+  done
+
   if [[ $cleaned -gt 0 ]]; then
-    log "Cleaned up $cleaned deprecated files"
+    log "Cleaned up $cleaned deprecated artifacts"
   else
     log "No deprecated artifacts found"
   fi
@@ -218,12 +228,12 @@ install_skills() {
 
   # Rune-specific skills
   local rune_skills=(
-    "crafting"
-    "observing"
-    "enforcing"
-    "fating"
+    "glyph"
+    "sigil"
+    "rigor"
+    "wyrd"
+    "lore"
     "validating"
-    "enhancing"
     "physics-reference"
     "patterns-reference"
   )
@@ -321,7 +331,7 @@ create_version_file() {
   if [[ "$MINIMAL" == "true" ]]; then
     skills_json='[]'
   else
-    skills_json='["crafting", "observing", "enforcing", "fating", "validating", "enhancing", "physics-reference", "patterns-reference"]'
+    skills_json='["glyph", "sigil", "rigor", "wyrd", "lore", "validating", "physics-reference", "patterns-reference"]'
   fi
 
   cat > "$VERSION_FILE" << EOF
@@ -414,7 +424,7 @@ main() {
   info "  /sigil \"insight\"       — Record taste preference"
   info "  /rigor file.tsx        — Validate web3 safety"
   info "  /wyrd                  — Check learning state"
-  info "  /enhance               — Slot external knowledge"
+  info "  /lore                  — Slot external knowledge"
   echo ""
 
   info "Effect detection:"

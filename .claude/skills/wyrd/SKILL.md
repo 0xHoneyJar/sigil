@@ -1,6 +1,6 @@
 ---
-name: fating
-description: Hypothesis validation, confidence calibration, and rejection learning
+name: wyrd
+description: Hypothesis validation and closed-loop learning
 user-invocable: true
 disable-model-invocation: true
 allowed-tools:
@@ -9,9 +9,9 @@ allowed-tools:
   - Glob
 ---
 
-# Fating
+# Wyrd
 
-The Wyrd construct: hypothesis validation, confidence calibration, and rejection learning.
+Hypothesis validation and closed-loop learning.
 
 > "What will be is what survives the test."
 

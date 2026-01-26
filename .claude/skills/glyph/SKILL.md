@@ -1,6 +1,6 @@
 ---
-name: crafting
-description: Generate or validate UI with design physics (Wyrd-integrated)
+name: glyph
+description: Generate or validate UI with design physics
 user-invocable: true
 disable-model-invocation: true
 allowed-tools:
@@ -9,9 +9,9 @@ allowed-tools:
   - Glob
 ---
 
-# Crafting
+# Glyph
 
-Generate UI components with correct design physics, with Wyrd closed-loop integration.
+Generate UI components with correct design physics.
 
 ## Usage
 

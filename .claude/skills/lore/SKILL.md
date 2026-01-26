@@ -1,5 +1,5 @@
 ---
-name: enhancing
+name: lore
 description: Slot external knowledge into Rune constructs
 user-invocable: true
 disable-model-invocation: true
@@ -10,7 +10,7 @@ allowed-tools:
   - Bash
 ---
 
-# Enhancing
+# Lore
 
 Slot external knowledge into Rune constructs.
 
@@ -18,15 +18,15 @@ Slot external knowledge into Rune constructs.
 
 ```bash
 # Interactive mode
-/enhance
+/lore
 
 # With source
-/enhance --source "curl -s https://animations.dev/... | bash"
-/enhance --source ./local-patterns/
-/enhance --url https://example.com/guide.md
+/lore --source "curl -s https://animations.dev/... | bash"
+/lore --source ./local-patterns/
+/lore --url https://example.com/guide.md
 
 # Specify target construct
-/enhance --construct glyph
+/lore --construct glyph
 ```
 
 ## Purpose
@@ -144,7 +144,7 @@ When source releases updates:
 
 ```bash
 # Re-fetch
-/enhance --source "curl -s https://..." --update
+/lore --source "curl -s https://..." --update
 
 # Or manually
 rm -rf .claude/references/{source}

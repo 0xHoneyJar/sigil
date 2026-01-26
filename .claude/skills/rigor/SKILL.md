@@ -1,5 +1,5 @@
 ---
-name: enforcing
+name: rigor
 description: Validate data correctness in web3 components
 user-invocable: true
 disable-model-invocation: true
@@ -8,9 +8,9 @@ allowed-tools:
   - Glob
 ---
 
-# Enforcing
+# Rigor
 
-The Rigor construct: data correctness validation for web3 components.
+Validate data correctness in web3 components.
 
 ## Usage
 

@@ -1,4 +1,4 @@
-name: enforcing
+name: rigor
 description: Validate data correctness in web3 components
 user-invocable: true
 disable-model-invocation: true

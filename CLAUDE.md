@@ -22,7 +22,7 @@ Captures human insights. Learns preferences from usage.
 **Key files**:
 - `rules/sigil/00-sigil-core.md` — Philosophy
 - `rules/sigil/01-sigil-taste.md` — How taste is read and applied
-- `skills/observing/SKILL.md` — Task skill for capturing insights
+- `skills/sigil/SKILL.md` — Skill for capturing insights
 
 **Output**: `grimoires/sigil/taste.md` (append-only, human-readable)
 
@@ -118,16 +118,16 @@ Closed-loop feedback system. Hypothesize → Generate → Validate → Learn.
 
 **DON'T**: Describe what you would build. Ask "would you like me to generate this?"
 
-## Enhancement Flow
+## Lore (Knowledge)
 
-Slot external knowledge into constructs using `/enhance`:
+Slot external knowledge into constructs using `/lore`:
 
 ```bash
 # Install external skill (e.g., animations.dev)
 curl -s "https://animations.dev/api/..." | bash
 
 # Slot into Rune
-/enhance --source ~/.claude/skills/emil-design-engineering --construct glyph
+/lore --source ~/.claude/skills/emil-design-engineering --construct glyph
 ```
 
 **References** live in `.claude/references/`:
@@ -143,7 +143,7 @@ See `references/design-engineering/animations.md` for easing selection...
 ```
 
 **Two learning flows**:
-- `/enhance` — Import curated external knowledge
+- `/lore` — Import curated external knowledge
 - `continuous-learning` — Capture organic debugging discoveries
 
 ## Intelligent Subagents
@@ -296,12 +296,12 @@ Global sprint numbering across multiple development cycles:
 │   ├── rigor/          # Correctness rules (3 files)
 │   └── wyrd/           # Learning rules (11 files)
 ├── skills/
-│   ├── observing/      # /sigil command
-│   ├── crafting/       # /glyph command
-│   ├── enforcing/      # /rigor command
-│   ├── fating/         # /wyrd command
+│   ├── glyph/          # /glyph — Craft (HOW)
+│   ├── sigil/          # /sigil — Taste (WHY)
+│   ├── rigor/          # /rigor — Correctness (WHAT)
+│   ├── wyrd/           # /wyrd — Learning (FEEDBACK)
+│   ├── lore/           # /lore — Knowledge (LORE)
 │   ├── validating/     # /validate command
-│   ├── enhancing/      # /enhance command
 │   ├── physics-reference/
 │   └── patterns-reference/
 ├── references/         # External knowledge sources

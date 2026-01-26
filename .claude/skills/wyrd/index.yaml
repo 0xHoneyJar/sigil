@@ -1,4 +1,4 @@
-name: fating
+name: wyrd
 description: Hypothesis validation and closed-loop learning
 user-invocable: true
 disable-model-invocation: true

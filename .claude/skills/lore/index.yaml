@@ -1,4 +1,4 @@
-name: enhancing
+name: lore
 description: Slot external knowledge into Rune constructs
 user-invocable: true
 disable-model-invocation: true
@@ -11,11 +11,11 @@ allowed-tools:
 
 triggers:
   commands:
-    - enhance
+    - lore
   keywords:
     - reference
     - external
-    - install
+    - knowledge
     - slot
 
 zones:

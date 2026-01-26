@@ -1,5 +1,5 @@
-name: observing
-description: Capture taste observations for design preferences
+name: sigil
+description: Capture taste preferences for design physics
 user-invocable: true
 disable-model-invocation: true
 

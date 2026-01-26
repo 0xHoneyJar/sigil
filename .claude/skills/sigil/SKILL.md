@@ -1,6 +1,6 @@
 ---
-name: observing
-description: Capture taste observations for design preferences
+name: sigil
+description: Capture taste preferences for design physics
 user-invocable: true
 disable-model-invocation: true
 allowed-tools:
@@ -8,9 +8,9 @@ allowed-tools:
   - Write
 ---
 
-# Observing
+# Sigil
 
-The Sigil construct: taste capture and preference learning.
+Capture taste preferences for design physics.
 
 ## Usage
 
