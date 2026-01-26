@@ -34,9 +34,11 @@
           "local_id": 3,
           "global_id": 3,
           "name": "Self-Validation",
-          "status": "in_progress",
+          "status": "complete",
           "created": "2026-01-25T00:00:00Z",
-          "started": "2026-01-25T23:05:00Z"
+          "started": "2026-01-25T23:05:00Z",
+          "completed": "2026-01-25T23:30:00Z",
+          "commit": "bb6c1a45"
         },
         {
           "local_id": 4,
