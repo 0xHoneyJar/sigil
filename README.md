@@ -6,11 +6,11 @@ Constructs for AI-assisted craftsmanship. Activate what the task demands.
 
 |  | Construct | Activate | Effect | Status |
 |:--:|:--|:--|:--|:--:|
-| ✦ | **Sigil** | `/sigil` | Captures taste — why users prefer what they prefer | ✓ |
-| ◆ | **Glyph** | `/glyph` | Design physics — correct timing, sync, confirmation | ✓ |
-| ◉ | **Rigor** | `/rigor` | Data correctness — catches bugs that lose money | ✓ |
-| ◇ | *Voice* | `/voice` | UI copy — text that matches product tone | · |
-| ❖ | *Ward* | `/ward` | Security — patterns that prevent vulnerabilities | · |
+| ᛝ | **Sigil** | `/sigil` | Captures taste — why users prefer what they prefer | ✓ |
+| ⚒ | **Glyph** | `/glyph` | Design physics — correct timing, sync, confirmation | ✓ |
+| ⚖ | **Rigor** | `/rigor` | Data correctness — catches bugs that lose money | ✓ |
+| ᚢ | *Voice* | `/voice` | UI copy — text that matches product tone | · |
+| ⛨ | *Ward* | `/ward` | Security — patterns that prevent vulnerabilities | · |
 
 ---
 
