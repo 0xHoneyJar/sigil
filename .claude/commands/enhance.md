@@ -109,6 +109,8 @@ curl -s "https://animations.dev/api/activate-design-engineering?email=..." | bas
 | Reference | Construct | Source | Version |
 |-----------|-----------|--------|---------|
 | `design-engineering/` | Glyph | animations.dev | 2026-01 |
+| `ui-skills/` | Glyph | github.com/ibelick/ui-skills | 2026-01 |
+| `rams/` | Glyph/Rigor | rams.ai | 2026-01 |
 
 ---
 

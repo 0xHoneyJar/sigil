@@ -50,3 +50,15 @@ If user requests violating a protected capability:
 1. Explain the risk clearly
 2. Ask for explicit confirmation
 3. If confirmed, document the override in code comment
+
+## External Reference
+
+See `references/ui-skills/fixing-accessibility.md` for expanded a11y guidance:
+- Screen reader compatibility checks
+- Keyboard navigation patterns
+- ARIA attribute requirements
+- Focus management
+
+See `references/rams/SKILL.md` for automated review:
+- WCAG 2.1 critical/serious/moderate checks
+- Output format with line numbers and fixes

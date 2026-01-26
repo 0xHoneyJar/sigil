@@ -207,3 +207,21 @@ See `references/design-engineering/` for expanded guidance:
 - Virtualization: Use for 100+ items
 - Preloading: `rel="preload"`, `fetchPriority`
 - Layout prevention: No CLS from dynamic content
+
+See `references/ui-skills/` for enforcement:
+
+**Baseline UI** (`baseline-ui.md`):
+- Stack: Tailwind defaults, motion/react, cn utility
+- Components: Base UI, React Aria, Radix primitives
+- Animation: Only when requested, only compositor props
+- Interaction: AlertDialog for destructive, h-dvh not h-screen
+
+**Fixing Motion Performance** (`fixing-motion-performance.md`):
+- GPU acceleration: transform, opacity only
+- Will-change: Sparingly, remove after animation
+- Layout thrashing prevention
+
+See `references/rams/SKILL.md` for design review:
+- WCAG 2.1 accessibility checks
+- Visual design consistency
+- Component state coverage

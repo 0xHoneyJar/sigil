@@ -6,25 +6,28 @@ External knowledge sources slotted into Rune constructs.
 
 ```
 references/
-├── design-engineering/    # Emil Kowalski's animations.dev course
-│   ├── SKILL.md          # Overview and quick reference
-│   ├── animations.md     # Easing, timing, springs
-│   ├── component-design.md
-│   ├── forms-controls.md
-│   ├── marketing.md
-│   ├── performance.md
-│   ├── touch-accessibility.md
-│   └── ui-polish.md
-└── {future-sources}/     # Additional knowledge sources
+├── design-engineering/    # Emil Kowalski's animations.dev
+├── ui-skills/             # ibelick/ui-skills collection
+├── rams/                  # Rams design review checks
+└── {future-sources}/
 ```
+
+## Installed References
+
+| Reference | Construct | Source | Content |
+|-----------|-----------|--------|---------|
+| `design-engineering/` | **Glyph** | animations.dev | Animation, UI polish, forms, accessibility |
+| `ui-skills/` | **Glyph** | github.com/ibelick/ui-skills | UI baseline, motion perf, a11y, metadata |
+| `rams/` | **Glyph/Rigor** | rams.ai | A11y review, visual design checks |
 
 ## Mapping to Constructs
 
-| Reference | Construct | Enhances |
-|-----------|-----------|----------|
-| `design-engineering/` | **Glyph** | Animation, material, practices |
-| `web3-security/` | **Rigor** | Security patterns (future) |
-| `user-research/` | **Sigil** | Taste capture (future) |
+| If content is about... | Maps to |
+|------------------------|---------|
+| Animation, UI, components, forms | **Glyph** |
+| Security, data correctness | **Rigor** |
+| User preferences, taste | **Sigil** |
+| Learning, confidence | **Wyrd** |
 
 ## Adding References
 
@@ -32,18 +35,18 @@ Use `/enhance` to add new knowledge sources:
 
 ```bash
 # From curl installer
-/enhance --source "curl -s https://example.com/skill | bash" --construct glyph
+curl -fsSL https://rams.ai/install | bash
 
-# From local directory
-/enhance --source ./my-patterns/ --construct rigor
+# From npx
+npx skills add ibelick/ui-skills
 
-# From URL
-/enhance --url https://example.com/patterns.md --construct sigil
+# Manual fetch
+curl -sL https://example.com/skill.md -o .claude/references/{source}/SKILL.md
 ```
 
 ## How Rules Reference Knowledge
 
-Rules in `.claude/rules/{construct}/` can reference this knowledge:
+Rules in `.claude/rules/{construct}/` reference this knowledge:
 
 ```markdown
 # In rules/glyph/05-glyph-animation.md
@@ -51,7 +54,10 @@ Rules in `.claude/rules/{construct}/` can reference this knowledge:
 See `references/design-engineering/animations.md` for:
 - Easing curve selection
 - Spring physics parameters
-- Performance optimization
+
+See `references/ui-skills/baseline-ui.md` for:
+- Stack requirements (Tailwind, motion/react)
+- Component primitives (Base UI, Radix)
 ```
 
 ## Quality Standards
