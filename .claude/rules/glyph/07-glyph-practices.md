@@ -180,3 +180,30 @@ const { data } = useSWR('/api/users', fetcher)
   <XIcon />
 </button>
 ```
+
+## External References
+
+See `references/design-engineering/` for expanded guidance:
+
+**Forms & Controls** (`forms-controls.md`):
+- Input sizing: 16px+ to prevent iOS zoom
+- Form submission: Enter for single-line, Cmd+Enter for multi-line
+- Button states: Loading spinners, disabled styling
+- Validation: Inline errors, not alerts
+
+**Touch & Accessibility** (`touch-accessibility.md`):
+- Touch-first design: `@media (hover: hover)` for hover effects
+- Keyboard nav: `scrollIntoView()` on focus
+- iOS Safari: Tap highlight, safe areas, 100vh issues
+- Reduced motion: Always implement `prefers-reduced-motion`
+
+**Component Design** (`component-design.md`):
+- Compound components: Context-based composition
+- Props API: Balanced customization vs simplicity
+- Render props vs children: When to use each
+- Controlled vs uncontrolled: Default to uncontrolled
+
+**Performance** (`performance.md`):
+- Virtualization: Use for 100+ items
+- Preloading: `rel="preload"`, `fetchPriority`
+- Layout prevention: No CLS from dynamic content

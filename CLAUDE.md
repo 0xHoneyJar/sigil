@@ -118,6 +118,34 @@ Closed-loop feedback system. Hypothesize → Generate → Validate → Learn.
 
 **DON'T**: Describe what you would build. Ask "would you like me to generate this?"
 
+## Enhancement Flow
+
+Slot external knowledge into constructs using `/enhance`:
+
+```bash
+# Install external skill (e.g., animations.dev)
+curl -s "https://animations.dev/api/..." | bash
+
+# Slot into Rune
+/enhance --source ~/.claude/skills/emil-design-engineering --construct glyph
+```
+
+**References** live in `.claude/references/`:
+
+| Reference | Construct | Content |
+|-----------|-----------|---------|
+| `design-engineering/` | Glyph | Animations, UI polish, forms, accessibility |
+
+Rules reference this knowledge:
+```markdown
+# In rules/glyph/05-glyph-animation.md
+See `references/design-engineering/animations.md` for easing selection...
+```
+
+**Two learning flows**:
+- `/enhance` — Import curated external knowledge
+- `continuous-learning` — Capture organic debugging discoveries
+
 ## Intelligent Subagents
 
 | Subagent | Purpose | Verdict Levels |
@@ -275,6 +303,8 @@ Global sprint numbering across multiple development cycles:
 │   ├── validating/     # /validate task skill
 │   ├── physics-reference/
 │   └── patterns-reference/
+├── references/         # External knowledge sources
+│   └── design-engineering/  # Emil's animations.dev
 ├── hooks/
 │   ├── sprint-plan-hook.md
 │   ├── implement-hook.md
@@ -283,7 +313,8 @@ Global sprint numbering across multiple development cycles:
 └── commands/
     ├── sigil.md
     ├── glyph.md
-    └── rigor.md
+    ├── rigor.md
+    └── enhance.md      # Slot external knowledge
 
 grimoires/
 ├── loa/                # Loa state (ledger, notes)

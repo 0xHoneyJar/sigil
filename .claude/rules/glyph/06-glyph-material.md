@@ -61,3 +61,14 @@ Border-radius: 16px max (pill = 9999px for pills only)
 | Success | Green |
 | Error | Red |
 | Disabled | Gray 50% |
+
+## External Reference
+
+See `references/design-engineering/ui-polish.md` for expanded guidance:
+
+- **Typography**: `-webkit-font-smoothing`, `font-variant-numeric: tabular-nums`
+- **Shadows**: Subtle with slight y-offset, avoid pure black
+- **Gradients**: Noise overlay for banding prevention
+- **Scrollbars**: Only customize in small containers, not page-level
+- **z-index**: Fixed scale (1, 10, 100, 1000) or `isolation: isolate`
+- **Dark mode**: `color-scheme: dark`, prefers-color-scheme detection

@@ -64,3 +64,14 @@ const transition = prefersReduced ? { duration: 0 } : { duration: 0.3 }
 | Animating padding | Layout jank | Use transform |
 | Animation on keyboard nav | Disconnected | Use 0ms |
 | Bounce everywhere | Unprofessional | Reserve for drag releases |
+| `transition: all` | Performance hit | Specify exact properties |
+
+## External Reference
+
+See `references/design-engineering/animations.md` for expanded guidance:
+
+- **Decision flowchart**: Should I animate this? (100+ daily views → skip)
+- **Easing selection**: Enter/exit → ease-out, moving → ease-in-out
+- **Spring physics**: stiffness 100-500, damping 10-40
+- **Performance**: Only transform + opacity, use `will-change` sparingly
+- **Reduced motion**: Always implement `prefers-reduced-motion`
