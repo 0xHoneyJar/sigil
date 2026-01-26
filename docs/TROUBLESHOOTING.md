@@ -146,10 +146,10 @@ chmod +x ~/.sigil/bin/lens
 **Solution:**
 ```bash
 # Check available releases
-curl -s https://api.github.com/repos/0xHoneyJar/sigil/releases | grep tag_name
+curl -s https://api.github.com/repos/0xHoneyJar/rune/releases | grep tag_name
 
 # Manually download from GitHub
-# Visit: https://github.com/0xHoneyJar/sigil/releases
+# Visit: https://github.com/0xHoneyJar/rune/releases
 
 # Specify a different version
 SIGIL_CLI_VERSION=1.0.0 ./scripts/install-cli.sh
@@ -180,7 +180,7 @@ SIGIL_CLI_VERSION=1.0.0 ./scripts/install-cli.sh
    SIGIL_VERIFY=false ./scripts/install-cli.sh
    ```
 
-3. If persistent, report to [issues](https://github.com/0xHoneyJar/sigil/issues)
+3. If persistent, report to [issues](https://github.com/0xHoneyJar/rune/issues)
 
 ---
 
@@ -402,7 +402,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 If your issue isn't listed here:
 
-1. **Check existing issues:** [github.com/0xHoneyJar/sigil/issues](https://github.com/0xHoneyJar/sigil/issues)
+1. **Check existing issues:** [github.com/0xHoneyJar/rune/issues](https://github.com/0xHoneyJar/rune/issues)
 2. **Run diagnostics:**
    ```bash
    ./scripts/preflight-sigil.sh --json

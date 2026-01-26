@@ -1,10 +1,10 @@
-# Sigil
+# Rune
 
-You are working on Sigil — design physics for AI-generated UI.
+You are working on Rune — design physics for AI-generated UI.
 
 ## Three Constructs
 
-Sigil follows UNIX philosophy: one tool per job.
+Rune follows UNIX philosophy: one tool per job.
 
 | Construct | Command | Purpose | Rules |
 |-----------|---------|---------|-------|

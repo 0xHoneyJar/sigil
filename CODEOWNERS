@@ -2,19 +2,19 @@
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # Default owners for everything
-* @0xHoneyJar/sigil-maintainers
+* @0xHoneyJar/rune-maintainers
 
 # Physics rules require physics expertise
-.claude/rules/ @0xHoneyJar/sigil-physics
+.claude/rules/ @0xHoneyJar/rune-physics
 
 # Commands
-.claude/commands/ @0xHoneyJar/sigil-maintainers
+.claude/commands/ @0xHoneyJar/rune-maintainers
 
 # Constitution changes need review
-grimoires/sigil/constitution.yaml @0xHoneyJar/sigil-maintainers
+grimoires/sigil/constitution.yaml @0xHoneyJar/rune-maintainers
 
 # Skills
-.claude/skills/ @0xHoneyJar/sigil-maintainers
+.claude/skills/ @0xHoneyJar/rune-maintainers
 
 # Protocols
-.claude/protocols/ @0xHoneyJar/sigil-maintainers
+.claude/protocols/ @0xHoneyJar/rune-maintainers

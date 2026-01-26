@@ -44,7 +44,7 @@ SKIP_CLI=false
 SKIP_NPM=false
 FORCE=false
 VERSION="latest"
-SIGIL_REPO="https://github.com/0xHoneyJar/sigil"
+SIGIL_REPO="https://github.com/0xHoneyJar/rune"
 
 # Colors
 RED='\033[0;31m'
@@ -221,7 +221,7 @@ install_construct_git() {
             fi
         else
             # Fallback: fetch from remote
-            resolved_version=$(curl -fsSL "https://raw.githubusercontent.com/0xHoneyJar/sigil/main/VERSION.json" 2>/dev/null | grep -o '"sigil"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"\([^"]*\)"$/\1/' || echo "0.0.0")
+            resolved_version=$(curl -fsSL "https://raw.githubusercontent.com/0xHoneyJar/rune/main/VERSION.json" 2>/dev/null | grep -o '"sigil"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*"\([^"]*\)"$/\1/' || echo "0.0.0")
         fi
     fi
 
@@ -264,7 +264,7 @@ install_cli() {
         SIGIL_CLI_VERSION="$VERSION" SIGIL_SKIP_PATH=true "$SCRIPT_DIR/install-cli.sh"
     else
         info "Downloading CLI installer..."
-        curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/scripts/install-cli.sh \
+        curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/rune/main/scripts/install-cli.sh \
             | SIGIL_CLI_VERSION="$VERSION" SIGIL_SKIP_PATH=true bash
     fi
 

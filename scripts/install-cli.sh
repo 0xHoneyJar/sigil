@@ -5,7 +5,7 @@
 # Downloads and installs anchor and lens CLIs from GitHub releases.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/scripts/install-cli.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/rune/main/scripts/install-cli.sh | bash
 #
 # Environment Variables:
 #   SIGIL_CLI_VERSION  - Version to install (default: latest)
@@ -24,7 +24,7 @@
 set -euo pipefail
 
 # Configuration
-REPO="0xHoneyJar/sigil"
+REPO="0xHoneyJar/rune"
 INSTALL_DIR="${SIGIL_INSTALL_DIR:-$HOME/.sigil/bin}"
 VERSION="${SIGIL_CLI_VERSION:-latest}"
 SKIP_PATH="${SIGIL_SKIP_PATH:-false}"

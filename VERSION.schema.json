@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/0xHoneyJar/sigil/VERSION.schema.json",
+  "$id": "https://github.com/0xHoneyJar/rune/VERSION.schema.json",
   "title": "Sigil Version Manifest",
   "description": "Version coordination for the Sigil ecosystem",
   "type": "object",

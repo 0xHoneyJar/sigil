@@ -52,7 +52,7 @@ Copy the appropriate template when creating a GitHub release.
 
 ## 📚 Documentation
 
-- [Full Changelog](https://github.com/0xHoneyJar/sigil/blob/main/CHANGELOG.md#version-anchor)
+- [Full Changelog](https://github.com/0xHoneyJar/rune/blob/main/CHANGELOG.md#version-anchor)
 - [Migration Guide](link)
 ```
 
@@ -87,7 +87,7 @@ Copy the appropriate template when creating a GitHub release.
 
 ### 📚 Full Changelog
 
-[CHANGELOG.md#version](https://github.com/0xHoneyJar/sigil/blob/main/CHANGELOG.md#version-anchor)
+[CHANGELOG.md#version](https://github.com/0xHoneyJar/rune/blob/main/CHANGELOG.md#version-anchor)
 ```
 
 ---
@@ -108,7 +108,7 @@ Copy the appropriate template when creating a GitHub release.
 
 ### Full Changelog
 
-[CHANGELOG.md#version](https://github.com/0xHoneyJar/sigil/blob/main/CHANGELOG.md#version-anchor)
+[CHANGELOG.md#version](https://github.com/0xHoneyJar/rune/blob/main/CHANGELOG.md#version-anchor)
 ```
 
 ---

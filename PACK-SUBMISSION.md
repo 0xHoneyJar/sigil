@@ -8,7 +8,7 @@
 | **Version** | 4.0.0 |
 | **Author** | THJ Team |
 | **License** | MIT |
-| **Repository** | https://github.com/0xHoneyJar/sigil |
+| **Repository** | https://github.com/0xHoneyJar/rune |
 | **Homepage** | https://sigil.design |
 
 ## Description
@@ -174,12 +174,12 @@ loa install sigil
 
 Or via curl installer:
 ```bash
-curl -fsSL https://cdn.jsdelivr.net/gh/0xHoneyJar/sigil@v4.0.0/scripts/mount-sigil.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/0xHoneyJar/rune@v4.0.0/scripts/mount-sigil.sh | bash
 ```
 
 Or manually:
 ```bash
-git clone https://github.com/0xHoneyJar/sigil.git
+git clone https://github.com/0xHoneyJar/rune.git
 cd sigil && ./scripts/mount-sigil.sh
 ```
 
@@ -227,5 +227,5 @@ Sigil includes additional components distributed separately:
 
 ## Contact
 
-- Issues: https://github.com/0xHoneyJar/sigil/issues
-- Discussions: https://github.com/0xHoneyJar/sigil/discussions
+- Issues: https://github.com/0xHoneyJar/rune/issues
+- Discussions: https://github.com/0xHoneyJar/rune/discussions

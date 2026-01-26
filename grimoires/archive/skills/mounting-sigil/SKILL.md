@@ -129,7 +129,7 @@ fi
 ### Step 1: Configure Upstream Remote (Git Fallback)
 
 ```bash
-SIGIL_REMOTE_URL="${SIGIL_UPSTREAM:-https://github.com/0xHoneyJar/sigil.git}"
+SIGIL_REMOTE_URL="${SIGIL_UPSTREAM:-https://github.com/0xHoneyJar/rune.git}"
 SIGIL_REMOTE_NAME="sigil-upstream"
 SIGIL_BRANCH="${SIGIL_BRANCH:-main}"
 

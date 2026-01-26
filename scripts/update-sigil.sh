@@ -36,7 +36,7 @@ FORCE=false
 UPDATE_CONSTRUCT=true
 UPDATE_CLI=true
 UPDATE_NPM=true
-SIGIL_REPO="0xHoneyJar/sigil"
+SIGIL_REPO="0xHoneyJar/rune"
 VERSION_URL="https://raw.githubusercontent.com/$SIGIL_REPO/main/VERSION.json"
 
 # Colors

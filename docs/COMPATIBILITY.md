@@ -262,4 +262,4 @@ If you encounter compatibility issues:
    - Node version (`node --version`)
    - Package manager and version
 
-3. **Open issue:** [github.com/0xHoneyJar/sigil/issues](https://github.com/0xHoneyJar/sigil/issues)
+3. **Open issue:** [github.com/0xHoneyJar/rune/issues](https://github.com/0xHoneyJar/rune/issues)

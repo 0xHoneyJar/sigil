@@ -375,7 +375,7 @@ purpose:
     have asked "walk me through what happened" first.
   evidence:
     - type: issue
-      ref: https://github.com/0xHoneyJar/sigil/issues/50
+      ref: https://github.com/0xHoneyJar/rune/issues/50
     - type: observation
       ref: grimoires/sigil/observations/2026-01-22-diagnostic-fail.md
       count: 3

@@ -22,7 +22,7 @@ step() { echo -e "${BLUE}[sigil]${NC} -> $*"; }
 
 # === Configuration ===
 SIGIL_HOME="${SIGIL_HOME:-$HOME/.sigil/sigil}"
-SIGIL_REPO="${SIGIL_REPO:-https://github.com/0xHoneyJar/sigil.git}"
+SIGIL_REPO="${SIGIL_REPO:-https://github.com/0xHoneyJar/rune.git}"
 SIGIL_BRANCH="${SIGIL_BRANCH:-main}"
 VERSION_FILE=".sigil-version.json"
 SIGIL_VERSION="13.0.0"
@@ -73,7 +73,7 @@ while [[ $# -gt 0 ]]; do
       echo "  5. NEVER touches existing CLAUDE.md in your repo"
       echo ""
       echo "Examples:"
-      echo "  curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/sigil/main/.claude/scripts/mount-sigil.sh | bash"
+      echo "  curl -fsSL https://raw.githubusercontent.com/0xHoneyJar/rune/main/.claude/scripts/mount-sigil.sh | bash"
       echo "  curl ... | bash -s -- -y         # Auto-confirm updates"
       echo "  curl ... | bash -s -- --git      # Force git installation"
       echo ""

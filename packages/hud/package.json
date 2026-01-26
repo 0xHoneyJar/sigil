@@ -73,12 +73,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/0xHoneyJar/sigil.git",
+    "url": "https://github.com/0xHoneyJar/rune.git",
     "directory": "packages/hud"
   },
-  "homepage": "https://github.com/0xHoneyJar/sigil/tree/main/packages/hud#readme",
+  "homepage": "https://github.com/0xHoneyJar/rune/tree/main/packages/hud#readme",
   "bugs": {
-    "url": "https://github.com/0xHoneyJar/sigil/issues"
+    "url": "https://github.com/0xHoneyJar/rune/issues"
   },
   "keywords": [
     "sigil",
