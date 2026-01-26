@@ -30,14 +30,15 @@ curl ... | bash -s -- --minimal
 | Navigation | Immediate | 150ms | None |
 | Local State | Immediate | 100ms | None |
 
-## Four Constructs
+## Five Constructs
 
 | Construct | Command | Purpose |
 |-----------|---------|---------|
-| ᛊ **Sigil** | `/sigil` | Taste (WHY) — Capture human preferences |
 | ᚷ **Glyph** | `/glyph` | Craft (HOW) — Generate with correct physics |
+| ᛊ **Sigil** | `/sigil` | Taste (WHY) — Capture human preferences |
 | ᚱ **Rigor** | `/rigor` | Correctness (WHAT) — Validate web3 safety |
-| ᚹ **Wyrd** | `/wyrd` | Fate (VALIDATION) — Confidence calibration |
+| ᚹ **Wyrd** | `/wyrd` | Learning (FEEDBACK) — Confidence calibration |
+| ᛚ **Lore** | `/lore` | Knowledge (EXTERNAL) — Slot external knowledge |
 
 ## Usage
 
@@ -84,6 +85,14 @@ Checks for BigInt safety, data source correctness, receipt guards.
 
 Shows confidence calibration and learning metrics.
 
+### Slot External Knowledge
+
+```
+/lore --source ~/.claude/skills/design-engineering --construct glyph
+```
+
+Imports curated external knowledge into Rune constructs.
+
 ## What Gets Installed
 
 ```
@@ -94,10 +103,11 @@ Shows confidence calibration and learning metrics.
 │   ├── rigor/    (3 files)  — Correctness rules
 │   └── wyrd/     (11 files) — Learning rules
 ├── skills/
-│   ├── crafting/           — /glyph
-│   ├── observing/          — /sigil
-│   ├── enforcing/          — /rigor
-│   ├── fating/             — /wyrd
+│   ├── glyph/              — /glyph
+│   ├── sigil/              — /sigil
+│   ├── rigor/              — /rigor
+│   ├── wyrd/               — /wyrd
+│   ├── lore/               — /lore
 │   └── validating/         — /validate
 └── hooks/                  — Workflow integration
 
