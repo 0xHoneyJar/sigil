@@ -2,7 +2,7 @@
 
 You are working on Rune — design physics for AI-generated UI.
 
-## Three Constructs
+## Four Constructs
 
 Rune follows UNIX philosophy: one tool per job.
 
@@ -11,6 +11,7 @@ Rune follows UNIX philosophy: one tool per job.
 | **Sigil** | `/sigil` | Taste (WHY) | `rules/sigil/` |
 | **Glyph** | `/glyph` | Craft (HOW) | `rules/glyph/` |
 | **Rigor** | `/rigor` | Correctness (WHAT) | `rules/rigor/` |
+| **Wyrd** | `/wyrd` | Learning (FEEDBACK) | `rules/wyrd/` |
 
 ## Sigil (Taste)
 
@@ -67,6 +68,27 @@ Validates data correctness in web3 components. Catches bugs that lose money.
 - BigInt: `0n` is falsy — use `amount != null && amount > 0n`
 - Receipt guard: Check hash changed before processing
 - Data source: Transaction amounts MUST come from on-chain
+
+## Wyrd (Learning)
+
+Closed-loop feedback system. Hypothesize → Generate → Validate → Learn.
+
+**When to use**: Automatically integrated into `/glyph`. Captures rejections and learns patterns.
+
+**Key files**:
+- `rules/wyrd/00-wyrd-core.md` — Philosophy, closed-loop workflow
+- `rules/wyrd/01-wyrd-hypothesis.md` — Hypothesis generation with confidence
+- `rules/wyrd/03-wyrd-confidence.md` — Confidence calculation from taste
+- `rules/wyrd/07-wyrd-pattern-detection.md` — 3+ rejections = pattern
+
+**State**: `grimoires/rune/wyrd.md` (rejection log, patterns, confidence)
+
+**Learning loop**:
+1. Hypothesis with confidence score
+2. User accepts/rejects
+3. Rejection captured with reason
+4. 3+ similar rejections → pattern detected
+5. Pattern promoted to taste.md
 
 ## Philosophy
 
@@ -241,23 +263,33 @@ Global sprint numbering across multiple development cycles:
 ```
 .claude/
 ├── rules/
-│   ├── sigil/          # Taste rules (2 files)
-│   ├── glyph/          # Craft rules (8 files)
-│   └── rigor/          # Correctness rules (3 files)
+│   ├── sigil/          # Taste rules (4 files)
+│   ├── glyph/          # Craft rules (21 files)
+│   ├── rigor/          # Correctness rules (3 files)
+│   └── wyrd/           # Learning rules (11 files)
 ├── skills/
 │   ├── observing/      # /sigil task skill
 │   ├── crafting/       # /glyph task skill
 │   ├── enforcing/      # /rigor task skill
-│   ├── physics-reference/   # Reference skill
-│   └── patterns-reference/  # Reference skill
+│   ├── fating/         # /wyrd task skill
+│   ├── validating/     # /validate task skill
+│   ├── physics-reference/
+│   └── patterns-reference/
+├── hooks/
+│   ├── sprint-plan-hook.md
+│   ├── implement-hook.md
+│   ├── review-sprint-hook.md
+│   └── audit-sprint-hook.md
 └── commands/
-    ├── sigil.md        # Invokes observing
-    ├── glyph.md        # Invokes crafting
-    └── rigor.md        # Invokes enforcing
+    ├── sigil.md
+    ├── glyph.md
+    └── rigor.md
 
 grimoires/
-└── sigil/
-    └── taste.md        # Accumulated preferences
+├── loa/                # Loa state (ledger, notes)
+└── rune/               # Rune state
+    ├── taste.md        # Accumulated preferences (Sigil)
+    └── wyrd.md         # Learning state (Wyrd)
 ```
 
 ## Commit Conventions

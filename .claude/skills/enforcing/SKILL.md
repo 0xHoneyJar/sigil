@@ -1,57 +1,136 @@
 ---
 name: enforcing
-description: Check data correctness in web3 components
+description: Validate data correctness in web3 components
 user-invocable: true
 disable-model-invocation: true
 allowed-tools:
   - Read
   - Glob
-  - Grep
 ---
 
 # Enforcing
 
-Validate data correctness in web3 components. Catch bugs that lose money.
+The Rigor construct: data correctness validation for web3 components.
 
 ## Usage
 
 ```
-/rigor file.tsx
-/rigor
+/rigor file.tsx          # Validate specific file
+/rigor                   # Validate current context
 ```
 
-## What It Checks
+## Philosophy
 
-1. **Data sources** — Transaction data from on-chain?
-2. **BigInt safety** — Safe comparisons? (0n is falsy)
-3. **Receipt guards** — Protected against re-execution?
-4. **Stale closures** — Callbacks capture fresh values?
+**Correctness over feel.** A beautiful button that sends the wrong amount is worse than an ugly one that's accurate.
 
-## Workflow
+**On-chain over indexed.** When money is involved, trust the blockchain, not the indexer.
 
-1. Read target file (or detect from context)
-2. Identify web3 patterns (hooks, transactions)
-3. Check against rigor rules
-4. Report violations with fixes
+## What Rigor Checks
 
-## Output Format
+### 1. BigInt Safety
 
+JavaScript BigInt has a critical footgun: `0n` is falsy.
+
+```javascript
+if (0n) console.log('true')   // Never prints!
 ```
-Rigor Check: src/components/StakePanel.tsx
 
-✗ BigInt Safety (line 45)
-  if (shares) → if (shares != null && shares > 0n)
-
-✗ Data Source (line 62)
-  Button state from indexed data
-  → Use on-chain read for canWithdraw
-
-✓ Receipt Guard (line 78)
-  Hash comparison present
-
-Summary: 2 violations, 1 pass
+**Safe Pattern**:
+```tsx
+if (amount != null && amount > 0n) { ... }
 ```
+
+**Anti-Pattern**:
+```tsx
+if (shares) { ... }  // BROKEN: 0n is valid but falsy
+```
+
+### 2. Data Sources
+
+| Use Case | Source | Why |
+|----------|--------|-----|
+| Display (read-only) | Indexed | Faster UX |
+| Transaction amounts | On-chain | Must be accurate |
+| Button enabled state | On-chain | Prevents failed tx |
+
+**Safe Pattern**:
+```tsx
+const { data: txShares } = useReadContract({...})  // On-chain
+const canWithdraw = (txShares ?? 0n) > 0n
+```
+
+**Anti-Pattern**:
+```tsx
+const canWithdraw = envioData?.hasBalance  // Stale!
+```
+
+### 3. Receipt Guards
+
+Prevent re-execution when receipt updates trigger effects.
+
+**Safe Pattern**:
+```tsx
+const lastHashRef = useRef<string>()
+
+useEffect(() => {
+  if (!receipt) return
+  if (receipt.transactionHash === lastHashRef.current) return
+  lastHashRef.current = receipt.transactionHash
+  onReceipt(receipt)
+}, [receipt, onReceipt])
+```
+
+**Anti-Pattern**:
+```tsx
+useEffect(() => {
+  if (receipt) handleSuccess(receipt)  // May trigger multiple times
+}, [receipt])
+```
+
+### 4. Stale Closures
+
+useEffect callbacks capture state at creation time.
+
+**Safe Pattern**:
+```tsx
+const amountRef = useRef(currentAmount)
+amountRef.current = currentAmount
+
+useEffect(() => {
+  if (receipt) processReceipt(amountRef.current)
+}, [receipt])
+```
+
+## Report Format
+
+```markdown
+## Rigor Validation
+
+### VaultWithdraw.tsx
+
+CRITICAL: Transaction amount from indexed data (line 45)
+  → Amount should come from useReadContract, not useEnvioQuery
+  → Fix: Replace `envioData.shares` with on-chain read
+
+HIGH: BigInt falsy check (line 67)
+  → `if (shares)` fails when shares === 0n
+  → Fix: `if (shares != null && shares > 0n)`
+
+### Summary
+- 1 file checked
+- 2 findings (1 CRITICAL, 1 HIGH)
+```
+
+## Severity Levels
+
+| Severity | Example | Action |
+|----------|---------|--------|
+| CRITICAL | Transaction from indexed data | Block |
+| HIGH | BigInt falsy check | Require fix |
+| MEDIUM | Stale closure risk | Warn |
+| LOW | Missing type annotation | Note |
 
 ## Rules Loaded
 
-- `.claude/rules/rigor/*.md`
+- `.claude/constructs/packs/rune/rules/rigor/*.md`
+- `.claude/rules/rigor/*.md` (local overrides)
